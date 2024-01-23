@@ -5,7 +5,13 @@ VisualStudioVersion = 17.8.34408.163
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Px.Utils", "Px.Utils\Px.Utils.csproj", "{D94934AF-6B41-4C66-818A-C4C33230E9DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Px.Utils.UnitTests", "Px.Utils.UnitTests\Px.Utils.UnitTests.csproj", "{AE7110F9-E4E7-4279-813A-4570A91B18AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Px.Utils.UnitTests", "Px.Utils.UnitTests\Px.Utils.UnitTests.csproj", "{AE7110F9-E4E7-4279-813A-4570A91B18AE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{DE1BECF9-A223-47DF-A777-0E7B9B7B682F}"
+	ProjectSection(SolutionItems) = preProject
+		CONTRIBUTING.md = CONTRIBUTING.md
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
