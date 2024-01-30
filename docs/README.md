@@ -9,9 +9,9 @@ We do not want to limit the user if not absolutely necessary. There are variatio
 ### High modularity
 Extending the library with a new features should be as easy as possible and every module should be useable on its own.
 
-## Featrues
+## Features
 
-### Reading px files
+### Reading the px files
 TBA
 
 ### Data models
@@ -20,5 +20,5 @@ TBA
 ### Computing
 TBA
 
-## Intalling
+## Installing
 TBA when published to NuGet
