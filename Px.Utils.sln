@@ -5,7 +5,13 @@ VisualStudioVersion = 17.8.34408.163
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Px.Utils", "Px.Utils\Px.Utils.csproj", "{D94934AF-6B41-4C66-818A-C4C33230E9DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Px.Utils.UnitTests", "Px.Utils.UnitTests\Px.Utils.UnitTests.csproj", "{AE7110F9-E4E7-4279-813A-4570A91B18AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Px.Utils.UnitTests", "Px.Utils.UnitTests\Px.Utils.UnitTests.csproj", "{AE7110F9-E4E7-4279-813A-4570A91B18AE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{42DFE3AF-7507-415A-806B-99B74519BF97}"
+	ProjectSection(SolutionItems) = preProject
+		docs\CONTRIBUTING.md = docs\CONTRIBUTING.md
+		docs\README.md = docs\README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{BC1C9772-9B8F-49A7-A8F3-09E3A94789ED}"
 EndProject
