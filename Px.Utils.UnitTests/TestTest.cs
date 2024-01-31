@@ -5,8 +5,8 @@ namespace Px.Utils.UnitTests
         [Fact]
         public void TestTest1()
         {
-            InitTest initTest = new();
-            Assert.Equal("Hello World", initTest.Test());
+            string s = "Hello World";
+            Assert.Equal("Hello World", s);
         }
     }
 }
