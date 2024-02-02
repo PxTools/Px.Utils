@@ -1,13 +1,12 @@
 ﻿
-namespace PxUtils.PxFile
+using System.Text;
+
+namespace PxUtils.PxFile.Meta
 {
     public class PxFileMetadataReader : IPxFileMetadataReader
     {
-        private readonly IPxFileStream _pxFileStream;
-
-        public PxFileMetadataReader(IPxFileStream pxFileStream)
+        public PxFileMetadataReader(IPxFileStream pxFileStream, PxFileMetaReaderConfig config)
         {
-            _pxFileStream = pxFileStream;
         }
 
         public IEnumerable<KeyValuePair<string, string>> ReadMetadata()

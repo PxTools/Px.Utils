@@ -1,4 +1,4 @@
-﻿namespace PxUtils.PxFile
+﻿namespace PxUtils.PxFile.Meta
 {
     internal interface IPxFileMetadataReader
     {
