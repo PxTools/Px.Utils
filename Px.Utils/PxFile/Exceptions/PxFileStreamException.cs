@@ -7,6 +7,5 @@
         public PxFileStreamException(string message) : base(message) { }
 
         public PxFileStreamException(string message, Exception innerException) : base(message, innerException) { }
-
     }
 }
