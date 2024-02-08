@@ -142,7 +142,7 @@ namespace PxUtils.PxFile.MetadataUtility
         {
             const int CODEPAGE_SEARCH_TIMEOUT_MS = 2000;
 
-            stream.Position = 0;
+            long position = stream.Position;
 
             byte[] bom = new byte[3];
             await stream.ReadAsync(bom.AsMemory(0, 3));
@@ -154,7 +154,7 @@ namespace PxUtils.PxFile.MetadataUtility
             using CancellationTokenSource ctSource = new();
             ctSource.CancelAfter(CODEPAGE_SEARCH_TIMEOUT_MS);
 
-            stream.Position = 0;
+            stream.Position = position;
 
             // Use ASCII because encoding is still unknown, CODEPAGE keyword is readable as ASCII
             KeyValuePair<string, string> encoding = await GetMetadataEntriesAsync(new StreamReader(stream, Encoding.ASCII), symbolsConf, readBufferSize)
@@ -175,7 +175,7 @@ namespace PxUtils.PxFile.MetadataUtility
         /// <exception cref="PxFileStreamException">Thrown when the 'CODEPAGE' keyword is not found in the file's metadata or the specified encoding is not available.</exception>
         internal static Encoding GetEncoding(Stream stream, int readBufferSize)
         {
-            stream.Position = 0;
+            long position = stream.Position;
 
             byte[] bom = new byte[3];
             stream.Read(bom);
@@ -184,7 +184,7 @@ namespace PxUtils.PxFile.MetadataUtility
 
             PxFileSymbolsConf symbolsConf = PxFileSymbolsConf.Default;
 
-            stream.Position = 0;
+            stream.Position = position;
 
             // Use ASCII because encoding is still unknown, CODEPAGE keyword is readable as ASCII
             KeyValuePair<string, string> encoding = GetMetadataEntries(new StreamReader(stream, Encoding.ASCII), symbolsConf, readBufferSize)
