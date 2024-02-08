@@ -4,6 +4,9 @@ using System.Text;
 
 namespace PxUtils.PxFile.MetadataUtility
 {
+    /// <summary>
+    /// Static class for utility functions to parse metadata from a Px file.
+    /// </summary>
     internal static class MetadataParsing
     {
         /// <summary>
@@ -144,23 +147,7 @@ namespace PxUtils.PxFile.MetadataUtility
             byte[] bom = new byte[3];
             await stream.ReadAsync(bom.AsMemory(0, 3));
 
-            // UTF8 BOM
-            if (bom[0] == 0xEF && bom[1] == 0xBB && bom[2] == 0xBF)
-            {
-                return Encoding.UTF8;
-            }
-
-            // UTF16 BOM
-            else if (bom[0] == 0xFE && bom[1] == 0xFF)
-            {
-                return Encoding.Unicode;
-            }
-
-            // UTF32 BOM
-            else if (bom[0] == 0x00 && bom[1] == 0x00 && bom[2] == 0xFE)
-            {
-                return Encoding.UTF32;
-            }
+            if (GetBom(bom) is Encoding utf) return utf;
 
             PxFileSymbolsConf symbolsConf = PxFileSymbolsConf.Default;
 
@@ -173,22 +160,40 @@ namespace PxUtils.PxFile.MetadataUtility
             KeyValuePair<string, string> encoding = await GetMetadataEntriesAsync(new StreamReader(stream, Encoding.ASCII), symbolsConf, readBufferSize)
                 .FirstOrDefaultAsync(kvp => kvp.Key == symbolsConf.Symbols.KeyWords.CodePage, ctSource.Token);
 
-            if (encoding.Value is null) throw new PxFileStreamException($"Could not find CODEPAGE keyword in the file.");
-
-            string encodingName = encoding.Value.Trim(symbolsConf.Tokens.Value.StringDelimeter);
-
-            bool isAvailable = Array.Exists(Encoding.GetEncodings(), e => e.Name == encodingName);
-            if (!isAvailable) Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-            try
-            {
-                return Encoding.GetEncoding(encodingName);
-            }
-            catch (ArgumentException aExp)
-            {
-                throw new PxFileStreamException($"The encoding {encodingName} provided with the CODEPAGE keyword is not available", aExp);
-            }
+            return GetEncodingFromValue(encoding.Value, symbolsConf);
         }
+
+        /// <summary>
+        /// Determines the encoding of the file managed by the PxFileStreamFactory.
+        /// The method first checks for the presence of a Byte Order Mark (BOM) to identify UTF-8, UTF-16, and UTF-32 encodings.
+        /// If no BOM is found, it reads the file's metadata to find the 'CODEPAGE' keyword and uses its value to determine the encoding.
+        /// If the 'CODEPAGE' keyword is not found or the encoding it specifies is not available, an exception is thrown.
+        /// </summary>
+        /// <param name="stream">The Stream object representing the file.</param>
+        /// <param name="readBufferSize">The size of the buffer to use when reading from the stream.</param>
+        /// <returns>The detected Encoding of the file.</returns>
+        /// <exception cref="PxFileStreamException">Thrown when the 'CODEPAGE' keyword is not found in the file's metadata or the specified encoding is not available.</exception>
+        internal static Encoding GetEncoding(Stream stream, int readBufferSize)
+        {
+            stream.Position = 0;
+
+            byte[] bom = new byte[3];
+            stream.Read(bom);
+
+            if (GetBom(bom) is Encoding utf) return utf;
+
+            PxFileSymbolsConf symbolsConf = PxFileSymbolsConf.Default;
+
+            stream.Position = 0;
+
+            // Use ASCII because encoding is still unknown, CODEPAGE keyword is readable as ASCII
+            KeyValuePair<string, string> encoding = GetMetadataEntries(new StreamReader(stream, Encoding.ASCII), symbolsConf, readBufferSize)
+                .FirstOrDefault(kvp => kvp.Key == symbolsConf.Symbols.KeyWords.CodePage);
+
+            return GetEncodingFromValue(encoding.Value, symbolsConf);
+        }
+
+        #region Private Methods
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Append(char[] buffer, int start, int endIndex, bool keyWordMode, StringBuilder keyWordBldr, StringBuilder valueStringBldr)
@@ -205,5 +210,51 @@ namespace PxUtils.PxFile.MetadataUtility
                 }
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Encoding? GetBom(byte[] buffer)
+        {
+            // UTF8 BOM
+            if (buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF)
+            {
+                return Encoding.UTF8;
+            }
+
+            // UTF16 BOM
+            else if (buffer[0] == 0xFE && buffer[1] == 0xFF)
+            {
+                return Encoding.Unicode;
+            }
+
+            // UTF32 BOM
+            else if (buffer[0] == 0x00 && buffer[1] == 0x00 && buffer[2] == 0xFE)
+            {
+                return Encoding.UTF32;
+            }
+
+            return null;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Encoding GetEncodingFromValue(string value, PxFileSymbolsConf symbolsConf)
+        {
+            if (value is null) throw new PxFileStreamException($"Could not find CODEPAGE keyword in the file.");
+
+            string encodingName = value.Trim(symbolsConf.Tokens.Value.StringDelimeter);
+
+            bool isAvailable = Array.Exists(Encoding.GetEncodings(), e => e.Name == encodingName);
+            if (!isAvailable) Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            try
+            {
+                return Encoding.GetEncoding(encodingName);
+            }
+            catch (ArgumentException aExp)
+            {
+                throw new PxFileStreamException($"The encoding {encodingName} provided with the CODEPAGE keyword is not available", aExp);
+            }
+        }
+
+        #endregion
     }
 }
