@@ -1,4 +1,5 @@
 ﻿using Px.Utils.PxFile.Exceptions;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace PxUtils.PxFile.MetadataUtility
@@ -22,7 +23,11 @@ namespace PxUtils.PxFile.MetadataUtility
             char sectionSeparator = symbolsConf.Tokens.SectionSeparator;
             string dataKeyword = symbolsConf.Symbols.KeyWords.Data;
 
-            char[] buffer = new char[readBufferSize];
+            char[] readBuffer = new char[readBufferSize];
+            char[] parsingBuffer = new char[readBufferSize];
+
+            ValueTask<int> readTask = inputStream.ReadAsync(readBuffer.AsMemory());
+            
             char nextDelimeter = keywordSeperator;
             bool keyWordMode = true;
             bool endOfMetaSection = false;
@@ -32,14 +37,17 @@ namespace PxUtils.PxFile.MetadataUtility
 
             do
             {
-                int readChars = await inputStream.ReadAsync(buffer, 0, readBufferSize);
+                int readChars = await readTask;
+                (readBuffer, parsingBuffer) = (parsingBuffer, readBuffer);
+                readTask = inputStream.ReadAsync(readBuffer.AsMemory());
+
                 int lastDelimeterIndx = -1;
 
                 for (int i = 0; i < readChars; i++)
                 {
-                    if (buffer[i] == nextDelimeter)
+                    if (parsingBuffer[i] == nextDelimeter)
                     {
-                        Append(lastDelimeterIndx + 1, i);
+                        Append(parsingBuffer, lastDelimeterIndx + 1, readChars, keyWordMode, keyWordBldr, valueStringBldr);
                         if (keyWordBldr.ToString().Trim() == dataKeyword)
                         {
                             endOfMetaSection = true;
@@ -57,24 +65,66 @@ namespace PxUtils.PxFile.MetadataUtility
                         nextDelimeter = keyWordMode ? keywordSeperator : sectionSeparator;
                     }
                 }
-                Append(lastDelimeterIndx + 1, readChars);
+                Append(parsingBuffer, lastDelimeterIndx + 1, readChars, keyWordMode, keyWordBldr, valueStringBldr);
 
             } while (!endOfMetaSection && !inputStream.EndOfStream);
+        }
 
-            void Append(int start, int endIndex)
+        /// <summary>
+        /// Reads metadata entries from the provided input stream synchronously.
+        /// Each metadata entry is a key-value pair, where the key and value are separated by a specified keyword separator,
+        /// and each entry is separated by a specified section separator.
+        /// The method continues reading entries until it encounters a keyword that matches the 'Data' keyword in the provided symbols configuration,
+        /// or until it reaches the end of the stream.
+        /// </summary>
+        /// <param name="inputStream">The StreamReader from which to read the metadata entries.</param>
+        /// <param name="symbolsConf">The configuration that specifies the keyword separator, section separator, and 'Data' keyword.</param>
+        /// <param name="readBufferSize">The size of the buffer to use when reading from the stream.</param>
+        /// <returns>An IEnumerable of key-value pairs representing the metadata entries.</returns>
+        internal static IEnumerable<KeyValuePair<string, string>> GetMetadataEntries(StreamReader inputStream, PxFileSymbolsConf symbolsConf, int readBufferSize)
+        {
+            char keywordSeperator = symbolsConf.Tokens.KeywordSeparator;
+            char sectionSeparator = symbolsConf.Tokens.SectionSeparator;
+            string dataKeyword = symbolsConf.Symbols.KeyWords.Data;
+
+            char[] buffer = new char[readBufferSize];
+            char nextDelimeter = keywordSeperator;
+            bool keyWordMode = true;
+            bool endOfMetaSection = false;
+
+            StringBuilder keyWordBldr = new();
+            StringBuilder valueStringBldr = new();
+
+            do
             {
-                if (endIndex - start > 0)
+                int readChars = inputStream.Read(buffer, 0, readBufferSize);
+                int lastDelimeterIndx = -1;
+
+                for (int i = 0; i < readChars; i++)
                 {
-                    if (keyWordMode)
+                    if (buffer[i] == nextDelimeter)
                     {
-                        keyWordBldr.Append(buffer, start, endIndex - start);
-                    }
-                    else
-                    {
-                        valueStringBldr.Append(buffer, start, endIndex - start);
+                        Append(buffer, lastDelimeterIndx + 1, readChars, keyWordMode, keyWordBldr, valueStringBldr);
+                        if (keyWordBldr.ToString().Trim() == dataKeyword)
+                        {
+                            endOfMetaSection = true;
+                            break;
+                        }
+                        else if (!keyWordMode)
+                        {
+                            yield return new KeyValuePair<string, string>(keyWordBldr.ToString().Trim(), valueStringBldr.ToString().Trim());
+                            keyWordBldr.Clear();
+                            valueStringBldr.Clear();
+                        }
+
+                        lastDelimeterIndx = i;
+                        keyWordMode = !keyWordMode;
+                        nextDelimeter = keyWordMode ? keywordSeperator : sectionSeparator;
                     }
                 }
-            }
+                Append(buffer, lastDelimeterIndx + 1, readChars, keyWordMode, keyWordBldr, valueStringBldr);
+
+            } while (!endOfMetaSection && !inputStream.EndOfStream);
         }
 
         /// <summary>
@@ -117,6 +167,8 @@ namespace PxUtils.PxFile.MetadataUtility
             using CancellationTokenSource ctSource = new();
             ctSource.CancelAfter(CODEPAGE_SEARCH_TIMEOUT_MS);
 
+            stream.Position = 0;
+
             // Use ASCII because encoding is still unknown, CODEPAGE keyword is readable as ASCII
             KeyValuePair<string, string> encoding = await GetMetadataEntriesAsync(new StreamReader(stream, Encoding.ASCII), symbolsConf, readBufferSize)
                 .FirstOrDefaultAsync(kvp => kvp.Key == symbolsConf.Symbols.KeyWords.CodePage, ctSource.Token);
@@ -135,6 +187,22 @@ namespace PxUtils.PxFile.MetadataUtility
             catch (ArgumentException aExp)
             {
                 throw new PxFileStreamException($"The encoding {encodingName} provided with the CODEPAGE keyword is not available", aExp);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void Append(char[] buffer, int start, int endIndex, bool keyWordMode, StringBuilder keyWordBldr, StringBuilder valueStringBldr)
+        {
+            if (endIndex - start > 0)
+            {
+                if (keyWordMode)
+                {
+                    keyWordBldr.Append(buffer, start, endIndex - start);
+                }
+                else
+                {
+                    valueStringBldr.Append(buffer, start, endIndex - start);
+                }
             }
         }
     }

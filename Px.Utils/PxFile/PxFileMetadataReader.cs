@@ -2,6 +2,7 @@
 using PxUtils.PxFile.MetadataUtility;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 
 namespace PxUtils.PxFile.Meta
 {
@@ -36,9 +37,26 @@ namespace PxUtils.PxFile.Meta
             throw new NotImplementedException();
         }
 
-        public async Task<IReadOnlyDictionary<string, string>> ReadMetadataToDictionaryAsync()
+        public async Task<IReadOnlyDictionary<string, string>> ReadMetadataToDictionaryAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            using Stream stream = pxFileStreamFactory.OpenStream();
+
+            if (encodingCache is null)
+            {
+                encodingCache = await MetadataParsing.GetEncodingAsync(stream, readBufferSize);
+                stream.Position = 0;
+            }
+
+            using StreamReader reader = new(stream, encodingCache);
+
+            Dictionary<string, string> metaDict = [];
+
+            ConfiguredCancelableAsyncEnumerable<KeyValuePair<string, string>> metaEnumerable = MetadataParsing.GetMetadataEntriesAsync(reader, PxFileSymbolsConf.Default, readBufferSize)
+                .WithCancellation(cancellationToken);
+
+            await foreach (KeyValuePair<string, string> kvp in metaEnumerable) metaDict.Add(kvp.Key, kvp.Value);
+
+            return metaDict;
         }
     }
 }
