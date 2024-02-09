@@ -1,4 +1,5 @@
-﻿using Px.Utils.UnitTests.PxFileTests.Fixtures;
+﻿using Px.Utils.PxFile.Exceptions;
+using Px.Utils.UnitTests.PxFileTests.Fixtures;
 using PxUtils.PxFile.Meta;
 using System.Text;
 
@@ -165,6 +166,18 @@ namespace PxFileTests.PxFileMetadataReaderTests
 
             Assert.Equal("COPYRIGHT", metadata[7].Key);
             Assert.Equal("YES", metadata[7].Value);
+        }
+
+        [Fact]
+        public static void ReadMetadata_CalledWith_BROKEN_UTF8_N_Throws_InvalidPxFileMetadataException()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(MinimalPx.BROKEN_UTF8_N);
+            using Stream stream = new MemoryStream(data);
+
+            // Act
+            stream.Seek(0, SeekOrigin.Begin);
+            Assert.Throws<InvalidPxFileMetadataException>(() => PxFileMetadataReader.ReadMetadata(stream, Encoding.UTF8).ToList());
         }
     }
 }

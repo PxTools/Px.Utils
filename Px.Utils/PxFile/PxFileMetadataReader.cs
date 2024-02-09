@@ -1,4 +1,5 @@
 ﻿using Px.Utils.PxFile.Exceptions;
+using System;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -48,24 +49,32 @@ namespace PxUtils.PxFile.Meta
                 for (int i = 0; i < readChars; i++)
                 {
                     if (buffer[i] == stringDelimeter) readingValueString = !readingValueString;
-                    else if (buffer[i] == nextDelimeter && !readingValueString)
+                    if (!readingValueString)
                     {
-                        Append(buffer, lastDelimeterIndx + 1, i, keyWordMode, keyWordBldr, valueStringBldr);
-                        if (keyWordBldr.ToString().Trim() == dataKeyword)
+                        if ((keyWordMode && buffer[i] == sectionSeparator) || (!keyWordMode && buffer[i] == keywordSeperator))
                         {
-                            endOfMetaSection = true;
-                            break;
-                        }
-                        else if (!keyWordMode)
-                        {
-                            yield return new KeyValuePair<string, string>(keyWordBldr.ToString().Trim(), valueStringBldr.ToString().Trim());
-                            keyWordBldr.Clear();
-                            valueStringBldr.Clear();
+                            throw new InvalidPxFileMetadataException($"Unexpected character '{buffer[i]}' found at position {i}.");
                         }
 
-                        lastDelimeterIndx = i;
-                        keyWordMode = !keyWordMode;
-                        nextDelimeter = keyWordMode ? keywordSeperator : sectionSeparator;
+                        if (buffer[i] == nextDelimeter)
+                        {
+                            Append(buffer, lastDelimeterIndx + 1, i, keyWordMode, keyWordBldr, valueStringBldr);
+                            if (keyWordBldr.ToString().Trim() == dataKeyword)
+                            {
+                                endOfMetaSection = true;
+                                break;
+                            }
+                            else if (!keyWordMode)
+                            {
+                                yield return new KeyValuePair<string, string>(keyWordBldr.ToString().Trim(), valueStringBldr.ToString().Trim());
+                                keyWordBldr.Clear();
+                                valueStringBldr.Clear();
+                            }
+
+                            lastDelimeterIndx = i;
+                            keyWordMode = !keyWordMode;
+                            nextDelimeter = keyWordMode ? keywordSeperator : sectionSeparator;
+                        }
                     }
                 }
                 Append(buffer, lastDelimeterIndx + 1, readChars, keyWordMode, keyWordBldr, valueStringBldr);
@@ -123,24 +132,32 @@ namespace PxUtils.PxFile.Meta
                 for (int i = 0; i < readChars; i++)
                 {
                     if (parsingBuffer[i] == stringDelimeter) readingValueString = !readingValueString;
-                    else if (parsingBuffer[i] == nextDelimeter && !readingValueString)
+                    if (!readingValueString)
                     {
-                        Append(parsingBuffer, lastDelimeterIndx + 1, readChars, keyWordMode, keyWordBldr, valueStringBldr);
-                        if (keyWordBldr.ToString().Trim() == dataKeyword)
+                        if ((keyWordMode && parsingBuffer[i] == sectionSeparator) || (!keyWordMode && parsingBuffer[i] == keywordSeperator))
                         {
-                            endOfMetaSection = true;
-                            break;
-                        }
-                        else if (!keyWordMode)
-                        {
-                            yield return new KeyValuePair<string, string>(keyWordBldr.ToString().Trim(), valueStringBldr.ToString().Trim());
-                            keyWordBldr.Clear();
-                            valueStringBldr.Clear();
+                            throw new InvalidPxFileMetadataException($"Unexpected character '{parsingBuffer[i]}' found at position {i}.");
                         }
 
-                        lastDelimeterIndx = i;
-                        keyWordMode = !keyWordMode;
-                        nextDelimeter = keyWordMode ? keywordSeperator : sectionSeparator;
+                        if (parsingBuffer[i] == nextDelimeter)
+                        {
+                            Append(parsingBuffer, lastDelimeterIndx + 1, i, keyWordMode, keyWordBldr, valueStringBldr);
+                            if (keyWordBldr.ToString().Trim() == dataKeyword)
+                            {
+                                endOfMetaSection = true;
+                                break;
+                            }
+                            else if (!keyWordMode)
+                            {
+                                yield return new KeyValuePair<string, string>(keyWordBldr.ToString().Trim(), valueStringBldr.ToString().Trim());
+                                keyWordBldr.Clear();
+                                valueStringBldr.Clear();
+                            }
+
+                            lastDelimeterIndx = i;
+                            keyWordMode = !keyWordMode;
+                            nextDelimeter = keyWordMode ? keywordSeperator : sectionSeparator;
+                        }
                     }
                 }
                 Append(parsingBuffer, lastDelimeterIndx + 1, readChars, keyWordMode, keyWordBldr, valueStringBldr);
@@ -291,7 +308,7 @@ namespace PxUtils.PxFile.Meta
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Encoding GetEncodingFromValue(string value, PxFileSymbolsConf symbolsConf)
         {
-            if (value is null) throw new PxFileStreamException($"Could not find CODEPAGE keyword in the file.");
+            if (value is null) throw new InvalidPxFileMetadataException($"Could not find CODEPAGE keyword in the file.");
 
             string encodingName = value.Trim(symbolsConf.Tokens.Value.StringDelimeter);
 
@@ -304,7 +321,7 @@ namespace PxUtils.PxFile.Meta
             }
             catch (ArgumentException aExp)
             {
-                throw new PxFileStreamException($"The encoding {encodingName} provided with the CODEPAGE keyword is not available", aExp);
+                throw new InvalidPxFileMetadataException($"The encoding {encodingName} provided with the CODEPAGE keyword is not available", aExp);
             }
         }
 
