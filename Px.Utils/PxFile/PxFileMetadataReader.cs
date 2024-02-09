@@ -26,11 +26,13 @@ namespace PxUtils.PxFile.Meta
 
             char keywordSeperator = symbolsConf.Tokens.KeywordSeparator;
             char sectionSeparator = symbolsConf.Tokens.SectionSeparator;
+            char stringDelimeter = symbolsConf.Tokens.Value.StringDelimeter;
             string dataKeyword = symbolsConf.Symbols.KeyWords.Data;
 
             char[] buffer = new char[readBufferSize];
             char nextDelimeter = keywordSeperator;
             bool keyWordMode = true;
+            bool readingValueString = false;
             bool endOfMetaSection = false;
 
             StringBuilder keyWordBldr = new();
@@ -45,7 +47,8 @@ namespace PxUtils.PxFile.Meta
 
                 for (int i = 0; i < readChars; i++)
                 {
-                    if (buffer[i] == nextDelimeter)
+                    if (buffer[i] == stringDelimeter) readingValueString = !readingValueString;
+                    else if (buffer[i] == nextDelimeter && !readingValueString)
                     {
                         Append(buffer, lastDelimeterIndx + 1, i, keyWordMode, keyWordBldr, valueStringBldr);
                         if (keyWordBldr.ToString().Trim() == dataKeyword)
@@ -91,6 +94,7 @@ namespace PxUtils.PxFile.Meta
 
             char keywordSeperator = symbolsConf.Tokens.KeywordSeparator;
             char sectionSeparator = symbolsConf.Tokens.SectionSeparator;
+            char stringDelimeter = symbolsConf.Tokens.Value.StringDelimeter;
             string dataKeyword = symbolsConf.Symbols.KeyWords.Data;
 
             char[] readBuffer = new char[readBufferSize];
@@ -102,6 +106,7 @@ namespace PxUtils.PxFile.Meta
 
             char nextDelimeter = keywordSeperator;
             bool keyWordMode = true;
+            bool readingValueString = false;
             bool endOfMetaSection = false;
 
             StringBuilder keyWordBldr = new();
@@ -117,7 +122,8 @@ namespace PxUtils.PxFile.Meta
 
                 for (int i = 0; i < readChars; i++)
                 {
-                    if (parsingBuffer[i] == nextDelimeter)
+                    if (parsingBuffer[i] == stringDelimeter) readingValueString = !readingValueString;
+                    else if (parsingBuffer[i] == nextDelimeter && !readingValueString)
                     {
                         Append(parsingBuffer, lastDelimeterIndx + 1, readChars, keyWordMode, keyWordBldr, valueStringBldr);
                         if (keyWordBldr.ToString().Trim() == dataKeyword)
