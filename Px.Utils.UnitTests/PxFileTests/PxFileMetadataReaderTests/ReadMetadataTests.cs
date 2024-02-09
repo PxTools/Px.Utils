@@ -175,7 +175,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.BROKEN_UTF8_N);
             using Stream stream = new MemoryStream(data);
 
-            // Act
+            // Act + Assert
             stream.Seek(0, SeekOrigin.Begin);
             Assert.Throws<InvalidPxFileMetadataException>(() => PxFileMetadataReader.ReadMetadata(stream, Encoding.UTF8).ToList());
         }
