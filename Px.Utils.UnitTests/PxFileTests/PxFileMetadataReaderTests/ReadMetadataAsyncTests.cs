@@ -1,7 +1,7 @@
 ﻿using PxUtils.UnitTests.PxFileTests.Fixtures;
 using PxUtils.PxFile.Meta;
 using System.Text;
-using Px.Utils.Exceptions;
+using PxUtils.Exceptions;
 
 namespace PxFileTests.PxFileMetadataReaderTests
 {
