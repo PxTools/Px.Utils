@@ -1,4 +1,4 @@
-﻿namespace Px.Utils.UnitTests.PxFileTests.Fixtures
+﻿namespace PxUtils.UnitTests.PxFileTests.Fixtures
 {
     internal static class MinimalPx
     {

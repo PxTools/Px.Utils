@@ -1,5 +1,5 @@
-﻿using Px.Utils.PxFile.Exceptions;
-using Px.Utils.UnitTests.PxFileTests.Fixtures;
+﻿using PxUtils.PxFile.Exceptions;
+using PxUtils.UnitTests.PxFileTests.Fixtures;
 using PxUtils.PxFile.Meta;
 using System.Text;
 

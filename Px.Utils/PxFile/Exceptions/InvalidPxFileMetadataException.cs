@@ -1,4 +1,4 @@
-﻿namespace Px.Utils.PxFile.Exceptions
+﻿namespace PxUtils.PxFile.Exceptions
 {
     public class InvalidPxFileMetadataException : Exception
     {
