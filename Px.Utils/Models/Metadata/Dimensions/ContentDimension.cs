@@ -7,8 +7,9 @@ namespace PxUtils.Models.Metadata.Dimensions
         string code,
         MultilanguageString name,
         List<Property> additionalProperties,
-        List<ContentDimensionValue> values
-        ) : IReadOnlyDimension
+        List<ContentDimensionValue> values,
+        string? defaultValueCode = null
+        ) : IDimension
     {
         public string Code { get; } = code;
 
@@ -20,11 +21,15 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         public List<ContentDimensionValue> Values { get; } = values;
 
+        public string? DefaultValueCode { get; } = defaultValueCode;
+
         #region Interface implementations
 
         IReadOnlyMultilanguageString IReadOnlyDimension.Name => Name;
 
         IReadOnlyList<IReadOnlyDimensionValue> IReadOnlyDimension.Values => Values;
+
+        IReadOnlyList<DimensionValue> IDimension.Values => Values;
 
         IReadOnlyList<Property> IReadOnlyDimension.AdditionalProperties => AdditionalProperties;
 

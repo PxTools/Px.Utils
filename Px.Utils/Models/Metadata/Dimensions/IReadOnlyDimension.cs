@@ -14,5 +14,7 @@ namespace PxUtils.Models.Metadata.Dimensions
         IReadOnlyList<Property> AdditionalProperties { get; }
 
         IReadOnlyList<IReadOnlyDimensionValue> Values { get; }
+
+        string? DefaultValueCode { get; }
     }
 }

@@ -4,7 +4,7 @@ using PxUtils.Language;
 namespace PxUtils.Models.Metadata.Dimensions
 {
     public class TimeDimension(string code, MultilanguageString name, List<Property> additionalProperties, List<DimensionValue> values, TimeDimensionInterval interval)
-        : IReadOnlyDimension
+        : IDimension
     {
         public string Code { get; } = code;
 
@@ -18,10 +18,16 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         public TimeDimensionInterval Interval { get; } = interval;
 
+        public string? DefaultValueCode { get; }
+
+        #region Interface implementations
+
         IReadOnlyMultilanguageString IReadOnlyDimension.Name => Name;
 
         IReadOnlyList<Property> IReadOnlyDimension.AdditionalProperties => AdditionalProperties;
 
         IReadOnlyList<IReadOnlyDimensionValue> IReadOnlyDimension.Values => Values;
+
+        #endregion
     }
 }
