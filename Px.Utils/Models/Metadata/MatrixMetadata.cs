@@ -1,4 +1,5 @@
-﻿
+﻿using PxUtils.Models.Metadata.Dimensions;
+
 namespace PxUtils.Models.Metadata
 {
     public class MatrixMetadata(string defaultLanguage, List<string> availableLanguages, List<Dimension> dimensions, List<Property> additionalProperties) : IReadOnlyMatrixMetadata

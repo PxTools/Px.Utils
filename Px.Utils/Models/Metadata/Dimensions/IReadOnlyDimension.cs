@@ -1,7 +1,7 @@
 ﻿using PxUtils.Language;
 using PxUtils.Models.Metadata.Enums;
 
-namespace PxUtils.Models.Metadata
+namespace PxUtils.Models.Metadata.Dimensions
 {
     public interface IReadOnlyDimension
     {
@@ -10,5 +10,9 @@ namespace PxUtils.Models.Metadata
         DimensionType Type { get; }
 
         IReadOnlyMultilanguageString Name { get; }
+
+        IReadOnlyList<Property> AdditionalProperties { get; }
+
+        IReadOnlyList<IReadOnlyDimensionValue> Values { get; }
     }
 }
