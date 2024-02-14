@@ -15,6 +15,6 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         IReadOnlyList<IReadOnlyDimensionValue> Values { get; }
 
-        string? DefaultValueCode { get; }
+        IReadOnlyDimensionValue? DefaultValue { get; }
     }
 }

@@ -4,7 +4,7 @@
     {
         Time,
         Content,
-        Geological,
+        Geographical,
         Ordinal,
         Nominal,
         Other,

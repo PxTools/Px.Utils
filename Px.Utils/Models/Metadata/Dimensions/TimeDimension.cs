@@ -3,7 +3,13 @@ using PxUtils.Language;
 
 namespace PxUtils.Models.Metadata.Dimensions
 {
-    public class TimeDimension(string code, MultilanguageString name, List<Property> additionalProperties, List<DimensionValue> values, TimeDimensionInterval interval)
+    public class TimeDimension(
+        string code,
+        MultilanguageString name,
+        List<Property> additionalProperties,
+        List<DimensionValue> values,
+        DimensionValue? defaultValue,
+        TimeDimensionInterval interval)
         : IDimension
     {
         public string Code { get; } = code;
@@ -16,9 +22,9 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         public IReadOnlyList<DimensionValue> Values { get; } = values;
 
-        public TimeDimensionInterval Interval { get; } = interval;
+        public DimensionValue? DefaultValue { get; } = defaultValue;
 
-        public string? DefaultValueCode { get; }
+        public TimeDimensionInterval Interval { get; } = interval;
 
         #region Interface implementations
 
@@ -27,6 +33,8 @@ namespace PxUtils.Models.Metadata.Dimensions
         IReadOnlyList<Property> IReadOnlyDimension.AdditionalProperties => AdditionalProperties;
 
         IReadOnlyList<IReadOnlyDimensionValue> IReadOnlyDimension.Values => Values;
+
+        IReadOnlyDimensionValue? IReadOnlyDimension.DefaultValue => DefaultValue;
 
         #endregion
     }
