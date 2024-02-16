@@ -63,7 +63,7 @@ namespace Px.Utils.ModelBuilders
             else if (index > 0)
             {
                 output = remaining[..index];
-                remaining = remaining[(index - 1)..];
+                remaining = remaining[index..];
             }
             else // 0 -> There is no legal key at the start of the string
             {
@@ -88,7 +88,7 @@ namespace Px.Utils.ModelBuilders
                 if (index > 1) // 1 because empty lang string is not valid
                 {
                     string output = remaining[1..index].Trim();
-                    remaining = remaining[index..];
+                    remaining = remaining[(index + 1)..];
                     if (output.Contains(_langParamStart))
                     {
                         throw new ArgumentException($"Language identifier {output} contains invalid symbols");
