@@ -4,20 +4,15 @@
     {
         public string KeyWord { get; }
         public string? Language { get; }
-        public string? DimensionIdentifier { get; }
-        public string? ValueIdentifier { get; }
+        public string? FirstIdentifier { get; }
+        public string? SecondIdentifier { get; }
 
-        public MetadataEntryKey(string keyWord)
-        {
-            KeyWord = keyWord;
-        }
-
-        public MetadataEntryKey(string keyWord, string language, string? dimensionIdentifier = null, string? valueIdentifier = null)
+        public MetadataEntryKey(string keyWord, string? language = null, string? firstIdentifier = null, string? secondIdentifier = null)
         {
             KeyWord = keyWord;
             Language = language;
-            DimensionIdentifier = dimensionIdentifier;
-            ValueIdentifier = valueIdentifier;
+            FirstIdentifier = firstIdentifier;
+            SecondIdentifier = secondIdentifier;
         }
     }
 }

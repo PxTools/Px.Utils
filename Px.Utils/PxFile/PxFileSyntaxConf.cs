@@ -1,10 +1,10 @@
 ﻿namespace PxUtils.PxFile
 {
-    public class PxFileSymbolsConf
+    public class PxFileSyntaxConf
     {
-        public class TokenCollection
+        public class SymbolCollection
         {
-            public class KeyTokens
+            public class KeySymbols
             {
                 private const char LIST_SEPARATOR_DEFAULT = ',';
                 private const char LANG_PARAM_START_DEFAULT = '[';
@@ -20,12 +20,12 @@
                 public char SpecifierParamEnd { get; set; } = SPECIFIER_PARAM_END_DEFAULT;
                 public char StringDelimeter { get; set; } = STRING_DELIMETER_DEFAULT;
 
-                private KeyTokens() { }
+                private KeySymbols() { }
 
-                public static KeyTokens DefaultKeyTokens => new();
+                public static KeySymbols DefaultKeySymbols => new();
             }
 
-            public class ValueTokens
+            public class ValueSymbols
             {
                 private const char STRING_DELIMETER_DEFAULT = '"';
                 private const char TIME_SERIES_INTERVAL_START_DEFAULT = '(';
@@ -37,9 +37,9 @@
                 public char TimeSeriesIntervalEnd { get; set; } = TIME_SERIES_INTERVAL_END_DEFAULT;
                 public char TimeSeriesLimitsSeparator { get; set; } = TIME_SERIES_LIMITS_SEPARATOR_DEFAULT;
 
-                private ValueTokens() { }
+                private ValueSymbols() { }
 
-                public static ValueTokens DefaultValueTokens => new();
+                public static ValueSymbols DefaultValueSymbols => new();
             }
 
             private const char KEYWORD_SEPARATOR_DEFAULT = '=';
@@ -48,19 +48,19 @@
             public char KeywordSeparator { get; set; } = KEYWORD_SEPARATOR_DEFAULT;
             public char SectionSeparator { get; set; } = SECTION_SEPARATOR_DEFAULT;
 
-            public KeyTokens Key { get; set; }
-            public ValueTokens Value { get; set; }
+            public KeySymbols Key { get; set; }
+            public ValueSymbols Value { get; set; }
 
-            private TokenCollection()
+            private SymbolCollection()
             {
-                Key = KeyTokens.DefaultKeyTokens;
-                Value = ValueTokens.DefaultValueTokens;
+                Key = KeySymbols.DefaultKeySymbols;
+                Value = ValueSymbols.DefaultValueSymbols;
             }
 
-            public static TokenCollection DefaultTokens => new();
+            public static SymbolCollection DefaultSymbols => new();
         }
 
-        public class SymbolsCollection
+        public class TokenCollection
         {
             public class TimeValue
             {
@@ -83,7 +83,7 @@
                 public static TimeValue DefaultTimeValue => new();
             }
 
-            public class KeyWordSymbols
+            public class KeyWordTokens
             {
                 private const string DATA = "DATA";
                 private const string CODEPAGE = "CODEPAGE";
@@ -91,33 +91,33 @@
                 public string Data { get; set; } = DATA;
                 public string CodePage { get; set; } = CODEPAGE;
 
-                private KeyWordSymbols() { }
+                private KeyWordTokens() { }
 
-                public static KeyWordSymbols DefaultKeyWordSymbols => new();
+                public static KeyWordTokens DefaultKeyWordTokens => new();
             }
 
             public TimeValue Time { get; set; }
 
-            public KeyWordSymbols KeyWords { get; set; }
+            public KeyWordTokens KeyWords { get; set; }
 
-            private SymbolsCollection()
+            private TokenCollection()
             {
                 Time = TimeValue.DefaultTimeValue;
-                KeyWords = KeyWordSymbols.DefaultKeyWordSymbols;
+                KeyWords = KeyWordTokens.DefaultKeyWordTokens;
             }
 
-            public static SymbolsCollection DefaultSymbols => new();
+            public static TokenCollection DefaultTokens => new();
         }
 
+        public SymbolCollection Symbols { get; set; }
         public TokenCollection Tokens { get; set; }
-        public SymbolsCollection Symbols { get; set; }
 
-        private PxFileSymbolsConf()
+        private PxFileSyntaxConf()
         {
+            Symbols = SymbolCollection.DefaultSymbols;
             Tokens = TokenCollection.DefaultTokens;
-            Symbols = SymbolsCollection.DefaultSymbols;
         }
 
-        public static PxFileSymbolsConf Default => new();
+        public static PxFileSyntaxConf Default => new();
     }
 }
