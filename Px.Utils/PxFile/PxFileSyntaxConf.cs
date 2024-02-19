@@ -28,11 +28,13 @@
             public class ValueSymbols
             {
                 private const char STRING_DELIMETER_DEFAULT = '"';
+                private const char LIST_SEPARATOR_DEFAULT = ',';
                 private const char TIME_SERIES_INTERVAL_START_DEFAULT = '(';
                 private const char TIME_SERIES_INTERVAL_END_DEFAULT = ')';
                 private const char TIME_SERIES_LIMITS_SEPARATOR_DEFAULT = '-';
 
                 public char StringDelimeter { get; set; } = STRING_DELIMETER_DEFAULT;
+                public char ListSeparator { get; set; } = LIST_SEPARATOR_DEFAULT;
                 public char TimeSeriesIntervalStart { get; set; } = TIME_SERIES_INTERVAL_START_DEFAULT;
                 public char TimeSeriesIntervalEnd { get; set; } = TIME_SERIES_INTERVAL_END_DEFAULT;
                 public char TimeSeriesLimitsSeparator { get; set; } = TIME_SERIES_LIMITS_SEPARATOR_DEFAULT;
@@ -87,9 +89,13 @@
             {
                 private const string DATA = "DATA";
                 private const string CODEPAGE = "CODEPAGE";
+                private const string DEFAULT_LANGUAGE = "LANGUAGE";
+                private const string AVAILABLE_LANGUAGES = "LANGUAGES";
 
                 public string Data { get; set; } = DATA;
                 public string CodePage { get; set; } = CODEPAGE;
+                public string DefaultLanguage { get; set; } = DEFAULT_LANGUAGE;
+                public string AvailableLanguages { get; set; } = AVAILABLE_LANGUAGES;
 
                 private KeyWordTokens() { }
 

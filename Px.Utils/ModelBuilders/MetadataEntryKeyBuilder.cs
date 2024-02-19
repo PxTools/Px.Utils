@@ -1,9 +1,9 @@
 ﻿using PxUtils.Models.Metadata;
 using PxUtils.PxFile;
 
-namespace Px.Utils.ModelBuilders
+namespace PxUtils.ModelBuilders
 {
-    public class PropertyBuilder
+    public class MetadataEntryKeyBuilder
     {
         private readonly char _langParamStart;
         private readonly char _langParamEnd;
@@ -16,7 +16,7 @@ namespace Px.Utils.ModelBuilders
 
         private readonly char[] _illlegalKeyTokes;
 
-        public PropertyBuilder(PxFileSyntaxConf? configuration = null)
+        public MetadataEntryKeyBuilder(PxFileSyntaxConf? configuration = null)
         {
             PxFileSyntaxConf _conf = configuration ?? PxFileSyntaxConf.Default;
             _langParamStart = _conf.Symbols.Key.LangParamStart;
@@ -37,7 +37,7 @@ namespace Px.Utils.ModelBuilders
             ];
         }
 
-        public MetadataEntryKey ParseMetadataEntryKey(string key)
+        public MetadataEntryKey Parse(string key)
         {
             string name = ParseKeyName(ref key);
             string? lang = ParseLang(ref key);

@@ -1,11 +1,11 @@
-﻿using Px.Utils.ModelBuilders;
+﻿using PxUtils.ModelBuilders;
 
 namespace PxUtils.UnitTests.ModelBuilderTests
 {
     [TestClass]
-    public class PropertyBuilderTests
+    public class MetadataEntryKeyBuilderTests
     {
-        private readonly PropertyBuilder builder = new();
+        private readonly MetadataEntryKeyBuilder builder = new();
 
         #region Valid key tests
 
@@ -20,7 +20,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string input = $"{key}[{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\")";
 
             // Act
-            var result = builder.ParseMetadataEntryKey(input);
+            var result = builder.Parse(input);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -38,7 +38,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string input = $"{key}[{lang}]";
 
             // Act
-            var result = builder.ParseMetadataEntryKey(input);
+            var result = builder.Parse(input);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -57,7 +57,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string input = $"{key}(\"{firstIdentifier}\",\"{secondIdentifier}\")";
 
             // Act
-            var result = builder.ParseMetadataEntryKey(input);
+            var result = builder.Parse(input);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -75,7 +75,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string input = $"{key}(\"{firstIdentifier}\")";
 
             // Act
-            var result = builder.ParseMetadataEntryKey(input);
+            var result = builder.Parse(input);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -91,7 +91,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string key = "FOOBAR";
 
             // Act
-            var result = builder.ParseMetadataEntryKey(key);
+            var result = builder.Parse(key);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -107,7 +107,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string key = "FOO-BAR";
 
             // Act
-            var result = builder.ParseMetadataEntryKey(key);
+            var result = builder.Parse(key);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -125,7 +125,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string input = $"{key}(\"{firstIdentifier}\")";
 
             // Act
-            var result = builder.ParseMetadataEntryKey(input);
+            var result = builder.Parse(input);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -148,7 +148,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}]X(\"{firstIdentifier}\",\"{secondIdentifier}\")";
 
-            Action func = new(() => builder.ParseMetadataEntryKey(input));
+            Action func = new(() => builder.Parse(input));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -164,7 +164,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}](\"{firstIdentifier}\"X,\"{secondIdentifier}\")";
 
-            Action func = new(() => builder.ParseMetadataEntryKey(input));
+            Action func = new(() => builder.Parse(input));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -180,7 +180,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\"X)";
 
-            Action func = new(() => builder.ParseMetadataEntryKey(input));
+            Action func = new(() => builder.Parse(input));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -196,7 +196,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\")X";
 
-            Action func = new(() => builder.ParseMetadataEntryKey(input));
+            Action func = new(() => builder.Parse(input));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -212,7 +212,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}][{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\")";
 
-            Action func = new(() => builder.ParseMetadataEntryKey(input));
+            Action func = new(() => builder.Parse(input));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -228,7 +228,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}](\"{firstIdentifier}\")(\"{secondIdentifier}\")";
 
-            Action func = new(() => builder.ParseMetadataEntryKey(input));
+            Action func = new(() => builder.Parse(input));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -244,7 +244,8 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}](\"{firstIdentifier}\" \"{secondIdentifier}\")";
 
-            Action func = new(() => builder.ParseMetadataEntryKey(input));
+            // Act
+            Action func = new(() => builder.Parse(input));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -260,7 +261,8 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\",\"fyy\")";
 
-            Action func = new(() => builder.ParseMetadataEntryKey(input));
+            // Act
+            Action func = new(() => builder.Parse(input));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -276,7 +278,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string secondIdentifier = "bar";
             string input = $"{key}[[{lang}]](\"{firstIdentifier}\",\"{secondIdentifier}\")";
 
-            Action func = new(() => builder.ParseMetadataEntryKey(input));
+            Action func = new(() => builder.Parse(input));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -292,7 +294,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string secondIdentifier = "bar(\"baz\")";
             string input = $"{key}[{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\")";
 
-            Action func = new(() => builder.ParseMetadataEntryKey(input));
+            Action func = new(() => builder.Parse(input));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -306,7 +308,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string lang = "fi";
             string input = $"{key}[{lang}]()";
 
-            Action func = new(() => builder.ParseMetadataEntryKey(input));
+            Action func = new(() => builder.Parse(input));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -322,7 +324,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string input = $"{key}[](\"{firstIdentifier}\",\"{secondIdentifier}\")";
 
             // Act
-            Action func = new(() => builder.ParseMetadataEntryKey(input));
+            Action func = new(() => builder.Parse(input));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
