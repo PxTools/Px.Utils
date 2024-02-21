@@ -73,12 +73,15 @@
                 private const string MONTH_INTERVAL = "M1";
                 private const string WEEK_INTERVAL = "W1";
 
+                private const string DATETIME_FORMAT_STRING = "yyyyMMdd HH:mm";
+
                 public string TimeIntervalIndicator { get; set; } = TIME_INTERVAL_INDICATOR;
                 public string YearInterval { get; set; } = YEAR_INTERVAL;
                 public string HalfYearInterval { get; set; } = HALF_YEAR_INTERVAL;
                 public string QuarterYearInterval { get; set; } = QUARTER_YEAR_INTERVAL;
                 public string MonthInterval { get; set; } = MONTH_INTERVAL;
                 public string WeekInterval { get; set; } = WEEK_INTERVAL;
+                public string DateTimeFormatString { get; set; } = DATETIME_FORMAT_STRING;
 
                 private TimeValue() { }
 
@@ -91,11 +94,25 @@
                 private const string CODEPAGE = "CODEPAGE";
                 private const string DEFAULT_LANGUAGE = "LANGUAGE";
                 private const string AVAILABLE_LANGUAGES = "LANGUAGES";
+                private const string CONTENT_VARIABLE_IDENTIFIER = "CONTVARIABLE";
+                private const string VARIABLE_CODE = "VARIABLECODE";
+                private const string VARIABLE_VALUE_CODES = "CODES";
+                private const string VARIABLE_VALUES = "VALUES";
+                private const string UNITS = "UNITS";
+                private const string LAST_UPDATED = "LAST-UPDATED";
+                private const string DIMENSION_DEFAULT_VALUE = "ELIMINATION";
 
                 public string Data { get; set; } = DATA;
                 public string CodePage { get; set; } = CODEPAGE;
                 public string DefaultLanguage { get; set; } = DEFAULT_LANGUAGE;
                 public string AvailableLanguages { get; set; } = AVAILABLE_LANGUAGES;
+                public string ContentVariableIdentifier { get; set; } = CONTENT_VARIABLE_IDENTIFIER;
+                public string VariableCode { get; set; } = VARIABLE_CODE;
+                public string VariableValueCodes { get; set; } = VARIABLE_VALUE_CODES;
+                public string VariableValues { get; set; } = VARIABLE_VALUES;
+                public string Units { get; set; } = UNITS;
+                public string LastUpdated { get; set; } = LAST_UPDATED;
+                public string DimensionDefaultValue { get; set; } = DIMENSION_DEFAULT_VALUE;
 
                 private KeyWordTokens() { }
 

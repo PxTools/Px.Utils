@@ -50,5 +50,14 @@ namespace PxUtils.Language
             if (_translations.ContainsKey(lang)) _translations[lang] = text;
             else throw new TranslationNotFoundException(lang);
         }
+
+        public bool Equals(IReadOnlyMultilanguageString? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return _translations.Count == other.Languages.Count() &&
+                _translations.All(kvp => other.Languages.Contains(kvp.Key) && other[kvp.Key] == kvp.Value);
+        }
     }
 }
