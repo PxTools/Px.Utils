@@ -2,11 +2,11 @@
 
 namespace PxUtils.Models.Metadata
 {
-    public class MatrixMetadata(string defaultLanguage, List<string> availableLanguages, List<IDimension> dimensions, List<Property> additionalProperties) : IReadOnlyMatrixMetadata
+    public class MatrixMetadata(string defaultLanguage, IReadOnlyList<string> availableLanguages, List<IDimension> dimensions, List<Property> additionalProperties) : IReadOnlyMatrixMetadata
     {
         public string DefaultLanguage { get; } = defaultLanguage;
 
-        public List<string> AvailableLanguages { get; } = availableLanguages;
+        public IReadOnlyList<string> AvailableLanguages { get; } = availableLanguages;
 
         public List<IDimension> Dimensions { get; } = dimensions;
 

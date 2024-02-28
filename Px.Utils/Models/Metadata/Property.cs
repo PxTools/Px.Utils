@@ -43,7 +43,7 @@ namespace PxUtils.Models.Metadata
             }
         }
 
-        public IReadOnlyMultilanguageString GetMultiLanguageString()
+        public MultilanguageString GetMultiLanguageString()
         {
             if (!CanGetMultilanguageValue) throw new InvalidOperationException("Value can not be represented as a multilanguage string");
             else return new MultilanguageString(Entries.Select(kvp => {

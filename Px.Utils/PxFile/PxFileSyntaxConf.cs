@@ -88,6 +88,29 @@
                 public static TimeValue DefaultTimeValue => new();
             }
 
+            public class VariableTypeTokens
+            {
+                private const string CONTENT = "Content";
+                private const string TIME = "Time";
+                private const string ORDINAL = "Ordinal";
+                private const string NOMINAL = "Nominal";
+                private const string GEOGRAPHICAL = "Geographical";
+                private const string OTHER = "Other";
+                private const string UNKNOWN = "Unknown";
+
+                public string Content { get; set; } = CONTENT;
+                public string Time { get; set; } = TIME;
+                public string Ordinal { get; set; } = ORDINAL;
+                public string Nominal { get; set; } = NOMINAL;
+                public string Geographical { get; set; } = GEOGRAPHICAL;
+                public string Other { get; set; } = OTHER;
+                public string Unknown { get; set; } = UNKNOWN;
+
+                private VariableTypeTokens() { }
+
+                public static VariableTypeTokens DefaultVariableTypeTokens => new();
+            }
+
             public class KeyWordTokens
             {
                 private const string DATA = "DATA";
@@ -101,6 +124,10 @@
                 private const string UNITS = "UNITS";
                 private const string LAST_UPDATED = "LAST-UPDATED";
                 private const string DIMENSION_DEFAULT_VALUE = "ELIMINATION";
+                private const string TIME_VAL = "TIMEVAL";
+                private const string DIMENSION_TYPE = "VARIABLE-TYPE";
+                private const string STUB_DIMENSIONS = "STUB";
+                private const string HEADING_DIMENSIONS = "HEADING";
 
                 public string Data { get; set; } = DATA;
                 public string CodePage { get; set; } = CODEPAGE;
@@ -113,6 +140,10 @@
                 public string Units { get; set; } = UNITS;
                 public string LastUpdated { get; set; } = LAST_UPDATED;
                 public string DimensionDefaultValue { get; set; } = DIMENSION_DEFAULT_VALUE;
+                public string TimeVal { get; set; } = TIME_VAL;
+                public string DimensionType { get; set; } = DIMENSION_TYPE;
+                public string StubDimensions { get; set; } = STUB_DIMENSIONS;
+                public string HeadingDimensions { get; set; } = HEADING_DIMENSIONS;
 
                 private KeyWordTokens() { }
 
@@ -123,10 +154,13 @@
 
             public KeyWordTokens KeyWords { get; set; }
 
+            public VariableTypeTokens VariableTypes { get; set; }
+
             private TokenCollection()
             {
                 Time = TimeValue.DefaultTimeValue;
                 KeyWords = KeyWordTokens.DefaultKeyWordTokens;
+                VariableTypes = VariableTypeTokens.DefaultVariableTypeTokens;
             }
 
             public static TokenCollection DefaultTokens => new();
