@@ -4,29 +4,36 @@ namespace PxUtils.Models.Metadata
 {
     public class Property : IReadOnlyProperty
     {
-        public IReadOnlyDictionary<MetadataEntryKey, string> Entries { get; }
+        public string KeyWord { get; }
 
         public bool CanGetStringValue { get; }
         public bool CanGetMultilanguageValue { get; }
 
-        public Property(MetadataEntryKey key, string value)
+        private MultilanguageString Entries { get; }
+
+        public Property(string keyWord, string value)
         {
-            Entries = new Dictionary<MetadataEntryKey, string> { { key, value } };
+            Entries = new MultilanguageString("none", value);
+            KeyWord = keyWord;
             CanGetStringValue = true;
             CanGetMultilanguageValue = false;
         }
 
-        public Property(IEnumerable<KeyValuePair<MetadataEntryKey, string>> entries)
+        public Property(string keyWord, MultilanguageString entries)
         {
-            Entries = new Dictionary<MetadataEntryKey, string>(entries);
-            CanGetStringValue = Entries.Distinct().Count() == 1;
+            Entries = entries;
+            KeyWord = keyWord;
+            CanGetStringValue = entries.Languages
+                .Select(l => entries[l])
+                .Distinct()
+                .Count() == 1;
             CanGetMultilanguageValue = true;
         }
 
         public string GetString()
         {
             if (!CanGetStringValue) throw new InvalidOperationException("Property value can not be represented as a single string");
-            else return Entries.First().Value;
+            else return Entries.UniqueValue();
         }
 
         public bool TryGetString(out string? value)
@@ -38,7 +45,7 @@ namespace PxUtils.Models.Metadata
             }
             else
             {
-                value = Entries.First().Value;
+                value = Entries.UniqueValue();
                 return true;
             }
         }
@@ -46,16 +53,7 @@ namespace PxUtils.Models.Metadata
         public MultilanguageString GetMultiLanguageString()
         {
             if (!CanGetMultilanguageValue) throw new InvalidOperationException("Value can not be represented as a multilanguage string");
-            else return new MultilanguageString(Entries.Select(kvp => {
-                if(kvp.Key.Language is null)
-                {
-                    throw new InvalidOperationException($"Property {kvp.Key.KeyWord} is missing a language identifier and therefore the value cannot be represented as a multilanguage string.");
-                }
-                else
-                {
-                    return new KeyValuePair<string, string>(kvp.Key.Language, kvp.Value);
-                }
-            }));
+            else return new MultilanguageString(Entries);
         }
 
         public bool TryGetMultilanguageString(out IReadOnlyMultilanguageString? value)
@@ -67,16 +65,7 @@ namespace PxUtils.Models.Metadata
             }
             else
             {
-                value =  new MultilanguageString(Entries.Select(kvp => {
-                    if (kvp.Key.Language is null)
-                    {
-                        throw new InvalidOperationException($"Property {kvp.Key.KeyWord} is missing a language identifier and therefore the value cannot be represented as a multilanguage string.");
-                    }
-                    else
-                    {
-                        return new KeyValuePair<string, string>(kvp.Key.Language, kvp.Value);
-                    }
-                }));
+                value = Entries;
                 return true;
             }
         }

@@ -1,8 +1,9 @@
 ﻿using PxUtils.Exceptions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PxUtils.Language
 {
-    public class MultilanguageString : IReadOnlyMultilanguageString
+    public sealed class MultilanguageString : IReadOnlyMultilanguageString
     {
         private readonly Dictionary<string, string> _translations;
 
@@ -15,17 +16,39 @@ namespace PxUtils.Language
             }
         }
 
+        /// <summary>
+        /// Languages for which translations are available
+        /// </summary>
         public IEnumerable<string> Languages => _translations.Keys;
 
+        /// <summary>
+        /// Constructor for creating a multilanguage string with a single translation
+        /// </summary>
+        /// <param name="lang">Language for the translation</param>
+        /// <param name="text">Content</param>
         public MultilanguageString(string lang, string text)
         {
             _translations = [];
             _translations[lang] = text;
         }
 
+        /// <summary>
+        /// Constructor for creating a multilanguage string with multiple translations
+        /// </summary>
+        /// <param name="translations">Collection of language content pairs</param>
         public MultilanguageString(IEnumerable<KeyValuePair<string, string>> translations)
         {
             _translations = new(translations);
+        }
+
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        /// <param name="multilanguageString">To be copied</param>
+        public MultilanguageString(MultilanguageString multilanguageString)
+        {
+            _translations = multilanguageString.Languages
+                .ToDictionary(lang => lang, lang => multilanguageString[lang]);
         }
 
         public MultilanguageString() => _translations = [];
@@ -51,13 +74,25 @@ namespace PxUtils.Language
             else throw new TranslationNotFoundException(lang);
         }
 
-        public bool Equals(IReadOnlyMultilanguageString? other)
-        {
-            if (other is null) return false;
-            if (ReferenceEquals(this, other)) return true;
+        public bool Equals(IReadOnlyMultilanguageString? other) => Equals(this, other);
 
-            return _translations.Count == other.Languages.Count() &&
-                _translations.All(kvp => other.Languages.Contains(kvp.Key) && other[kvp.Key] == kvp.Value);
+        public bool Equals(IReadOnlyMultilanguageString? x, IReadOnlyMultilanguageString? y)
+        {
+            if (x is null || y is null) return false;
+            if (x.Languages.Count() != y.Languages.Count()) return false;
+            else foreach (var lang in x.Languages)
+            {
+                if (!y.Languages.Contains(lang)) return false;
+                if (x[lang] != y[lang]) return false;
+            }
+            return true;
+        }
+
+        public int GetHashCode([DisallowNull] IReadOnlyMultilanguageString obj)
+        {
+            return obj.Languages
+                .OrderBy(lang => lang)
+                .Aggregate(0, (hash, lang) => hash ^ obj[lang].GetHashCode());
         }
     }
 }

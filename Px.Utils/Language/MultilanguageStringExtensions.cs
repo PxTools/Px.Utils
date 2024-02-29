@@ -10,7 +10,7 @@
         public static string UniqueValue(this IReadOnlyMultilanguageString multilanguageString)
         {
             string uniqueValue = multilanguageString[multilanguageString.Languages.First()];
-            foreach (var language in multilanguageString.Languages)
+            foreach (var language in multilanguageString.Languages.Skip(1))
             {
                 if (multilanguageString[language] != uniqueValue)
                 {

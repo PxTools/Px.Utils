@@ -8,6 +8,8 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         public MultilanguageString Name { get; } = name;
 
+        public List<Property> AdditionalProperties { get; } = [];
+
         #region Interface implementations
 
         IReadOnlyMultilanguageString IReadOnlyDimensionValue.Name => Name;

@@ -49,7 +49,7 @@ namespace PxUtils.ModelBuilders
 
         public static List<MultilanguageString> ParseListOfMultilanguageStrings(Property input, char listSeparator, char stringDelimeter)
         {
-            if (!input.CanGetMultilanguageValue) throw new ArgumentException($"Property {input.Entries.First().Key.KeyWord} does not have multilanguage value");
+            if (!input.CanGetMultilanguageValue) throw new ArgumentException($"Property {input.KeyWord} does not have multilanguage value");
             MultilanguageString values = input.GetMultiLanguageString();
             Dictionary<string, List<string>> langToListDict = [];
             
