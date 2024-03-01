@@ -53,10 +53,10 @@ namespace PxUtils.Models.Metadata
         public MultilanguageString GetMultiLanguageString()
         {
             if (!CanGetMultilanguageValue) throw new InvalidOperationException("Value can not be represented as a multilanguage string");
-            else return new MultilanguageString(Entries);
+            else return new(Entries);
         }
 
-        public bool TryGetMultilanguageString(out IReadOnlyMultilanguageString? value)
+        public bool TryGetMultilanguageString(out MultilanguageString? value)
         {
             if(!CanGetMultilanguageValue)
             {
@@ -65,7 +65,7 @@ namespace PxUtils.Models.Metadata
             }
             else
             {
-                value = Entries;
+                value = new(Entries);
                 return true;
             }
         }
