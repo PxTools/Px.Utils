@@ -1,9 +1,9 @@
 ﻿using PxUtils.ModelBuilders;
 
-namespace PxUtils.UnitTests.ModelBuilderTests
+namespace ModelBuilderTests.ValueParserUtilitiesTests
 {
     [TestClass]
-    public class ValueParserUtilitiesTests
+    public class ParseStringListTests
     {
         [TestMethod]
         public void ParseStringList_ValidInput_ReturnsList()
@@ -108,7 +108,7 @@ namespace PxUtils.UnitTests.ModelBuilderTests
             string input = "\"a\" \"b\", \"c\"";
             char listSeparator = ',';
             char stringDelimeter = '"';
-            
+
             // Act
             Action func = new(() => ValueParserUtilities.ParseStringList(input, listSeparator, stringDelimeter));
 
