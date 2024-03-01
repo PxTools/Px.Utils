@@ -1,6 +1,6 @@
 ﻿using PxUtils.ModelBuilders;
 
-namespace PxUtils.UnitTests.ModelBuilderTests
+namespace ModelBuilderTests
 {
     [TestClass]
     public class MetadataEntryKeyBuilderTests

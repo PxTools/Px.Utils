@@ -1,7 +1,7 @@
 ﻿using PxUtils.Language;
 using PxUtils.Models.Metadata;
 
-namespace Px.Utils.UnitTests.ModelTests
+namespace ModelTests
 {
     [TestClass]
     public class PropertyTests
