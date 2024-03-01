@@ -56,7 +56,7 @@ namespace PxUtils.Language
         public void Add(string lang, string text)
         {
             if (_translations.ContainsKey(lang)) throw new TranslationAlreadyDefinedException(text);
-            else _translations[text] = lang;
+            else _translations[lang] = text;
         }
 
         public void Add(IEnumerable<KeyValuePair<string, string>> translations)
@@ -74,6 +74,12 @@ namespace PxUtils.Language
             else throw new TranslationNotFoundException(lang);
         }
 
+        public override bool Equals(object? obj)
+        {
+            if(obj is IReadOnlyMultilanguageString romls) return Equals(this, romls);
+            else return false;
+        }
+
         public bool Equals(IReadOnlyMultilanguageString? other) => Equals(this, other);
 
         public bool Equals(IReadOnlyMultilanguageString? x, IReadOnlyMultilanguageString? y)
@@ -87,6 +93,8 @@ namespace PxUtils.Language
             }
             return true;
         }
+
+        public override int GetHashCode() => GetHashCode(this);
 
         public int GetHashCode([DisallowNull] IReadOnlyMultilanguageString obj)
         {
