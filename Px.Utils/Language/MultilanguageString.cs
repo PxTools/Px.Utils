@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PxUtils.Language
 {
-    public sealed class MultilanguageString : IReadOnlyMultilanguageString
+    public sealed class MultilanguageString : IEquatable<MultilanguageString>, IEqualityComparer<MultilanguageString>
     {
         private readonly Dictionary<string, string> _translations;
 
@@ -53,36 +53,60 @@ namespace PxUtils.Language
 
         public MultilanguageString() => _translations = [];
 
-        public void Add(string lang, string text)
+        public MultilanguageString Add(string lang, string text)
         {
-            if (_translations.ContainsKey(lang)) throw new TranslationAlreadyDefinedException(text);
-            else _translations[lang] = text;
-        }
-
-        public void Add(IEnumerable<KeyValuePair<string, string>> translations)
-        {
-            foreach (var translation in translations)
+            if (_translations.ContainsKey(lang))
             {
-                if (_translations.ContainsKey(translation.Key)) throw new TranslationAlreadyDefinedException(translation.Key);
-                else _translations[translation.Key] = translation.Value;
+                throw new TranslationAlreadyDefinedException(text);
+            }
+            else
+            {
+                Dictionary<string, string> newTranslations = new(_translations)
+                {
+                    [lang] = text
+                };
+                return new(newTranslations);
             }
         }
 
-        public void Edit(string lang, string text)
+        public MultilanguageString Add(IEnumerable<KeyValuePair<string, string>> translations)
         {
-            if (_translations.ContainsKey(lang)) _translations[lang] = text;
+            Dictionary<string, string> newTranslations = new(_translations);
+            foreach (KeyValuePair<string, string> translation in translations)
+            {
+                if (_translations.ContainsKey(translation.Key)) throw new TranslationAlreadyDefinedException(translation.Key);
+                else newTranslations[translation.Key] = translation.Value;
+            }
+            return new(newTranslations);
+        }
+
+        public MultilanguageString ReplaceTranslation(string lang, string newText)
+        {
+            if (_translations.ContainsKey(lang))
+            {
+                Dictionary<string, string> newTranslations = new(_translations)
+                {
+                    [lang] = newText
+                };
+                return new(newTranslations);
+            }
             else throw new TranslationNotFoundException(lang);
+        }
+
+        public MultilanguageString EditAllTranslations(Func<string,string> operation)
+        {
+            return new(_translations.Select(kvp => new KeyValuePair<string, string>(kvp.Key, operation(kvp.Value))));
         }
 
         public override bool Equals(object? obj)
         {
-            if(obj is IReadOnlyMultilanguageString romls) return Equals(this, romls);
+            if(obj is MultilanguageString romls) return Equals(this, romls);
             else return false;
         }
 
-        public bool Equals(IReadOnlyMultilanguageString? other) => Equals(this, other);
+        public bool Equals(MultilanguageString? other) => Equals(this, other);
 
-        public bool Equals(IReadOnlyMultilanguageString? x, IReadOnlyMultilanguageString? y)
+        public bool Equals(MultilanguageString? x, MultilanguageString? y)
         {
             if (x is null || y is null) return false;
             if (x.Languages.Count() != y.Languages.Count()) return false;
@@ -94,9 +118,19 @@ namespace PxUtils.Language
             return true;
         }
 
+        public static bool operator ==(MultilanguageString lhs, MultilanguageString rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(MultilanguageString lhs, MultilanguageString rhs)
+        {
+            return !lhs.Equals(rhs);
+        }
+
         public override int GetHashCode() => GetHashCode(this);
 
-        public int GetHashCode([DisallowNull] IReadOnlyMultilanguageString obj)
+        public int GetHashCode([DisallowNull] MultilanguageString obj)
         {
             return obj.Languages
                 .OrderBy(lang => lang)

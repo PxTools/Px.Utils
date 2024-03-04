@@ -14,7 +14,7 @@ namespace ModelBuilderTests
         {
             // Arrange
             string key = "FOOBAR";
-            string lang = "fi";
+            string lang = "aa";
             string firstIdentifier = "foo";
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\")";
@@ -34,7 +34,7 @@ namespace ModelBuilderTests
         {
             // Arrange
             string key = "FOOBAR";
-            string lang = "fi";
+            string lang = "aa";
             string input = $"{key}[{lang}]";
 
             // Act
@@ -143,7 +143,7 @@ namespace ModelBuilderTests
         {
             // Arrange
             string key = "FOOBAR";
-            string lang = "fi";
+            string lang = "aa";
             string firstIdentifier = "foo";
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}]X(\"{firstIdentifier}\",\"{secondIdentifier}\")";
@@ -159,7 +159,7 @@ namespace ModelBuilderTests
         {
             // Arrange
             string key = "FOOBAR";
-            string lang = "fi";
+            string lang = "aa";
             string firstIdentifier = "foo";
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}](\"{firstIdentifier}\"X,\"{secondIdentifier}\")";
@@ -175,7 +175,7 @@ namespace ModelBuilderTests
         {
             // Arrange
             string key = "FOOBAR";
-            string lang = "fi";
+            string lang = "aa";
             string firstIdentifier = "foo";
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\"X)";
@@ -191,7 +191,7 @@ namespace ModelBuilderTests
         {
             // Arrange
             string key = "FOOBAR";
-            string lang = "fi";
+            string lang = "aa";
             string firstIdentifier = "foo";
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\")X";
@@ -207,7 +207,7 @@ namespace ModelBuilderTests
         {
             // Arrange
             string key = "FOOBAR";
-            string lang = "fi";
+            string lang = "aa";
             string firstIdentifier = "foo";
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}][{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\")";
@@ -223,7 +223,7 @@ namespace ModelBuilderTests
         {
             // Arrange
             string key = "FOOBAR";
-            string lang = "fi";
+            string lang = "aa";
             string firstIdentifier = "foo";
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}](\"{firstIdentifier}\")(\"{secondIdentifier}\")";
@@ -239,7 +239,7 @@ namespace ModelBuilderTests
         {
             // Arrange
             string key = "FOOBAR";
-            string lang = "fi";
+            string lang = "aa";
             string firstIdentifier = "foo";
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}](\"{firstIdentifier}\" \"{secondIdentifier}\")";
@@ -256,7 +256,7 @@ namespace ModelBuilderTests
         {
             // Arrange
             string key = "FOOBAR";
-            string lang = "fi";
+            string lang = "aa";
             string firstIdentifier = "foo";
             string secondIdentifier = "bar";
             string input = $"{key}[{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\",\"fyy\")";
@@ -273,7 +273,7 @@ namespace ModelBuilderTests
         {
             // Arrange
             string key = "FOOBAR";
-            string lang = "fi";
+            string lang = "aa";
             string firstIdentifier = "foo";
             string secondIdentifier = "bar";
             string input = $"{key}[[{lang}]](\"{firstIdentifier}\",\"{secondIdentifier}\")";
@@ -289,7 +289,7 @@ namespace ModelBuilderTests
         {
             // Arrange
             string key = "FOOBAR";
-            string lang = "fi";
+            string lang = "aa";
             string firstIdentifier = "foo";
             string secondIdentifier = "bar(\"baz\")";
             string input = $"{key}[{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\")";
@@ -305,7 +305,7 @@ namespace ModelBuilderTests
         {
             // Arrange
             string key = "FOOBAR";
-            string lang = "fi";
+            string lang = "aa";
             string input = $"{key}[{lang}]()";
 
             Action func = new(() => builder.Parse(input));

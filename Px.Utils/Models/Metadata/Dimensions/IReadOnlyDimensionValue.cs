@@ -6,6 +6,6 @@ namespace PxUtils.Models.Metadata.Dimensions
     {
         string Code { get; }
 
-        IReadOnlyMultilanguageString Name { get; }
+        MultilanguageString Name { get; }
     }
 }

@@ -44,7 +44,7 @@ namespace LanguageTests
         public void AddTest_AddingNewTranslation()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            multilanguageString.Add("b", "test_value_b");
+            multilanguageString = multilanguageString.Add("b", "test_value_b");
             Assert.AreEqual("test_value_a", multilanguageString["a"]);
             Assert.AreEqual("test_value_b", multilanguageString["b"]);
             Assert.AreEqual(2, multilanguageString.Languages.Count());
@@ -68,7 +68,7 @@ namespace LanguageTests
         public void AddTest_AddingMultipleNewTranslations()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            multilanguageString.Add([new("b", "test_value_b"), new("c", "test_value_c")]);
+            multilanguageString = multilanguageString.Add([new("b", "test_value_b"), new("c", "test_value_c")]);
             Assert.AreEqual("test_value_a", multilanguageString["a"]);
             Assert.AreEqual("test_value_b", multilanguageString["b"]);
             Assert.AreEqual("test_value_c", multilanguageString["c"]);
@@ -93,7 +93,7 @@ namespace LanguageTests
         public void EditTest_EditExistingLanguage()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            multilanguageString.Edit("a", "test_value_b");
+            multilanguageString = multilanguageString.ReplaceTranslation("a", "test_value_b");
             Assert.AreEqual("test_value_b", multilanguageString["a"]);
         }
 
@@ -101,7 +101,7 @@ namespace LanguageTests
         public void EditTest_EditNonExistingLanguage_Throws()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            Assert.ThrowsException<TranslationNotFoundException>(() => multilanguageString.Edit("b", "test_value_b"));
+            Assert.ThrowsException<TranslationNotFoundException>(() => multilanguageString.ReplaceTranslation("b", "test_value_b"));
         }
 
         [TestMethod]

@@ -2,6 +2,8 @@
 using PxUtils.Models.Metadata;
 using PxUtils.Models.Metadata.Enums;
 using PxUtils.PxFile;
+using System.Diagnostics;
+using System.Linq;
 
 namespace PxUtils.ModelBuilders
 {
@@ -68,9 +70,10 @@ namespace PxUtils.ModelBuilders
         public static TimeDimensionInterval ParseTimeIntervalFromTimeVal(string input, PxFileSyntaxConf? conf = null)
         {
             conf ??= PxFileSyntaxConf.Default;
+            string intervalPart = new(input.TakeWhile(c => c != conf.Symbols.Value.ListSeparator).ToArray());
             string inputStart = conf.Tokens.Time.TimeIntervalIndicator + conf.Symbols.Value.TimeSeriesIntervalStart;
             char inputEnd = conf.Symbols.Value.TimeSeriesIntervalEnd;
-            if(input.StartsWith(inputStart) && input.EndsWith(inputEnd))
+            if(!string.IsNullOrEmpty(intervalPart) && intervalPart.StartsWith(inputStart) && intervalPart.EndsWith(inputEnd))
             {
                 Dictionary<string, TimeDimensionInterval> map = new()
                 {
@@ -81,7 +84,7 @@ namespace PxUtils.ModelBuilders
                     {conf.Tokens.Time.WeekInterval, TimeDimensionInterval.Week}
                 };
 
-                if(map.TryGetValue(input[6..^1], out TimeDimensionInterval interval)) return interval;
+                if(map.TryGetValue(intervalPart[6..^1], out TimeDimensionInterval interval)) return interval;
                 else return TimeDimensionInterval.Other;
             }
             else

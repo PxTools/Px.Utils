@@ -9,7 +9,7 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         DimensionType Type { get; }
 
-        IReadOnlyMultilanguageString Name { get; }
+        MultilanguageString Name { get; }
 
         IReadOnlyList<Property> AdditionalProperties { get; }
 

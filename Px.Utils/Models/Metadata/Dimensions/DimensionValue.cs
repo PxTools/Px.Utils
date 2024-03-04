@@ -12,7 +12,7 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         #region Interface implementations
 
-        IReadOnlyMultilanguageString IReadOnlyDimensionValue.Name => Name;
+        MultilanguageString IReadOnlyDimensionValue.Name => Name;
 
         #endregion
     }

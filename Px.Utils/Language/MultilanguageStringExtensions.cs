@@ -7,7 +7,7 @@
         /// This method assumes that all language versions of the string are identical.
         /// If the values differ, an exception is thrown.
         /// </summary>
-        public static string UniqueValue(this IReadOnlyMultilanguageString multilanguageString)
+        public static string UniqueValue(this MultilanguageString multilanguageString)
         {
             string uniqueValue = multilanguageString[multilanguageString.Languages.First()];
             foreach (var language in multilanguageString.Languages.Skip(1))
