@@ -146,6 +146,61 @@ namespace PxUtils.ModelBuilders
             return new ContentDimension(code, dimensionName, [], values);
         }
 
+        private static void AddAdditionalPropertiesToDimensions(
+            IEnumerable<IDimension> dimensions,
+            Dictionary<MetadataEntryKey, string> entries,
+            KeyValuePair<MetadataEntryKey, string> current,
+            PxFileLanguages pxLangs)
+        {
+            string firstIdentifier = current.Key.FirstIdentifier ??
+                throw new ArgumentException($"First identifier is required in the key {current.Key.KeyWord} for setting variable properties");
+
+            IDimension? targetDimension = dimensions.FirstOrDefault(d =>
+                        d.Name[current.Key.Language ?? pxLangs.DefaultLanguage] == firstIdentifier);
+
+            if (current.Key.SecondIdentifier is null)
+            {
+                if (targetDimension is not null) AddAdditionalPropertyToDimension(entries, current, targetDimension, pxLangs);
+                else if (HasContentDimensionWithValue(dimensions, firstIdentifier, out DimensionValue? value))
+                {
+                    AddPropertyToContentDimensionValue(entries, current, value, pxLangs);
+                }
+                else
+                {
+                    string eMsg = $"Failed to build property for key {current.Key} because the variable with name {firstIdentifier} was not found.";
+                    throw new ArgumentException(eMsg);
+                }
+            }
+            else
+            {
+                DimensionValue? value = targetDimension?.Values.FirstOrDefault(v => v.Name[current.Key.Language ?? pxLangs.DefaultLanguage] == current.Key.SecondIdentifier) ??
+                    throw new ArgumentException($"Failed to build property for key {current.Key} because the value with name {current.Key.SecondIdentifier} was not found.");
+                AddPropertyToDimensionValue(entries, current, targetDimension.Name, value, pxLangs);
+            }
+        }
+
+        private static void AddAdditionalPropertyToDimension(
+            Dictionary<MetadataEntryKey, string> entries,
+            KeyValuePair<MetadataEntryKey, string> current,
+            IDimension targetDimension,
+            PxFileLanguages pxLangs)
+        {
+            if (TryGetAndRemoveMultilanguageProperty(entries, current.Key.KeyWord, pxLangs, out Property? prop, targetDimension.Name))
+            {
+                targetDimension.AdditionalProperties.Add(prop);
+            }
+            else if (current.Key.Language is null)
+            {
+                targetDimension.AdditionalProperties.Add(new(current.Key.KeyWord, current.Value));
+                entries.Remove(current.Key);
+            }
+            else
+            {
+                string eMsg = $"Failed to build property for key {current.Key} because some of the required languages could not be found.";
+                throw new ArgumentException(eMsg);
+            }
+        }
+
         #endregion
 
         #region Dimension value building
@@ -207,6 +262,51 @@ namespace PxUtils.ModelBuilders
                 MultilanguageString unit = GetUnit(entries, langs, value.Name);
                 DateTime lastUpdated = GetLastUpdated(entries, langs, value.Name);
                 yield return new ContentDimensionValue(value, unit, lastUpdated);
+            }
+        }
+
+        private static void AddPropertyToDimensionValue(
+            Dictionary<MetadataEntryKey, string> entries,
+            KeyValuePair<MetadataEntryKey, string> current,
+            MultilanguageString targetDimensionName,
+            DimensionValue targetValue,
+            PxFileLanguages pxLangs)
+        {
+            if (TryGetAndRemoveMultilanguageProperty(entries, current.Key.KeyWord, pxLangs, out Property? prop, targetDimensionName, targetValue.Name))
+            {
+                targetValue.AdditionalProperties.Add(prop);
+            }
+            else if (current.Key.Language is null)
+            {
+                targetValue.AdditionalProperties.Add(new(current.Key.KeyWord, current.Value));
+                entries.Remove(current.Key);
+            }
+            else
+            {
+                string eMsg = $"Failed to build property for key {current.Key} because some of the required languages could not be found.";
+                throw new ArgumentException(eMsg);
+            }
+        }
+
+        private static void AddPropertyToContentDimensionValue(
+            Dictionary<MetadataEntryKey, string> entries,
+            KeyValuePair<MetadataEntryKey, string> current,
+            DimensionValue targetValue,
+            PxFileLanguages pxLangs)
+        {
+            if (TryGetAndRemoveMultilanguageProperty(entries, current.Key.KeyWord, pxLangs, out Property? prop, targetValue.Name))
+            {
+                targetValue.AdditionalProperties.Add(prop);
+            }
+            else if (current.Key.Language is null)
+            {
+                targetValue.AdditionalProperties.Add(new(current.Key.KeyWord, current.Value));
+                entries.Remove(current.Key);
+            }
+            else
+            {
+                string eMsg = $"Failed to build property for content key {current.Key} because some of the required languages could not be found.";
+                throw new ArgumentException(eMsg);
             }
         }
 
@@ -288,6 +388,50 @@ namespace PxUtils.ModelBuilders
             return new PxFileLanguages(defaultLang, availableLangs);
         }
 
+        private void AddAdditionalPropertiesToMatrixMetadata(MatrixMetadata metadata, Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs)
+        {
+            while (entries.Count != 0)
+            {
+                KeyValuePair<MetadataEntryKey, string> kvp = entries.First();
+                if (kvp.Key.FirstIdentifier is null)
+                {
+                    if (TryGetAndRemoveMultilanguageProperty(entries, kvp.Key.KeyWord, langs, out Property? prop))
+                    {
+                        metadata.AdditionalProperties.Add(prop);
+                    }
+                    else if (kvp.Key.Language is null)
+                    {
+                        metadata.AdditionalProperties.Add(new(kvp.Key.KeyWord, kvp.Value));
+                        entries.Remove(kvp.Key);
+                    }
+                    else
+                    {
+                        string eMsg = $"Failed to build property for key {kvp.Key} because some of the required languages could not be found.";
+                        throw new ArgumentException(eMsg);
+                    }
+                }
+                else
+                {
+                    AddAdditionalPropertiesToDimensions(metadata.Dimensions, entries, kvp, langs);
+                }
+            }
+        }
+
+        private static bool HasContentDimensionWithValue(IEnumerable<IDimension> dimensions, string name, [MaybeNullWhen(false)] out DimensionValue value)
+        {
+            IDimension? contentDimension = dimensions.FirstOrDefault(d => d.Type == DimensionType.Content);
+            if (contentDimension is not null)
+            {
+                value = contentDimension.Values.FirstOrDefault(v => v.Name.Languages.Any(l => v.Name[l] == name));
+                return value is not null;
+            }
+            else
+            {
+                value = null;
+                return false;
+            }
+        }
+
         #endregion
 
         #region Property building
@@ -341,149 +485,5 @@ namespace PxUtils.ModelBuilders
         }
 
         #endregion
-
-        private void AddAdditionalPropertiesToMatrixMetadata(MatrixMetadata metadata, Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs)
-        {
-            while(entries.Count != 0)
-            {
-                KeyValuePair<MetadataEntryKey, string> kvp = entries.First();
-                if (kvp.Key.FirstIdentifier is null)
-                {
-                    if (TryGetAndRemoveMultilanguageProperty(entries, kvp.Key.KeyWord, langs, out Property? prop))
-                    {
-                        metadata.AdditionalProperties.Add(prop);
-                    }
-                    else if (kvp.Key.Language is null)
-                    {
-                        metadata.AdditionalProperties.Add(new(kvp.Key.KeyWord, kvp.Value));
-                        entries.Remove(kvp.Key);
-                    }
-                    else
-                    {
-                        string eMsg = $"Failed to build property for key {kvp.Key} because some of the required languages could not be found.";
-                        throw new ArgumentException(eMsg);
-                    }
-                }
-                else
-                {
-                    AddAdditionalPropertiesToDimensions(metadata.Dimensions, entries, kvp, langs);
-                }
-            }   
-        }
-
-        private void AddAdditionalPropertiesToDimensions(
-            IEnumerable<IDimension> dimensions,
-            Dictionary<MetadataEntryKey, string> entries,
-            KeyValuePair<MetadataEntryKey, string> current,
-            PxFileLanguages pxLangs)
-        {
-            string firstIdentifier = current.Key.FirstIdentifier ??
-                throw new ArgumentException($"First identifier is required in the key {current.Key.KeyWord} for setting variable properties");
-
-            IDimension? targetDimension = dimensions.FirstOrDefault(d =>
-                        d.Name[current.Key.Language ?? pxLangs.DefaultLanguage] == firstIdentifier);
-
-            if(current.Key.SecondIdentifier is null)
-            {
-                if(targetDimension is not null) AddAdditionalPropertyToDimension(entries, current, targetDimension, pxLangs);
-                else if (HasContentDimensionWithValue(dimensions, firstIdentifier, out DimensionValue? value))
-                {
-                    AddPropertyToContentDimensionValue(entries, current, value, pxLangs);
-                }
-                else
-                {
-                    string eMsg = $"Failed to build property for key {current.Key} because the variable with name {firstIdentifier} was not found.";
-                    throw new ArgumentException(eMsg);
-                }
-            }
-            else
-            {
-                DimensionValue? value = targetDimension?.Values.FirstOrDefault(v => v.Name[current.Key.Language ?? pxLangs.DefaultLanguage] == current.Key.SecondIdentifier) ??
-                    throw new ArgumentException($"Failed to build property for key {current.Key} because the value with name {current.Key.SecondIdentifier} was not found.");
-                AddPropertyToDimensionValue(entries, current, targetDimension.Name, value, pxLangs);
-            }
-        }
-
-        private static bool HasContentDimensionWithValue(IEnumerable<IDimension> dimensions, string name, [MaybeNullWhen(false)] out DimensionValue value)
-        {
-            IDimension? contentDimension = dimensions.FirstOrDefault(d => d.Type == DimensionType.Content);
-            if (contentDimension is not null)
-            {
-                value = contentDimension.Values.FirstOrDefault(v => v.Name.Languages.Any(l => v.Name[l] == name));
-                return value is not null;
-            }
-            else
-            {
-                value = null;
-                return false;
-            }
-        }
-
-        private static void AddAdditionalPropertyToDimension(
-            Dictionary<MetadataEntryKey, string> entries,
-            KeyValuePair<MetadataEntryKey, string> current,
-            IDimension targetDimension,
-            PxFileLanguages pxLangs)
-        {
-            if (TryGetAndRemoveMultilanguageProperty(entries, current.Key.KeyWord, pxLangs, out Property? prop, targetDimension.Name))
-            {
-                targetDimension.AdditionalProperties.Add(prop);
-            }
-            else if (current.Key.Language is null)
-            {
-                targetDimension.AdditionalProperties.Add(new(current.Key.KeyWord, current.Value));
-                entries.Remove(current.Key);
-            }
-            else
-            {
-                string eMsg = $"Failed to build property for key {current.Key} because some of the required languages could not be found.";
-                throw new ArgumentException(eMsg);
-            }
-        }
-
-        private static void AddPropertyToDimensionValue(
-            Dictionary<MetadataEntryKey, string> entries,
-            KeyValuePair<MetadataEntryKey, string> current,
-            MultilanguageString targetDimensionName,
-            DimensionValue targetValue,
-            PxFileLanguages pxLangs)
-        {
-            if (TryGetAndRemoveMultilanguageProperty(entries, current.Key.KeyWord, pxLangs, out Property? prop, targetDimensionName, targetValue.Name))
-            {
-                targetValue.AdditionalProperties.Add(prop);
-            }
-            else if (current.Key.Language is null)
-            {
-                targetValue.AdditionalProperties.Add(new(current.Key.KeyWord, current.Value));
-                entries.Remove(current.Key);
-            }
-            else
-            {
-                string eMsg = $"Failed to build property for key {current.Key} because some of the required languages could not be found.";
-                throw new ArgumentException(eMsg);
-            }
-        }
-
-        private static void AddPropertyToContentDimensionValue(
-            Dictionary<MetadataEntryKey, string> entries,
-            KeyValuePair<MetadataEntryKey, string> current,
-            DimensionValue targetValue,
-            PxFileLanguages pxLangs)
-        {
-            if (TryGetAndRemoveMultilanguageProperty(entries, current.Key.KeyWord, pxLangs, out Property? prop, targetValue.Name))
-            {
-                targetValue.AdditionalProperties.Add(prop);
-            }
-            else if (current.Key.Language is null)
-            {
-                targetValue.AdditionalProperties.Add(new(current.Key.KeyWord, current.Value));
-                entries.Remove(current.Key);
-            }
-            else
-            {
-                string eMsg = $"Failed to build property for content key {current.Key} because some of the required languages could not be found.";
-                throw new ArgumentException(eMsg);
-            }
-        }
     }
 }
