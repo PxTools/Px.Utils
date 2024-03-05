@@ -44,10 +44,14 @@ namespace LanguageTests
         public void CopyAndAddTest_AddingNewTranslation()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            multilanguageString = multilanguageString.CopyAndAdd("b", "test_value_b");
+            MultilanguageString copy = multilanguageString.CopyAndAdd("b", "test_value_b");
+            Assert.AreEqual("test_value_a", copy["a"]);
+            Assert.AreEqual("test_value_b", copy["b"]);
+            Assert.AreEqual(2, copy.Languages.Count());
+
+            // Test that the original multilanguage string is not modified
             Assert.AreEqual("test_value_a", multilanguageString["a"]);
-            Assert.AreEqual("test_value_b", multilanguageString["b"]);
-            Assert.AreEqual(2, multilanguageString.Languages.Count());
+            Assert.AreEqual(1, multilanguageString.Languages.Count());
         }
 
         [TestMethod]
@@ -55,6 +59,10 @@ namespace LanguageTests
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
             Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd("a", "test_value_a"));
+
+            // Test that the original multilanguage string is not modified
+            Assert.AreEqual("test_value_a", multilanguageString["a"]);
+            Assert.AreEqual(1, multilanguageString.Languages.Count());
         }
 
         [TestMethod]
@@ -62,17 +70,25 @@ namespace LanguageTests
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
             Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd("a", "test_value_b"));
+
+            // Test that the original multilanguage string is not modified
+            Assert.AreEqual("test_value_a", multilanguageString["a"]);
+            Assert.AreEqual(1, multilanguageString.Languages.Count());
         }
 
         [TestMethod]
         public void CopyAndAddTest_AddingMultipleNewTranslations()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            multilanguageString = multilanguageString.CopyAndAdd([new("b", "test_value_b"), new("c", "test_value_c")]);
+            MultilanguageString copy = multilanguageString.CopyAndAdd([new("b", "test_value_b"), new("c", "test_value_c")]);
+            Assert.AreEqual("test_value_a", copy["a"]);
+            Assert.AreEqual("test_value_b", copy["b"]);
+            Assert.AreEqual("test_value_c", copy["c"]);
+            Assert.AreEqual(3, copy.Languages.Count());
+
+            // Test that the original multilanguage string is not modified
             Assert.AreEqual("test_value_a", multilanguageString["a"]);
-            Assert.AreEqual("test_value_b", multilanguageString["b"]);
-            Assert.AreEqual("test_value_c", multilanguageString["c"]);
-            Assert.AreEqual(3, multilanguageString.Languages.Count());
+            Assert.AreEqual(1, multilanguageString.Languages.Count());
         }
 
         [TestMethod]
@@ -80,6 +96,10 @@ namespace LanguageTests
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
             Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd([new("a", "test_value_a"), new("b", "test_value_b")]));
+
+            // Test that the original multilanguage string is not modified
+            Assert.AreEqual("test_value_a", multilanguageString["a"]);
+            Assert.AreEqual(1, multilanguageString.Languages.Count());
         }
 
         [TestMethod]
@@ -87,15 +107,26 @@ namespace LanguageTests
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
             Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd([new("a", "test_value_b"), new("b", "test_value_b")]));
+
+            // Test that the original multilanguage string is not modified
+            Assert.AreEqual("test_value_a", multilanguageString["a"]);
+            Assert.AreEqual(1, multilanguageString.Languages.Count());
         }
 
         [TestMethod]
         public void CopyAndReplace_EditExistingLanguage()
         {
             MultilanguageString multilanguageString = new([new("a", "test_value_a"), new("b", "test_value_b")]);
-            multilanguageString = multilanguageString.CopyAndReplace("a", "test_value_aa");
-            Assert.AreEqual("test_value_aa", multilanguageString["a"]);
+            MultilanguageString copy = multilanguageString.CopyAndReplace("a", "test_value_aa");
+            Assert.AreEqual("test_value_aa", copy["a"]);
+            Assert.AreEqual("test_value_b", copy["b"]);
+            Assert.AreEqual(2, copy.Languages.Count());
+
+            // Test that the original multilanguage string is not modified
+            Assert.AreEqual("test_value_a", multilanguageString["a"]);
             Assert.AreEqual("test_value_b", multilanguageString["b"]);
+            Assert.AreEqual(2, multilanguageString.Languages.Count());
+
         }
 
         [TestMethod]
@@ -103,17 +134,27 @@ namespace LanguageTests
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
             Assert.ThrowsException<TranslationNotFoundException>(() => multilanguageString.CopyAndReplace("b", "test_value_aa"));
+
+            // Test that the original multilanguage string is not modified
+            Assert.AreEqual("test_value_a", multilanguageString["a"]);
+            Assert.AreEqual(1, multilanguageString.Languages.Count());
         }
 
         [TestMethod]
         public void CopyAndEditAll_ReturnsEditedMultilanguageString()
         {
             MultilanguageString multilanguageString = new([new("a", "test_value_a"), new("b", "test_value_b"), new("c", "test_value_c")]);
-            multilanguageString = multilanguageString.CopyAndEditAll(s => s.Replace("test", "abcd"));
+            MultilanguageString copy = multilanguageString.CopyAndEditAll(s => s.Replace("test", "abcd"));
+            Assert.AreEqual(3, copy.Languages.Count());
+            Assert.AreEqual("abcd_value_a", copy["a"]);
+            Assert.AreEqual("abcd_value_b", copy["b"]);
+            Assert.AreEqual("abcd_value_c", copy["c"]);
+
+            // Test that the original multilanguage string is not modified
+            Assert.AreEqual("test_value_a", multilanguageString["a"]);
+            Assert.AreEqual("test_value_b", multilanguageString["b"]);
+            Assert.AreEqual("test_value_c", multilanguageString["c"]);
             Assert.AreEqual(3, multilanguageString.Languages.Count());
-            Assert.AreEqual("abcd_value_a", multilanguageString["a"]);
-            Assert.AreEqual("abcd_value_b", multilanguageString["b"]);
-            Assert.AreEqual("abcd_value_c", multilanguageString["c"]);
         }
 
         [TestMethod]
