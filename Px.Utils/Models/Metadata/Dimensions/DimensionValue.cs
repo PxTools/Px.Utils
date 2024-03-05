@@ -8,7 +8,7 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         public MultilanguageString Name { get; } = name;
 
-        public List<Property> AdditionalProperties { get; } = [];
+        public Dictionary<string, Property> AdditionalProperties { get; } = [];
 
         #region Interface implementations
 

@@ -6,7 +6,7 @@ namespace PxUtils.Models.Metadata.Dimensions
     public class TimeDimension(
         string code,
         MultilanguageString name,
-        List<Property> additionalProperties,
+        Dictionary<string, Property> additionalProperties,
         List<DimensionValue> values,
         DimensionValue? defaultValue,
         TimeDimensionInterval interval)
@@ -18,7 +18,7 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         public MultilanguageString Name {get; } = name;
 
-        public List<Property> AdditionalProperties { get; } = additionalProperties;
+        public Dictionary<string, Property> AdditionalProperties { get; } = additionalProperties;
 
         public IReadOnlyList<DimensionValue> Values { get; } = values;
 
@@ -30,7 +30,7 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         MultilanguageString IReadOnlyDimension.Name => Name;
 
-        IReadOnlyList<Property> IReadOnlyDimension.AdditionalProperties => AdditionalProperties;
+        IReadOnlyDictionary<string, Property> IReadOnlyDimension.AdditionalProperties => AdditionalProperties;
 
         IReadOnlyList<IReadOnlyDimensionValue> IReadOnlyDimension.Values => Values;
 

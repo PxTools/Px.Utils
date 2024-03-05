@@ -6,7 +6,7 @@ namespace PxUtils.Models.Metadata.Dimensions
     public class ContentDimension(
         string code,
         MultilanguageString name,
-        List<Property> additionalProperties,
+        Dictionary<string, Property> additionalProperties,
         List<ContentDimensionValue> values,
         ContentDimensionValue? defaultValue = null
         ) : IDimension
@@ -17,7 +17,7 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         public MultilanguageString Name { get; } = name;
 
-        public List<Property> AdditionalProperties { get; } = additionalProperties;
+        public Dictionary<string, Property> AdditionalProperties { get; } = additionalProperties;
 
         public List<ContentDimensionValue> Values { get; } = values;
 
@@ -25,13 +25,15 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         #region Interface implementations
 
+        DimensionValue? IDimension.DefaultValue => DefaultValue;
+
         MultilanguageString IReadOnlyDimension.Name => Name;
 
         IReadOnlyList<IReadOnlyDimensionValue> IReadOnlyDimension.Values => Values;
 
         IReadOnlyList<DimensionValue> IDimension.Values => Values;
 
-        IReadOnlyList<Property> IReadOnlyDimension.AdditionalProperties => AdditionalProperties;
+        IReadOnlyDictionary<string, Property> IReadOnlyDimension.AdditionalProperties => AdditionalProperties;
 
         IReadOnlyDimensionValue? IReadOnlyDimension.DefaultValue => DefaultValue;
 

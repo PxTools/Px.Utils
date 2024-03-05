@@ -6,8 +6,10 @@ namespace PxUtils.Models.Metadata.Dimensions
     {
         new MultilanguageString Name { get; }
 
-        new List<Property> AdditionalProperties { get; }
+        new Dictionary<string, Property> AdditionalProperties { get; }
 
         new IReadOnlyList<DimensionValue> Values { get; }
+
+        new DimensionValue? DefaultValue { get; }
     }
 }

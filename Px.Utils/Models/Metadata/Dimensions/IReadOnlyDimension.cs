@@ -11,7 +11,7 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         MultilanguageString Name { get; }
 
-        IReadOnlyList<Property> AdditionalProperties { get; }
+        IReadOnlyDictionary<string, Property> AdditionalProperties { get; }
 
         IReadOnlyList<IReadOnlyDimensionValue> Values { get; }
 
