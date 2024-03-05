@@ -41,34 +41,34 @@ namespace LanguageTests
         }
 
         [TestMethod]
-        public void AddTest_AddingNewTranslation()
+        public void CopyAndAddTest_AddingNewTranslation()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            multilanguageString = multilanguageString.Add("b", "test_value_b");
+            multilanguageString = multilanguageString.CopyAndAdd("b", "test_value_b");
             Assert.AreEqual("test_value_a", multilanguageString["a"]);
             Assert.AreEqual("test_value_b", multilanguageString["b"]);
             Assert.AreEqual(2, multilanguageString.Languages.Count());
         }
 
         [TestMethod]
-        public void AddTest_AddingExistingTranslation_Throws()
+        public void CopyAndAddTest_AddingExistingTranslation_Throws()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.Add("a", "test_value_a"));
+            Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd("a", "test_value_a"));
         }
 
         [TestMethod]
-        public void AddTest_AddingExistingTranslationWithDifferentValue_Throws()
+        public void CopyAndAddTest_AddingExistingTranslationWithDifferentValue_Throws()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.Add("a", "test_value_b"));
+            Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd("a", "test_value_b"));
         }
 
         [TestMethod]
-        public void AddTest_AddingMultipleNewTranslations()
+        public void CopyAndAddTest_AddingMultipleNewTranslations()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            multilanguageString = multilanguageString.Add([new("b", "test_value_b"), new("c", "test_value_c")]);
+            multilanguageString = multilanguageString.CopyAndAdd([new("b", "test_value_b"), new("c", "test_value_c")]);
             Assert.AreEqual("test_value_a", multilanguageString["a"]);
             Assert.AreEqual("test_value_b", multilanguageString["b"]);
             Assert.AreEqual("test_value_c", multilanguageString["c"]);
@@ -76,32 +76,44 @@ namespace LanguageTests
         }
 
         [TestMethod]
-        public void AddTest_AddingMultipleTranslationsWithExistingTranslation_Throws()
+        public void CopyAndAddTest_AddingMultipleTranslationsWithExistingTranslation_Throws()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.Add([new("a", "test_value_a"), new("b", "test_value_b")]));
+            Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd([new("a", "test_value_a"), new("b", "test_value_b")]));
         }
 
         [TestMethod]
-        public void AddTest_AddingMultipleTranslationsWithExistingTranslationWithDifferentValue_Throws()
+        public void CopyAndAddTest_AddingMultipleTranslationsWithExistingTranslationWithDifferentValue_Throws()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.Add([new("a", "test_value_b"), new("b", "test_value_b")]));
+            Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd([new("a", "test_value_b"), new("b", "test_value_b")]));
         }
 
         [TestMethod]
-        public void EditTest_EditExistingLanguage()
+        public void CopyAndReplace_EditExistingLanguage()
         {
-            MultilanguageString multilanguageString = new("a", "test_value_a");
-            multilanguageString = multilanguageString.ReplaceTranslation("a", "test_value_b");
-            Assert.AreEqual("test_value_b", multilanguageString["a"]);
+            MultilanguageString multilanguageString = new([new("a", "test_value_a"), new("b", "test_value_b")]);
+            multilanguageString = multilanguageString.CopyAndReplace("a", "test_value_aa");
+            Assert.AreEqual("test_value_aa", multilanguageString["a"]);
+            Assert.AreEqual("test_value_b", multilanguageString["b"]);
         }
 
         [TestMethod]
-        public void EditTest_EditNonExistingLanguage_Throws()
+        public void CopyAndReplace_EditNonExistingLanguage_Throws()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            Assert.ThrowsException<TranslationNotFoundException>(() => multilanguageString.ReplaceTranslation("b", "test_value_b"));
+            Assert.ThrowsException<TranslationNotFoundException>(() => multilanguageString.CopyAndReplace("b", "test_value_aa"));
+        }
+
+        [TestMethod]
+        public void CopyAndEditAll_ReturnsEditedMultilanguageString()
+        {
+            MultilanguageString multilanguageString = new([new("a", "test_value_a"), new("b", "test_value_b"), new("c", "test_value_c")]);
+            multilanguageString = multilanguageString.CopyAndEditAll(s => s.Replace("test", "abcd"));
+            Assert.AreEqual(3, multilanguageString.Languages.Count());
+            Assert.AreEqual("abcd_value_a", multilanguageString["a"]);
+            Assert.AreEqual("abcd_value_b", multilanguageString["b"]);
+            Assert.AreEqual("abcd_value_c", multilanguageString["c"]);
         }
 
         [TestMethod]
@@ -113,11 +125,43 @@ namespace LanguageTests
         }
 
         [TestMethod]
+        public void EqualsTest_WithEqualsOperator_SameStringsAreEqual()
+        {
+            MultilanguageString first = new([new("a", "test_value_a"), new("b", "test_value_b")]);
+            MultilanguageString second = new([new("a", "test_value_a"), new("b", "test_value_b")]);
+            Assert.IsTrue(first == second);
+        }
+
+        [TestMethod]
+        public void EqualsTest_WithNotEqualsOperator_SameStringsAreEqual()
+        {
+            MultilanguageString first = new([new("a", "test_value_a"), new("b", "test_value_b")]);
+            MultilanguageString second = new([new("a", "test_value_a"), new("b", "test_value_b")]);
+            Assert.IsFalse(first != second);
+        }
+
+        [TestMethod]
         public void EqualsTest_DifferentStringsAreNotEqual()
         {
             MultilanguageString first = new([new("a", "test_value_a"), new("b", "test_value_b")]);
             MultilanguageString second = new([new("c", "test_value_c"), new("d", "test_value_d")]);
             Assert.AreNotEqual(first, second);
+        }
+
+        [TestMethod]
+        public void EqualsTest_WithEqualsOperator_DifferentStringsAreNotEqual()
+        {
+            MultilanguageString first = new([new("a", "test_value_a"), new("b", "test_value_b")]);
+            MultilanguageString second = new([new("c", "test_value_c"), new("d", "test_value_d")]);
+            Assert.IsFalse(first == second);
+        }
+
+        [TestMethod]
+        public void EqualsTest_WithNotEqualsOperator_DifferentStringsAreNotEqual()
+        {
+            MultilanguageString first = new([new("a", "test_value_a"), new("b", "test_value_b")]);
+            MultilanguageString second = new([new("c", "test_value_c"), new("d", "test_value_d")]);
+            Assert.IsTrue(first != second);
         }
 
         [TestMethod]

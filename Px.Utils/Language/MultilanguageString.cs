@@ -53,7 +53,7 @@ namespace PxUtils.Language
 
         public MultilanguageString() => _translations = [];
 
-        public MultilanguageString Add(string lang, string text)
+        public MultilanguageString CopyAndAdd(string lang, string text)
         {
             if (_translations.ContainsKey(lang))
             {
@@ -69,7 +69,7 @@ namespace PxUtils.Language
             }
         }
 
-        public MultilanguageString Add(IEnumerable<KeyValuePair<string, string>> translations)
+        public MultilanguageString CopyAndAdd(IEnumerable<KeyValuePair<string, string>> translations)
         {
             Dictionary<string, string> newTranslations = new(_translations);
             foreach (KeyValuePair<string, string> translation in translations)
@@ -80,7 +80,7 @@ namespace PxUtils.Language
             return new(newTranslations);
         }
 
-        public MultilanguageString ReplaceTranslation(string lang, string newText)
+        public MultilanguageString CopyAndReplace(string lang, string newText)
         {
             if (_translations.ContainsKey(lang))
             {
@@ -93,7 +93,7 @@ namespace PxUtils.Language
             else throw new TranslationNotFoundException(lang);
         }
 
-        public MultilanguageString EditAllTranslations(Func<string,string> operation)
+        public MultilanguageString CopyAndEditAll(Func<string,string> operation)
         {
             return new(_translations.Select(kvp => new KeyValuePair<string, string>(kvp.Key, operation(kvp.Value))));
         }

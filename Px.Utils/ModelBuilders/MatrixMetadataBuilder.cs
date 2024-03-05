@@ -70,7 +70,7 @@ namespace PxUtils.ModelBuilders
             string contentKey = _pxFileSyntaxConf.Tokens.KeyWords.ContentVariableIdentifier;
             if(TryGetAndRemoveMultilanguageProperty(entries, contentKey, langs, out Property? contVarName))
             {
-                MultilanguageString name = contVarName.GetMultiLanguageString().EditAllTranslations(s => s.Trim(_stringDelimeter));
+                MultilanguageString name = contVarName.GetMultiLanguageString().CopyAndEditAll(s => s.Trim(_stringDelimeter));
                 contentDimension = BuildContentDimension(entries, langs, name);
                 return true;
             }
