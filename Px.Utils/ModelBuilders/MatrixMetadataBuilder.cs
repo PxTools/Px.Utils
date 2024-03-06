@@ -9,12 +9,20 @@ using System.Globalization;
 
 namespace PxUtils.ModelBuilders
 {
+    /// <summary>
+    /// Class for building <see cref="MatrixMetadata"/> objects from metadata input.
+    /// </summary>
     public class MatrixMetadataBuilder
     {
         private readonly PxFileSyntaxConf _pxFileSyntaxConf;
         private readonly char _listSeparator;
         private readonly char _stringDelimeter;
 
+        /// <summary>
+        /// Initializes a new instance of the MatrixMetadataBuilder class.
+        /// This constructor takes an optional PxFileSyntaxConf object. If none is provided, it uses the default configuration.
+        /// </summary>
+        /// <param name="pxFileSyntaxConf">An optional configuration object for Px file syntax. If not provided, the default configuration is used.</param>
         public MatrixMetadataBuilder(PxFileSyntaxConf? pxFileSyntaxConf = null)
         {
             _pxFileSyntaxConf = pxFileSyntaxConf ?? PxFileSyntaxConf.Default;
@@ -22,6 +30,11 @@ namespace PxUtils.ModelBuilders
             _stringDelimeter = _pxFileSyntaxConf.Symbols.Value.StringDelimeter;
         }
 
+        /// <summary>
+        /// Builds a MatrixMetadata object from a given set of metadata entries.
+        /// </summary>
+        /// <param name="metadataInput">An IEnumerable of key-value pairs representing the metadata entries in the Px-File format.</param>
+        /// <returns>A MatrixMetadata object constructed from the input metadata.</returns>
         public MatrixMetadata Build(IEnumerable<KeyValuePair<string, string>> metadataInput)
         {
             MetadataEntryKeyBuilder entryKeyBuilder = new();

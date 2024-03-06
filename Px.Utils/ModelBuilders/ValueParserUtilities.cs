@@ -5,8 +5,19 @@ using PxUtils.PxFile;
 
 namespace PxUtils.ModelBuilders
 {
+    /// <summary>
+    /// Class containing utility methods for parsing various types of values from Px-style metadata value string.
+    /// </summary>
     public static class ValueParserUtilities
     {
+        /// <summary>
+        /// Parses a string into a list of strings, using the provided list separator and string delimiter.
+        /// It throws an exception if the input string is not in the correct format or contains illegal characters.
+        /// </summary>
+        /// <param name="input">The string to parse into a list of strings.</param>
+        /// <param name="listSeparator">The character used to separate items in the list.</param>
+        /// <param name="stringDelimeter">The character used to delimit strings in the list.</param>
+        /// <returns>A list of strings parsed from the input string.</returns>
         public static List<string> ParseStringList(string input, char listSeparator, char stringDelimeter)
         {
             List<string> list = [];
@@ -47,6 +58,16 @@ namespace PxUtils.ModelBuilders
             return list;
         }
 
+        /// <summary>
+        /// Parses a <see cref="Property"/> object into a list of <see cref="MultilanguageString"/> objects, using the provided list separator and string delimiter.
+        /// This method checks if the input <see cref="Property"/> can get a multilanguage value. If it can, it parses each language string into a list of strings and constructs a list of <see cref="MultilanguageString"/> objects.
+        /// If the input <see cref="Property"/> cannot get a multilanguage value, it parses the string value of the <see cref="Property"/> into a list of strings and constructs a list of <see cref="MultilanguageString"/> objects with the backup language.
+        /// </summary>
+        /// <param name="input">The <see cref="Property"/> object to parse into a list of <see cref="MultilanguageString"/> objects.</param>
+        /// <param name="backupLang">The backup language to use if the <see cref="Property"/> cannot get a multilanguage value.</param>
+        /// <param name="listSeparator">The character used to separate items in the list.</param>
+        /// <param name="stringDelimeter">The character used to delimit strings in the list.</param>
+        /// <returns>A list of <see cref="MultilanguageString"/> objects parsed from the input <see cref="Property"/>.</returns>
         public static List<MultilanguageString> ParseListOfMultilanguageStrings(Property input, string backupLang, char listSeparator, char stringDelimeter)
         {
             if (input.CanGetMultilanguageValue)
@@ -74,6 +95,14 @@ namespace PxUtils.ModelBuilders
             }
         }
 
+        /// <summary>
+        /// Parses a string into a <see cref="TimeDimensionInterval"/> enumeration value.
+        /// This method extracts the time interval part from the input string and maps it to a <see cref="TimeDimensionInterval"/> enumeration value.
+        /// It throws an exception if the input string is not in the correct format or does not represent a valid time interval.
+        /// </summary>
+        /// <param name="input">The string to parse into a <see cref="TimeDimensionInterval"/> enumeration value.</param>
+        /// <param name="conf">An optional <see cref="PxFileSyntaxConf"/> object. If not provided, the default configuration is used.</param>
+        /// <returns>A <see cref="TimeDimensionInterval"/> enumeration value parsed from the input string.</returns>
         public static TimeDimensionInterval ParseTimeIntervalFromTimeVal(string input, PxFileSyntaxConf? conf = null)
         {
             conf ??= PxFileSyntaxConf.Default;
@@ -99,7 +128,15 @@ namespace PxUtils.ModelBuilders
                 throw new ArgumentException($"Invalid time interval string {input}");
             }
         }
-        
+
+        /// <summary>
+        /// Parses a string into a <see cref="DimensionType"/> enumeration value.
+        /// This method maps the input string to a <see cref="DimensionType"/> enumeration value based on the provided or default PxFileSyntaxConf configuration.
+        /// If the input string does not map to a known <see cref="DimensionType"/>, the method returns <see cref="DimensionType.Unknown"/>.
+        /// </summary>
+        /// <param name="input">The string to parse into a <see cref="DimensionType"/> enumeration value.</param>
+        /// <param name="conf">An optional <see cref="PxFileSyntaxConf"/> object. If not provided, the default configuration is used.</param>
+        /// <returns>A <see cref="DimensionType"/> enumeration value parsed from the input string.</returns>
         public static DimensionType StringToDimensionType(string input, PxFileSyntaxConf? conf = null)
         {
             conf ??= PxFileSyntaxConf.Default;

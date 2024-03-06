@@ -3,6 +3,9 @@ using PxUtils.PxFile;
 
 namespace PxUtils.ModelBuilders
 {
+    /// <summary>
+    /// Class for building <see cref="MetadataEntryKey"/> records from strings.
+    /// </summary>
     public class MetadataEntryKeyBuilder
     {
         private readonly char _langParamStart;
@@ -16,6 +19,11 @@ namespace PxUtils.ModelBuilders
 
         private readonly char[] _illlegalKeyTokes;
 
+        /// <summary>
+        /// Initializes a new instance of the MetadataEntryKeyBuilder class.
+        /// This constructor takes an optional PxFileSyntaxConf object. If none is provided, it uses the default configuration.
+        /// </summary>
+        /// <param name="configuration">An optional configuration object for Px file syntax. If not provided, the default configuration is used.</param>
         public MetadataEntryKeyBuilder(PxFileSyntaxConf? configuration = null)
         {
             PxFileSyntaxConf _conf = configuration ?? PxFileSyntaxConf.Default;
@@ -37,6 +45,13 @@ namespace PxUtils.ModelBuilders
             ];
         }
 
+        /// <summary>
+        /// Parses a string into a <see cref="MetadataEntryKey"/> record.
+        /// This method extracts the key name, language, and specifiers from the input string and constructs the record.
+        /// It throws an exception if the input string is not in the correct format or contains illegal characters.
+        /// </summary>
+        /// <param name="key">The string to parse into a <see cref="MetadataEntryKey"/> record.</param>
+        /// <returns>A <see cref="MetadataEntryKey"/> record constructed from the input string.</returns>
         public MetadataEntryKey Parse(string key)
         {
             string name = ParseKeyName(ref key);
