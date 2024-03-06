@@ -69,5 +69,11 @@ namespace PxUtils.Models.Metadata
                 return true;
             }
         }
+
+        public MultilanguageString ToMultilanguageStringWithBackupLanguage(string backupLang)
+        {
+            if(CanGetMultilanguageValue) return new(Entries);
+            else return new(backupLang, Entries.UniqueValue());
+        }
     }
 }

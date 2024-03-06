@@ -36,13 +36,13 @@ namespace PxUtils.ModelBuilders
             PxFileLanguages langs = GetLanguages(entries);
 
             string stubKey = _pxFileSyntaxConf.Tokens.KeyWords.StubDimensions;
-            IEnumerable<MultilanguageString> stubDimensionNames = TryGetAndRemoveMultilanguageProperty(entries, stubKey, langs, out Property? maybeStub)
-                ? ValueParserUtilities.ParseListOfMultilanguageStrings(maybeStub, _listSeparator, _stringDelimeter)
+            IEnumerable<MultilanguageString> stubDimensionNames = TryGetAndRemoveProperty(entries, stubKey, langs, out Property? maybeStub)
+                ? ValueParserUtilities.ParseListOfMultilanguageStrings(maybeStub, langs.DefaultLanguage, _listSeparator, _stringDelimeter)
                 : throw new ArgumentException("Stub variable names not found in metadata");
 
             string headingKey = _pxFileSyntaxConf.Tokens.KeyWords.HeadingDimensions;
-            IEnumerable<MultilanguageString> headingDimensionNames = TryGetAndRemoveMultilanguageProperty(entries, headingKey, langs, out Property? maybeHeading)
-                ? ValueParserUtilities.ParseListOfMultilanguageStrings(maybeHeading, _listSeparator, _stringDelimeter)
+            IEnumerable<MultilanguageString> headingDimensionNames = TryGetAndRemoveProperty(entries, headingKey, langs, out Property? maybeHeading)
+                ? ValueParserUtilities.ParseListOfMultilanguageStrings(maybeHeading, langs.DefaultLanguage, _listSeparator, _stringDelimeter)
                 : throw new ArgumentException("Heading variable names not found in metadata");
 
             ContentDimension cd = TryGetContentDimension(entries, langs, out ContentDimension? maybeContent)
@@ -68,11 +68,20 @@ namespace PxUtils.ModelBuilders
         private bool TryGetContentDimension(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, [MaybeNullWhen(false)] out ContentDimension contentDimension)
         {
             string contentKey = _pxFileSyntaxConf.Tokens.KeyWords.ContentVariableIdentifier;
-            if(TryGetAndRemoveMultilanguageProperty(entries, contentKey, langs, out Property? contVarName))
+            if(TryGetAndRemoveProperty(entries, contentKey, langs, out Property? contVarName))
             {
-                MultilanguageString name = contVarName.GetMultiLanguageString().CopyAndEditAll(s => s.Trim(_stringDelimeter));
-                contentDimension = BuildContentDimension(entries, langs, name);
-                return true;
+                if(contVarName.CanGetMultilanguageValue)
+                {
+                    MultilanguageString name = contVarName.GetMultiLanguageString().CopyAndEditAll(s => s.Trim(_stringDelimeter));
+                    contentDimension = BuildContentDimension(entries, langs, name);
+                    return true;
+                }
+                else
+                {
+                    string name = contVarName.GetString().Trim(_stringDelimeter);
+                    contentDimension = BuildContentDimension(entries, langs, new MultilanguageString(langs.DefaultLanguage, name));
+                    return true;
+                }
             }
 
             contentDimension = null;
@@ -87,7 +96,7 @@ namespace PxUtils.ModelBuilders
         {
             string timeValIdentifierKey = _pxFileSyntaxConf.Tokens.KeyWords.TimeVal;
             string dimensionTypeKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionType;
-            if(TryGetAndRemoveMultilanguageProperty(entries, timeValIdentifierKey, langs, out Property? timeVal, dimensionNameToTest))
+            if(TryGetAndRemoveProperty(entries, timeValIdentifierKey, langs, out Property? timeVal, dimensionNameToTest))
             {
                 string code = GetDimensionCode(entries, langs, dimensionNameToTest);
                 DimensionValue[] values = BuildDimensionValues(entries, langs, dimensionNameToTest);
@@ -97,9 +106,12 @@ namespace PxUtils.ModelBuilders
                 timeDimension = new TimeDimension(code, dimensionNameToTest, additionalProperties, [.. values], maybeDefault, interval);
                 return true;
             }
-            else if (TryGetAndRemoveMultilanguageProperty(entries, dimensionTypeKey, langs, out Property? dimTypeContent, dimensionNameToTest) &&
-                dimTypeContent.GetString() == _pxFileSyntaxConf.Tokens.VariableTypes.Time)
+            else if (TryGetProperty(entries, dimensionTypeKey, langs, out Property? dimType, dimensionNameToTest) &&
+                ValueParserUtilities.StringToDimensionType(dimType.GetString()) == DimensionType.Time)
             {
+                List<MetadataEntryKey> keys = BuildKeys(entries, dimensionTypeKey, langs, dimensionNameToTest);
+                keys.ForEach(k => entries.Remove(k));
+
                 string code = GetDimensionCode(entries, langs, dimensionNameToTest);
                 DimensionValue[] values = BuildDimensionValues(entries, langs, dimensionNameToTest);
                 DimensionValue? maybeDefault = GetDefaultValue(entries, langs, dimensionNameToTest, values);
@@ -116,9 +128,9 @@ namespace PxUtils.ModelBuilders
             string code = GetDimensionCode(entries, langs, dimensionName);
             DimensionValue[] values = BuildDimensionValues(entries, langs, dimensionName);
             DimensionValue? maybeDefault = GetDefaultValue(entries, langs, dimensionName, values);
+            
             string dimensionTypeKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionType;
-
-            DimensionType type = TryGetAndRemoveMultilanguageProperty(entries, dimensionTypeKey, langs, out Property? dimTypeContent, dimensionName)
+            DimensionType type = TryGetAndRemoveProperty(entries, dimensionTypeKey, langs, out Property? dimTypeContent, dimensionName)
                 ? ValueParserUtilities.StringToDimensionType(dimTypeContent.GetString(), _pxFileSyntaxConf)
                 : DimensionType.Unknown;
 
@@ -130,13 +142,16 @@ namespace PxUtils.ModelBuilders
             string code = GetDimensionCode(entries, langs, dimensionName);
             List<ContentDimensionValue> values = BuildContentDimensionValues(entries, langs, dimensionName).ToList();
             string defaultValueKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionDefaultValue;
-            if (TryGetAndRemoveMultilanguageProperty(entries, defaultValueKey, langs, out Property? defaultValueName))
+            if (TryGetAndRemoveProperty(entries, defaultValueKey, langs, out Property? defaultValueProperty))
             {
-                ContentDimensionValue? defaultValue = values.Find(v => v.Name == defaultValueName.GetMultiLanguageString());
+                MultilanguageString defaultValueName = defaultValueProperty.CanGetMultilanguageValue
+                    ? defaultValueProperty.GetMultiLanguageString()
+                    : new MultilanguageString(langs.DefaultLanguage, defaultValueProperty.GetString());
+                ContentDimensionValue? defaultValue = values.Find(v => v.Name == defaultValueName);
 
                 if (defaultValue is null)
                 {
-                    string defaultName = defaultValueName.GetMultiLanguageString()[langs.DefaultLanguage];
+                    string defaultName = defaultValueName[langs.DefaultLanguage];
                     string eMsg = $"Default value is defined for the content variable but the variable does not contain a value with name {defaultName}";
                     throw new ArgumentException(eMsg);
                 }
@@ -186,19 +201,13 @@ namespace PxUtils.ModelBuilders
             IDimension targetDimension,
             PxFileLanguages pxLangs)
         {
-            if (TryGetAndRemoveMultilanguageProperty(entries, current.Key.KeyWord, pxLangs, out Property? prop, targetDimension.Name))
+            if (TryGetAndRemoveProperty(entries, current.Key.KeyWord, pxLangs, out Property? prop, targetDimension.Name))
             {
                 targetDimension.AdditionalProperties[prop.KeyWord] = prop;
             }
-            else if (current.Key.Language is null)
-            {
-                string keyWord = current.Key.KeyWord;
-                targetDimension.AdditionalProperties[keyWord] = new(keyWord, current.Value);
-                entries.Remove(current.Key);
-            }
             else
             {
-                string eMsg = $"Failed to build property for key {current.Key} because some of the required languages could not be found.";
+                string eMsg = $"Failed to build property for key {current.Key}, either some required metadata is missing or contains errors.";
                 throw new ArgumentException(eMsg);
             }
         }
@@ -213,9 +222,9 @@ namespace PxUtils.ModelBuilders
             MultilanguageString dimensionName)
         {
             string valueNamesKey = _pxFileSyntaxConf.Tokens.KeyWords.VariableValues;
-            if (TryGetAndRemoveMultilanguageProperty(entries, valueNamesKey, langs, out Property? valueNames, dimensionName))
+            if (TryGetAndRemoveProperty(entries, valueNamesKey, langs, out Property? valueNames, dimensionName))
             {
-                return GetVariableValueIterator(entries, langs, dimensionName, valueNames.GetMultiLanguageString());
+                return GetVariableValueIterator(entries, langs, dimensionName, valueNames);
             }
 
             throw new ArgumentException($"Value names not found for dimension {dimensionName[langs.DefaultLanguage]}");
@@ -225,13 +234,14 @@ namespace PxUtils.ModelBuilders
             Dictionary<MetadataEntryKey, string> entries,
             PxFileLanguages langs,
             MultilanguageString dimensionName,
-            MultilanguageString valueNamesBlob)
+            Property valueNamesProperty)
         {
-            Dictionary<string, List<string>> valueNames = langs.AvailableLanguages
-                .ToDictionary(l => l, l => ValueParserUtilities.ParseStringList(valueNamesBlob[l], _listSeparator, _stringDelimeter));
+            Dictionary<string, List<string>> valueNames = valueNamesProperty.CanGetMultilanguageValue
+                ? langs.AvailableLanguages.ToDictionary(l => l, l => ValueParserUtilities.ParseStringList(valueNamesProperty.GetMultiLanguageString()[l], _listSeparator, _stringDelimeter))
+                : langs.AvailableLanguages.ToDictionary(l => l, l => ValueParserUtilities.ParseStringList(valueNamesProperty.GetString(), _listSeparator, _stringDelimeter));
 
             string valueCodesKey = _pxFileSyntaxConf.Tokens.KeyWords.VariableValueCodes;
-            List<string> codes = TryGetAndRemoveMultilanguageProperty(entries, valueCodesKey, langs, out Property? codeSet, dimensionName)
+            List<string> codes = TryGetAndRemoveProperty(entries, valueCodesKey, langs, out Property? codeSet, dimensionName)
                 ? ValueParserUtilities.ParseStringList(codeSet.GetString(), _listSeparator, _stringDelimeter)
                 : valueNames[langs.DefaultLanguage];
 
@@ -278,19 +288,13 @@ namespace PxUtils.ModelBuilders
             DimensionValue targetValue,
             PxFileLanguages pxLangs)
         {
-            if (TryGetAndRemoveMultilanguageProperty(entries, current.Key.KeyWord, pxLangs, out Property? prop, targetDimensionName, targetValue.Name))
+            if (TryGetAndRemoveProperty(entries, current.Key.KeyWord, pxLangs, out Property? prop, targetDimensionName, targetValue.Name))
             {
                 targetValue.AdditionalProperties[prop.KeyWord] = prop;
             }
-            else if (current.Key.Language is null)
-            {
-                string keyWord = current.Key.KeyWord;
-                targetValue.AdditionalProperties[keyWord] = new(current.Key.KeyWord, current.Value);
-                entries.Remove(current.Key);
-            }
             else
             {
-                string eMsg = $"Failed to build property for key {current.Key} because some of the required languages could not be found.";
+                string eMsg = $"Failed to build property for key {current.Key}, either some required metadata is missing or contains errors.";
                 throw new ArgumentException(eMsg);
             }
         }
@@ -301,19 +305,13 @@ namespace PxUtils.ModelBuilders
             DimensionValue targetValue,
             PxFileLanguages pxLangs)
         {
-            if (TryGetAndRemoveMultilanguageProperty(entries, current.Key.KeyWord, pxLangs, out Property? prop, targetValue.Name))
+            if (TryGetAndRemoveProperty(entries, current.Key.KeyWord, pxLangs, out Property? prop, targetValue.Name))
             {
                 targetValue.AdditionalProperties[prop.KeyWord] = prop;
             }
-            else if (current.Key.Language is null)
-            {
-                string keyWord = current.Key.KeyWord;
-                targetValue.AdditionalProperties[keyWord] = new(current.Key.KeyWord, current.Value);
-                entries.Remove(current.Key);
-            }
             else
             {
-                string eMsg = $"Failed to build property for content key {current.Key} because some of the required languages could not be found.";
+                string eMsg = $"Failed to build property for key {current.Key}, either some required metadata is missing or contains errors.";
                 throw new ArgumentException(eMsg);
             }
         }
@@ -321,17 +319,19 @@ namespace PxUtils.ModelBuilders
         private string GetDimensionCode(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName)
         {
             string varCodeKey = _pxFileSyntaxConf.Tokens.KeyWords.VariableCode;
-            return TryGetAndRemoveMultilanguageProperty(entries, varCodeKey, langs, out Property? codeSet, dimensionName)
+            return TryGetAndRemoveProperty(entries, varCodeKey, langs, out Property? codeSet, dimensionName)
             ? codeSet.GetString() : dimensionName[langs.DefaultLanguage];
         }
 
         private MultilanguageString GetUnit(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString name)
         {
             string unitKey = _pxFileSyntaxConf.Tokens.KeyWords.Units;
-            if (TryGetAndRemoveMultilanguageProperty(entries, unitKey, langs, out Property? unit, name) ||
-              TryGetAndRemoveMultilanguageProperty(entries, unitKey, langs, out unit))
+            if (TryGetAndRemoveProperty(entries, unitKey, langs, out Property? unit, name) ||
+              TryGetAndRemoveProperty(entries, unitKey, langs, out unit))
             {
-                return unit.GetMultiLanguageString();
+                return unit.CanGetMultilanguageValue
+                    ? unit.GetMultiLanguageString()
+                    : new MultilanguageString(langs.DefaultLanguage, unit.GetString());
             }
 
             throw new ArgumentException("Unit information not found");
@@ -340,10 +340,10 @@ namespace PxUtils.ModelBuilders
         private DateTime GetLastUpdated(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString valueName)
         {
             string lastUpdatedKey = _pxFileSyntaxConf.Tokens.KeyWords.LastUpdated;
-            if (TryGetAndRemoveMultilanguageProperty(entries, lastUpdatedKey, langs, out Property? lastUpdated, valueName))
+            if (TryGetAndRemoveProperty(entries, lastUpdatedKey, langs, out Property? lastUpdated, valueName))
             {
                 string formatString = _pxFileSyntaxConf.Tokens.Time.DateTimeFormatString;
-                return DateTime.ParseExact(lastUpdated.GetMultiLanguageString().UniqueValue(), formatString, CultureInfo.InvariantCulture);
+                return DateTime.ParseExact(lastUpdated.GetString(), formatString, CultureInfo.InvariantCulture);
             }
 
             throw new ArgumentException("Last update information not found");
@@ -352,9 +352,12 @@ namespace PxUtils.ModelBuilders
         private Dim? GetDefaultValue<Dim>(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName, Dim[] values) where Dim : DimensionValue
         { 
             string defaultValueKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionDefaultValue;
-            if (TryGetAndRemoveMultilanguageProperty(entries, defaultValueKey, langs, out Property? defaultValueName, dimensionName))
+            if (TryGetAndRemoveProperty(entries, defaultValueKey, langs, out Property? defaultValueName, dimensionName))
             {
-                if (Array.Find(values, v => v.Name == defaultValueName.GetMultiLanguageString()) is Dim dimensionValue)
+                MultilanguageString name = defaultValueName.CanGetMultilanguageValue
+                    ? defaultValueName.GetMultiLanguageString()
+                    : new MultilanguageString(langs.DefaultLanguage, defaultValueName.GetString());
+                if (Array.Find(values, v => v.Name == name) is Dim dimensionValue)
                 {
                     return dimensionValue;
                 }
@@ -404,18 +407,13 @@ namespace PxUtils.ModelBuilders
                 if (kvp.Key.FirstIdentifier is null)
                 {
                     string keyWord = kvp.Key.KeyWord;
-                    if (TryGetAndRemoveMultilanguageProperty(entries, keyWord, langs, out Property? prop))
+                    if (TryGetAndRemoveProperty(entries, keyWord, langs, out Property? prop))
                     {
                         metadata.AdditionalProperties[keyWord] = prop;
                     }
-                    else if (kvp.Key.Language is null)
-                    {
-                        metadata.AdditionalProperties[keyWord] = new(kvp.Key.KeyWord, kvp.Value);
-                        entries.Remove(kvp.Key);
-                    }
                     else
                     {
-                        string eMsg = $"Failed to build property for key {kvp.Key.KeyWord} because some of the required languages could not be found.";
+                        string eMsg = $"Failed to build property for key {keyWord}, either some required metadata is missing or contains errors.";
                         throw new ArgumentException(eMsg);
                     }
                 }
@@ -445,11 +443,69 @@ namespace PxUtils.ModelBuilders
 
         #region Property building
 
-        private static bool TryGetAndRemoveMultilanguageProperty(
+        private static bool TryGetProperty(
             Dictionary<MetadataEntryKey, string> entries,
             string propertyName,
             PxFileLanguages langs,
             [MaybeNullWhen(false)] out Property property,
+            MultilanguageString? firstIdentifier = null,
+            MultilanguageString? secondIdentifier = null)
+        {
+            List<MetadataEntryKey> keys = BuildKeys(entries, propertyName, langs, firstIdentifier, secondIdentifier);
+            if (keys.Count == 0)
+            {
+                property = null;
+                return false;
+            }
+            else
+            {
+                property = BuildProperty(entries, keys, langs);
+                return true;
+            }
+        }
+
+        private static bool TryGetAndRemoveProperty(
+            Dictionary<MetadataEntryKey, string> entries,
+            string propertyName,
+            PxFileLanguages langs,
+            [MaybeNullWhen(false)] out Property property,
+            MultilanguageString? firstIdentifier = null,
+            MultilanguageString? secondIdentifier = null)
+        {
+            List<MetadataEntryKey> keys = BuildKeys(entries, propertyName, langs, firstIdentifier, secondIdentifier);
+            if (keys.Count == 0)
+            {
+                property = null;
+                return false;
+            }
+            else
+            {
+                property = BuildProperty(entries, keys, langs);
+                keys.ForEach(k => entries.Remove(k));
+                return true;
+            }
+        }
+
+        private static Property BuildProperty(Dictionary<MetadataEntryKey, string> entries, List<MetadataEntryKey> keys, PxFileLanguages langs)
+        {
+            if (keys.Count == 0) throw new ArgumentException("No metadta entry keys provided for building property");
+
+            Dictionary<MetadataEntryKey, string> read = [];
+            foreach (MetadataEntryKey key in keys)
+            {
+                if (entries.TryGetValue(key, out string? langValue)) read[key] = langValue;
+                else throw new ArgumentException($"Can not build property from provided key: {key.KeyWord}. Key not found in metadata.");
+            }
+
+            if(keys.Count == 1) return new Property(keys[0].KeyWord, read[keys[0]]);
+            else return new(keys[0].KeyWord, new MultilanguageString(read.Select(kvp => 
+                new KeyValuePair<string, string>(kvp.Key.Language ?? langs.DefaultLanguage, kvp.Value))));
+        }
+
+        private static List<MetadataEntryKey> BuildKeys(
+            Dictionary<MetadataEntryKey, string> entries,
+            string propertyName,
+            PxFileLanguages langs,
             MultilanguageString? firstIdentifier = null,
             MultilanguageString? secondIdentifier = null)
         {
@@ -461,36 +517,24 @@ namespace PxUtils.ModelBuilders
             string defLang = langs.DefaultLanguage;
 
             // Default language
-            Dictionary<MetadataEntryKey, string> read = [];
+            List<MetadataEntryKey> keys = [];
             MetadataEntryKey defaultKey = new(propertyName, null, firstIdentifier?[defLang], secondIdentifier?[defLang]);
             MetadataEntryKey defaultKeyWithLang = new(propertyName, defLang, firstIdentifier?[defLang], secondIdentifier?[defLang]);
-            if (entries.TryGetValue(defaultKey, out string? defLangValue)) read[defaultKey] = defLangValue;
-            else if ( entries.TryGetValue(defaultKeyWithLang, out defLangValue)) read[defaultKeyWithLang] = defLangValue;
-            else
-            {
-                property = null;
-                return false;
-            }
+            if (entries.ContainsKey(defaultKey)) keys.Add(defaultKey);
+            else if (entries.ContainsKey(defaultKeyWithLang)) keys.Add(defaultKeyWithLang);
+            else return keys;
 
             // Other languages
+            List<MetadataEntryKey> otherLanguageKeys = [];
             foreach (string lang in langs.AvailableLanguages.Where(l => l != defLang))
             {
                 MetadataEntryKey langKey = new(propertyName, lang, firstIdentifier?[lang], secondIdentifier?[lang]);
-                if (entries.TryGetValue(langKey, out string? langValue))
-                {
-                    read[langKey] = langValue;
-                }
-                else
-                {
-                    property = null;
-                    return false;
-                }
+                if (entries.ContainsKey(langKey)) otherLanguageKeys.Add(langKey);
+                else return keys;
             }
-
-            read.Keys.ToList().ForEach(k => entries.Remove(k));
-            property = new(propertyName, new MultilanguageString(read.Select(kvp => 
-                new KeyValuePair<string, string>(kvp.Key.Language ?? defLang, kvp.Value))));
-            return true;
+            
+            keys.AddRange(otherLanguageKeys);
+            return keys;
         }
 
         #endregion

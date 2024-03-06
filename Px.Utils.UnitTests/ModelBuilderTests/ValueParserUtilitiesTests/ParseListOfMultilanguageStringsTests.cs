@@ -25,7 +25,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
             ];
 
             // Act
-            List<MultilanguageString> result = ValueParserUtilities.ParseListOfMultilanguageStrings(property, ',', '"');
+            List<MultilanguageString> result = ValueParserUtilities.ParseListOfMultilanguageStrings(property, "none", ',', '"');
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
@@ -49,7 +49,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
             ];
 
             // Act
-            List<MultilanguageString> result = ValueParserUtilities.ParseListOfMultilanguageStrings(property, ',', '"');
+            List<MultilanguageString> result = ValueParserUtilities.ParseListOfMultilanguageStrings(property, "none", ',', '"');
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
@@ -62,7 +62,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
             Property property = new("test_key", "test_value");
 
             // Act and assert
-            Assert.ThrowsException<ArgumentException>(() => ValueParserUtilities.ParseListOfMultilanguageStrings(property, ',', '"'));
+            Assert.ThrowsException<ArgumentException>(() => ValueParserUtilities.ParseListOfMultilanguageStrings(property, "none", ',', '"'));
         }
 
         [TestMethod]
@@ -75,7 +75,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
             List<MultilanguageString> expected = [new("lang_a", "a_0")];
 
             // Act
-            List<MultilanguageString> result = ValueParserUtilities.ParseListOfMultilanguageStrings(property, ',', '"');
+            List<MultilanguageString> result = ValueParserUtilities.ParseListOfMultilanguageStrings(property, "none", ',', '"');
 
             // Assert
             CollectionAssert.AreEqual(expected, result);

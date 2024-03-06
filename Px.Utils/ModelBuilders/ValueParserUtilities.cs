@@ -2,8 +2,6 @@
 using PxUtils.Models.Metadata;
 using PxUtils.Models.Metadata.Enums;
 using PxUtils.PxFile;
-using System.Diagnostics;
-using System.Linq;
 
 namespace PxUtils.ModelBuilders
 {
@@ -49,22 +47,31 @@ namespace PxUtils.ModelBuilders
             return list;
         }
 
-        public static List<MultilanguageString> ParseListOfMultilanguageStrings(Property input, char listSeparator, char stringDelimeter)
+        public static List<MultilanguageString> ParseListOfMultilanguageStrings(Property input, string backupLang, char listSeparator, char stringDelimeter)
         {
-            if (!input.CanGetMultilanguageValue) throw new ArgumentException($"Property {input.KeyWord} does not have multilanguage value");
-            MultilanguageString values = input.GetMultiLanguageString();
-            Dictionary<string, List<string>> langToListDict = [];
-            
-            // Build dictionary of language to list of strings
-            foreach (string lang in values.Languages) langToListDict[lang] = ParseStringList(values[lang], listSeparator, stringDelimeter);
-            
-            // Create list of multilanguage strings
-            return langToListDict.First().Value.Select((_, index) =>
+            if (input.CanGetMultilanguageValue)
+            {
+                MultilanguageString values = input.GetMultiLanguageString();
+                Dictionary<string, List<string>> langToListDict = [];
+
+                // Build dictionary of language to list of strings
+                foreach (string lang in values.Languages) langToListDict[lang] = ParseStringList(values[lang], listSeparator, stringDelimeter);
+
+                // Create list of multilanguage strings
+                return langToListDict.First().Value.Select((_, index) =>
                 {
                     IEnumerable<KeyValuePair<string, string>> translations = langToListDict.Keys
-                        .Select(lang => new KeyValuePair<string, string>(lang, langToListDict[lang][index])); 
+                        .Select(lang => new KeyValuePair<string, string>(lang, langToListDict[lang][index]));
                     return new MultilanguageString(translations);
                 }).ToList();
+            }
+            else
+            {
+                List<string> list = ParseStringList(input.GetString(), listSeparator, stringDelimeter);
+                List<MultilanguageString> result = [];
+                foreach (string s in list) result.Add(new MultilanguageString(backupLang, s));
+                return result;
+            }
         }
 
         public static TimeDimensionInterval ParseTimeIntervalFromTimeVal(string input, PxFileSyntaxConf? conf = null)
@@ -108,7 +115,7 @@ namespace PxUtils.ModelBuilders
             };
 
             if (map.TryGetValue(input, out DimensionType value)) return value;
-            else throw new ArgumentException($"Invalid dimension type string {input}");
+            else return DimensionType.Unknown;
         }
     }
 }
