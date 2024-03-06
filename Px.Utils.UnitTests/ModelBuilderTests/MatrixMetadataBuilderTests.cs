@@ -70,7 +70,7 @@ namespace ModelBuilderTests
         {
             string lang = "fi";
             MultilanguageString expected = new(lang, fi);
-            MultilanguageString actual = Actual_1Lang.AdditionalProperties[keyWord].ToMultilanguageStringWithBackupLanguage(lang);
+            MultilanguageString actual = Actual_1Lang.AdditionalProperties[keyWord].ForceToMultilanguageString(lang);
             Assert.AreEqual(expected, actual);
         }
 

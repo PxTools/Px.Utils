@@ -70,7 +70,7 @@ namespace PxUtils.Models.Metadata
             }
         }
 
-        public MultilanguageString ToMultilanguageStringWithBackupLanguage(string backupLang)
+        public MultilanguageString ForceToMultilanguageString(string backupLang)
         {
             if(CanGetMultilanguageValue) return new(Entries);
             else return new(backupLang, Entries.UniqueValue());
