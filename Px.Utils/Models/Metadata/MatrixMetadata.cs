@@ -2,14 +2,33 @@
 
 namespace PxUtils.Models.Metadata
 {
+    /// <summary>
+    /// Metadata for a matrix object in a strucured format.
+    /// </summary>
+    /// <param name="defaultLanguage">The default language of the matrix</param>
+    /// <param name="availableLanguages">Every available language for the matrix</param>
+    /// <param name="dimensions">Ordered list of dimension objects that define the structure of the matrix</param>
+    /// <param name="additionalProperties">Properties of the matrix object, excluding dimension metadata or the languages</param>
     public class MatrixMetadata(string defaultLanguage, IReadOnlyList<string> availableLanguages, List<IDimension> dimensions, Dictionary<string, Property> additionalProperties) : IReadOnlyMatrixMetadata
     {
+        /// <summary>
+        /// The default language of the matrix
+        /// </summary>
         public string DefaultLanguage { get; } = defaultLanguage;
 
+        /// <summary>
+        /// The available languages of the matrix, including the default language
+        /// </summary>
         public IReadOnlyList<string> AvailableLanguages { get; } = availableLanguages;
 
+        /// <summary>
+        /// Ordered list of dimension objects that define the structure of the matrix
+        /// </summary>
         public List<IDimension> Dimensions { get; } = dimensions;
 
+        /// <summary>
+        /// Additional properties of the matrix object, does not include properties of the dimensions or their values.
+        /// </summary>
         public Dictionary<string, Property> AdditionalProperties { get; } = additionalProperties;
 
         IReadOnlyList<IReadOnlyDimension> IReadOnlyMatrixMetadata.Dimensions => Dimensions;
