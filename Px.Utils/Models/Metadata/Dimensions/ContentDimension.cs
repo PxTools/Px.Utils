@@ -3,6 +3,14 @@ using PxUtils.Models.Metadata.Enums;
 
 namespace PxUtils.Models.Metadata.Dimensions
 {
+    /// <summary>
+    /// Class representing a content dimension.
+    /// </summary>
+    /// <param name="code">Unique code among the dimensions of the metadata matrix</param>
+    /// <param name="name">Multilanguage name of the dimension</param>
+    /// <param name="additionalProperties">Properties of the dimension, excluding the required properties</param>
+    /// <param name="values">Ordered list of dimension values that define the structure of the dimension</param>
+    /// <param name="defaultValue">Default value of the dimension, this property is optional</param>
     public class ContentDimension(
         string code,
         MultilanguageString name,
@@ -11,21 +19,43 @@ namespace PxUtils.Models.Metadata.Dimensions
         ContentDimensionValue? defaultValue = null
         ) : IDimension
     {
+        /// <summary>
+        /// Unique code among the dimensions of the metadata matrix. Used for identifying this dimension.
+        /// </summary>
         public string Code { get; } = code;
 
+        /// <summary>
+        /// The type of the dimension. Always DimensionType.Content for this class.
+        /// </summary>
         public DimensionType Type => DimensionType.Content;
 
-        public MultilanguageString Name { get; } = name;
+        /// <summary>
+        /// Multilanguage name of the dimension.
+        /// </summary>
+        public MultilanguageString Name { get; set; } = name;
 
+        /// <summary>
+        /// Editable collection of properties of the dimension, excluding the required properties.
+        /// </summary>
         public Dictionary<string, Property> AdditionalProperties { get; } = additionalProperties;
 
-        public List<ContentDimensionValue> Values { get; } = values;
+        /// <summary>
+        /// List of editable dimension values that define the structure of the dimension.
+        /// </summary>
+        public IReadOnlyList<ContentDimensionValue> Values { get; } = values;
 
-        public ContentDimensionValue? DefaultValue { get; } = defaultValue;
+        /// <summary>
+        /// The default value of the dimension, this property is optional.
+        /// </summary>
+        public ContentDimensionValue? DefaultValue { get; set; } = defaultValue;
 
         #region Interface implementations
 
-        DimensionValue? IDimension.DefaultValue => DefaultValue;
+        DimensionValue? IDimension.DefaultValue
+        {
+            get => DefaultValue;
+            set => DefaultValue = value as ContentDimensionValue;
+        }
 
         MultilanguageString IReadOnlyDimension.Name => Name;
 
