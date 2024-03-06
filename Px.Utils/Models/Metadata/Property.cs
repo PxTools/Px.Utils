@@ -7,7 +7,7 @@ namespace PxUtils.Models.Metadata
     /// The class provides methods to get the property value as a single string or as a multilanguage string, 
     /// and to check if the property value can be represented in these formats.
     /// </summary>
-    public class Property : IReadOnlyProperty
+    public class Property
     {
         /// <summary>
         /// The keyword of the property as it appears in the Px-file

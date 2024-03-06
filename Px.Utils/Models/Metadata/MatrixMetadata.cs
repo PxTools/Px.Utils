@@ -31,6 +31,12 @@ namespace PxUtils.Models.Metadata
         /// </summary>
         public Dictionary<string, Property> AdditionalProperties { get; } = additionalProperties;
 
+        #region Interface implementation
+
         IReadOnlyList<IReadOnlyDimension> IReadOnlyMatrixMetadata.Dimensions => Dimensions;
+
+        IReadOnlyDictionary<string, Property> IReadOnlyMatrixMetadata.AdditionalProperties => AdditionalProperties;
+
+        #endregion
     }
 }
