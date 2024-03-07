@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{42DFE3AF-7507-415A-806B-99B74519BF97}"
 	ProjectSection(SolutionItems) = preProject
 		docs\CONTRIBUTING.md = docs\CONTRIBUTING.md
+		docs\PXFILE_SPECIFICATION.md = docs\PXFILE_SPECIFICATION.md
 		docs\README.md = docs\README.md
 	EndProjectSection
 EndProject
