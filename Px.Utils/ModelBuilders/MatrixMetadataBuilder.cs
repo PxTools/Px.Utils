@@ -1,5 +1,4 @@
-﻿using Px.Utils.Language;
-using PxUtils.Language;
+﻿using PxUtils.Language;
 using PxUtils.Models.Metadata;
 using PxUtils.Models.Metadata.Dimensions;
 using PxUtils.Models.Metadata.Enums;
@@ -63,7 +62,7 @@ namespace PxUtils.ModelBuilders
             IEnumerable<IDimension> dimensions = stubDimensionNames.Concat(headingDimensionNames)
                 .Select<MultilanguageString, IDimension>(name =>
                 {
-                    if (maybeCd is not null && name == maybeCd.Name) return maybeCd;
+                    if (maybeCd is not null && name.Equals(maybeCd.Name)) return maybeCd;
                     else if(TestIfTimeAndBuild(entries, langs, name, out TimeDimension? timeDim)) return timeDim;
                     else return BuildDimension(entries, langs, name);
                 });
@@ -147,7 +146,7 @@ namespace PxUtils.ModelBuilders
             if (TryGetAndRemoveProperty(entries, defaultValueKey, langs, out Property? defaultValueProperty))
             {
                 MultilanguageString defaultValueName = defaultValueProperty.ForceToMultilanguageString(langs.DefaultLanguage);
-                ContentDimensionValue? defaultValue = values.Find(v => v.Name == defaultValueName);
+                ContentDimensionValue? defaultValue = values.Find(v => v.Name.Equals(defaultValueName));
 
                 if (defaultValue is null)
                 {
@@ -354,7 +353,7 @@ namespace PxUtils.ModelBuilders
             if (TryGetAndRemoveProperty(entries, defaultValueKey, langs, out Property? defaultValueName, dimensionName))
             {
                 MultilanguageString name = defaultValueName.ForceToMultilanguageString(langs.DefaultLanguage);
-                if (Array.Find(values, v => v.Name == name) is Dim dimensionValue)
+                if (Array.Find(values, v => v.Name.Equals(name)) is Dim dimensionValue)
                 {
                     return dimensionValue;
                 }

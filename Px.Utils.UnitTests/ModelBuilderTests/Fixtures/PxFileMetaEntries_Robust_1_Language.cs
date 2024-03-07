@@ -1,4 +1,4 @@
-﻿namespace Px.Utils.UnitTests.ModelBuilderTests.Fixtures
+﻿namespace ModelBuilderTests.Fixtures
 {
     internal static class PxFileMetaEntries_Robust_1_Language
     {

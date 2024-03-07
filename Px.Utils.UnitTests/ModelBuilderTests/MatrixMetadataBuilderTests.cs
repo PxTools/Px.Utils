@@ -1,4 +1,4 @@
-﻿using Px.Utils.UnitTests.ModelBuilderTests.Fixtures;
+﻿using ModelBuilderTests.Fixtures;
 using PxUtils.Language;
 using PxUtils.ModelBuilders;
 using PxUtils.Models.Metadata;

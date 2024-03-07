@@ -1,4 +1,4 @@
-﻿namespace Px.Utils.Language
+﻿namespace PxUtils.Language
 {
     internal struct PxFileLanguages(string defaultLanguage, IReadOnlyList<string> availableLanguages)
     {

@@ -63,7 +63,7 @@ namespace PxUtils.Models.Metadata
         public string GetString()
         {
             if (!CanGetStringValue) throw new InvalidOperationException("Property value can not be represented as a single string");
-            else return Entries.UniqueValue();
+            else return Entries.UniformValue();
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace PxUtils.Models.Metadata
             }
             else
             {
-                value = Entries.UniqueValue();
+                value = Entries.UniformValue();
                 return true;
             }
         }
@@ -125,7 +125,7 @@ namespace PxUtils.Models.Metadata
         public MultilanguageString ForceToMultilanguageString(string backupLang)
         {
             if(CanGetMultilanguageValue) return new(Entries);
-            else return new(backupLang, Entries.UniqueValue());
+            else return new(backupLang, Entries.UniformValue());
         }
     }
 }

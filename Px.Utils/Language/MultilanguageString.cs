@@ -165,22 +165,6 @@ namespace PxUtils.Language
         }
 
         /// <summary>
-        /// Equals operator for <see cref="MultilanguageString"/> objects
-        /// </summary>
-        public static bool operator ==(MultilanguageString lhs, MultilanguageString rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        /// <summary>
-        /// Not equals operator for <see cref="MultilanguageString"/> objects
-        /// </summary>
-        public static bool operator !=(MultilanguageString lhs, MultilanguageString rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
-
-        /// <summary>
         /// Override for object.GetHashCode() method.
         /// </summary>
         /// <returns>An integer hash code</returns>

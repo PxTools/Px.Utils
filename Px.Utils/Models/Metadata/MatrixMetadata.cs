@@ -3,7 +3,7 @@
 namespace PxUtils.Models.Metadata
 {
     /// <summary>
-    /// Metadata for a matrix object in a strucured format.
+    /// Metadata for a matrix object in a structured format.
     /// </summary>
     /// <param name="defaultLanguage">The default language of the matrix</param>
     /// <param name="availableLanguages">Every available language for the matrix</param>

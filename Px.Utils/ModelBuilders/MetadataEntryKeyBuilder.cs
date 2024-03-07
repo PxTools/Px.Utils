@@ -17,7 +17,7 @@ namespace PxUtils.ModelBuilders
         private readonly char _stringDelimeter;
         private readonly char _listSeparator;
 
-        private readonly char[] _illlegalKeyTokes;
+        private readonly char[] _illegalKeyTokens;
 
         /// <summary>
         /// Initializes a new instance of the MetadataEntryKeyBuilder class.
@@ -36,7 +36,7 @@ namespace PxUtils.ModelBuilders
             _stringDelimeter = _conf.Symbols.Key.StringDelimeter;
             _listSeparator = _conf.Symbols.Key.ListSeparator;
 
-            _illlegalKeyTokes = [ 
+            _illegalKeyTokens = [ 
                 _conf.Symbols.Key.LangParamEnd,
                 _conf.Symbols.Key.SpecifierParamEnd,
                 _conf.Symbols.Key.StringDelimeter,
@@ -85,7 +85,7 @@ namespace PxUtils.ModelBuilders
                 throw new ArgumentException($"Can not parse key name from string {remaining}");
             }
 
-            if (output.IndexOfAny(_illlegalKeyTokes) >= 0) throw new ArgumentException($"Illegal key name {output}");
+            if (output.IndexOfAny(_illegalKeyTokens) >= 0) throw new ArgumentException($"Illegal key name {output}");
 
             return output.Trim();
         }

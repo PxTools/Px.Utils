@@ -7,17 +7,17 @@
         /// This method assumes that all language versions of the string are identical.
         /// If the values differ, an exception is thrown.
         /// </summary>
-        public static string UniqueValue(this MultilanguageString multilanguageString)
+        public static string UniformValue(this MultilanguageString multilanguageString)
         {
-            string uniqueValue = multilanguageString[multilanguageString.Languages.First()];
+            string uniformValue = multilanguageString[multilanguageString.Languages.First()];
             foreach (var language in multilanguageString.Languages.Skip(1))
             {
-                if (multilanguageString[language] != uniqueValue)
+                if (multilanguageString[language] != uniformValue)
                 {
                     throw new InvalidOperationException("The multilanguage string has different values for different languages");
                 }
             }
-            return uniqueValue;
+            return uniformValue;
         }
     }
 }

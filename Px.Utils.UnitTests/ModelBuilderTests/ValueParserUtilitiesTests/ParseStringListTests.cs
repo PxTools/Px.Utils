@@ -117,7 +117,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
         }
 
         [TestMethod]
-        public void ParseStringList_MissingOpeningDelimerInSubstring_ThrowsArgumentException()
+        public void ParseStringList_MissingOpeningDelimeterInSubstring_ThrowsArgumentException()
         {
             // Arrange
             string input = "\"a\", b\", \"c\"";

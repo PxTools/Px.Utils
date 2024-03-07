@@ -166,43 +166,11 @@ namespace LanguageTests
         }
 
         [TestMethod]
-        public void EqualsTest_WithEqualsOperator_SameStringsAreEqual()
-        {
-            MultilanguageString first = new([new("a", "test_value_a"), new("b", "test_value_b")]);
-            MultilanguageString second = new([new("a", "test_value_a"), new("b", "test_value_b")]);
-            Assert.IsTrue(first == second);
-        }
-
-        [TestMethod]
-        public void EqualsTest_WithNotEqualsOperator_SameStringsAreEqual()
-        {
-            MultilanguageString first = new([new("a", "test_value_a"), new("b", "test_value_b")]);
-            MultilanguageString second = new([new("a", "test_value_a"), new("b", "test_value_b")]);
-            Assert.IsFalse(first != second);
-        }
-
-        [TestMethod]
         public void EqualsTest_DifferentStringsAreNotEqual()
         {
             MultilanguageString first = new([new("a", "test_value_a"), new("b", "test_value_b")]);
             MultilanguageString second = new([new("c", "test_value_c"), new("d", "test_value_d")]);
             Assert.AreNotEqual(first, second);
-        }
-
-        [TestMethod]
-        public void EqualsTest_WithEqualsOperator_DifferentStringsAreNotEqual()
-        {
-            MultilanguageString first = new([new("a", "test_value_a"), new("b", "test_value_b")]);
-            MultilanguageString second = new([new("c", "test_value_c"), new("d", "test_value_d")]);
-            Assert.IsFalse(first == second);
-        }
-
-        [TestMethod]
-        public void EqualsTest_WithNotEqualsOperator_DifferentStringsAreNotEqual()
-        {
-            MultilanguageString first = new([new("a", "test_value_a"), new("b", "test_value_b")]);
-            MultilanguageString second = new([new("c", "test_value_c"), new("d", "test_value_d")]);
-            Assert.IsTrue(first != second);
         }
 
         [TestMethod]
@@ -216,7 +184,7 @@ namespace LanguageTests
         public void GetHashCodeTest_DifferentStringsHaveDifferentHashes()
         {
             MultilanguageString first = new([new("a", "test_value_a"), new("b", "test_value_b")]);
-            MultilanguageString second= new([new("c", "test_value_c"), new("d", "test_value_d")]);
+            MultilanguageString second = new([new("c", "test_value_c"), new("d", "test_value_d")]);
             Assert.AreNotEqual(first.GetHashCode(), second.GetHashCode());
         }
 
