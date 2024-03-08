@@ -135,3 +135,34 @@ Some keywords have special value types. These are described in the following sec
 		- In the range format the token is in the following form: ```TLIST(XX, AAAA-ZZZZ)``` where ```XX``` is the interval specifier and ```AAAA``` and ```ZZZZ``` are timestamps.
 		- In this format no other items are allowed after the token.
 		- Example TIMEVAL value in this format: ```TLIST(A1, "2000-2002")```
+
+## Content requirements
+
+### About the spesifiers
+The specifiers are used to map the entry to the whole matrix, a spesific dimension or dimension value.
+In the general case the first spesifier is used to provide the name of the dimension and the second is used to provide the name of the value.
+The content dimension is an exception, entries releted to it do not have a second spesifier and the first spesifier is used to provide the name of the content dimension value.
+If the entry is related to the whole matrix, the spesifiers are not used.
+
+### Mandatory entries
+CHARSET
+CODEPAGE
+LANGUAGE
+STUB
+HEADING
+VALUES
+DATA
+
+If CONTVARIABLE is defines, the following entries are mandatory:
+UNITS
+LAST-UPDATED
+PRECISION
+
+### Recommended entries
+TABLEID
+DESCRIPTION
+CONTVARIABLE
+VARIABLECODE
+CODES
+VARIABLE-TYPE
+TIMEVAL
