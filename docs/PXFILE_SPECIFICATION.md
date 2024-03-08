@@ -6,13 +6,13 @@ Purpose of this document is to describe the syntax and content requirements for 
 
 ### Entries
 The px file consists of list of entries. Each entry consists of two parts: the key and the value.
-Which are reparated by an equal sign ```=```. Entries are separated by a semicolon ```;```.
+Which are separated by an equal sign ```=```. Entries are separated by a semicolon ```;```.
 
 Example entry:
 ``` KEYWORD[en]("Dimension_name")="Some value text here";```
 
 #### Recommendations
-- Each entry should be on a new line.
+- Each entry must be on a new line.
 
 ### Keys
 Keys consist of three parts: the keyword name, the language code and the specifier. The parts must always be in that order, but only the keyword is mandatory.
@@ -27,14 +27,14 @@ Whitespace characters are not significant in the key.
 - Do not use whitespace characters in the key.
 
 #### Keyword
-- Can contain only letters ```aA-zZ```, numbers ```0-9```, underscores ```_``` and hyphens ```-```.
+- Can contain uppercase letters ```A-Z```, numbers ```0-9``` and hyphen ```-```, lowercase letters ```a-z``` and underscore ```_``` are allowed but not recommended.
 - Must start with a letter.
 - No whitespace is allowed.
 
 ##### Recommendations
 - Only use uppercase letters.
 - Use hyphens ```-``` to separate words.
-- Dont use more that 20 characters.
+- Don't use more that 20 characters.
 
 #### Language code
 - The code string can not contain ```;``` ```=``` ```[``` ```]``` or ```"```.
@@ -44,16 +44,18 @@ Whitespace characters are not significant in the key.
 - Whitespace characters are not allowed inside the ```[ ]``` brackets.
 
 ##### Recommendations
-- Use the ISO 639 language codes or BCP 47 language tags.
+- Use the ISO 639 language codes or either BCP 47 or MS-LCID language tags.
 
 #### Specifier
-- The spesifier consists of one or two strings marked by ```"``` characters and separated by a comma ```,```.
+- The specifier consists of one or two strings marked by ```"``` characters and separated by a comma ```,```.
 - The specifier strings can not contain ```;``` or ```"``` characters.
 - ```(``` character marks the beginning of the specifier.
 - ```)``` character marks the end of the specifier.
 - Only the ```"``` marked string, whitespace characters and commas are allowed inside the specifier brackets.
-- Trailing commas ```,``` are not allowed.
+- Preceding or trailing commas ```,``` are not allowed.
 - Whitespace characters outside of of the ```"``` character marked string are not significant.
+
+Note that the CELLNOTE keyword is an exception to the specifier rule. Support and syntax for is being discussed at the time of writing this document.
 
 ##### Recommendations
 - Only use one whitespace character after the comma and no other whitespace characters.
@@ -83,12 +85,12 @@ Whitespace characters are not significant in the value outside of ```"``` separa
 - If the string is split into multiple lines, each line must begin and end with ```"``` characters.
 
 #### Boolean
-- The boolean value is either ```YES``` or ```NO```.
+- The boolean value is either ```YES``` or ```NO``` written in capital letters.
 - Whitespace characters are not significant in the value (as long as the ```YES``` and ```NO``` remain intact).
 
 #### Number
-- The number value can contain only numbers ```0-9```, a single dot ```.``` and a single minus sign ```-```.
-- Decimal separator is dot ```.```.
+- The number value can contain only numbers ```0-9```, a single period ```.``` and a single minus sign ```-```.
+- Decimal separator is period ```.```.
 - Thousands separator is not allowed.
 - Whitespace characters are not allowed between the characters of the number.
 
@@ -106,12 +108,13 @@ Some keywords have special value types. These are described in the following sec
 
 #### DATA
 - The value of the DATA entry is a list of values that can be either string or number.
-- The list items are separated by a whitespace (ASCII hex ```20```).
+- The list items are separated by a space (ASCII hex ```20```) or tab (ASCII hex ```09```).
 - The data list can be split into multiple lines
-- Each line must end with a whitespace character (ASCII hex ```20```).
+- Each line must end with a space or tab character (ASCII hex ```20```) or (ASCII hex ```09```).
+- Only one kind of separator can be used in the same list.
 - The number values are subject to the same rules as the number value type.
-- The strings have a limited set of contents that are allowed: one to six dots ```.``` that mark missing values.
-	- List of allowed strings: ```.```, ```..```, ```...```, ```....```, ```.....```, ```......```.
+- The strings have a limited set of contents that are allowed: one to six dots ```.``` that mark missing values or hyphen ```-``` that marks exact zero.
+	- List of allowed strings: ```.```, ```..```, ```...```, ```....```, ```.....```, ```......```, ```-```.
 - The strings must be marked by ```"``` characters.
 
 ##### TIMEVAL
@@ -121,9 +124,11 @@ Some keywords have special value types. These are described in the following sec
 	- **timestamp** depends on the interval specifier:
 		- A1 -> ```YYYY``` where ```Y``` is ```0-9```.
 		- H1 -> ```YYYYH```, where ```Y``` is ```0-9``` and ```H``` is ```1``` or ```2```.
+		- T1 -> ```YYYYT```, where ```Y``` is ```0-9``` and ```T``` is ```1-3```.
 		- Q1 -> ```YYYYQ```, where ```Y``` is ```0-9``` and ```Q``` is ```1-4```.
-		- M1 -> ```YYYYMM```, where ```Y``` is ```0-9``` and ```Q``` is ```01-12``` (note the leading zero).
-		- W1 -> ```YYYYWW```, where ```Y``` is ```0-9``` and ```Q``` is ```01-52``` (note the leading zero).
+		- M1 -> ```YYYYMM```, where ```Y``` is ```0-9``` and ```MM``` is ```01-12``` (note the leading zero).
+		- W1 -> ```YYYYWW```, where ```Y``` is ```0-9``` and ```WW``` is ```01-52``` (note the leading zero).
+		- D1 -> ```YYYYMMDD```, where ```Y``` is ```0-9```, ```MM``` is ```01-12``` and ```DD``` is ```01-31``` (note the leading zeros).
 		- The timestamps are always considered to be strings and must be marked by ```"``` characters.
 - TIMEVAL value van be in one of two formats:
 	1. a token ```TLIST(XX)``` followed by a list of timestamps, where ```XX``` is **the interval specifier**.
