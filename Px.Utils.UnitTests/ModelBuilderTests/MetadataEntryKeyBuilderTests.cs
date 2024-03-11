@@ -10,7 +10,7 @@ namespace ModelBuilderTests
         #region Valid key tests
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_KeyWithLangAndTwoSpesifiers_ReturnsEntryKey()
+        public void ParseMetadataEntryKeyTest_KeyWithLangAndTwoSpecifiers_ReturnsEntryKey()
         {
             // Arrange
             string key = "FOOBAR";
@@ -117,7 +117,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_KeyWithOneSpesifierWithBrackets_ReturnsEntryKey()
+        public void ParseMetadataEntryKeyTest_KeyWithOneSpecifierWithBrackets_ReturnsEntryKey()
         {
             // Arrange
             string key = "FOOBAR";
@@ -139,7 +139,7 @@ namespace ModelBuilderTests
         #region Invalid key tests
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_SymbolBetweenLangAndSpesifierBlocks_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTest_SymbolBetweenLangAndSpecifierBlocks_ThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -155,7 +155,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_SymbolBetweenSpesifiers_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTest_SymbolBetweenSpecifiers_ThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -171,7 +171,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_SymbolAfterSpesifiers_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTest_SymbolAfterSpecifiers_ThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -219,7 +219,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_TwoSpesifierBlocks_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTest_TwoSpecifierBlocks_ThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -235,7 +235,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_MissingSeparatorBetweenSpesifier_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTest_MissingSeparatorBetweenSpecifier_ThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -252,7 +252,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_ThreeSpesifiers_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTest_ThreeSpecifiers_ThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -285,7 +285,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_QuotesInSpesifier_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTest_QuotesInSpecifier_ThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -301,7 +301,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_EmptySpesifierBlock_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTest_EmptySpecifierBlock_ThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -322,6 +322,40 @@ namespace ModelBuilderTests
             string firstIdentifier = "foo";
             string secondIdentifier = "bar";
             string input = $"{key}[](\"{firstIdentifier}\",\"{secondIdentifier}\")";
+
+            // Act
+            Action func = new(() => builder.Parse(input));
+
+            // Assert
+            Assert.ThrowsException<ArgumentException>(func);
+        }
+
+        [TestMethod]
+        public void ParseMetadataEntryKeyTest_KeyWordHasWhiteSpace_ThrowsArgumentException()
+        {
+            // Arrange
+            string key = "FOO BAR";
+            string lang = "aa";
+            string firstIdentifier = "foo";
+            string secondIdentifier = "bar";
+            string input = $"{key}[{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\")";
+
+            // Act
+            Action func = new(() => builder.Parse(input));
+
+            // Assert
+            Assert.ThrowsException<ArgumentException>(func);
+        }
+
+        [TestMethod]
+        public void ParseMetadataEntryKeyTest_LangBlockHasTwoClosingBrackets_ThrowsArgumentException()
+        {
+            // Arrange
+            string key = "FOOBAR";
+            string lang = "aa]";
+            string firstIdentifier = "foo";
+            string secondIdentifier = "bar";
+            string input = $"{key}[{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\")";
 
             // Act
             Action func = new(() => builder.Parse(input));

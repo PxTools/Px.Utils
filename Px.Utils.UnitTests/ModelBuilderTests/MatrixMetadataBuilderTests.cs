@@ -111,7 +111,8 @@ namespace ModelBuilderTests
         [TestMethod]
         public void MultiLangContentDimensionBuildTest()
         {
-            ContentDimension? contentDimension = (ContentDimension?)Actual_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            IDimension? contentDimension = Actual_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            Assert.IsInstanceOfType<ContentDimension>(contentDimension);
             Assert.IsNotNull(contentDimension);
             Assert.AreEqual(3, contentDimension.Values.Count);
             Assert.AreEqual("Tiedot", contentDimension.Code);
@@ -121,7 +122,8 @@ namespace ModelBuilderTests
         [TestMethod]
         public void SingleLangContentDimensionBuildTest()
         {
-            ContentDimension? contentDimension = (ContentDimension?)Actual_1Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            IDimension? contentDimension = (ContentDimension?)Actual_1Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            Assert.IsInstanceOfType<ContentDimension>(contentDimension);
             Assert.IsNotNull(contentDimension);
             Assert.AreEqual(3, contentDimension.Values.Count);
             Assert.AreEqual("Tiedot", contentDimension.Code);

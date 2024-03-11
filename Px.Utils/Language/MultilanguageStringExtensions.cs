@@ -3,7 +3,7 @@
     public static class MultilanguageStringExtensions
     {
         /// <summary>
-        /// Retrieves the unique value from a multilanguage string.
+        /// Retrieves the uniform value from a multilanguage string.
         /// This method assumes that all language versions of the string are identical.
         /// If the values differ, an exception is thrown.
         /// </summary>
