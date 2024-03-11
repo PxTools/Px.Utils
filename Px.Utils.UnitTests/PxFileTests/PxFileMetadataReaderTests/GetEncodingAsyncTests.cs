@@ -1,13 +1,14 @@
-﻿using PxUtils.UnitTests.PxFileTests.Fixtures;
-using PxUtils.PxFile.Meta;
+﻿using PxUtils.PxFile.Meta;
+using PxUtils.UnitTests.PxFileTests.Fixtures;
 using System.Text;
 
 namespace PxFileTests.PxFileMetadataReaderTests
 {
-    public static class GetEncodingAsyncTests
+    [TestClass]
+    public class GetEncodingAsyncTests
     {
-        [Fact]
-        public static async Task GetEncodingAsync_CalledFor_MINIMAL_UTF8_N_ReturnsUtf8()
+        [TestMethod]
+        public async Task GetEncodingAsync_CalledFor_MINIMAL_UTF8_N_ReturnsUtf8()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N);
@@ -17,11 +18,11 @@ namespace PxFileTests.PxFileMetadataReaderTests
             Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
 
             // Assert
-            Assert.Equal(Encoding.UTF8, encoding);
+            Assert.AreEqual(Encoding.UTF8, encoding);
         }
 
-        [Fact]
-        public static async Task GetEncodingAsync_CalledFor_MINIMAL_N_WithUtf8BOM_ReturnsUtf8()
+        [TestMethod]
+        public async Task GetEncodingAsync_CalledFor_MINIMAL_N_WithUtf8BOM_ReturnsUtf8()
         {
             // Arrange
             byte[] bom = [0xEF, 0xBB, 0xBF];
@@ -33,11 +34,11 @@ namespace PxFileTests.PxFileMetadataReaderTests
             Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
 
             // Assert
-            Assert.Equal(Encoding.UTF8, encoding);
+            Assert.AreEqual(Encoding.UTF8, encoding);
         }
 
-        [Fact]
-        public static async Task GetEncodingAsync_CalledFor_MINIMAL_N_WithUtf16BOM_ReturnsUtf16()
+        [TestMethod]
+        public async Task GetEncodingAsync_CalledFor_MINIMAL_N_WithUtf16BOM_ReturnsUtf16()
         {
             // Arrange
             byte[] bom = [0xFE, 0xFF];
@@ -49,11 +50,11 @@ namespace PxFileTests.PxFileMetadataReaderTests
             Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
 
             // Assert
-            Assert.Equal(Encoding.Unicode, encoding);
+            Assert.AreEqual(Encoding.Unicode, encoding);
         }
 
-        [Fact]
-        public static async Task GetEncodingAsync_CalledFor_MINIMAL_UTF8_RN_ReturnsUtf8()
+        [TestMethod]
+        public async Task GetEncodingAsync_CalledFor_MINIMAL_UTF8_RN_ReturnsUtf8()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_RN);
@@ -63,11 +64,11 @@ namespace PxFileTests.PxFileMetadataReaderTests
             Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
 
             // Assert
-            Assert.Equal(Encoding.UTF8, encoding);
+            Assert.AreEqual(Encoding.UTF8, encoding);
         }
 
-        [Fact]
-        public static async Task GetEncodingAsync_CalledFor_MINIMAL_ISO_8859_15_N_ReturnsIso885915()
+        [TestMethod]
+        public async Task GetEncodingAsync_CalledFor_MINIMAL_ISO_8859_15_N_ReturnsIso885915()
         {
             // Arrange
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -79,11 +80,11 @@ namespace PxFileTests.PxFileMetadataReaderTests
             Encoding resutEncoding = await PxFileMetadataReader.GetEncodingAsync(stream);
 
             // Assert
-            Assert.Equal(encoding, resutEncoding);
+            Assert.AreEqual(encoding, resutEncoding);
         }
 
-        [Fact]
-        public static async Task GetEncodingAsync_CalledFor_MINIMAL_ISO_8859_1_RN_ReturnsIso88591()
+        [TestMethod]
+        public async Task GetEncodingAsync_CalledFor_MINIMAL_ISO_8859_1_RN_ReturnsIso88591()
         {
             // Arrange
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -95,7 +96,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
             Encoding resutEncoding = await PxFileMetadataReader.GetEncodingAsync(stream);
 
             // Assert
-            Assert.Equal(encoding, resutEncoding);
+            Assert.AreEqual(encoding, resutEncoding);
         }
     }
 }

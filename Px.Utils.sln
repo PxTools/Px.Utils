@@ -5,8 +5,6 @@ VisualStudioVersion = 17.8.34408.163
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Px.Utils", "Px.Utils\Px.Utils.csproj", "{D94934AF-6B41-4C66-818A-C4C33230E9DD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Px.Utils.UnitTests", "Px.Utils.UnitTests\Px.Utils.UnitTests.csproj", "{AE7110F9-E4E7-4279-813A-4570A91B18AE}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{42DFE3AF-7507-415A-806B-99B74519BF97}"
 	ProjectSection(SolutionItems) = preProject
 		docs\CONTRIBUTING.md = docs\CONTRIBUTING.md
@@ -21,6 +19,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\CI.yml = .github\workflows\CI.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Px.Utils.UnitTests", "Px.Utils.UnitTests\Px.Utils.UnitTests.csproj", "{D72C6067-56A5-4302-838B-41E6CA725C4F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D94934AF-6B41-4C66-818A-C4C33230E9DD} = {D94934AF-6B41-4C66-818A-C4C33230E9DD}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,10 +34,10 @@ Global
 		{D94934AF-6B41-4C66-818A-C4C33230E9DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D94934AF-6B41-4C66-818A-C4C33230E9DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D94934AF-6B41-4C66-818A-C4C33230E9DD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AE7110F9-E4E7-4279-813A-4570A91B18AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AE7110F9-E4E7-4279-813A-4570A91B18AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AE7110F9-E4E7-4279-813A-4570A91B18AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AE7110F9-E4E7-4279-813A-4570A91B18AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D72C6067-56A5-4302-838B-41E6CA725C4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D72C6067-56A5-4302-838B-41E6CA725C4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D72C6067-56A5-4302-838B-41E6CA725C4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D72C6067-56A5-4302-838B-41E6CA725C4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

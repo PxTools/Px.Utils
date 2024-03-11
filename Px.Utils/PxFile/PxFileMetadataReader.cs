@@ -1,5 +1,4 @@
-﻿using PxUtils.PxFile.Exceptions;
-using System;
+﻿using PxUtils.Exceptions;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -21,14 +20,14 @@ namespace PxUtils.PxFile.Meta
         /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="readBufferSize">The size of the buffer to use when reading the stream. If not specified, the default buffer size is used.</param>
         /// <returns>An IEnumerable of key-value pairs representing the metadata entries in the file.</returns>
-        public static IEnumerable<KeyValuePair<string, string>> ReadMetadata(Stream stream, Encoding encoding, PxFileSymbolsConf? symbolsConf = null, int readBufferSize = DEFAULT_READ_BUFFER_SIZE)
+        public static IEnumerable<KeyValuePair<string, string>> ReadMetadata(Stream stream, Encoding encoding, PxFileSyntaxConf? symbolsConf = null, int readBufferSize = DEFAULT_READ_BUFFER_SIZE)
         {
-            symbolsConf ??= PxFileSymbolsConf.Default;
+            symbolsConf ??= PxFileSyntaxConf.Default;
 
-            char keywordSeperator = symbolsConf.Tokens.KeywordSeparator;
-            char sectionSeparator = symbolsConf.Tokens.SectionSeparator;
-            char stringDelimeter = symbolsConf.Tokens.Value.StringDelimeter;
-            string dataKeyword = symbolsConf.Symbols.KeyWords.Data;
+            char keywordSeperator = symbolsConf.Symbols.KeywordSeparator;
+            char sectionSeparator = symbolsConf.Symbols.SectionSeparator;
+            char stringDelimeter = symbolsConf.Symbols.Value.StringDelimeter;
+            string dataKeyword = symbolsConf.Tokens.KeyWords.Data;
 
             char[] buffer = new char[readBufferSize];
             char nextDelimeter = keywordSeperator;
@@ -95,16 +94,16 @@ namespace PxUtils.PxFile.Meta
         public static async IAsyncEnumerable<KeyValuePair<string, string>> ReadMetadataAsync(
             Stream stream,
             Encoding encoding,
-            PxFileSymbolsConf? symbolsConf = null,
+            PxFileSyntaxConf? symbolsConf = null,
             int readBufferSize = DEFAULT_READ_BUFFER_SIZE,
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            symbolsConf ??= PxFileSymbolsConf.Default;
+            symbolsConf ??= PxFileSyntaxConf.Default;
 
-            char keywordSeperator = symbolsConf.Tokens.KeywordSeparator;
-            char sectionSeparator = symbolsConf.Tokens.SectionSeparator;
-            char stringDelimeter = symbolsConf.Tokens.Value.StringDelimeter;
-            string dataKeyword = symbolsConf.Symbols.KeyWords.Data;
+            char keywordSeperator = symbolsConf.Symbols.KeywordSeparator;
+            char sectionSeparator = symbolsConf.Symbols.SectionSeparator;
+            char stringDelimeter = symbolsConf.Symbols.Value.StringDelimeter;
+            string dataKeyword = symbolsConf.Tokens.KeyWords.Data;
 
             char[] readBuffer = new char[readBufferSize];
             char[] parsingBuffer = new char[readBufferSize];
@@ -177,7 +176,7 @@ namespace PxUtils.PxFile.Meta
         public static IReadOnlyDictionary<string, string> ReadMetadataToDictionary(
             Stream stream,
             Encoding encoding,
-            PxFileSymbolsConf? symbolsConf = null,
+            PxFileSyntaxConf? symbolsConf = null,
             int readBufferSize = DEFAULT_READ_BUFFER_SIZE)
             => new Dictionary<string, string>(ReadMetadata(stream, encoding, symbolsConf, readBufferSize));
 
@@ -194,7 +193,7 @@ namespace PxUtils.PxFile.Meta
         public static async Task<IReadOnlyDictionary<string, string>> ReadMetadataToDictionaryAsync(
             Stream stream,
             Encoding encoding,
-            PxFileSymbolsConf? symbolsConf = null,
+            PxFileSyntaxConf? symbolsConf = null,
             int readBufferSize = DEFAULT_READ_BUFFER_SIZE,
             CancellationToken cancellationToken = default)
         {
@@ -216,9 +215,9 @@ namespace PxUtils.PxFile.Meta
         /// <param name="stream">The stream from which to determine the encoding.</param>
         /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <returns>The determined Encoding of the stream.</returns>
-        public static Encoding GetEncoding(Stream stream, PxFileSymbolsConf? symbolsConf = null)
+        public static Encoding GetEncoding(Stream stream, PxFileSyntaxConf? symbolsConf = null)
         {
-            symbolsConf ??= PxFileSymbolsConf.Default;
+            symbolsConf ??= PxFileSyntaxConf.Default;
             long position = stream.Position;
 
             byte[] bom = new byte[3];
@@ -230,7 +229,7 @@ namespace PxUtils.PxFile.Meta
 
             // Use ASCII because encoding is still unknown, CODEPAGE keyword is readable as ASCII
             KeyValuePair<string, string> encoding = ReadMetadata(stream, Encoding.ASCII, symbolsConf, 512)
-                .FirstOrDefault(kvp => kvp.Key == symbolsConf.Symbols.KeyWords.CodePage);
+                .FirstOrDefault(kvp => kvp.Key == symbolsConf.Tokens.KeyWords.CodePage);
 
             return GetEncodingFromValue(encoding.Value, symbolsConf);
         }
@@ -244,9 +243,9 @@ namespace PxUtils.PxFile.Meta
         /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A Task that represents the asynchronous operation. The Task result contains the determined Encoding of the stream.</returns>
-        public static async Task<Encoding> GetEncodingAsync(Stream stream, PxFileSymbolsConf? symbolsConf = null, CancellationToken cancellationToken = default)
+        public static async Task<Encoding> GetEncodingAsync(Stream stream, PxFileSyntaxConf? symbolsConf = null, CancellationToken cancellationToken = default)
         {
-            symbolsConf ??= PxFileSymbolsConf.Default;
+            symbolsConf ??= PxFileSyntaxConf.Default;
             long position = stream.Position;
 
             byte[] bom = new byte[3];
@@ -258,7 +257,7 @@ namespace PxUtils.PxFile.Meta
 
             // Use ASCII because encoding is still unknown, CODEPAGE keyword is readable as ASCII
             KeyValuePair<string, string> encoding = await ReadMetadataAsync(stream, Encoding.ASCII, symbolsConf, 512, cancellationToken)
-                .FirstOrDefaultAsync(kvp => kvp.Key == symbolsConf.Symbols.KeyWords.CodePage, cancellationToken);
+                .FirstOrDefaultAsync(kvp => kvp.Key == symbolsConf.Tokens.KeyWords.CodePage, cancellationToken);
 
             return GetEncodingFromValue(encoding.Value, symbolsConf);
         }
@@ -306,11 +305,11 @@ namespace PxUtils.PxFile.Meta
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Encoding GetEncodingFromValue(string value, PxFileSymbolsConf symbolsConf)
+        private static Encoding GetEncodingFromValue(string value, PxFileSyntaxConf symbolsConf)
         {
             if (value is null) throw new InvalidPxFileMetadataException($"Could not find CODEPAGE keyword in the file.");
 
-            string encodingName = value.Trim(symbolsConf.Tokens.Value.StringDelimeter);
+            string encodingName = value.Trim(symbolsConf.Symbols.Value.StringDelimeter);
 
             bool isAvailable = Array.Exists(Encoding.GetEncodings(), e => e.Name == encodingName);
             if (!isAvailable) Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
