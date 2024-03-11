@@ -169,6 +169,8 @@ If the entry is related to the whole matrix, the spesifiers are not used. If the
 
 ### Mandatory entries
 
+The keywords marked with an asterisk (*) are mandatory with conditions. The conditions are explained in the section of the keyword.
+
 #### CHARSET
 Value must be a string. Either ```ANSI``` or ```Unicode```. The value must also match the encoding of the file. If the file is not readable in the encoding specified, the file is not valid.
 - This entry is language independent.
