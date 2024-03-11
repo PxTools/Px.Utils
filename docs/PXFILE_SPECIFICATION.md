@@ -84,6 +84,9 @@ Whitespace characters are not significant in the value outside of ```"``` separa
 - A string value can contain any characters except ```"```.
 - If the string is split into multiple lines, each line must begin and end with ```"``` characters.
 
+#### Datetime
+- String value in the format ```YYYYMMDD HH:MM```.
+
 #### Boolean
 - The boolean value is either ```YES``` or ```NO``` written in capital letters.
 - Whitespace characters are not significant in the value (as long as the ```YES``` and ```NO``` remain intact).
@@ -140,3 +143,142 @@ Some keywords have special value types. These are described in the following sec
 		- In the range format the token is in the following form: ```TLIST(XX, AAAA-ZZZZ)``` where ```XX``` is the interval specifier and ```AAAA``` and ```ZZZZ``` are timestamps.
 		- In this format no other items are allowed after the token.
 		- Example TIMEVAL value in this format: ```TLIST(A1, "2000-2002")```
+
+## Content requirements
+
+### About the languages
+The default language of the file is defined by the LANGUAGE entry. If the file has more than one language, they are defined by the LANGUAGES entry (including the default). Language codes used in the file must all be found in the LANGUAGES entry. If a language code is found in the file that is not found in the LANGUAGES entry, the file is not valid.
+
+Most entries in px-files are language dependent and the language of the entry is defined by the language code in the key. The default language is an exception, specifying it in the key is optional.
+Language dependant keywords **must** have an entry for each language defined in the LANGUAGES entry per unique set of specifiers.
+
+If a keyword has entries in multiple languages with same specifiers:
+- The language code in the key must match one of the codes in the LANGUAGES entry.
+- For entries with that keyword, but without language code in the key, the default language is assumed.
+
+If a keyword has only one entry for a set of specifiers, the entry is considered to not depend on the language.
+
+For files with only one language, the language codes in the keys can be omitted from the file.
+
+### About the specifiers
+The specifiers are used to map the entry to the whole matrix, a spesific dimension or dimension value.
+In the general case the first spesifier is used to provide the name of the dimension and the second is used to provide the name of the value.
+The content dimension is an exception, entries releted to it can be defined without a second specifier and the first spesifier is used to provide the name of the content dimension value. **This however is not recommended**.
+
+If the entry is related to the whole matrix, the spesifiers are not used. If the entry is not dependant on any dimension or dimension value, using a specifier **is considered an error**.
+
+### Mandatory entries
+
+The keywords marked with an asterisk (*) are mandatory with conditions. The conditions are explained in the section of the keyword.
+
+#### CHARSET
+Value must be a string. Either ```ANSI``` or ```Unicode```. The value must also match the encoding of the file. If the file is not readable in the encoding specified, the file is not valid.
+- This entry is language independent.
+- This entry does not depend on any dimensions or dimension values.
+
+#### CODEPAGE
+More spesific encoding information. The value must be a string that matches the encoding of the file. If the file is not readable in the encoding specified, the file is not valid.
+- If the CHARSET entry is ```ANSI```, the value must be the exact name of the encoding used. IE: ```ISO-8859-1```.
+- If the CHARSET entry is ```Unicode```, the value must be the exact name of the encoding used. IE: ```UTF-8```, ```UTF-16``` etc.
+- Values are not case sensitive, but uppercase characters are **recommended**.
+- This entry is language independent.
+- This entry does not depend on any dimensions or dimension values.
+
+#### LANGUAGE
+- The value must be a string.
+- Syntax -> Keys -> Language code rules and recommendations apply to the value.
+- This entry does not depend on any dimensions or dimension values.
+
+#### LANGUAGES*
+- This entry is required **IF** the file contains more than one language.
+- The value must be a list of strings.
+- Syntax -> Keys -> Language code rules and recommendations apply to each value.
+- This entry does not depend on any dimensions or dimension values.
+
+#### STUB*
+- Can be omitted if all the dimensions are defined in the HEADING.
+- Defines the dimensions of the matrix which are placed on the rows.
+- The value must be a list of strings.
+- The values are the names of the dimensions.
+- Language dependant.
+
+#### HEADING*
+- Can be omitted if all the dimensions are defined in the STUB.
+- Defines the dimensions of the matrix which are placed on the columns.
+- The value must be a list of strings.
+- The values are the names of the dimensions.
+- Language dependant.
+
+#### VALUES
+- Defines the dimension values of one dimension per entry.
+- Must be defined for each dimension in STUB and HEADING.
+- The value must be a list of strings.
+- Language dependant.
+
+#### DATA
+- Defines the data of the matrix.
+- Length of one row must be exactly ```Product of number of values in each dimension defined with the HEADING keyword```
+- The number of rows must be exactly ```Product of number of values in each dimension defined with the STUB keyword```
+- No language code or specifiers are allowed in the key.
+
+#### If CONTVARIABLE is defined, the following entries are mandatory:
+##### UNITS*
+- The value must be a string.
+- Must be defined for each value of the dimension defined with the CONTVARIABLE keyword.
+- Can be defined for the whole matrix without spesifiers.
+- Recommended to be defined for the content dimension value with two specifiers.
+- Can be defined for the content dimension values with the value name as only the first specifier, but this is not recommended.
+- Language dependant.
+
+##### LAST-UPDATED*
+- Datetime value.
+- Must be defined for each value of the dimension defined with the CONTVARIABLE keyword.
+- Can be defined for the whole matrix without spesifiers.
+- Recommended to be defined for the content dimension value with two specifiers.
+- Can be defined for the content dimension values with the value name as only the first specifier, but this is not recommended.
+- Can be defined for each language, but this is not recommended.
+
+##### PRECISION*
+- The value must be an integer (and valid number type).
+- Must be defined for each value of the dimension defined with the CONTVARIABLE keyword.
+- Can be defined for the whole matrix without spesifiers.
+- Recommended to be defined for the content dimension value with two specifiers.
+- Can be defined for the content dimension values with the value name as only the first specifier, but this is not recommended.
+- Can be defined for each language, but this is not recommended.
+
+### Recommended entries
+#### TABLEID
+- The value must be a string.
+- Unique identifier for the table within the database.
+- This entry must be language independent.
+
+#### DESCRIPTION
+- The value must be a string.
+- Language dependant.
+
+#### CONTVARIABLE
+- The value must be a string.
+- Defines the content dimension.
+- Value must be one of the dimension names defined in the STUB or HEADING.
+- Language dependant.
+
+#### VARIABLECODE
+- The value must be a string.
+- Must be defined for each dimension defined by the STUB or HEADING.
+- One entry per dimension per language.
+- Language dependant.
+
+#### CODES
+- The value must be a list of strings.
+- Lenth of the list must be equal to the number of values in the dimension defined by the VALUES entries.
+- Must be defined for each variable defined by the STUB or HEADING.
+- Language dependant.
+
+#### VARIABLE-TYPE
+- The value must be a string.
+- Recommended that the variable type is defined for each variable defined by the STUB or HEADING.
+- Has a set of allowed values: ```Content```, ```Time```, ```Geographical```, ```Ordinal```, ```Nominal```, ```Other```, ```Unknown```.
+- Can be defined for each language, but this is not recommended.
+
+#### TIMEVAL
+- See the TIMEVAL entry for the syntax and content requirements.
