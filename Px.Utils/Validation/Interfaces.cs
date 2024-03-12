@@ -1,6 +1,6 @@
 ﻿using PxUtils.PxFile;
 
-namespace Px.Utils.Validation
+namespace PxUtils.Validation.Planning
 {
     /*
      * THIS IS A PLANNING DOCUMENT FOR SHARING DESIGN IDEAS BETWEEN TEAM MEMBERS

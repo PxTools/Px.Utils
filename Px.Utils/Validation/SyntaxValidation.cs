@@ -1,12 +1,11 @@
-﻿using PxUtils.PxFile.Validation;
-using PxUtils.PxFile;
+﻿using PxUtils.PxFile;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PxUtils.PxFile.Validation
+namespace PxUtils.Validation
 {
     public static class SyntaxValidation
     {

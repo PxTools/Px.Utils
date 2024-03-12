@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PxUtils.PxFile.Validation
+namespace PxUtils.Validation
 {
     public interface IStreamValidationFunction : IValidationFunction
     {
