@@ -1,4 +1,5 @@
-﻿using PxUtils.PxFile.Validation;
+﻿using PxUtils.Validation;
+using PxUtils.Validation.SyntaxValidation;
 using PxUtils.UnitTests.PxFileTests.Fixtures;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,6 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             // Act
             ValidationReport result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
 
-            Assert.AreEqual(ValidationTarget.Syntax, result.ReportType);
             Assert.AreEqual(0, result.FeedbackItems?.Count);
         }
 

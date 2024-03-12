@@ -8,7 +8,6 @@ namespace PxUtils.Validation
 {
     public class ValidationReport
     {
-        public ValidationTarget ReportType { get; set; }
         public List<ValidationFeedbackItem>? FeedbackItems { get; set; }
     }
 }

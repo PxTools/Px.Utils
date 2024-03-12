@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PxUtils.Validation
+namespace PxUtils.Validation.SyntaxValidation
 {
     public interface IStreamValidationFunction : IValidationFunction
     {
@@ -23,7 +23,7 @@ namespace PxUtils.Validation
 
         public ValidationFeedbackItem Validate(char nextCharacter, PxFileSyntaxConf symbolsConf, long line, int character, string filename)
         {
-            if (nextCharacter != '\n' && nextCharacter != '\0')
+            if (nextCharacter != symbolsConf.Symbols.LineSeparator && nextCharacter != symbolsConf.Symbols.EndOfStream)
             {
                 return new ValidationFeedbackItem(filename, line, character, new ValidationFeedbackMultipleEntriesOnLine());
             }

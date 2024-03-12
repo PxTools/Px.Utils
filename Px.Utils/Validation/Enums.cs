@@ -6,12 +6,6 @@ using System.Threading.Tasks;
 
 namespace PxUtils.Validation
 {
-    public enum ValidationTarget
-    {
-        Syntax,
-        Content
-    }
-
     public enum ValidationFeedbackLevel
     {
         Warning,

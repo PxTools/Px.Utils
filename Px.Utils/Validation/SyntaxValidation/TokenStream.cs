@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PxUtils.Validation
+namespace PxUtils.Validation.SyntaxValidation
 {
     public class TokenStream
     {
