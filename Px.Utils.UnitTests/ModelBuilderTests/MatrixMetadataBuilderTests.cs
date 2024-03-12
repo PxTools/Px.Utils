@@ -178,6 +178,28 @@ namespace ModelBuilderTests
             Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("LAST-UPDATED"));
         }
 
+        [DataTestMethod]
+        [DataRow(0, 1)]
+        [DataRow(1, 1)]
+        [DataRow(2, 0)]
+        public void MultiLangPrecisionTest(int index, int expected)
+        {
+            ContentDimension? contentDimension = (ContentDimension?)Actual_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            Assert.AreEqual(expected, contentDimension?.Values[index].Precision);
+            Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("PRECISION"));
+        }
+
+        [DataTestMethod]
+        [DataRow(0, 1)]
+        [DataRow(1, 1)]
+        [DataRow(2, 0)]
+        public void SingleLangPrecisionTest(int index, int expected)
+        {
+            ContentDimension? contentDimension = (ContentDimension?)Actual_1Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            Assert.AreEqual(expected, contentDimension?.Values[index].Precision);
+            Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("PRECISION"));
+        }
+
         [TestMethod]
         public void MultiLangTimeDimensionBuildTest()
         {

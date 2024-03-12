@@ -123,6 +123,7 @@
                 private const string VARIABLE_VALUES = "VALUES";
                 private const string UNITS = "UNITS";
                 private const string LAST_UPDATED = "LAST-UPDATED";
+                private const string PRECISION = "PRECISION";
                 private const string DIMENSION_DEFAULT_VALUE = "ELIMINATION";
                 private const string TIME_VAL = "TIMEVAL";
                 private const string DIMENSION_TYPE = "VARIABLE-TYPE";
@@ -139,6 +140,7 @@
                 public string VariableValues { get; set; } = VARIABLE_VALUES;
                 public string Units { get; set; } = UNITS;
                 public string LastUpdated { get; set; } = LAST_UPDATED;
+                public string Precision { get; set; } = PRECISION;
                 public string DimensionDefaultValue { get; set; } = DIMENSION_DEFAULT_VALUE;
                 public string TimeVal { get; set; } = TIME_VAL;
                 public string DimensionType { get; set; } = DIMENSION_TYPE;

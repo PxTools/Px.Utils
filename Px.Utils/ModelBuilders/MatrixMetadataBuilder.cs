@@ -275,9 +275,10 @@ namespace PxUtils.ModelBuilders
         {
             foreach(DimensionValue value in BuildDimensionValues(entries, langs, dimensionName))
             {
-                MultilanguageString unit = GetUnit(entries, langs, value.Name);
-                DateTime lastUpdated = GetLastUpdated(entries, langs, value.Name);
-                yield return new ContentDimensionValue(value, unit, lastUpdated);
+                MultilanguageString unit = GetUnit(entries, langs, dimensionName, value.Name);
+                DateTime lastUpdated = GetLastUpdated(entries, langs, dimensionName, value.Name);
+                int precision = GetPrecision(entries, langs, dimensionName, value.Name);
+                yield return new ContentDimensionValue(value, unit, lastUpdated, precision);
             }
         }
 
@@ -323,28 +324,39 @@ namespace PxUtils.ModelBuilders
             ? codeSet.GetString() : dimensionName[langs.DefaultLanguage];
         }
 
-        private MultilanguageString GetUnit(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString name)
+        private MultilanguageString GetUnit(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimName, MultilanguageString valName)
         {
             string unitKey = _pxFileSyntaxConf.Tokens.KeyWords.Units;
-            if (TryGetAndRemoveProperty(entries, unitKey, langs, out Property? unit, name) ||
-              TryGetAndRemoveProperty(entries, unitKey, langs, out unit))
-            {
-                return unit.ForceToMultilanguageString(langs.DefaultLanguage);
-            }
+            if (TryGetAndRemoveProperty(entries, unitKey, langs, out Property? unit, dimName, valName) || // Both identifiers
+                TryGetAndRemoveProperty(entries, unitKey, langs, out unit, valName) // Only value identifier
+                ) return unit.ForceToMultilanguageString(langs.DefaultLanguage);
 
             throw new ArgumentException("Unit information not found");
         }
 
-        private DateTime GetLastUpdated(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString valueName)
+        private DateTime GetLastUpdated(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimName, MultilanguageString valName)
         {
             string lastUpdatedKey = _pxFileSyntaxConf.Tokens.KeyWords.LastUpdated;
-            if (TryGetAndRemoveProperty(entries, lastUpdatedKey, langs, out Property? lastUpdated, valueName))
+            if (TryGetAndRemoveProperty(entries, lastUpdatedKey, langs, out Property? lastUpdated, dimName, valName) || // Both identifiers
+                TryGetAndRemoveProperty(entries, lastUpdatedKey, langs, out lastUpdated, valName)) // Only value identifier
             {
                 string formatString = _pxFileSyntaxConf.Tokens.Time.DateTimeFormatString;
                 return DateTime.ParseExact(lastUpdated.GetString(), formatString, CultureInfo.InvariantCulture);
             }
 
             throw new ArgumentException("Last update information not found");
+        }
+
+        private int GetPrecision(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimName, MultilanguageString valName)
+        {
+            string precisionKey = _pxFileSyntaxConf.Tokens.KeyWords.Precision;
+            if (TryGetAndRemoveProperty(entries, precisionKey, langs, out Property? precision, dimName, valName) || // Both identifiers
+               TryGetAndRemoveProperty(entries, precisionKey, langs, out precision, valName)) // Only value identifier
+            {
+                return int.Parse(precision.GetString());
+            }
+
+            return 0; // Default value
         }
 
         private Dim? GetDefaultValue<Dim>(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName, Dim[] values) where Dim : DimensionValue

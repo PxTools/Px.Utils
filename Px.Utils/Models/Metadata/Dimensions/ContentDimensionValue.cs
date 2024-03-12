@@ -15,16 +15,23 @@ namespace PxUtils.Models.Metadata.Dimensions
         public DateTime LastUpdated { get; }
 
         /// <summary>
+        /// The number of decimal places to which the data described by this dimension value is rounded.
+        /// </summary>
+        public int Precision { get; }
+
+        /// <summary>
         /// Default constructor.
         /// </summary>
         /// <param name="code">Unique code among the values of this dimension</param>
         /// <param name="name">Multilanguage name of the dimension value</param>
         /// <param name="unit">The unit for the data described by this dimension value</param>
         /// <param name="lastUpdated">The date and time when the data described by this dimension value was last updated</param>
-        public ContentDimensionValue(string code, MultilanguageString name, MultilanguageString unit, DateTime lastUpdated) : base(code, name)
+        /// <param name="precision">The number of decimal places to which the data described by this dimension value is rounded</param>
+        public ContentDimensionValue(string code, MultilanguageString name, MultilanguageString unit, DateTime lastUpdated, int precision) : base(code, name)
         {
             Unit = unit;
             LastUpdated = lastUpdated;
+            Precision = precision;
         }
 
         /// <summary>
@@ -33,10 +40,12 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// <param name="dimensionValue">Used to set the code and name of the dimension value</param>
         /// <param name="unit">The unit for the data described by this dimension value</param>
         /// <param name="lastUpdated">The date and time when the data described by this dimension value was last updated</param>
-        public ContentDimensionValue(DimensionValue dimensionValue, MultilanguageString unit, DateTime lastUpdated) : base(dimensionValue.Code, dimensionValue.Name)
+        /// <param name="precision">The number of decimal places to which the data described by this dimension value is rounded</param>
+        public ContentDimensionValue(DimensionValue dimensionValue, MultilanguageString unit, DateTime lastUpdated, int precision) : base(dimensionValue.Code, dimensionValue.Name)
         {
             Unit = unit;
             LastUpdated = lastUpdated;
+            Precision = precision;
         }
     }
 }
