@@ -9,5 +9,7 @@ namespace PxUtils.Validation
     public interface IValidationFunction
     {
         ValidationFeedbackLevel Level { get; }
+        public bool IsRelevant(ValidationEntry entry);
+        public ValidationFeedbackItem Validate(ValidationEntry entry);
     }
 }

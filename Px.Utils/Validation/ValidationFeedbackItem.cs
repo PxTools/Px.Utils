@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace PxUtils.Validation
 {
-    public class ValidationFeedbackItem(string file, long line, int character, ValidationFeedback feedback)
+    public class ValidationFeedbackItem(ValidationEntry entry, ValidationFeedback feedback)
     {
-        public string File { get; set; } = file;
-        public long Line { get; set; } = line;
-        public int Character { get; set; } = character;
+        public string File { get; set; } = entry.File;
+        public long Line { get; set; } = entry.Line;
+        public int Character { get; set; } = entry.Character;
         public ValidationFeedback Feedback { get; set; } = feedback;
     }
 }

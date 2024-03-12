@@ -1,4 +1,5 @@
-﻿using PxUtils.PxFile;
+﻿using Px.Utils.Validation.SyntaxValidation;
+using PxUtils.PxFile;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,25 +8,30 @@ using System.Threading.Tasks;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
-    public interface IStreamValidationFunction : IValidationFunction
-    {
-        ValidationFeedbackItem Validate(char nextCharacter, PxFileSyntaxConf symbolsConf, long line, int character, string filename);
-        bool IsRelevant(char currentCharacter, PxFileSyntaxConf symbolsConf);
-    }
 
-    public class MultipleEntriesOnLineValidationFunction : IStreamValidationFunction
+    public class MultipleEntriesOnLineValidationFunction : IValidationFunction
     {
         public ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Warning;
-        public bool IsRelevant(char currentCharacter, PxFileSyntaxConf symbolsConf)
+
+        public bool IsRelevant(ValidationEntry entry)
         {
-            return currentCharacter == symbolsConf.Symbols.SectionSeparator;
+            StreamValidationEntry? streamEntry = entry as StreamValidationEntry;
+            return streamEntry != null
+                ? streamEntry.CurrentCharacter == streamEntry.SyntaxConf.Symbols.SectionSeparator
+                : throw new ArgumentException("Entry is not of type StreamValidationEntry");
         }
 
-        public ValidationFeedbackItem Validate(char nextCharacter, PxFileSyntaxConf symbolsConf, long line, int character, string filename)
+        public ValidationFeedbackItem Validate(ValidationEntry entry)
         {
-            if (nextCharacter != symbolsConf.Symbols.LineSeparator && nextCharacter != symbolsConf.Symbols.EndOfStream)
+            StreamValidationEntry? streamEntry = entry as StreamValidationEntry;
+            if (streamEntry == null)
             {
-                return new ValidationFeedbackItem(filename, line, character, new ValidationFeedbackMultipleEntriesOnLine());
+                throw new ArgumentException("Entry is not of type StreamValidationEntry");
+            }
+
+            if (streamEntry.NextCharacter != streamEntry.SyntaxConf.Symbols.LineSeparator && streamEntry.NextCharacter != streamEntry.SyntaxConf.Symbols.EndOfStream)
+            {
+                return new ValidationFeedbackItem(entry, new ValidationFeedbackMultipleEntriesOnLine());
             }
             else
             {
