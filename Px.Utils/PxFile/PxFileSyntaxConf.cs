@@ -136,7 +136,7 @@
                 public string DefaultLanguage { get; set; } = DEFAULT_LANGUAGE;
                 public string AvailableLanguages { get; set; } = AVAILABLE_LANGUAGES;
                 public string ContentVariableIdentifier { get; set; } = CONTENT_VARIABLE_IDENTIFIER;
-                public string VariableCode { get; set; } = VARIABLE_CODE;
+                public string DimensionCode { get; set; } = VARIABLE_CODE;
                 public string VariableValueCodes { get; set; } = VARIABLE_VALUE_CODES;
                 public string VariableValues { get; set; } = VARIABLE_VALUES;
                 public string Units { get; set; } = UNITS;

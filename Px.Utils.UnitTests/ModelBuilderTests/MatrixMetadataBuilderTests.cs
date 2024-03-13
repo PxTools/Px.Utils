@@ -93,6 +93,23 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
+        public void MultiLangVariableBuildTest_FromRecommendedFixture()
+        {
+            Assert.AreEqual(4, Actual_Recommended_3Lang.Dimensions.Count);
+
+            List<string> expectedCodes = ["year", "area", "type", "info"];
+            CollectionAssert.AreEqual(expectedCodes, Actual_Recommended_3Lang.Dimensions.Select(d => d.Code).ToList());
+
+            List<MultilanguageString> expectedNames = [
+                new([new("fi", "Vuosi"), new("sv", "År"), new("en", "Year")]),
+                new([new("fi", "Alue"), new("sv", "Område"), new("en", "Region")]),
+                new([new("fi", "Talotyyppi"), new("sv", "Hustyp"), new("en", "Building type")]),
+                new([new("fi", "Tiedot"), new("sv", "Uppgifter"), new("en", "Information")])
+                ];
+            CollectionAssert.AreEqual(expectedNames, Actual_Recommended_3Lang.Dimensions.Select(d => d.Name).ToList());
+        }
+
+        [TestMethod]
         public void SingleLangVariableBuildTest()
         {
             Assert.AreEqual(4, Actual_1Lang.Dimensions.Count);
@@ -210,7 +227,7 @@ namespace ModelBuilderTests
             Assert.IsInstanceOfType<ContentDimension>(contentDimension);
             Assert.IsNotNull(contentDimension);
             Assert.AreEqual(3, contentDimension.Values.Count);
-            Assert.AreEqual("Tiedot", contentDimension.Code);
+            Assert.AreEqual("info", contentDimension.Code);
             Assert.IsFalse(Actual_3Lang.AdditionalProperties.ContainsKey("CONTVARIABLE"));
         }
 
@@ -354,7 +371,7 @@ namespace ModelBuilderTests
         [TestMethod]
         public void MultiLangMapTest_FromRecommendedFixture()
         {
-            IDimension? area_dim = Actual_Recommended_3Lang.Dimensions.Find(d => d.Code == "Alue");
+            IDimension? area_dim = Actual_Recommended_3Lang.Dimensions.Find(d => d.Code == "area");
             Assert.IsNotNull(area_dim);
             Assert.AreEqual(DimensionType.Geographical, area_dim.Type);
         }

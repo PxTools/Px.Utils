@@ -1,11 +1,11 @@
 ﻿using PxUtils.Language;
-using PxUtils.ModelBuilders;
 using PxUtils.Models.Metadata;
+using PxUtils.Models.Metadata.ExtensionMethods;
 
-namespace ModelBuilderTests.ValueParserUtilitiesTests
+namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
 {
     [TestClass]
-    public class ParseListOfMultilanguageStringsTests
+    public class ValueAsListOfMultilanguageStringsTests
     {
         [TestMethod]
         public void ParseListOfMultilanguageStrings_ValidInput_ReturnsList()
@@ -25,7 +25,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
             ];
 
             // Act
-            List<MultilanguageString> result = ValueParserUtilities.ParseListOfMultilanguageStrings(property, "none", ',', '"');
+            List<MultilanguageString> result = property.ValueAsListOfMultilanguageStrings( "none", ',', '"');
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
@@ -49,7 +49,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
             ];
 
             // Act
-            List<MultilanguageString> result = ValueParserUtilities.ParseListOfMultilanguageStrings(property, "none", ',', '"');
+            List<MultilanguageString> result = property.ValueAsListOfMultilanguageStrings( "none", ',', '"');
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
@@ -62,7 +62,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
             Property property = new("test_key", "test_value");
 
             // Act and assert
-            Assert.ThrowsException<ArgumentException>(() => ValueParserUtilities.ParseListOfMultilanguageStrings(property, "none", ',', '"'));
+            Assert.ThrowsException<ArgumentException>(() => property.ValueAsListOfMultilanguageStrings( "none", ',', '"'));
         }
 
         [TestMethod]
@@ -75,7 +75,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
             List<MultilanguageString> expected = [new("lang_a", "a_0")];
 
             // Act
-            List<MultilanguageString> result = ValueParserUtilities.ParseListOfMultilanguageStrings(property, "none", ',', '"');
+            List<MultilanguageString> result = property.ValueAsListOfMultilanguageStrings( "none", ',', '"');
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
