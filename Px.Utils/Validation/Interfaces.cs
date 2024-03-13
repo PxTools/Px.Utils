@@ -44,8 +44,8 @@ namespace PxUtils.Validation.Planning
     {
         string Keyword { get; }
         string Language { get; }
-        string FirstIdentifier { get; }
-        string SecondIdentifier { get; }
+        string FirstSpecifier { get; }
+        string SecondSpecifier { get; }
     }
 
     public interface IEntryBuilder

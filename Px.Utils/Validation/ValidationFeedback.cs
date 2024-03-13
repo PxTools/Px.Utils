@@ -8,7 +8,7 @@ namespace PxUtils.Validation
 {
     public abstract class ValidationFeedback
     {
-        public abstract ValidationFeedbackLevel Level { get; set; }
-        public abstract string Rule { get; set; }
+        public abstract ValidationFeedbackLevel Level { get; }
+        public abstract string Rule { get; }
     }
 }
