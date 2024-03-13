@@ -13,6 +13,7 @@ namespace ModelBuilderTests
     {
         private MatrixMetadata Actual_3Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_3_Languages.Entries);
         private MatrixMetadata Actual_1Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_1_Language.Entries);
+        private MatrixMetadata Actual_Recommended_3Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Recommended_3_Langs.Entries);
 
         [TestMethod]
         public void MultiLangTableLevelMetaLanguageTests()
@@ -108,6 +109,8 @@ namespace ModelBuilderTests
             CollectionAssert.AreEqual(expectedNames, Actual_1Lang.Dimensions.Select(d => d.Name).ToList());
         }
 
+        #region Content Dimension Tests
+
         [TestMethod]
         public void MultiLangContentDimensionBuildTest()
         {
@@ -201,6 +204,56 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
+        public void MultiLangContentDimensionBuildTest_FromRecommendedFixture()
+        {
+            IDimension? contentDimension = Actual_Recommended_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            Assert.IsInstanceOfType<ContentDimension>(contentDimension);
+            Assert.IsNotNull(contentDimension);
+            Assert.AreEqual(3, contentDimension.Values.Count);
+            Assert.AreEqual("Tiedot", contentDimension.Code);
+            Assert.IsFalse(Actual_3Lang.AdditionalProperties.ContainsKey("CONTVARIABLE"));
+        }
+
+        [DataTestMethod]
+        [DataRow(0, "indeksipisteluku", "indextal", "index point")]
+        [DataRow(1, "%", "%", "%")]
+        [DataRow(2, "lukumäärä", "antal", "number")]
+        public void MultiLangUnitsTest_FromRecommendedFixture(int index, string fi, string sv, string en)
+        {
+            ContentDimension? contentDimension = (ContentDimension?)Actual_Recommended_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            MultilanguageString expected = new([new("fi", fi), new("sv", sv), new("en", en)]);
+            Assert.AreEqual(expected, contentDimension?.Values[index].Unit);
+            Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("UNIT"));
+        }
+
+        [DataTestMethod]
+        [DataRow(0, "20230131 08:00")]
+        [DataRow(1, "20230131 09:00")]
+        [DataRow(2, "20230131 10:00")]
+        public void MultiLangLastUpdatedTest_FromRecommendedFixture(int index, string timeStamp)
+        {
+            ContentDimension? contentDimension = (ContentDimension?)Actual_Recommended_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            DateTime expected = DateTime.ParseExact(timeStamp, "yyyyMMdd HH:mm", CultureInfo.InvariantCulture);
+            Assert.AreEqual(expected, contentDimension?.Values[index].LastUpdated);
+            Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("LAST-UPDATED"));
+        }
+
+        [DataTestMethod]
+        [DataRow(0, 1)]
+        [DataRow(1, 1)]
+        [DataRow(2, 0)]
+        public void MultiLangPrecisionTest_FromRecommendedFixture(int index, int expected)
+        {
+            ContentDimension? contentDimension = (ContentDimension?)Actual_Recommended_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            Assert.AreEqual(expected, contentDimension?.Values[index].Precision);
+            Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("PRECISION"));
+        }
+
+        #endregion
+
+        #region Time Dimension Tests
+
+        [TestMethod]
         public void MultiLangTimeDimensionBuildTest()
         {
             TimeDimension? timeDimension = (TimeDimension?)Actual_3Lang.Dimensions.Find(d => d.Type == DimensionType.Time);
@@ -223,6 +276,8 @@ namespace ModelBuilderTests
             Assert.IsTrue(timeDimension.AdditionalProperties.ContainsKey("TIMEVAL"));
             Assert.IsFalse(Actual_3Lang.AdditionalProperties.ContainsKey("TIMEVAL"));
         }
+
+        #endregion
 
         [TestMethod]
         public void MultiLangDefaultDimensionValueTest()
@@ -294,6 +349,22 @@ namespace ModelBuilderTests
             Assert.AreEqual(3, dim3.Values.Count);
             List<string> expected3 = ["ketjutettu_lv", "vmuutos_lv", "lkm_julk_uudet"];
             CollectionAssert.AreEqual(expected3, dim3.Values.Select(v => v.Code).ToList());
+        }
+
+        [TestMethod]
+        public void MultiLangMapTest_FromRecommendedFixture()
+        {
+            IDimension? area_dim = Actual_Recommended_3Lang.Dimensions.Find(d => d.Code == "Alue");
+            Assert.IsNotNull(area_dim);
+            Assert.AreEqual(DimensionType.Geographical, area_dim.Type);
+        }
+
+        [TestMethod]
+        public void SingleLangMapTest()
+        {
+            IDimension? area_dim = Actual_1Lang.Dimensions.Find(d => d.Code == "Alue");
+            Assert.IsNotNull(area_dim);
+            Assert.AreEqual(DimensionType.Geographical, area_dim.Type);
         }
     }
 }

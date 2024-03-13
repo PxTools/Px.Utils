@@ -126,6 +126,7 @@
                 private const string PRECISION = "PRECISION";
                 private const string DIMENSION_DEFAULT_VALUE = "ELIMINATION";
                 private const string TIME_VAL = "TIMEVAL";
+                private const string MAP = "MAP";
                 private const string DIMENSION_TYPE = "VARIABLE-TYPE";
                 private const string STUB_DIMENSIONS = "STUB";
                 private const string HEADING_DIMENSIONS = "HEADING";
@@ -143,6 +144,7 @@
                 public string Precision { get; set; } = PRECISION;
                 public string DimensionDefaultValue { get; set; } = DIMENSION_DEFAULT_VALUE;
                 public string TimeVal { get; set; } = TIME_VAL;
+                public string Map { get; set; } = MAP;
                 public string DimensionType { get; set; } = DIMENSION_TYPE;
                 public string StubDimensions { get; set; } = STUB_DIMENSIONS;
                 public string HeadingDimensions { get; set; } = HEADING_DIMENSIONS;

@@ -130,12 +130,26 @@ namespace PxUtils.ModelBuilders
             DimensionValue[] values = BuildDimensionValues(entries, langs, dimensionName);
             DimensionValue? maybeDefault = GetDefaultValue(entries, langs, dimensionName, values);
             
+            DimensionType type = GetDimensionType(entries, langs, dimensionName);
+            return new Dimension(code, dimensionName, [], [.. values], maybeDefault, type);
+        }
+
+        private DimensionType GetDimensionType(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName)
+        {
             string dimensionTypeKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionType;
             DimensionType type = TryGetAndRemoveProperty(entries, dimensionTypeKey, langs, out Property? dimTypeContent, dimensionName)
                 ? ValueParserUtilities.StringToDimensionType(dimTypeContent.GetString(), _pxFileSyntaxConf)
                 : DimensionType.Unknown;
 
-            return new Dimension(code, dimensionName, [], [.. values], maybeDefault, type);
+            if(type is DimensionType.Other or DimensionType.Unknown)
+            {
+                string mapKey = _pxFileSyntaxConf.Tokens.KeyWords.Map;
+                if(TryGetProperty(entries, mapKey, langs, out Property? _, dimensionName))
+                {
+                    return DimensionType.Geographical;
+                }
+            }
+            return type;
         }
 
         private ContentDimension BuildContentDimension(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName)
