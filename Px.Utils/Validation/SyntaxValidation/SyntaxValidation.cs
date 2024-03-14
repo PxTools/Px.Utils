@@ -12,7 +12,7 @@ namespace PxUtils.Validation.SyntaxValidation
 {
     public static class SyntaxValidation
     {
-        public static SyntaxValidationResult ValidatePxFileSyntax(Stream stream, string filename, PxFileSyntaxConf? syntaxConf = null)
+        public static SyntaxValidationResult ValidatePxFileSyntax(Stream stream, string filename, PxFileSyntaxConf? syntaxConf = null, int bufferSize = 4096)
         {
             IEnumerable<IValidationFunction> stringValidationFunctions = [
                     new MultipleEntriesOnLine()
@@ -21,7 +21,10 @@ namespace PxUtils.Validation.SyntaxValidation
             IEnumerable<IValidationFunction> keyValueValidationFunctions = [
                   new MoreThanOneLanguageParameter(),
                   new MoreThanOneSpecifierParameter(),
-                  new WrongKeyOrder()
+                  new WrongKeyOrderOrMissingKeyword(),
+                  new InvalidSpecifier(),
+                  new IllegalSymbolsInKeyParamSection(),
+                  new IllegalValueFormat()
                 ];
 
             IEnumerable<IValidationFunction> structuredValidationFunctions = [
@@ -29,10 +32,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 ];
 
             syntaxConf ??= PxFileSyntaxConf.Default;
-            ValidationReport report = new()
-            {
-                FeedbackItems = []
-            };
+            ValidationReport report = new();
 
             Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
             if (encoding == null)
@@ -41,7 +41,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 return new(report, []);
             }
 
-            List<StringValidationEntry> stringEntries = BuildEntries(stream, encoding, syntaxConf, filename);
+            List<StringValidationEntry> stringEntries = BuildEntries(stream, encoding, syntaxConf, filename, bufferSize);
             ValidateStringEntries(stringEntries, stringValidationFunctions, report);
             List<KeyValuePairValidationEntry> keyValuePairs = BuildKeyValuePairs(stringEntries);
             ValidateKeyValuePairEntries(keyValuePairs, keyValueValidationFunctions, report);
@@ -51,44 +51,49 @@ namespace PxUtils.Validation.SyntaxValidation
             return new(report, structuredEntries);
         }
 
-        private static List<StringValidationEntry> BuildEntries(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename)
+        private static List<StringValidationEntry> BuildEntries(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize)
         {
             int line = 0;
             int character = 0;
             stream.Seek(0, SeekOrigin.Begin);
             StreamReader reader = new(stream, encoding);
-            // Iterate each character of the reader
             List<StringValidationEntry> stringEntries = [];
             StringBuilder entryBuilder = new();
-            while (!reader.EndOfStream)
+            char[] buffer = new char[bufferSize];
+            int charsRead;
+
+            while ((charsRead = reader.Read(buffer, 0, bufferSize)) > 0)
             {
-                char currentCharacter = (char)reader.Read();
-                if (currentCharacter == syntaxConf.Symbols.KeywordSeparator)
+                for (int i = 0; i < charsRead; i++)
                 {
-                    string stringEntry = entryBuilder.ToString();
-                    if (CleanString(stringEntry).Equals(syntaxConf.Tokens.KeyWords.Data))
+                    char currentCharacter = buffer[i];
+                    if (currentCharacter == syntaxConf.Symbols.KeywordSeparator)
                     {
-                        break;
+                        string stringEntry = entryBuilder.ToString();
+                        if (CleanString(stringEntry).Equals(syntaxConf.Tokens.KeyWords.Data))
+                        {
+                            break;
+                        }
                     }
-                }
-                if (currentCharacter == syntaxConf.Symbols.LineSeparator)
-                {
-                    line++;
-                    character = 0;
-                }
-                else
-                {
-                    character++;
-                }
-                if (currentCharacter == syntaxConf.Symbols.SectionSeparator)
-                {
-                    string stringEntry = entryBuilder.ToString();
-                    stringEntries.Add(new StringValidationEntry(line, character, filename, stringEntry, syntaxConf, stringEntries.Count));
-                    entryBuilder.Clear();
-                }
-                else
-                {
-                    entryBuilder.Append(currentCharacter);
+                    if (currentCharacter == syntaxConf.Symbols.LineSeparator)
+                    {
+                        line++;
+                        character = 0;
+                    }
+                    else
+                    {
+                        character++;
+                    }
+                    if (currentCharacter == syntaxConf.Symbols.SectionSeparator)
+                    {
+                        string stringEntry = entryBuilder.ToString();
+                        stringEntries.Add(new StringValidationEntry(line, character, filename, stringEntry, syntaxConf, stringEntries.Count));
+                        entryBuilder.Clear();
+                    }
+                    else
+                    {
+                        entryBuilder.Append(currentCharacter);
+                    }
                 }
             }
             return stringEntries;
@@ -96,7 +101,14 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static string CleanString(string input)
         {
-            return input.Replace("\n", "").Replace("\"", "");
+            if (input == null)
+            {
+                return string.Empty;
+            }
+            else
+            {
+                return input.Replace("\n", "").Replace("\"", "");
+            }
         }
 
         private static void ValidateStringEntries(List<StringValidationEntry> stringEntries, IEnumerable<IValidationFunction> stringValidationFunctions, ValidationReport report)
@@ -120,7 +132,7 @@ namespace PxUtils.Validation.SyntaxValidation
             List<KeyValuePairValidationEntry> keyValuePairs = new();
             foreach (StringValidationEntry entry in stringEntries)
             {
-                string[] split = CleanString(entry.EntryString).Split("=");
+                string[] split = entry.EntryString.Split("=");
                 keyValuePairs.Add(new (entry.Line, entry.Character, entry.File, new KeyValuePair<string, string>(split[0], split[1]), entry.SyntaxConf));
             }
             return keyValuePairs;
@@ -160,48 +172,13 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static ValidationEntryKey ParseValidationEntryKey(string input, PxFileSyntaxConf syntaxConf)
         {
-            string? language = null;
-            string? firstSpecifier = null;
-            string? secondSpecifier = null;
-
-            // Try to find the beginnning of the language parameter
-            int languageParameterStartIndex = input.IndexOf(syntaxConf.Symbols.Key.LangParamStart);
-            // Try to find the beginning of the specifier. If not found, return the keyword
-            int specifierStartIndex = input.IndexOf(syntaxConf.Symbols.Key.SpecifierParamStart);
-            int keywordEndIndex = languageParameterStartIndex;
-
-            if (languageParameterStartIndex == -1)
-            {
-                keywordEndIndex = specifierStartIndex;
-            }
-            // No language or specifier were found, return keyword
-            if (keywordEndIndex == -1)
-            {
-                return new(input, null, null, null);
-            }
-
-            // Extract the keyword
-            string keyword = input[0..keywordEndIndex];
-
-            // Extract the language if it exists
-            if (languageParameterStartIndex != -1)
-            {
-                int languageParameterEndIndex = input.IndexOf(syntaxConf.Symbols.Key.LangParamEnd);
-                language = input[(languageParameterStartIndex + 1)..languageParameterEndIndex];
-            }
-
-            // Extract the specifiers if they exist
-            if (specifierStartIndex != -1)
-            {
-                int specifierEndIndex = input.IndexOf(syntaxConf.Symbols.Key.SpecifierParamEnd);
-                string identifiers = input[(specifierStartIndex + 1)..specifierEndIndex];
-                string[] splitSpecifiers = identifiers.Split(syntaxConf.Symbols.Key.ListSeparator);
-                firstSpecifier = splitSpecifiers[0].Trim(syntaxConf.Symbols.Key.StringDelimeter);
-                if (splitSpecifiers.Length > 1)
-                {
-                    secondSpecifier = splitSpecifiers[1].Trim(syntaxConf.Symbols.Key.StringDelimeter).Trim();
-                }
-            }
+            ExtractSectionResult languageResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(input, syntaxConf.Symbols.Key.LangParamStart, syntaxConf.Symbols.Key.LangParamEnd);
+            string? language = languageResult.Sections.Length > 0 ? CleanString(languageResult.Sections[0]) : null;
+            ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageResult.Remainder, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf.Symbols.Key.SpecifierParamEnd);
+            string[] specifiers = SyntaxValidationUtilityMethods.GetSpecifiersFromParameter(specifierResult.Sections.FirstOrDefault(), syntaxConf);
+            string? firstSpecifier = specifiers.Length > 0 ? CleanString(specifiers[0]) : null;
+            string? secondSpecifier = specifiers.Length > 1 ? CleanString(specifiers[1]) : null;
+            string keyword = CleanString(specifierResult.Remainder);
 
             return new(keyword, language, firstSpecifier, secondSpecifier);
         }

@@ -35,4 +35,28 @@ namespace PxUtils.Validation.SyntaxValidation
         public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Error;
         public override string Rule { get; } = "The key is not defined in the order of KEYWORD[language](\"specifier\")";
     }
+
+    public class SyntaxValidationFeedbackMissingKeyword : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Error;
+        public override string Rule { get; } = "The entry has no keyword";
+    }
+
+    public class SyntaxValidationFeedbackInvalidSpecifier(string[] reasons) : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Error;
+        public override string Rule { get; } = $"The specifier is not following valid format: {string.Join(". ", reasons)}";
+    }
+
+    public class SyntaxValidationFeedbackIllegalSymbolsInParamSections(string[] reasons) : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Error;
+        public override string Rule { get; } = $"The key parameter section contains illegal symbols: {string.Join(". ", reasons)}";
+    }
+
+    public class SyntaxValidationFeedbackInvalidValueSection(string reason) : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Error;
+        public override string Rule { get; } = "The value section is following a valid format. " + reason;
+    }
 }
