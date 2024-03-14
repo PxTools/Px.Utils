@@ -30,6 +30,26 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
+        public void ParseMetadataEntryKeyTest_KeyWithLangAndTwoSpecifiersWithSpace_ReturnsEntryKey()
+        {
+            // Arrange
+            string key = "FOOBAR";
+            string lang = "aa";
+            string firstIdentifier = "foo";
+            string secondIdentifier = "bar";
+            string input = $"{key}[{lang}](\"{firstIdentifier}\", \"{secondIdentifier}\")";
+
+            // Act
+            var result = builder.Parse(input);
+
+            // Assert
+            Assert.AreEqual(key, result.KeyWord);
+            Assert.AreEqual(lang, result.Language);
+            Assert.AreEqual(firstIdentifier, result.FirstIdentifier);
+            Assert.AreEqual(secondIdentifier, result.SecondIdentifier);
+        }
+
+        [TestMethod]
         public void ParseMetadataEntryKeyTest_KeyWithLang_ReturnsEntryKey()
         {
             // Arrange

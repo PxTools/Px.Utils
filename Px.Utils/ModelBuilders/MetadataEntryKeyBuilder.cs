@@ -127,7 +127,7 @@ namespace PxUtils.ModelBuilders
             {
                 return remaining[1..^1]
                     .Split(_listSeparator)
-                    .Select(s => ValidateAndTrimSpecifierValue(s))
+                    .Select(ValidateAndTrimSpecifierValue)
                     .ToList();
             }
             else
@@ -138,6 +138,7 @@ namespace PxUtils.ModelBuilders
 
         private string ValidateAndTrimSpecifierValue(string input)
         {
+            input = input.Trim();
             if (input.Length > 2 && input[0] == _stringDelimeter && input[^1] == _stringDelimeter)
             {
                 string trimmed = input[1..^1];

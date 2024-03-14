@@ -240,7 +240,8 @@ More spesific encoding information. The value must be a string that matches the 
 
 ##### PRECISION*
 - The value must be an integer (and valid number type).
-- Must be defined for each value of the dimension defined with the CONTVARIABLE keyword.
+- Recommended to be defined for each value of the dimension defined with the CONTVARIABLE keyword.
+- Must be defined for each value where the number of decimals in the data is not zero (This is difficult to validate due to decimal rounding, so zero is assumed when not defined).
 - Can be defined for the whole matrix without spesifiers.
 - Recommended to be defined for the content dimension value with two specifiers.
 - Can be defined for the content dimension values with the value name as only the first specifier, but this is not recommended.

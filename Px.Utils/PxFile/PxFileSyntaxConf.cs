@@ -123,8 +123,10 @@
                 private const string VARIABLE_VALUES = "VALUES";
                 private const string UNITS = "UNITS";
                 private const string LAST_UPDATED = "LAST-UPDATED";
+                private const string PRECISION = "PRECISION";
                 private const string DIMENSION_DEFAULT_VALUE = "ELIMINATION";
                 private const string TIME_VAL = "TIMEVAL";
+                private const string MAP = "MAP";
                 private const string DIMENSION_TYPE = "VARIABLE-TYPE";
                 private const string STUB_DIMENSIONS = "STUB";
                 private const string HEADING_DIMENSIONS = "HEADING";
@@ -134,13 +136,15 @@
                 public string DefaultLanguage { get; set; } = DEFAULT_LANGUAGE;
                 public string AvailableLanguages { get; set; } = AVAILABLE_LANGUAGES;
                 public string ContentVariableIdentifier { get; set; } = CONTENT_VARIABLE_IDENTIFIER;
-                public string VariableCode { get; set; } = VARIABLE_CODE;
+                public string DimensionCode { get; set; } = VARIABLE_CODE;
                 public string VariableValueCodes { get; set; } = VARIABLE_VALUE_CODES;
                 public string VariableValues { get; set; } = VARIABLE_VALUES;
                 public string Units { get; set; } = UNITS;
                 public string LastUpdated { get; set; } = LAST_UPDATED;
+                public string Precision { get; set; } = PRECISION;
                 public string DimensionDefaultValue { get; set; } = DIMENSION_DEFAULT_VALUE;
                 public string TimeVal { get; set; } = TIME_VAL;
+                public string Map { get; set; } = MAP;
                 public string DimensionType { get; set; } = DIMENSION_TYPE;
                 public string StubDimensions { get; set; } = STUB_DIMENSIONS;
                 public string HeadingDimensions { get; set; } = HEADING_DIMENSIONS;
