@@ -2,7 +2,7 @@
 using PxUtils.Models.Metadata;
 using PxUtils.Models.Metadata.ExtensionMethods;
 
-namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
+namespace ModelTests.ExtensionTests.PropertyExtensionTests
 {
     [TestClass]
     public class ValueAsStringTests
