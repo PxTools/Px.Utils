@@ -77,4 +77,46 @@ namespace PxUtils.Validation.SyntaxValidation
         public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Warning;
         public override string Rule { get; } = "The value section is split to multiple lines unnecessarily. Recommended only beyond length of 150";
     }
+
+    public class SyntaxValidationFeedbackInvalidKeywordFormat(string[] reasons) : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Error;
+        public override string Rule { get; } = $"The keyword is not following valid format. {string.Join(". ", reasons)}";
+    }
+
+    public class SyntaxValidationFeedbackInvalidLanguageFormat(string[] reasons) : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Error;
+        public override string Rule { get; } = $"The language parameter is not following valid format. {string.Join(". ", reasons)}";
+    }
+
+    public class SyntaxValidationFeedbackIllegalCharactersInSpecifier(string[] reasons) : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Error;
+        public override string Rule { get; } = $"The specifier contains illegal characters. {string.Join(". ", reasons)}";
+    }
+
+    public class SyntaxValidationFeedbackEntryWithoutValue() : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Error;
+        public override string Rule { get; } = "The entry has no value section separated with =";
+    }
+
+    public class SyntaxValidationFeedbackIncompliantLanguageParam() : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Warning;
+        public override string Rule { get; } = "The language parameter is not compliant with BCP 47, MS-LCID or ISO 639 standards.";
+    }
+
+    public class SyntaxValidationFeedbackKeywordContainsUnrecommendedCharacters(string[] reasons) : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Warning;
+        public override string Rule { get; } = $"The keyword contains characters that are not recommended. {string.Join(". ", reasons)}";
+    }
+
+    public class SyntaxValidationFeedbackKeywordIsExcessivelyLong() : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Warning;
+        public override string Rule { get; } = "The keyword is excessively long. Recommended length of up to 20 characters";
+    }
 }

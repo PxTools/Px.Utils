@@ -1,11 +1,5 @@
-﻿using PxUtils.Validation;
-using PxUtils.Validation.SyntaxValidation;
-using PxUtils.UnitTests.PxFileTests.Fixtures;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using PxUtils.Validation.SyntaxValidation;
 using System.Text;
-using System.Threading.Tasks;
 using Px.Utils.UnitTests.PxFileTests.Fixtures;
 
 namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
@@ -17,7 +11,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         public void ValidateStreamSyntax_CalledWith_MINIMAL_UTF8_Returns_Valid_Result()
         {
             // Arrange
-            byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N);
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N);
             using Stream stream = new MemoryStream(data);
             stream.Seek(0, SeekOrigin.Begin);
             string filename = "foo";
@@ -33,7 +27,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         public void ValidateStreamSyntax_CalledWith_MINIMAL_UTF8_N_WITH_MULTIPLE_ENTRIES_IN_SINGLE_LINE_Returns_Result_With_Warnings()
         {
             // Arrange
-            byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_WITH_MULTIPLE_ENTRIES_IN_SINGLE_LINE);
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N_WITH_MULTIPLE_ENTRIES_IN_SINGLE_LINE);
             using Stream stream = new MemoryStream(data);
             stream.Seek(0, SeekOrigin.Begin);
             string filename = "foo";
@@ -62,8 +56,8 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             Assert.AreEqual(10, result.StructuredEntries.Count);
             Assert.AreEqual("YES", result.StructuredEntries[8].Value);
             Assert.AreEqual("NO", result.StructuredEntries[9].Value);
-            Assert.AreEqual("lang", result.StructuredEntries[8].Key.Language);
-            Assert.AreEqual("lang", result.StructuredEntries[9].Key.Language);
+            Assert.AreEqual("fi", result.StructuredEntries[8].Key.Language);
+            Assert.AreEqual("fi", result.StructuredEntries[9].Key.Language);
             Assert.AreEqual("first_specifier", result.StructuredEntries[8].Key.FirstSpecifier);
             Assert.AreEqual("first_specifier", result.StructuredEntries[9].Key.FirstSpecifier);
             Assert.AreEqual("second_specifier", result.StructuredEntries[8].Key.SecondSpecifier);
@@ -166,7 +160,8 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             // Act
             SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
 
-            Assert.AreEqual(3, result.Report.FeedbackItems?.Count);
+            // This test also catches a later issues with invalid language formats and badly formatted keywords
+            Assert.AreEqual(10, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackIllegalSymbolsInParamSections));
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackIllegalSymbolsInParamSections));
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[2].Feedback, typeof(SyntaxValidationFeedbackIllegalSymbolsInParamSections));
@@ -237,6 +232,128 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             Assert.AreEqual(2, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackExcessNewLinesInValue));
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackExcessNewLinesInValue));
+        }
+
+        [TestMethod]
+        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_INVALID_KEYWORDS_Returns_Result_With_Errors()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_INVALID_KEYWORDS);
+            using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            string filename = "foo";
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+
+            Assert.AreEqual(3, result.Report.FeedbackItems?.Count);
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackInvalidKeywordFormat));
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackInvalidKeywordFormat));
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[2].Feedback, typeof(SyntaxValidationFeedbackInvalidKeywordFormat));
+        }
+
+        [TestMethod]
+        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_INVALID_LANGUAGES_Returns_Result_With_Errors()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_INVALID_LANGUAGES);
+            using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            string filename = "foo";
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+
+            // This test also catches an earlier issue with excess whitespace in the key part
+            Assert.AreEqual(3, result.Report.FeedbackItems?.Count);
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackInvalidLanguageFormat));
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[2].Feedback, typeof(SyntaxValidationFeedbackIncompliantLanguageParam));
+        }
+
+        [TestMethod]
+        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS_Returns_With_Errors()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS);
+            using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            string filename = "foo";
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+
+            // This test also catches an earlier issue with illegal symbols in the key parameter section
+            Assert.AreEqual(2, result.Report.FeedbackItems?.Count);
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackIllegalCharactersInSpecifier));
+        }
+
+        [TestMethod]
+        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_VALUELESS_ENTRY_Returns_With_Errors()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_VALUELESS_ENTRY);
+            using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            string filename = "foo";
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+
+            // This test also catches an earlier issue with illegal symbols in the key parameter section
+            Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackEntryWithoutValue));
+        }
+
+        [TestMethod]
+        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_INCOMPLIANT_LANGUAGES_Returns_With_Warnings()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_INCOMPLIANT_LANGUAGES);
+            using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            string filename = "foo";
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+
+            // This test also catches an earlier issue with illegal symbols in the key parameter section
+            Assert.AreEqual(2, result.Report.FeedbackItems?.Count);
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackIncompliantLanguageParam));
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackIncompliantLanguageParam));
+        }
+
+        [TestMethod]
+        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_LONG_KEYWORD_Returns_With_Warnings()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_LONG_KEYWORD);
+            using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            string filename = "foo";
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+
+            Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeywordIsExcessivelyLong));
+        }
+
+        [TestMethod]
+        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_UNRECOMMENDED_KEYWORD_NAMING_Returns_With_Warnings()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_UNRECOMMENDED_KEYWORD_NAMING);
+  
+            using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            string filename = "foo";
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+
+            Assert.AreEqual(2, result.Report.FeedbackItems?.Count);
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeywordContainsUnrecommendedCharacters));
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackKeywordContainsUnrecommendedCharacters));
         }
     }
 }

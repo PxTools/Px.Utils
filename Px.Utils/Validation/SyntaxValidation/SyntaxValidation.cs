@@ -1,6 +1,5 @@
 ﻿using PxUtils.PxFile;
 using PxUtils.PxFile.Meta;
-using PxUtils.Validation.Planning;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,7 +14,8 @@ namespace PxUtils.Validation.SyntaxValidation
         public static SyntaxValidationResult ValidatePxFileSyntax(Stream stream, string filename, PxFileSyntaxConf? syntaxConf = null, int bufferSize = 4096)
         {
             IEnumerable<IValidationFunction> stringValidationFunctions = [
-                    new MultipleEntriesOnLine()
+                    new MultipleEntriesOnLine(),
+                    new EntryWithoutValue()
                 ];
 
             IEnumerable<IValidationFunction> keyValueValidationFunctions = [
@@ -31,7 +31,12 @@ namespace PxUtils.Validation.SyntaxValidation
                 ];
 
             IEnumerable<IValidationFunction> structuredValidationFunctions = [
-                   
+                  new InvalidKeywordFormat(),
+                  new IllegalCharactersInLanguageParameter(),
+                  new IllegalCharactersInSpecifierParameter(),
+                  new IncompliantLanguage(),
+                  new KeywordHasUnrecommendedCharacters(),
+                  new KeywordIsExcessivelyLong()
                 ];
 
             syntaxConf ??= PxFileSyntaxConf.Default;
@@ -132,11 +137,12 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static List<KeyValuePairValidationEntry> BuildKeyValuePairs(List<StringValidationEntry> stringEntries)
         {
-            List<KeyValuePairValidationEntry> keyValuePairs = new();
+            List<KeyValuePairValidationEntry> keyValuePairs = [];
             foreach (StringValidationEntry entry in stringEntries)
             {
                 string[] split = entry.EntryString.Split("=");
-                keyValuePairs.Add(new (entry.Line, entry.Character, entry.File, new KeyValuePair<string, string>(split[0], split[1]), entry.SyntaxConf));
+                string value = split.Length > 1 ? split[1] : "";
+                keyValuePairs.Add(new (entry.Line, entry.Character, entry.File, new KeyValuePair<string, string>(split[0], value), entry.SyntaxConf));
             }
             return keyValuePairs;
         }
@@ -159,7 +165,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static List<StructuredValidationEntry> BuildStructuredEntries(List<KeyValuePairValidationEntry> keyValuePairs)
         {
-            List<StructuredValidationEntry> structuredEntries = new();
+            List<StructuredValidationEntry> structuredEntries = [];
             foreach (KeyValuePairValidationEntry entry in keyValuePairs)
             {
                 ValidationEntryKey key = ParseValidationEntryKey(entry.KeyValueEntry.Key, entry.SyntaxConf);
@@ -170,7 +176,18 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static void ValidateStructuredEntries(List<StructuredValidationEntry> structuredEntries, IEnumerable<IValidationFunction> validationFunctions, ValidationReport report)
         {
-            return;
+            foreach (var entry in structuredEntries)
+            {
+                foreach (IValidationFunction function in validationFunctions
+                                       .Where(f => f.IsRelevant(entry)))
+                {
+                    ValidationFeedbackItem? feedback = function.Validate(entry);
+                    if (feedback != null)
+                    {
+                        report.FeedbackItems.Add(feedback);
+                    }
+                }
+            }
         }
 
         private static ValidationEntryKey ParseValidationEntryKey(string input, PxFileSyntaxConf syntaxConf)

@@ -1,8 +1,13 @@
-﻿using PxUtils.PxFile;
+﻿using Px.Utils.Validation.SyntaxValidation;
+using PxUtils.PxFile;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Security.Principal;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace PxUtils.Validation.SyntaxValidation
@@ -166,7 +171,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 validationFailureReasons.Add("More than two specifier parts.");
             }
 
-            if (specifiers.Length > 1 && !specifierResult.Remainder.Contains(","))
+            if (specifiers.Length > 1 && !specifierResult.Remainder.Contains(','))
             {
                 validationFailureReasons.Add("Specifiers are not separated with a \",\"");
             }
@@ -361,6 +366,264 @@ namespace PxUtils.Validation.SyntaxValidation
             if (value.Contains(keyValueValidationEntry.SyntaxConf.Symbols.LineSeparator))
             {
                 return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackExcessNewLinesInValue());
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+    public class InvalidKeywordFormat : IValidationFunction
+    {
+        public bool IsRelevant(ValidationEntry entry) => true;
+
+        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        {
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+
+            string keyword = structuredValidationEntry.Key.Keyword;
+            // Missing keyword is catched earlier
+            if (keyword.Length == 0)
+            {
+                return null;
+            }
+
+            List<string> reasons = [];
+
+            // Check if keyword contains only letters, numbers, - and _
+            string legalSymbolsKeyword = @"a-zA-Z0-9_-";
+            // Find all illegal symbols in keyword
+            var matchesKeyword = Regex.Matches(keyword, $"[^{legalSymbolsKeyword}]");
+            var illegalSymbolsInKeyWord = matchesKeyword.Cast<Match>().Select(m => m.Value).Distinct().ToList();
+            if (illegalSymbolsInKeyWord.Count > 0)
+            {
+                reasons.Add($"Keyword contains illegal characters: {string.Join(", ", illegalSymbolsInKeyWord)}"); 
+            }
+
+            // Check if keyword starts with a letter
+            if (!char.IsLetter(keyword[0]))
+            {
+                reasons.Add("Keyword doesn't start with a letter");
+            }
+
+            if (reasons.Count > 0)
+            {
+                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackInvalidKeywordFormat([.. reasons]));
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+    public class IllegalCharactersInLanguageParameter : IValidationFunction
+    {
+        public bool IsRelevant(ValidationEntry entry)
+        {
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+            return structuredValidationEntry.Key.Language != null;
+        }
+
+        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        {
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+            string? lang = structuredValidationEntry.Key.Language;
+
+            // Language shouldn't be null because of IsRelevant call, but checking just to please Sonar gods.
+            if (lang == null)
+            {
+                return null;
+            }
+
+            List<string> reasons = [];
+
+            // Find illegal characters from language parameter string
+            string illegalCharacters = @"[;=\[\]""]";
+            MatchCollection matchesLang = Regex.Matches(lang, illegalCharacters);
+            List<string> foundIllegalCharacters = matchesLang.Cast<Match>().Select(m => m.Value).Distinct().ToList();
+
+            // Check if there are any special characters or whitespace in lang
+            if (foundIllegalCharacters.Count > 0)
+            {
+                reasons.Add($"Language parameter contains illegal characters: {string.Join(", ", foundIllegalCharacters)}");
+            }
+            if (lang.Contains(' '))
+            {
+                reasons.Add("Language parameter contains whitespace character(s)");
+            }
+
+            if (reasons.Count > 0)
+            {
+                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackInvalidLanguageFormat([.. reasons]));
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+    public class IllegalCharactersInSpecifierParameter : IValidationFunction
+    {
+        public bool IsRelevant(ValidationEntry entry)
+        {
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+            // Running this validation is relevant only for entries with a specifier
+            return structuredValidationEntry.Key.FirstSpecifier != null;
+        }
+
+        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        {
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+
+            List<string> reasons = [];
+
+            char[] illegalCharactersFoundInFirstSpecifier = FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.FirstSpecifier);
+            char[] illegalCharactersFoundInSecondSpecifier = FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.SecondSpecifier);
+
+            if (illegalCharactersFoundInFirstSpecifier.Length > 0)
+            {
+                reasons.Add($"Illegal characters found in first specifier: {string.Join(", ", illegalCharactersFoundInFirstSpecifier)}");
+            }
+            if (illegalCharactersFoundInSecondSpecifier.Length > 0)
+            {
+                reasons.Add($"Illegal characters found in second specifier: {string.Join(", ", illegalCharactersFoundInSecondSpecifier)}");
+            }
+
+            if (reasons.Count > 0)
+            {
+                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackIllegalCharactersInSpecifier([.. reasons]));
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private char[] FindIllegalCharactersInSpecifierPart(string? specifier)
+        {
+            if (specifier == null)
+            {
+                return [];
+            }
+
+            char[] illegalCharacters = [';', '"', ','];
+            return illegalCharacters.Where(specifier.Contains).ToArray();
+        }
+    }
+
+    public class EntryWithoutValue : IValidationFunction
+    {
+        public bool IsRelevant(ValidationEntry entry) => true;
+
+        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        {
+            StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException("Entry is not of type StringValidationEntry");
+
+            if (!stringEntry.EntryString.Contains(stringEntry.SyntaxConf.Symbols.KeywordSeparator))
+            {                 
+                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackEntryWithoutValue());
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+    public class IncompliantLanguage : IValidationFunction
+    {
+        public bool IsRelevant(ValidationEntry entry)
+        {
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+            // Running this validation is relevant only for entries with a language
+            return structuredValidationEntry.Key.Language != null;
+        }
+
+        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        {
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+
+            string? lang = structuredValidationEntry.Key.Language;
+
+            // Language shouldn't be null because of IsRelevant call, but checking just to please Sonar gods.
+            if (lang == null)
+            {
+                return null;
+            }
+
+            // If language is ISO 639 or MS-LCID compliant, it returns something
+            bool iso639OrMsLcidCompliant;
+            try
+            {
+                CultureInfo iso639OrMsLcid = new(lang);
+                iso639OrMsLcidCompliant = true;
+            }
+            catch (CultureNotFoundException)
+            {
+                iso639OrMsLcidCompliant = false;
+            }
+
+            bool bcp47Compliant = Bcp47Codes.Codes.Contains(lang);
+
+            if (iso639OrMsLcidCompliant || bcp47Compliant)
+            {
+                return null;
+            }
+            else
+            {
+                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackIncompliantLanguageParam());
+            }
+        }
+    }
+
+    public class KeywordHasUnrecommendedCharacters : IValidationFunction
+    {
+        public bool IsRelevant(ValidationEntry entry) => true;
+
+        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        {
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+
+            string keyword = structuredValidationEntry.Key.Keyword;
+            List<string> reasons = [];
+            string uppercaseKeyword = keyword.ToUpper();
+
+            if (uppercaseKeyword != keyword)
+            {
+                reasons.Add("Keyword should be in upper case");    
+            }
+            if (keyword.Contains('_'))
+            {
+                reasons.Add("Keyword should not contain _. Using - is recommended instead");
+            }
+
+            if (reasons.Count > 0)
+            {
+                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackKeywordContainsUnrecommendedCharacters([.. reasons]));
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+    public class KeywordIsExcessivelyLong : IValidationFunction
+    {
+        public bool IsRelevant(ValidationEntry entry) => true;
+
+        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        {
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+
+            string keyword = structuredValidationEntry.Key.Keyword;
+
+            if (keyword.Length > 20)
+            {
+                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackKeywordIsExcessivelyLong());
             }
             else
             {

@@ -36,10 +36,5 @@
             "CHARSET=\"ANSI\";\nAXIS-VERSION=\"2013\";\nCODEPAGE=\"utf-8\";\nLANGUAGES=\"aa\",\n\"åå\",\n\"öö\";\n" +
             "NEXT-UPDATE=\"20240131 08:00\";\nSUBJECT-AREA=\"test\";\nSUBJECT-AREA[åå]=\"test\";\nCOPYRIGHT=YES;\n" +
             "DATA=1,2,3,4,5,6,7,8,9,10,11,\n12,13,14,15,16,17,18,19,20;";
-
-        internal static string MINIMAL_UTF8_N_WITH_MULTIPLE_ENTRIES_IN_SINGLE_LINE =>
-            "CHARSET=\"ANSI\";AXIS-VERSION=\"2013\";CODEPAGE=\"utf-8\";\nLANGUAGES=\"aa\",\"åå\",\"öö\";\n" +
-            "NEXT-UPDATE=\"20240131 08:00\";\nSUBJECT-AREA=\"test\";\nSUBJECT-AREA[åå]=\"test\";\nCOPYRIGHT=YES;\n" +
-            "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
     }
 }
