@@ -32,12 +32,14 @@
                 private const char TIME_SERIES_INTERVAL_START_DEFAULT = '(';
                 private const char TIME_SERIES_INTERVAL_END_DEFAULT = ')';
                 private const char TIME_SERIES_LIMITS_SEPARATOR_DEFAULT = '-';
+                private const string DATETIME_FORMAT_DEFAULT = "yyyyMMdd HH:mm";
 
                 public char StringDelimeter { get; set; } = STRING_DELIMETER_DEFAULT;
                 public char ListSeparator { get; set; } = LIST_SEPARATOR_DEFAULT;
                 public char TimeSeriesIntervalStart { get; set; } = TIME_SERIES_INTERVAL_START_DEFAULT;
                 public char TimeSeriesIntervalEnd { get; set; } = TIME_SERIES_INTERVAL_END_DEFAULT;
                 public char TimeSeriesLimitsSeparator { get; set; } = TIME_SERIES_LIMITS_SEPARATOR_DEFAULT;
+                public string DateTimeFormat { get; set; } = DATETIME_FORMAT_DEFAULT;
 
                 private ValueSymbols() { }
 
@@ -158,17 +160,30 @@
                 public static KeyWordTokens DefaultKeyWordTokens => new();
             }
 
+            public class BooleanTokens
+            {
+                private const string YES = "YES";
+                private const string NO = "NO";
+
+                public string Yes { get; set; } = YES;
+                public string No { get; set; } = NO;
+
+                public static BooleanTokens DefaultBooleanTokens => new();
+            }
+
             public TimeValue Time { get; set; }
 
             public KeyWordTokens KeyWords { get; set; }
 
             public VariableTypeTokens VariableTypes { get; set; }
+            public BooleanTokens Booleans { get; set; }
 
             private TokenCollection()
             {
                 Time = TimeValue.DefaultTimeValue;
                 KeyWords = KeyWordTokens.DefaultKeyWordTokens;
                 VariableTypes = VariableTypeTokens.DefaultVariableTypeTokens;
+                Booleans = BooleanTokens.DefaultBooleanTokens;
             }
 
             public static TokenCollection DefaultTokens => new();

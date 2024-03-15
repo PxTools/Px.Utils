@@ -125,6 +125,20 @@ namespace Px.Utils.UnitTests.PxFileTests.Fixtures
             "BAR[fi](\"first_specifier\")=NO;\n" +
             "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
 
+        internal static string UTF8_N_WITH_VALID_LANGUAGES =>
+            "CHARSET=\"ANSI\";\n" +
+            "AXIS-VERSION=\"2013\";\n" +
+            "CODEPAGE=\"utf-8\";\n" +
+            "LANGUAGES=\"aa\",\"åå\",\"öö\";\n" +
+            "NEXT-UPDATE=\"20240131 08:00\";\n" +
+            "SUBJECT-AREA=\"test\";\n" +
+            "SUBJECT-AREA[gle]=\"test\";\n" +
+            "COPYRIGHT=YES;\n" +
+            "FOO[fi-FI](\"first_specifier\", \"second_specifier\")=YES;\n" +
+            "BAR[fi](\"first_specifier\")=NO;\n" +
+            "BAZ[fin]=YES;\n" +
+            "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
+
         internal static string UTF8_N_WITH_INVALID_LANGUAGES =>
             "CHARSET=\"ANSI\";\n" +
             "AXIS-VERSION=\"2013\";\n" +

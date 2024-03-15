@@ -1,21 +1,13 @@
-﻿using Px.Utils.Validation.SyntaxValidation;
-using PxUtils.PxFile;
-using System;
-using System.Collections.Generic;
+﻿using PxUtils.PxFile;
 using System.Globalization;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Principal;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
 
     public class MultipleEntriesOnLine : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry)
+        public bool IsRelevant(IValidationEntry entry)
         {
             StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException("Entry is not of type StringValidationEntry");
 
@@ -23,7 +15,7 @@ namespace PxUtils.Validation.SyntaxValidation
             return stringEntry.EntryIndex > 0;
         }
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException("Entry is not of type StringValidationEntry");
 
@@ -41,12 +33,9 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class MoreThanOneLanguageParameter : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry)
-        {
-            return true;
-        }
+        public bool IsRelevant(IValidationEntry entry) => true;
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -69,12 +58,9 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class MoreThanOneSpecifierParameter : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry)
-        {
-            return true;
-        }
+        public bool IsRelevant(IValidationEntry entry) => true;
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -97,12 +83,9 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class WrongKeyOrderOrMissingKeyword : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry)
-        {
-            return true;
-        }
+        public bool IsRelevant(IValidationEntry entry) => true;
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -132,18 +115,18 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackKeyHasWrongOrder());
             }
-            return null;
+            else
+            {
+                return null;
+            }
         }
     }
 
     public class InvalidSpecifier : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry)
-        {
-            return true;
-        }
+        public bool IsRelevant(IValidationEntry entry) => true;
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -153,7 +136,7 @@ namespace PxUtils.Validation.SyntaxValidation
                                     keyValueValidationEntry.SyntaxConf.Symbols.Key.SpecifierParamEnd
                                 ).Sections.FirstOrDefault();
 
-            if (specifierParamSection == null)
+            if (specifierParamSection is null)
             {
                 return null;
             }
@@ -198,12 +181,9 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class IllegalSymbolsInKeyParamSection : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry)
-        {
-            return true;
-        }
+        public bool IsRelevant(IValidationEntry entry) => true;
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -254,28 +234,22 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class IllegalValueFormat : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry)
-        {
-            return true;
-        }
+        public bool IsRelevant(IValidationEntry entry) => true;
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
             string value = keyValueValidationEntry.KeyValueEntry.Value;
             PxFileSyntaxConf syntaxConf = keyValueValidationEntry.SyntaxConf;
 
-            bool isList = SyntaxValidationUtilityMethods.IsStringList(value);
-            bool isString = SyntaxValidationUtilityMethods.IsStringFormat(value);
-            bool isBoolean = SyntaxValidationUtilityMethods.IsBooleanFormat(value);
-            bool isNumber = SyntaxValidationUtilityMethods.IsNumberFormat(value);
+            ValueType? type = SyntaxValidationUtilityMethods.GetValueTypeFromString(value, syntaxConf);
 
-            if (!isList && !isString && !isBoolean && !isNumber)
+            if (type is null)
             {
                 return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackInvalidValueSection("No compliant format was found."));
             }
-            else if ((isList || isString) && !SyntaxValidationUtilityMethods.ValueLineChangesAreCompliant(value, syntaxConf, isList))
+            else if ((type == ValueType.List || type == ValueType.String) && !SyntaxValidationUtilityMethods.ValueLineChangesAreCompliant(value, syntaxConf, type == ValueType.List))
             {
                 return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackInvalidValueSection("Uncompliant line changes found."));
             }
@@ -286,14 +260,18 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class ExcessWhitespaceInValue : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry)
+        public bool IsRelevant(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
             // This only matters if the value is a list of strings
-            return SyntaxValidationUtilityMethods.IsStringList(keyValueValidationEntry.KeyValueEntry.Value);
+            return SyntaxValidationUtilityMethods.IsStringListFormat(
+                keyValueValidationEntry.KeyValueEntry.Value,
+                keyValueValidationEntry.SyntaxConf.Symbols.Value.ListSeparator,
+                keyValueValidationEntry.SyntaxConf.Symbols.Key.StringDelimeter
+                );
         }
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -314,9 +292,9 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class KeyContainsExcessWhiteSpace : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry) => true;
+        public bool IsRelevant(IValidationEntry entry) => true;
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -346,18 +324,19 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class ExcessNewLinesInValue : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry)
+        public bool IsRelevant(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
             
             // We only need to run this validation if the value is less than 150 characters long and it is a string or list
+            ValueType? type = SyntaxValidationUtilityMethods.GetValueTypeFromString(keyValueValidationEntry.KeyValueEntry.Value, keyValueValidationEntry.SyntaxConf);
             return
                 keyValueValidationEntry.KeyValueEntry.Value.Length < 150 &&
-                (SyntaxValidationUtilityMethods.IsStringList(keyValueValidationEntry.KeyValueEntry.Value) ||
-                SyntaxValidationUtilityMethods.IsStringFormat(keyValueValidationEntry.KeyValueEntry.Value));
+                (type == ValueType.String ||
+                type == ValueType.List);
         }
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -376,9 +355,9 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class InvalidKeywordFormat : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry) => true;
+        public bool IsRelevant(IValidationEntry entry) => true;
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
 
@@ -420,19 +399,19 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class IllegalCharactersInLanguageParameter : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry)
+        public bool IsRelevant(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
-            return structuredValidationEntry.Key.Language != null;
+            return structuredValidationEntry.Key.Language is not null;
         }
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
             string? lang = structuredValidationEntry.Key.Language;
 
             // Language shouldn't be null because of IsRelevant call, but checking just to please Sonar gods.
-            if (lang == null)
+            if (lang is null)
             {
                 return null;
             }
@@ -467,14 +446,14 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class IllegalCharactersInSpecifierParameter : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry)
+        public bool IsRelevant(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
             // Running this validation is relevant only for entries with a specifier
-            return structuredValidationEntry.Key.FirstSpecifier != null;
+            return structuredValidationEntry.Key.FirstSpecifier is not null;
         }
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
 
@@ -504,7 +483,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private char[] FindIllegalCharactersInSpecifierPart(string? specifier)
         {
-            if (specifier == null)
+            if (specifier is null)
             {
                 return [];
             }
@@ -516,9 +495,9 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class EntryWithoutValue : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry) => true;
+        public bool IsRelevant(IValidationEntry entry) => true;
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException("Entry is not of type StringValidationEntry");
 
@@ -535,21 +514,21 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class IncompliantLanguage : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry)
+        public bool IsRelevant(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
             // Running this validation is relevant only for entries with a language
-            return structuredValidationEntry.Key.Language != null;
+            return structuredValidationEntry.Key.Language is not null;
         }
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
 
             string? lang = structuredValidationEntry.Key.Language;
 
             // Language shouldn't be null because of IsRelevant call, but checking just to please Sonar gods.
-            if (lang == null)
+            if (lang is null)
             {
                 return null;
             }
@@ -581,9 +560,9 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class KeywordHasUnrecommendedCharacters : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry) => true;
+        public bool IsRelevant(IValidationEntry entry) => true;
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
 
@@ -613,9 +592,9 @@ namespace PxUtils.Validation.SyntaxValidation
 
     public class KeywordIsExcessivelyLong : IValidationFunction
     {
-        public bool IsRelevant(ValidationEntry entry) => true;
+        public bool IsRelevant(IValidationEntry entry) => true;
 
-        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
 

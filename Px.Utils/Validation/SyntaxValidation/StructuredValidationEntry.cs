@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PxUtils.Validation.SyntaxValidation
+﻿namespace PxUtils.Validation.SyntaxValidation
 {
     public readonly record struct ValidationEntryKey
     {
@@ -22,10 +16,13 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
-    public class StructuredValidationEntry(int line, int character, string file, ValidationEntryKey key, string value) : ValidationEntry(line, character, file)
+    public class StructuredValidationEntry(int line, int character, string file, ValidationEntryKey key, string value) : IValidationEntry
     {
         public ValidationEntryKey Key { get; } = key;
 
         public string Value { get; } = value;
+        public int Line { get; } = line;
+        public int Character { get; } = character;
+        public string File { get; } = file;
     }
 }

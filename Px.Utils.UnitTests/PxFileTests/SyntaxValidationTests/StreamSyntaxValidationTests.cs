@@ -253,6 +253,21 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         }
 
         [TestMethod]
+        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_VALID_LANGUAGES_Returns_Valid_Result()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_VALID_LANGUAGES);
+            using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            string filename = "foo";
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+
+            Assert.AreEqual(0, result.Report.FeedbackItems?.Count);
+        }
+
+        [TestMethod]
         public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_INVALID_LANGUAGES_Returns_Result_With_Errors()
         {
             // Arrange

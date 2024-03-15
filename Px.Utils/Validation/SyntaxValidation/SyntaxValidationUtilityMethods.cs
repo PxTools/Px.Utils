@@ -1,13 +1,10 @@
 ﻿using PxUtils.PxFile;
+using System.Globalization;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
-    public struct ExtractSectionResult(string[] parameters, string remainder)
+    public readonly struct ExtractSectionResult(string[] parameters, string remainder)
     {
         public string[] Sections { get; } = parameters;
         public string Remainder { get; } = remainder;
@@ -35,7 +32,6 @@ namespace PxUtils.Validation.SyntaxValidation
                 endIndex = remainder.IndexOf(endSymbol, startIndex + 1);
                 if (endIndex == -1)
                 {
-                    // TODO: Create a ValidationFeedbackItem for this
                     break;
                 }
                 else
@@ -49,29 +45,38 @@ namespace PxUtils.Validation.SyntaxValidation
             return new ExtractSectionResult([.. parameters], remainder);
         }
 
-        public static string[] GetSpecifiersFromParameter(string? input, PxFileSyntaxConf syntaxConf)
+        public static string[] GetSpecifiersFromParameter(string? input, char stringDelimeter)
         {
-            if (input == null)
+            if (input is null)
             {
                 return [];
             }
 
-            return ExtractSectionFromString(input, syntaxConf.Symbols.Key.StringDelimeter).Sections;
+            return ExtractSectionFromString(input, stringDelimeter).Sections;
         }
 
-        public static bool IsStringFormat(string input)
+        public static bool IsDateTimeFormat(string input, char stringDelimeter, string dateTimeFormat)
         {
-            return input.StartsWith('"') && input.EndsWith('"');
+            if (!IsStringFormat(input, stringDelimeter))
+            {
+                return false;
+            }
+            return DateTime.TryParseExact(input.Trim(stringDelimeter), dateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
         }
 
-        public static bool IsStringList(string input)
+        public static bool IsStringFormat(string input, char stringDelimeter)
         {
-            string[] list = input.Split(",");
+            return input.StartsWith(stringDelimeter) && input.EndsWith(stringDelimeter);
+        }
+
+        public static bool IsStringListFormat(string input, char listDelimeter, char stringDelimeter)
+        {
+            string[] list = input.Split(listDelimeter);
             if (list.Length <= 1)
             {
                 return false;
             }
-            else if (Array.TrueForAll(list, x => IsStringFormat(x.Trim())))
+            else if (Array.TrueForAll(list, x => IsStringFormat(x.Trim(), stringDelimeter)))
             {                
                 return true;
             }
@@ -81,9 +86,9 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         }
 
-        public static bool IsBooleanFormat(string input)
+        public static bool IsBooleanFormat(string input, string booleanYes, string booleanNo)
         {
-            return input == "YES" || input == "NO";
+            return input == booleanYes || input == booleanNo;
         }
 
         public static bool IsNumberFormat(string input)
@@ -134,6 +139,34 @@ namespace PxUtils.Validation.SyntaxValidation
                 lineChangeIndex = input.IndexOf(syntaxConf.Symbols.LineSeparator, lineChangeIndex + 1);
             }
             return true;
+        }
+
+        public static ValueType? GetValueTypeFromString(string input, PxFileSyntaxConf syntaxConf)
+        {
+            if (IsStringListFormat(input, syntaxConf.Symbols.Value.ListSeparator, syntaxConf.Symbols.Key.StringDelimeter))
+            {
+                return ValueType.List;
+            }
+            else if (IsDateTimeFormat(input, syntaxConf.Symbols.Value.StringDelimeter, syntaxConf.Symbols.Value.DateTimeFormat))
+            {
+                return ValueType.DateTime;
+            }
+            else if (IsStringFormat(input, syntaxConf.Symbols.Value.StringDelimeter))
+            {
+                return ValueType.String;
+            }
+            else if (IsBooleanFormat(input, syntaxConf.Tokens.Booleans.Yes, syntaxConf.Tokens.Booleans.No))
+            {
+                return ValueType.Boolean;
+            }
+            else if (IsNumberFormat(input))
+            {
+                return ValueType.Number;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }
