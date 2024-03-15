@@ -47,10 +47,10 @@ namespace PxUtils.Validation.SyntaxValidation
 
             bool hasMultipleParameters = SyntaxValidationUtilityMethods.HasMoreThanOneSection(
                 keyValueValidationEntry.KeyValueEntry.Key,
-                keyValueValidationEntry.SyntaxConf.Symbols.Key.LangParamStart, 
+                keyValueValidationEntry.SyntaxConf.Symbols.Key.LangParamStart,
                 keyValueValidationEntry.SyntaxConf.Symbols.Key.LangParamEnd
             );
-            
+
             if (hasMultipleParameters)
             {
                 return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackMoreThanOneLanguage());
@@ -276,6 +276,96 @@ namespace PxUtils.Validation.SyntaxValidation
             }
 
             return null;
+        }
+    }
+
+    public class ExcessWhitespaceInValue : IValidationFunction
+    {
+        public bool IsRelevant(ValidationEntry entry)
+        {
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            // This only matters if the value is a list of strings
+            return SyntaxValidationUtilityMethods.IsStringList(keyValueValidationEntry.KeyValueEntry.Value);
+        }
+
+        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        {
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+
+            string value = keyValueValidationEntry.KeyValueEntry.Value;
+
+            // Remove elements from the list. We only want to check whitespace between elements
+            string stripItems = SyntaxValidationUtilityMethods.ExtractSectionFromString(value, keyValueValidationEntry.SyntaxConf.Symbols.Key.StringDelimeter).Remainder;
+            if (stripItems.Contains("  "))
+            {
+                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackValueContainsExcessWhitespace());
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+    public class KeyContainsExcessWhiteSpace : IValidationFunction
+    {
+        public bool IsRelevant(ValidationEntry entry) => true;
+
+        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        {
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+
+            string key = keyValueValidationEntry.KeyValueEntry.Key;
+
+            IEnumerable<char> whiteSpaces = key.Where(c => c == ' ');
+            if (!whiteSpaces.Any())
+            {
+                return null;
+            }
+            // There should be only one whitespace in the key part, separating specifier parts
+            else if (whiteSpaces.Count() > 1)
+            {
+                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackKeyContainsExcessWhitespace());
+            }
+            // If whitespace is found without a comma separating the specifier parts, it is considered excess
+            else if (!key.Contains($"{keyValueValidationEntry.SyntaxConf.Symbols.Key.ListSeparator} "))
+            {
+                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackKeyContainsExcessWhitespace());
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+    public class ExcessNewLinesInValue : IValidationFunction
+    {
+        public bool IsRelevant(ValidationEntry entry)
+        {
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            
+            // We only need to run this validation if the value is less than 150 characters long and it is a string or list
+            return
+                keyValueValidationEntry.KeyValueEntry.Value.Length < 150 &&
+                (SyntaxValidationUtilityMethods.IsStringList(keyValueValidationEntry.KeyValueEntry.Value) ||
+                SyntaxValidationUtilityMethods.IsStringFormat(keyValueValidationEntry.KeyValueEntry.Value));
+        }
+
+        public ValidationFeedbackItem? Validate(ValidationEntry entry)
+        {
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+
+            string value = keyValueValidationEntry.KeyValueEntry.Value;
+
+            if (value.Contains(keyValueValidationEntry.SyntaxConf.Symbols.LineSeparator))
+            {
+                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackExcessNewLinesInValue());
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

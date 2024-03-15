@@ -146,10 +146,12 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             // Act
             SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
 
-            Assert.AreEqual(3, result.Report.FeedbackItems?.Count);
+            Assert.AreEqual(5, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackInvalidSpecifier));
-            Assert.IsInstanceOfType(result.Report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackInvalidSpecifier));
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackKeyContainsExcessWhitespace));
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[2].Feedback, typeof(SyntaxValidationFeedbackInvalidSpecifier));
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[3].Feedback, typeof(SyntaxValidationFeedbackInvalidSpecifier));
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[4].Feedback, typeof(SyntaxValidationFeedbackKeyContainsExcessWhitespace));
         }
 
         [TestMethod]
@@ -202,6 +204,39 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackInvalidValueSection));
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackInvalidValueSection));
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[2].Feedback, typeof(SyntaxValidationFeedbackInvalidValueSection));
+        }
+
+        [TestMethod]
+        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_EXCESS_WHITESPACE_IN_LIST_Returns_Result_With_Warning()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_EXCESS_WHITESPACE_IN_LIST);
+            using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            string filename = "foo";
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+
+            Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackValueContainsExcessWhitespace));
+        }
+
+        [TestMethod]
+        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_SHORT_MULTILINE_VALUES_Returns_Result_With_Warnings()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_SHORT_MULTILINE_VALUES);
+            using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            string filename = "foo";
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+
+            Assert.AreEqual(2, result.Report.FeedbackItems?.Count);
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackExcessNewLinesInValue));
+            Assert.IsInstanceOfType(result.Report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackExcessNewLinesInValue));
         }
     }
 }

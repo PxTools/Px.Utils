@@ -24,7 +24,10 @@ namespace PxUtils.Validation.SyntaxValidation
                   new WrongKeyOrderOrMissingKeyword(),
                   new InvalidSpecifier(),
                   new IllegalSymbolsInKeyParamSection(),
-                  new IllegalValueFormat()
+                  new IllegalValueFormat(),
+                  new ExcessWhitespaceInValue(),
+                  new KeyContainsExcessWhiteSpace(),
+                  new ExcessNewLinesInValue()
                 ];
 
             IEnumerable<IValidationFunction> structuredValidationFunctions = [

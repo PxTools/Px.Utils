@@ -59,4 +59,22 @@ namespace PxUtils.Validation.SyntaxValidation
         public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Error;
         public override string Rule { get; } = "The value section is following a valid format. " + reason;
     }
+
+    public class SyntaxValidationFeedbackValueContainsExcessWhitespace : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Warning;
+        public override string Rule { get; } = "The value section contains excess whitespace.";
+    }
+
+    public class SyntaxValidationFeedbackKeyContainsExcessWhitespace : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Warning;
+        public override string Rule { get; } = "The key section contains excess whitespace.";
+    }
+
+    public class SyntaxValidationFeedbackExcessNewLinesInValue : ValidationFeedback
+    {
+        public override ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Warning;
+        public override string Rule { get; } = "The value section is split to multiple lines unnecessarily. Recommended only beyond length of 150";
+    }
 }
