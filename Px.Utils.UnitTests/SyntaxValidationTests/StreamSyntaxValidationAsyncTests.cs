@@ -1,14 +1,14 @@
 ﻿using PxUtils.Validation.SyntaxValidation;
+using PxUtils.UnitTests.SyntaxValidationTests.Fixtures;
 using System.Text;
-using Px.Utils.UnitTests.PxFileTests.Fixtures;
 
-namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
+namespace PxUtils.UnitTests.SyntaxValidationTests
 {
     [TestClass]
-    public class StreamSyntaxValidationTests
+    public class StreamSyntaxValidationAsyncTests
     {
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_MINIMAL_UTF8_Returns_Valid_Result()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_MINIMAL_UTF8_Returns_Valid_Result()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N);
@@ -17,14 +17,14 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(8, result.StructuredEntries.Count);
             Assert.AreEqual(0, result.Report.FeedbackItems?.Count);
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_MINIMAL_UTF8_N_WITH_MULTIPLE_ENTRIES_IN_SINGLE_LINE_Returns_Result_With_Warnings()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_MINIMAL_UTF8_N_WITH_MULTIPLE_ENTRIES_IN_SINGLE_LINE_Returns_Result_With_Warnings()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N_WITH_MULTIPLE_ENTRIES_IN_SINGLE_LINE);
@@ -33,7 +33,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(8, result.StructuredEntries.Count);
             Assert.AreEqual(2, result.Report.FeedbackItems?.Count);
@@ -42,7 +42,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_SPECIFIERS_Returns_Result_With_Right_Structure()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_SPECIFIERS_Returns_Result_With_Right_Structure()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_SPECIFIERS);
@@ -51,7 +51,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(10, result.StructuredEntries.Count);
             Assert.AreEqual("YES", result.StructuredEntries[8].Value);
@@ -64,7 +64,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_ENTRY_WITH_MULTIPLE_LANGUAGE_PARAMETERS_Returns_Result_With_Error()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_ENTRY_WITH_MULTIPLE_LANGUAGE_PARAMETERS_Returns_Result_With_Error()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_ENTRY_WITH_MULTIPLE_LANGUAGE_PARAMETERS);
@@ -73,14 +73,14 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackMoreThanOneLanguage));
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_ENTRY_WITH_MULTIPLE_SPECIFIER_PARAMETERS_Returns_Result_With_Error()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_ENTRY_WITH_MULTIPLE_SPECIFIER_PARAMETERS_Returns_Result_With_Error()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_SPECIFIERS_WITH_MULTIPLE_SPECIFIER_PARAMETERS);
@@ -89,14 +89,14 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackMoreThanOneSpecifier));
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_ENTRIES_IN_WRONG_ORDER_Returns_Result_With_Errors()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_ENTRIES_IN_WRONG_ORDER_Returns_Result_With_Errors()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_ENTRIES_IN_WRONG_ORDER);
@@ -105,7 +105,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(2, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeyHasWrongOrder));
@@ -113,7 +113,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_A_MISSING_KEYWORD_Returns_Result_With_Error()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_A_MISSING_KEYWORD_Returns_Result_With_Error()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_A_MISSING_KEYWORD);
@@ -122,14 +122,14 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackMissingKeyword));
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_INVALID_SPECIFIERS_Returns_Result_With_Errors()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_INVALID_SPECIFIERS_Returns_Result_With_Errors()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_INVALID_SPECIFIERS);
@@ -138,7 +138,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(5, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackInvalidSpecifier));
@@ -149,7 +149,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_ILLEGAL_SYMBOLS_IN_PARAMS_Returns_Result_With_Errors()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_ILLEGAL_SYMBOLS_IN_PARAMS_Returns_Result_With_Errors()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_ILLEGAL_SYMBOLS_IN_PARAMS);
@@ -158,7 +158,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             // This test also catches a later issues with invalid language formats and badly formatted keywords
             Assert.AreEqual(10, result.Report.FeedbackItems?.Count);
@@ -168,7 +168,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_CORRECTLY_FORMATTED_LIST_AND_MULTILINE_STRING_Returns_Valid_Result()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_CORRECTLY_FORMATTED_LIST_AND_MULTILINE_STRING_Returns_Valid_Result()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_CORRECTLY_FORMATTED_LIST_AND_MULTILINE_STRING);
@@ -177,14 +177,14 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(10, result.StructuredEntries.Count);
             Assert.AreEqual(0, result.Report.FeedbackItems?.Count);
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_BAD_VALUES_Returns_Valid_Errors()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_BAD_VALUES_Returns_Valid_Errors()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_BAD_VALUES);
@@ -193,7 +193,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(3, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackInvalidValueSection));
@@ -202,7 +202,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_EXCESS_WHITESPACE_IN_LIST_Returns_Result_With_Warning()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_EXCESS_WHITESPACE_IN_LIST_Returns_Result_With_Warning()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_EXCESS_WHITESPACE_IN_LIST);
@@ -211,14 +211,14 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackValueContainsExcessWhitespace));
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_SHORT_MULTILINE_VALUES_Returns_Result_With_Warnings()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_SHORT_MULTILINE_VALUES_Returns_Result_With_Warnings()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_SHORT_MULTILINE_VALUES);
@@ -227,7 +227,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(2, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackExcessNewLinesInValue));
@@ -235,7 +235,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_INVALID_KEYWORDS_Returns_Result_With_Errors()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_INVALID_KEYWORDS_Returns_Result_With_Errors()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_INVALID_KEYWORDS);
@@ -244,7 +244,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(3, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackInvalidKeywordFormat));
@@ -253,7 +253,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_VALID_LANGUAGES_Returns_Valid_Result()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_VALID_LANGUAGES_Returns_Valid_Result()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_VALID_LANGUAGES);
@@ -262,13 +262,13 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(0, result.Report.FeedbackItems?.Count);
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_INVALID_LANGUAGES_Returns_Result_With_Errors()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_INVALID_LANGUAGES_Returns_Result_With_Errors()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_INVALID_LANGUAGES);
@@ -277,7 +277,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(3, result.Report.FeedbackItems?.Count);
@@ -286,7 +286,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS_Returns_With_Errors()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS_Returns_With_Errors()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS);
@@ -295,7 +295,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             // This test also catches an earlier issue with illegal symbols in the key parameter section
             Assert.AreEqual(2, result.Report.FeedbackItems?.Count);
@@ -303,7 +303,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_VALUELESS_ENTRY_Returns_With_Errors()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_VALUELESS_ENTRY_Returns_With_Errors()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_VALUELESS_ENTRY);
@@ -312,7 +312,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             // This test also catches an earlier issue with illegal symbols in the key parameter section
             Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
@@ -320,7 +320,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_INCOMPLIANT_LANGUAGES_Returns_With_Warnings()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_INCOMPLIANT_LANGUAGES_Returns_With_Warnings()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_INCOMPLIANT_LANGUAGES);
@@ -329,7 +329,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             // This test also catches an earlier issue with illegal symbols in the key parameter section
             Assert.AreEqual(2, result.Report.FeedbackItems?.Count);
@@ -338,7 +338,7 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_LONG_KEYWORD_Returns_With_Warnings()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_LONG_KEYWORD_Returns_With_Warnings()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_LONG_KEYWORD);
@@ -347,24 +347,24 @@ namespace PxUtils.UnitTests.PxFileTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeywordIsExcessivelyLong));
         }
 
         [TestMethod]
-        public void ValidateStreamSyntax_CalledWith_UTF8_N_WITH_UNRECOMMENDED_KEYWORD_NAMING_Returns_With_Warnings()
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_UNRECOMMENDED_KEYWORD_NAMING_Returns_With_Warnings()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_UNRECOMMENDED_KEYWORD_NAMING);
-  
+
             using Stream stream = new MemoryStream(data);
             stream.Seek(0, SeekOrigin.Begin);
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
 
             Assert.AreEqual(2, result.Report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(result.Report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeywordContainsUnrecommendedCharacters));

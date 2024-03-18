@@ -106,7 +106,7 @@ namespace PxUtils.Validation.SyntaxValidation
             int line = 0;
             int character = 0;
             stream.Seek(0, SeekOrigin.Begin);
-            StreamReader reader = new(stream, encoding);
+            using StreamReader reader = new(stream, encoding);
             List<StringValidationEntry> stringEntries = [];
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
@@ -118,6 +118,7 @@ namespace PxUtils.Validation.SyntaxValidation
                     if (currentCharacter == syntaxConf.Symbols.KeywordSeparator)
                     {
                         string stringEntry = entryBuilder.ToString();
+                        // When DATA keyword is reached, metadata parsing is complete
                         if (SyntaxValidationUtilityMethods.CleanString(stringEntry).Equals(syntaxConf.Tokens.KeyWords.Data))
                         {
                             break;
@@ -143,6 +144,7 @@ namespace PxUtils.Validation.SyntaxValidation
                         entryBuilder.Append(currentCharacter);
                     }
                 }
+                Array.Clear(buffer, 0, buffer.Length);
             }
             return stringEntries;
         }

@@ -49,7 +49,7 @@ namespace PxUtils.Validation.SyntaxValidation
             syntaxConf ??= PxFileSyntaxConf.Default;
             ValidationReport report = new();
 
-            Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
+            Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
             if (encoding is null)
             {
                 report.FeedbackItems.Add(new ValidationFeedbackItem(new StringValidationEntry(0, 0, filename, string.Empty, syntaxConf, 0), new SyntaxValidationFeedbackNoEncoding()));
@@ -72,7 +72,7 @@ namespace PxUtils.Validation.SyntaxValidation
             int line = 0;
             int character = 0;
             stream.Seek(0, SeekOrigin.Begin);
-            StreamReader reader = new(stream, encoding);
+            using StreamReader reader = new(stream, encoding);
             List<StringValidationEntry> stringEntries = [];
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
@@ -109,6 +109,7 @@ namespace PxUtils.Validation.SyntaxValidation
                         entryBuilder.Append(currentCharacter);
                     }
                 }
+                Array.Clear(buffer, 0, buffer.Length);
             }
             return stringEntries;
         }
