@@ -168,5 +168,17 @@ namespace PxUtils.Validation.SyntaxValidation
                 return null;
             }
         }
+
+        public static string CleanString(string input)
+        {
+            if (input is null)
+            {
+                return string.Empty;
+            }
+            else
+            {
+                return input.Replace("\n", "").Replace("\"", "");
+            }
+        }
     }
 }

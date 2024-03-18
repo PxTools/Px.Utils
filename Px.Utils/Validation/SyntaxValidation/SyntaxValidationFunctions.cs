@@ -533,18 +533,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 return null;
             }
 
-            // If language is ISO 639 or MS-LCID compliant, it returns something
-            bool iso639OrMsLcidCompliant;
-            try
-            {
-                CultureInfo iso639OrMsLcid = new(lang);
-                iso639OrMsLcidCompliant = true;
-            }
-            catch (CultureNotFoundException)
-            {
-                iso639OrMsLcidCompliant = false;
-            }
-
+            bool iso639OrMsLcidCompliant = CultureInfo.GetCultures(CultureTypes.AllCultures).ToList().Exists(c => c.Name == lang || c.ThreeLetterISOLanguageName == lang);
             bool bcp47Compliant = Bcp47Codes.Codes.Contains(lang);
 
             if (iso639OrMsLcidCompliant || bcp47Compliant)
