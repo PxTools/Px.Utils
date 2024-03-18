@@ -10,6 +10,11 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             "NEXT-UPDATE=\"20240131 08:00\";\nSUBJECT-AREA=\"test\";\nSUBJECT-AREA[fi]=\"test\";\nCOPYRIGHT=YES;\n" +
             "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
 
+        internal static string UNKNOWN_ENCODING =>
+            "CHARSET=\"foo\";\nAXIS-VERSION=\"2013\";\nCODEPAGE=\"bar\";\nLANGUAGES=\"aa\",\"åå\",\"öö\";\n" +
+            "NEXT-UPDATE=\"20240131 08:00\";\nSUBJECT-AREA=\"test\";\nSUBJECT-AREA[fi]=\"test\";\nCOPYRIGHT=YES;\n" +
+            "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
+
         internal static List<StringValidationEntry> MULTIPLE_ENTRIES_IN_SINGLE_LINE => [
             new(0, 0, "foo", "CHARSET=\"ANSI\";", PxFileSyntaxConf.Default, 0),
             new(1, 0, "foo", "AXIS-VERSION=\"2013\";", PxFileSyntaxConf.Default, 1),

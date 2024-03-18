@@ -49,7 +49,7 @@ namespace PxUtils.Validation.SyntaxValidation
             syntaxConf ??= PxFileSyntaxConf.Default;
             ValidationReport report = new();
 
-            Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
+            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream, syntaxConf, true);
             if (encoding is null)
             {
                 report.FeedbackItems.Add(new ValidationFeedbackItem(new StringValidationEntry(0, 0, filename, string.Empty, syntaxConf, 0), new SyntaxValidationFeedbackNoEncoding()));

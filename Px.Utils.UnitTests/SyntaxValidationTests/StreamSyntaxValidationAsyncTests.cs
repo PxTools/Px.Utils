@@ -44,5 +44,20 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             Assert.AreEqual("first_specifier", result.StructuredEntries[9].Key.FirstSpecifier);
             Assert.AreEqual("second_specifier", result.StructuredEntries[8].Key.SecondSpecifier);
         }
+
+        [TestMethod]
+        public async Task ValidatePxFileSyntaxAsync_CalledWith_UNKNOWN_ENCODING_Returns_With_Error()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UNKNOWN_ENCODING);
+            using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            string filename = "foo";
+
+            // Act
+            SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileSyntaxAsync(stream, filename);
+
+            Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
+        }
     }
 }

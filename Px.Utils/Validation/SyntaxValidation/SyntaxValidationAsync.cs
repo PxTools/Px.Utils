@@ -15,7 +15,8 @@ namespace PxUtils.Validation.SyntaxValidation
             int bufferSize = DEFAULT_BUFFER_SIZE,
             IEnumerable<IValidationFunction>? customStringValidationFunctions = null,
             IEnumerable<IValidationFunction>? customKeyValueValidationFunctions = null,
-            IEnumerable<IValidationFunction>? customStructuredValidationFunctions = null)
+            IEnumerable<IValidationFunction>? customStructuredValidationFunctions = null,
+            CancellationToken cancellationToken = default)
         {
             IEnumerable<IValidationFunction> stringValidationFunctions = [
                     new MultipleEntriesOnLine(),
@@ -49,7 +50,7 @@ namespace PxUtils.Validation.SyntaxValidation
             syntaxConf ??= PxFileSyntaxConf.Default;
             ValidationReport report = new();
 
-            Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
+            Encoding? encoding = await PxFileMetadataReader.GetEncodingAsync(stream, syntaxConf, cancellationToken, true);
             if (encoding is null)
             {
                 report.FeedbackItems.Add(new ValidationFeedbackItem(new StringValidationEntry(0, 0, filename, string.Empty, syntaxConf, 0), new SyntaxValidationFeedbackNoEncoding()));

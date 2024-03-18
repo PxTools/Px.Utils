@@ -335,5 +335,20 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeywordContainsUnrecommendedCharacters));
             Assert.IsInstanceOfType(report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackKeywordContainsUnrecommendedCharacters));
         }
+
+        [TestMethod]
+        public void ValidatePxFileSyntax_CalledWith_UNKNOWN_ENCODING_Returns_With_Error()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UNKNOWN_ENCODING);
+            using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            string filename = "foo";
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+
+            Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
+        }
     }
 }
