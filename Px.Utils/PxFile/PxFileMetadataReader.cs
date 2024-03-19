@@ -214,9 +214,8 @@ namespace PxUtils.PxFile.Meta
         /// </summary>
         /// <param name="stream">The stream from which to determine the encoding.</param>
         /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
-        /// <param name="allowSoftException">If true, the method will not throw an exception if the CODEPAGE keyword is not found. This is used by the metadata validation methods.</param>
         /// <returns>The determined Encoding of the stream.</returns>
-        public static Encoding? GetEncoding(Stream stream, PxFileSyntaxConf? symbolsConf = null, bool allowSoftException = false)
+        public static Encoding GetEncoding(Stream stream, PxFileSyntaxConf? symbolsConf = null)
         {
             symbolsConf ??= PxFileSyntaxConf.Default;
             long position = stream.Position;
@@ -232,7 +231,28 @@ namespace PxUtils.PxFile.Meta
             KeyValuePair<string, string> encoding = ReadMetadata(stream, Encoding.ASCII, symbolsConf, 512)
                 .FirstOrDefault(kvp => kvp.Key == symbolsConf.Tokens.KeyWords.CodePage);
 
-            return GetEncodingFromValue(encoding.Value, symbolsConf, allowSoftException);
+            return GetEncodingFromValue(encoding.Value, symbolsConf);
+        }
+
+        /// <summary>
+        /// Tries to determine the encoding of the provided stream based on the Byte Order Mark (BOM) or the CODEPAGE keyword in the metadata.
+        /// </summary>
+        /// <param name="stream">The stream from which to determine the encoding.</param>
+        /// <param name="encoding">Encoding format the function tries to return</param>
+        /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
+        /// <returns></returns>
+        public static bool TryGetEncoding(Stream stream, out Encoding? encoding, PxFileSyntaxConf? symbolsConf = null)
+        {
+            try
+            {
+                encoding = GetEncoding(stream, symbolsConf);
+                return true;
+            }
+            catch (InvalidPxFileMetadataException)
+            {
+                encoding = null;
+                return false;
+            }
         }
 
         /// <summary>
@@ -244,7 +264,7 @@ namespace PxUtils.PxFile.Meta
         /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A Task that represents the asynchronous operation. The Task result contains the determined Encoding of the stream.</returns>
-        public static async Task<Encoding?> GetEncodingAsync(Stream stream, PxFileSyntaxConf? symbolsConf = null, CancellationToken cancellationToken = default, bool allowSoftException = false)
+        public static async Task<Encoding> GetEncodingAsync(Stream stream, PxFileSyntaxConf? symbolsConf = null, CancellationToken cancellationToken = default)
         {
             symbolsConf ??= PxFileSyntaxConf.Default;
             long position = stream.Position;
@@ -260,7 +280,26 @@ namespace PxUtils.PxFile.Meta
             KeyValuePair<string, string> encoding = await ReadMetadataAsync(stream, Encoding.ASCII, symbolsConf, 512, cancellationToken)
                 .FirstOrDefaultAsync(kvp => kvp.Key == symbolsConf.Tokens.KeyWords.CodePage, cancellationToken);
 
-            return GetEncodingFromValue(encoding.Value, symbolsConf, allowSoftException);
+            return GetEncodingFromValue(encoding.Value, symbolsConf);
+        }
+
+        /// <summary>
+        /// Asynchronously tries to determine the encoding of the provided stream based on the Byte Order Mark (BOM) or the CODEPAGE keyword in the metadata.
+        /// </summary>
+        /// <param name="stream">The stream from which to determine the encoding.</param>
+        /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+        /// <returns></returns>
+        public static async Task<(bool, Encoding?)> TryGetEncodingAsync(Stream stream, PxFileSyntaxConf? symbolsConf = null, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return (true, await GetEncodingAsync(stream, symbolsConf, cancellationToken));
+            }
+            catch (InvalidPxFileMetadataException)
+            {
+                return (false, null);
+            }
         }
 
         #region Private Methods
@@ -306,7 +345,7 @@ namespace PxUtils.PxFile.Meta
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Encoding? GetEncodingFromValue(string value, PxFileSyntaxConf symbolsConf, bool allowSoftException = false)
+        private static Encoding GetEncodingFromValue(string value, PxFileSyntaxConf symbolsConf)
         {
             if (value is null) throw new InvalidPxFileMetadataException($"Could not find CODEPAGE keyword in the file.");
 
@@ -321,12 +360,7 @@ namespace PxUtils.PxFile.Meta
             }
             catch (ArgumentException aExp)
             {
-                if (allowSoftException)
-                    return null;
-                else
-                {
-                    throw new InvalidPxFileMetadataException($"The encoding {encodingName} provided with the CODEPAGE keyword is not available", aExp);
-                }
+                throw new InvalidPxFileMetadataException($"The encoding {encodingName} provided with the CODEPAGE keyword is not available", aExp);
             }
         }
 

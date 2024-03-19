@@ -4,9 +4,16 @@ using System.Text.RegularExpressions;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
-
+    /// <summary>
+    /// This class is responsible for validating if there are multiple entries on a single line. It implements the IValidationFunction interface.
+    /// </summary>
     public class MultipleEntriesOnLine : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is not relevant for the first entry.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True if the entry index is greater than 0, false otherwise.</returns>
         public bool IsRelevant(IValidationEntry entry)
         {
             StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException("Entry is not of type StringValidationEntry");
@@ -15,6 +22,11 @@ namespace PxUtils.Validation.SyntaxValidation
             return stringEntry.EntryIndex > 0;
         }
 
+        /// <summary>
+        /// Validates the given entry. If the entry does not start with a line separator, it is considered as not being on its own line, and a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the entry does not start with a line separator, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException("Entry is not of type StringValidationEntry");
@@ -31,10 +43,23 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the entry has only one, if any, language parameter. It implements the IValidationFunction interface.
+    /// </summary>
     public class MoreThanOneLanguageParameter : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True for all entries</returns>
         public bool IsRelevant(IValidationEntry entry) => true;
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the key contains more than one language parameter, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains more than one language parameter, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
@@ -56,10 +81,23 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the entry has only one, if any, specifier parameter section. It implements the IValidationFunction interface.
+    /// </summary>
     public class MoreThanOneSpecifierParameter : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True for all entries</returns>
         public bool IsRelevant(IValidationEntry entry) => true;
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the key contains more than one specifier parameter, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains more than one specifier parameter, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
@@ -81,10 +119,23 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the key is defined in the order of KEYWORD[language](\"specifier\"). It implements the IValidationFunction interface.
+    /// </summary>
     public class WrongKeyOrderOrMissingKeyword : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True for all entries</returns>
         public bool IsRelevant(IValidationEntry entry) => true;
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the key is not defined in the order of KEYWORD[language](\"specifier\"), a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key is not defined in the order of KEYWORD[language](\"specifier\"), null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
@@ -122,10 +173,23 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the specifier is following a valid format. It implements the IValidationFunction interface.
+    /// </summary>
     public class InvalidSpecifier : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True for all entries</returns>
         public bool IsRelevant(IValidationEntry entry) => true;
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the specifier is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier is not following a valid format, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
@@ -179,10 +243,23 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the key parameter section contains no illegal symbols. It implements the IValidationFunction interface.
+    /// </summary>
     public class IllegalSymbolsInKeyParamSection : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True for all entries</returns>
         public bool IsRelevant(IValidationEntry entry) => true;
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the key parameter section contains illegal symbols, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key parameter section contains illegal symbols, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
@@ -232,10 +309,23 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the value section is following a valid format. It implements the IValidationFunction interface.
+    /// </summary>
     public class IllegalValueFormat : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True for all entries</returns>
         public bool IsRelevant(IValidationEntry entry) => true;
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the value section is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section is not following a valid format, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
@@ -258,8 +348,16 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the value section contains no excess whitespace. It implements the IValidationFunction interface.
+    /// </summary>
     public class ExcessWhitespaceInValue : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries with a value that is a list of strings.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True if the value is a list of strings, false otherwise.</returns>
         public bool IsRelevant(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
@@ -271,6 +369,11 @@ namespace PxUtils.Validation.SyntaxValidation
                 );
         }
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the value section contains excess whitespace, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section contains excess whitespace, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
@@ -290,10 +393,23 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the key contains no excess whitespace. It implements the IValidationFunction interface.
+    /// </summary>
     public class KeyContainsExcessWhiteSpace : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True for all entries</returns>
         public bool IsRelevant(IValidationEntry entry) => true;
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the key contains excess whitespace, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains excess whitespace, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
@@ -322,8 +438,16 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the value section contains no excess new lines. It implements the IValidationFunction interface.
+    /// </summary>
     public class ExcessNewLinesInValue : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries with a value that is less than 150 characters long and is a string or list.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True if the value is less than 150 characters long and it is a string or list, false otherwise.</returns>
         public bool IsRelevant(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
@@ -336,6 +460,11 @@ namespace PxUtils.Validation.SyntaxValidation
                 type == ValueType.List);
         }
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the value section contains excess new lines, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section contains excess new lines, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
@@ -353,10 +482,23 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the keyword is following a valid format. It implements the IValidationFunction interface.
+    /// </summary>
     public class InvalidKeywordFormat : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True for all entries</returns>
         public bool IsRelevant(IValidationEntry entry) => true;
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the keyword is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword is not following a valid format, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
@@ -397,14 +539,27 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the language parameter is following a valid format. It implements the IValidationFunction interface.
+    /// </summary>
     public class IllegalCharactersInLanguageParameter : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries with a language parameter.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True if the entry has a language parameter, false otherwise.</returns>
         public bool IsRelevant(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
             return structuredValidationEntry.Key.Language is not null;
         }
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the language parameter is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the language parameter is not following a valid format, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
@@ -444,8 +599,16 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the specifier parameter is following a valid format. It implements the IValidationFunction interface.
+    /// </summary>
     public class IllegalCharactersInSpecifierParameter : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries with a specifier parameter.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True if the entry has a specifier parameter, false otherwise.</returns>
         public bool IsRelevant(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
@@ -453,6 +616,11 @@ namespace PxUtils.Validation.SyntaxValidation
             return structuredValidationEntry.Key.FirstSpecifier is not null;
         }
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the specifier parameter is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier parameter is not following a valid format, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
@@ -493,10 +661,23 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the entry has a value section. It implements the IValidationFunction interface.
+    /// </summary>
     public class EntryWithoutValue : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True for all entries</returns>
         public bool IsRelevant(IValidationEntry entry) => true;
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If there is no value section, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if there is no value section, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException("Entry is not of type StringValidationEntry");
@@ -512,8 +693,16 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the entry with a language parameter has a language code that complies with ISO 639 or BCP 47. It implements the IValidationFunction interface.
+    /// </summary>
     public class IncompliantLanguage : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries with a language parameter.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True if the entry has a language parameter, false otherwise.</returns>
         public bool IsRelevant(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
@@ -521,6 +710,11 @@ namespace PxUtils.Validation.SyntaxValidation
             return structuredValidationEntry.Key.Language is not null;
         }
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the language parameter is not compliant with ISO 639 or BCP 47, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the language parameter is not compliant with ISO 639 or BCP 47, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
@@ -547,10 +741,23 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the entry keyword does not contain any unrecommended characters. It implements the IValidationFunction interface.
+    /// </summary>
     public class KeywordHasUnrecommendedCharacters : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True for all entries</returns>
         public bool IsRelevant(IValidationEntry entry) => true;
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the keyword contains unrecommended characters, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword contains unrecommended characters, null otherwise.</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
@@ -579,10 +786,23 @@ namespace PxUtils.Validation.SyntaxValidation
         }
     }
 
+    /// <summary>
+    /// This class is responsible for validating that the keyword is not excessively long. It implements the IValidationFunction interface.
+    /// </summary>
     public class KeywordIsExcessivelyLong : IValidationFunction
     {
+        /// <summary>
+        /// Determines if the validation is relevant for the given <see cref="IValidationEntry"/> entry. In this case, the validation is relevant for all entries.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <returns>True for all entries</returns>
         public bool IsRelevant(IValidationEntry entry) => true;
 
+        /// <summary>
+        /// Validates the given <see cref="IValidationEntry"/> entry. If the keyword is excessively long, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword is excessively long, otherwise null</returns>
         public ValidationFeedbackItem? Validate(IValidationEntry entry)
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");

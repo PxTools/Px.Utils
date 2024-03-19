@@ -18,7 +18,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, filename);
 
             Assert.AreEqual(8, result.StructuredEntries.Count);
             Assert.AreEqual(0, result.Report.FeedbackItems?.Count);
@@ -50,7 +50,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, filename);
 
             Assert.AreEqual(10, result.StructuredEntries.Count);
             Assert.AreEqual("YES", result.StructuredEntries[8].Value);
@@ -346,7 +346,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             string filename = "foo";
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileSyntax(stream, filename);
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, filename);
 
             Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
         }

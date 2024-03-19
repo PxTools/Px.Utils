@@ -2,8 +2,14 @@
 
 namespace PxUtils.Validation.SyntaxValidation
 {
+    /// <summary>
+    /// Provides a list of BCP-47 language codes. BCP-47 is a standard for the identification of human languages.
+    /// </summary>
     public static class Bcp47Codes
     {
+        /// <summary>
+        /// An immutable hash set of BCP-47 language codes.
+        /// </summary>
         public static readonly ImmutableHashSet<string> Codes =
         [
             "ar-SA", "cs-CZ", "da-DK", "de-DE", "el-GR", "en-AU",

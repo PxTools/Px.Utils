@@ -4,11 +4,25 @@ using System.Text;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
+    /// <summary>
+    /// Provides methods for validating the syntax of a PX file.
+    /// </summary>
     public static class SyntaxValidation
     {
         private const int DEFAULT_BUFFER_SIZE = 4096;
 
-        public static SyntaxValidationResult ValidatePxFileSyntax(
+        ///<summary>
+        /// Validates the syntax of a PX file's metadata.
+        ///</summary>
+        /// <param name="stream">The stream of the PX file to be validated.</param>
+        /// <param name="filename">The name of the file to be validated.</param>
+        /// <param name="syntaxConf">An optional <see cref="pxsynta"/> parameter that specifies the syntax configuration for the PX file. If not provided, the default syntax configuration is used.</param>
+        /// <param name="bufferSize">An optional parameter that specifies the buffer size for reading the file. If not provided, a default buffer size of 4096 is used.</param>
+        /// <param name="customStringValidationFunctions">An optional parameter that specifies custom <see cref="IValidationFunction"/> validation functions for string level entries. If not provided, only default validation functions are used.</param>
+        /// <param name="customKeyValueValidationFunctions">An optional parameter that specifies custom key-value pair level <see cref="IValidationFunction"/>  validation functions. If not provided, only default key-value pair validation functions are used.</param>
+        /// <param name="customStructuredValidationFunctions">An optional parameter that specifies custom <see cref="IValidationFunction"/> validation functions for structured key-value pairs. If not provided, only default structured validation functions are used.</param>
+        /// <returns>A <see cref="SyntaxValidationResult"/> object which contains a <see cref="SyntaxValidationResult"/> and a list of <see cref="StructuredValidationEntry"/> objects. The ValidationReport contains feedback items that provide information about any syntax errors or warnings found during validation. The list of StructuredValidationEntry objects represents the structured entries in the PX file that were validated.</returns>
+        public static SyntaxValidationResult ValidatePxFileMetadataSyntax(
             Stream stream,
             string filename,
             PxFileSyntaxConf? syntaxConf = null,
@@ -49,8 +63,8 @@ namespace PxUtils.Validation.SyntaxValidation
             syntaxConf ??= PxFileSyntaxConf.Default;
             ValidationReport report = new();
 
-            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream, syntaxConf, true);
-            if (encoding is null)
+            bool encodingFound = PxFileMetadataReader.TryGetEncoding(stream, out Encoding? encoding, syntaxConf);
+            if (!encodingFound || encoding is null)
             {
                 report.FeedbackItems.Add(new ValidationFeedbackItem(new StringValidationEntry(0, 0, filename, string.Empty, syntaxConf, 0), new SyntaxValidationFeedbackNoEncoding()));
                 return new(report, []);
@@ -66,6 +80,12 @@ namespace PxUtils.Validation.SyntaxValidation
             return new(report, structuredEntries);
         }
 
+        ///<summary>
+        /// Validates a collection of entries using a collection of validation functions and adds any feedback to the provided report.
+        ///</summary>
+        /// <param name="entries">The collection of <see cref="IValidationEntry"/> entries to be validated.</param>
+        /// <param name="validationFunctions">The collection of <see cref="IValidationFunction"/> validation functions to be used for validation.</param>
+        /// <param name="report">The <see cref="ValidationReport"/> report where validation feedback will be added.</param>
         public static void ValidateEntries(IEnumerable<IValidationEntry> entries, IEnumerable<IValidationFunction> validationFunctions, ValidationReport report)
         {
             foreach (var entry in entries)
@@ -82,6 +102,12 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         }
 
+        ///<summary>
+        /// Builds a list of <see cref="KeyValuePairValidationEntry"/> objects from a list of StringValidationEntry objects.
+        ///</summary>
+        /// <param name="stringEntries">The list of <see cref="StringValidationEntry"/> objects to be converted.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
+        /// <returns>A list of <see cref="KeyValuePairValidationEntry"/> objects built from the provided list of StringValidationEntry objects.</returns>
         public static List<KeyValuePairValidationEntry> BuildKeyValuePairs(List<StringValidationEntry> stringEntries, PxFileSyntaxConf syntaxConf)
         {
             return stringEntries.Select(entry =>
@@ -92,6 +118,11 @@ namespace PxUtils.Validation.SyntaxValidation
             }).ToList();
         }
 
+        /// <summary>
+        /// Builds a list of <see cref="StructuredValidationEntry"/> objects from a list of <see cref="KeyValuePairValidationEntry"/> objects.
+        /// </summary>
+        /// <param name="keyValuePairs">The list of <see cref="KeyValuePairValidationEntry"/> objects to be converted.</param>
+        /// <returns>A list of <see cref="StructuredValidationEntry"/> objects built from the provided list of <see cref="KeyValuePairValidationEntry"/> objects.</returns>
         public static List<StructuredValidationEntry> BuildStructuredEntries(List<KeyValuePairValidationEntry> keyValuePairs)
         {
             return keyValuePairs.Select(entry =>
