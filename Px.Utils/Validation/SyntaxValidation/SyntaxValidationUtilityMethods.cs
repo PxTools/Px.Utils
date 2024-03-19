@@ -225,7 +225,7 @@ namespace PxUtils.Validation.SyntaxValidation
         {
             if (IsStringListFormat(input, syntaxConf.Symbols.Value.ListSeparator, syntaxConf.Symbols.Key.StringDelimeter))
             {
-                return ValueType.List;
+                return ValueType.ListOfStrings;
             }
             else if (IsDateTimeFormat(input, syntaxConf.Symbols.Value.StringDelimeter, syntaxConf.Symbols.Value.DateTimeFormat))
             {

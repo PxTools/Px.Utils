@@ -247,7 +247,7 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackInvalidValueSection("No compliant format was found."));
             }
-            else if ((type == ValueType.List || type == ValueType.String) && !SyntaxValidationUtilityMethods.ValueLineChangesAreCompliant(value, syntaxConf, type == ValueType.List))
+            else if ((type == ValueType.ListOfStrings || type == ValueType.String) && !SyntaxValidationUtilityMethods.ValueLineChangesAreCompliant(value, syntaxConf, type == ValueType.ListOfStrings))
             {
                 return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackInvalidValueSection("Uncompliant line changes found."));
             }
@@ -334,7 +334,7 @@ namespace PxUtils.Validation.SyntaxValidation
             
             if (keyValueValidationEntry.KeyValueEntry.Value.Length > 150 ||
                 (type != ValueType.String &&
-                type != ValueType.List))
+                type != ValueType.ListOfStrings))
             {
                 return null;
             }

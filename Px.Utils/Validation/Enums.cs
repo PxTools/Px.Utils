@@ -5,8 +5,8 @@
     /// </summary>
     public enum ValidationFeedbackLevel
     {
-        Warning,
-        Error
+        Warning = 0,
+        Error = 1
     }
 
     /// <summary>
@@ -15,7 +15,7 @@
     public enum ValueType
     {
         String,
-        List,
+        ListOfStrings,
         Number,
         Boolean,
         DateTime,
