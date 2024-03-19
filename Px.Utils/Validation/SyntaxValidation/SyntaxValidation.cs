@@ -89,10 +89,10 @@ namespace PxUtils.Validation.SyntaxValidation
         ///<summary>
         /// Validates a collection of entries using a collection of validation functions and adds any feedback to the provided report.
         ///</summary>
-        /// <param name="entries">The collection of <see cref="IValidationEntry"/> entries to be validated.</param>
+        /// <param name="entries">The collection of <see cref="ValidationEntry"/> entries to be validated.</param>
         /// <param name="validationFunctions">The collection of <see cref="IValidationFunction"/> validation functions to be used for validation.</param>
         /// <param name="report">The <see cref="ValidationReport"/> report where validation feedback will be added.</param>
-        public static void ValidateEntries(IEnumerable<IValidationEntry> entries, IEnumerable<ValidationFunctionDelegate> validationFunctions, ValidationReport report)
+        public static void ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<ValidationFunctionDelegate> validationFunctions, ValidationReport report)
         {
             foreach (var entry in entries)
             {

@@ -4,16 +4,16 @@ using System.Text.RegularExpressions;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
-    public delegate ValidationFeedbackItem? ValidationFunctionDelegate(IValidationEntry entry);
+    public delegate ValidationFeedbackItem? ValidationFunctionDelegate(ValidationEntry entry);
 
     public class SyntaxValidationFunctions
     {
         /// <summary>
         /// Validates the given entry. If the entry does not start with a line separator, it is considered as not being on its own line, and a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the entry does not start with a line separator, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate MultipleEntriesOnLine = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate MultipleEntriesOnLine = (ValidationEntry entry) =>
         {
             StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException("Entry is not of type StringValidationEntry");
 
@@ -29,11 +29,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the key contains more than one language parameter, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the key contains more than one language parameter, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains more than one language parameter, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate MoreThanOneLanguageParameter = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate MoreThanOneLanguageParameter = (ValidationEntry entry) =>
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -54,11 +54,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the key contains more than one specifier parameter, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the key contains more than one specifier parameter, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains more than one specifier parameter, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate MoreThanOneSpecifierParameter = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate MoreThanOneSpecifierParameter = (ValidationEntry entry) =>
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -79,11 +79,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the key is not defined in the order of KEYWORD[language](\"specifier\"), a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the key is not defined in the order of KEYWORD[language](\"specifier\"), a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key is not defined in the order of KEYWORD[language](\"specifier\"), null otherwise.</returns>
-        public readonly ValidationFunctionDelegate WrongKeyOrderOrMissingKeyword = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate WrongKeyOrderOrMissingKeyword = (ValidationEntry entry) =>
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -120,11 +120,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the specifier is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the specifier is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier is not following a valid format, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate InvalidSpecifier = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate InvalidSpecifier = (ValidationEntry entry) =>
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -177,11 +177,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the key parameter section contains illegal symbols, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the key parameter section contains illegal symbols, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key parameter section contains illegal symbols, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate IllegalSymbolsInKeyParamSection = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate IllegalSymbolsInKeyParamSection = (ValidationEntry entry) =>
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -230,11 +230,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the value section is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the value section is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section is not following a valid format, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate IllegalValueFormat = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate IllegalValueFormat = (ValidationEntry entry) =>
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -256,11 +256,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the value section contains excess whitespace, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the value section contains excess whitespace, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section contains excess whitespace, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate ExcessWhitespaceInValue = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate ExcessWhitespaceInValue = (ValidationEntry entry) =>
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
             
@@ -289,11 +289,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the key contains excess whitespace, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the key contains excess whitespace, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains excess whitespace, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate KeyContainsExcessWhiteSpace = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate KeyContainsExcessWhiteSpace = (ValidationEntry entry) =>
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -321,11 +321,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the value section contains excess new lines, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the value section contains excess new lines, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section contains excess new lines, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate ExcessNewLinesInValue = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate ExcessNewLinesInValue = (ValidationEntry entry) =>
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
             
@@ -352,11 +352,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the keyword is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the keyword is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword is not following a valid format, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate InvalidKeywordFormat = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate InvalidKeywordFormat = (ValidationEntry entry) =>
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
 
@@ -405,11 +405,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the language parameter is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the language parameter is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the language parameter is not following a valid format, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate IllegalCharactersInLanguageParameter = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate IllegalCharactersInLanguageParameter = (ValidationEntry entry) =>
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
             // Running this validation is relevant only for entries with a language parameter
@@ -457,11 +457,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the specifier parameter is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the specifier parameter is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier parameter is not following a valid format, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate IllegalCharactersInSpecifierParameter = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate IllegalCharactersInSpecifierParameter = (ValidationEntry entry) =>
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
             // Running this validation is relevant only for entries with a specifier
@@ -506,11 +506,11 @@ namespace PxUtils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If there is no value section, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If there is no value section, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if there is no value section, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate EntryWithoutValue = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate EntryWithoutValue = (ValidationEntry entry) =>
         {
             StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException("Entry is not of type StringValidationEntry");
 
@@ -525,11 +525,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the language parameter is not compliant with ISO 639 or BCP 47, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the language parameter is not compliant with ISO 639 or BCP 47, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the language parameter is not compliant with ISO 639 or BCP 47, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate IncompliantLanguage = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate IncompliantLanguage = (ValidationEntry entry) =>
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
             // Running this validation is relevant only for entries with a language
@@ -555,11 +555,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the keyword contains unrecommended characters, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the keyword contains unrecommended characters, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate.</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword contains unrecommended characters, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate KeywordHasUnrecommendedCharacters = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate KeywordHasUnrecommendedCharacters = (ValidationEntry entry) =>
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
 
@@ -587,11 +587,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="IValidationEntry"/> entry. If the keyword is excessively long, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the keyword is excessively long, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="entry">The <see cref="IValidationEntry"/> entry to validate</param>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword is excessively long, otherwise null</returns>
-        public readonly ValidationFunctionDelegate KeywordIsExcessivelyLong = (IValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate KeywordIsExcessivelyLong = (ValidationEntry entry) =>
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
 

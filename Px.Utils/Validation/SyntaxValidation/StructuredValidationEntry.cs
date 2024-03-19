@@ -42,14 +42,14 @@
     }
 
     /// <summary>
-    /// Represents a structured validation entry. A structured validation entry is a type of validation entry that contains a key and a value. This class implements the <see cref="IValidationEntry"/> interface.
+    /// Represents a structured validation entry. A structured validation entry is a type of validation entry that contains a key and a value. This class implements the <see cref="ValidationEntry"/> interface.
     /// </summary>
     /// <param name="line">The line number in the file where the validation entry is located.</param>
     /// <param name="character">The character position in the line where the validation entry starts.</param>
     /// <param name="file">The name of the file where the validation entry is located.</param>
     /// <param name="key">The key of the validation entry, represented by a <see cref="ValidationEntryKey"/> object.</param>
     /// <param name="value">The value of the validation entry.</param>
-    public class StructuredValidationEntry(int line, int character, string file, ValidationEntryKey key, string value) : IValidationEntry
+    public class StructuredValidationEntry(int line, int character, string file, ValidationEntryKey key, string value) : ValidationEntry(line, character, file)
     {
         /// <summary>
         /// Gets the key part of the validation entry, represented by a <see cref="ValidationEntryKey"/> object.
@@ -60,20 +60,5 @@
         /// Gets the value part of the validation entry.
         /// </summary>
         public string Value { get; } = value;
-
-        /// <summary>
-        /// Gets the line number in the file where the validation entry is located.
-        /// </summary>
-        public int Line { get; } = line;
-
-        /// <summary>
-        /// Gets the character position in the line where the validation entry starts.
-        /// </summary>
-        public int Character { get; } = character;
-
-        /// <summary>
-        /// Gets the name of the file where the validation entry is located.
-        /// </summary>
-        public string File { get; } = file;
     }
 }
