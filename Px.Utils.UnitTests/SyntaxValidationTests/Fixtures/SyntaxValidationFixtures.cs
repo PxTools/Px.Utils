@@ -93,6 +93,11 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             new(0, 0, "foo", new KeyValuePair<string, string>("FOO", excessWhitespaceStringValue), PxFileSyntaxConf.Default),
         ];
 
+        private const string keyWithExcessWhitespace = "KEYWORD (fi) (\"first_specifier\", \"second_specifier\")";
+        internal static List<KeyValuePairValidationEntry> ENTRY_WITH_EXCESS_KEY_WHITESPACE => [
+            new(0, 0, "foo", new KeyValuePair<string, string>(keyWithExcessWhitespace, "foo"), PxFileSyntaxConf.Default),
+        ];
+
         private const string shortStringValueWithNewLine = "\"foobar foobar\"\n\"foobar foober\"";
         private const string shortListValueWithNewLine = "\"foo\", \"bar\",\n\"baz\"";
         internal static List<KeyValuePairValidationEntry> ENTRY_WITH_SHORT_MULTILINE_VALUES => [

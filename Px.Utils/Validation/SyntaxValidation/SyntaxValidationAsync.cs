@@ -25,38 +25,39 @@ namespace PxUtils.Validation.SyntaxValidation
             string filename,
             PxFileSyntaxConf? syntaxConf = null,
             int bufferSize = DEFAULT_BUFFER_SIZE,
-            IEnumerable<IValidationFunction>? customStringValidationFunctions = null,
-            IEnumerable<IValidationFunction>? customKeyValueValidationFunctions = null,
-            IEnumerable<IValidationFunction>? customStructuredValidationFunctions = null,
+            IEnumerable<ValidationFunctionDelegate>? customStringValidationFunctions = null,
+            IEnumerable<ValidationFunctionDelegate>? customKeyValueValidationFunctions = null,
+            IEnumerable<ValidationFunctionDelegate>? customStructuredValidationFunctions = null,
             CancellationToken cancellationToken = default)
         {
-            IEnumerable<IValidationFunction> stringValidationFunctions = [
-                    new MultipleEntriesOnLine(),
-                new EntryWithoutValue()
-                ];
+            SyntaxValidationFunctions validationFunctions = new();
+            IEnumerable<ValidationFunctionDelegate> stringValidationFunctions = [
+            validationFunctions.MultipleEntriesOnLine,
+                validationFunctions.EntryWithoutValue
+            ];
             stringValidationFunctions = stringValidationFunctions.Concat(customStringValidationFunctions ?? []);
 
-            IEnumerable<IValidationFunction> keyValueValidationFunctions = [
-                  new MoreThanOneLanguageParameter(),
-                new MoreThanOneSpecifierParameter(),
-                new WrongKeyOrderOrMissingKeyword(),
-                new InvalidSpecifier(),
-                new IllegalSymbolsInKeyParamSection(),
-                new IllegalValueFormat(),
-                new ExcessWhitespaceInValue(),
-                new KeyContainsExcessWhiteSpace(),
-                new ExcessNewLinesInValue()
-                ];
+            IEnumerable<ValidationFunctionDelegate> keyValueValidationFunctions = [
+                validationFunctions.MoreThanOneLanguageParameter,
+                validationFunctions.MoreThanOneSpecifierParameter,
+                validationFunctions.WrongKeyOrderOrMissingKeyword,
+                validationFunctions.InvalidSpecifier,
+                validationFunctions.IllegalSymbolsInKeyParamSection,
+                validationFunctions.IllegalValueFormat,
+                validationFunctions.ExcessWhitespaceInValue,
+                validationFunctions.KeyContainsExcessWhiteSpace,
+                validationFunctions.ExcessNewLinesInValue
+            ];
             keyValueValidationFunctions = keyValueValidationFunctions.Concat(customKeyValueValidationFunctions ?? []);
 
-            IEnumerable<IValidationFunction> structuredValidationFunctions = [
-                  new InvalidKeywordFormat(),
-                new IllegalCharactersInLanguageParameter(),
-                new IllegalCharactersInSpecifierParameter(),
-                new IncompliantLanguage(),
-                new KeywordHasUnrecommendedCharacters(),
-                new KeywordIsExcessivelyLong()
-                ];
+            IEnumerable<ValidationFunctionDelegate> structuredValidationFunctions = [
+                validationFunctions.InvalidKeywordFormat,
+                validationFunctions.IllegalCharactersInLanguageParameter,
+                validationFunctions.IllegalCharactersInSpecifierParameter,
+                validationFunctions.IncompliantLanguage,
+                validationFunctions.KeywordHasUnrecommendedCharacters,
+                validationFunctions.KeywordIsExcessivelyLong
+            ];
             structuredValidationFunctions = structuredValidationFunctions.Concat(customStructuredValidationFunctions ?? []);
 
             syntaxConf ??= PxFileSyntaxConf.Default;

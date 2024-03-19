@@ -29,7 +29,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StringValidationEntry> entries = SyntaxValidationFixtures.MULTIPLE_ENTRIES_IN_SINGLE_LINE;
-            List<IValidationFunction> functions = [new MultipleEntriesOnLine()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.MultipleEntriesOnLine];
             ValidationReport report = new();
 
             // Act
@@ -67,7 +68,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_MULTIPLE_LANGUAGE_PARAMETERS;
-            List<IValidationFunction> functions = [new MoreThanOneLanguageParameter()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.MoreThanOneLanguageParameter];
             ValidationReport report = new();
 
             // Act
@@ -77,12 +79,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackMoreThanOneLanguage));
         }
 
+
         [TestMethod]
         public void ValidateEntries_CalledWith_ENTRY_WITH_MULTIPLE_SPECIFIER_PARAMETER_SECTIONS_Returns_Result_With_Error()
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_MULTIPLE_SPECIFIER_PARAMETER_SECTIONS;
-            List<IValidationFunction> functions = [new MoreThanOneSpecifierParameter()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.MoreThanOneSpecifierParameter];
             ValidationReport report = new();
 
             // Act
@@ -93,11 +97,12 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateEntries_CalledWith_ENTRIES_WITH_INVALID_SPECIFIERS_Returns_Result_With_Errors()
+        public void ValidateEntries_CalledWith_ENTRIES_IN_WRONG_ORDER_AND_MISSING_KEYWORD_Returns_Result_With_Errors()
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_IN_WRONG_ORDER_AND_MISSING_KEYWORD;
-            List<IValidationFunction> functions = [new WrongKeyOrderOrMissingKeyword()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.WrongKeyOrderOrMissingKeyword];
             ValidationReport report = new();
 
             // Act
@@ -110,11 +115,12 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateEntries_CalledWith_ENTRIES_IN_WRONG_ORDER_AND_MISSING_KEYWORD_Returns_Result_With_Errors()
+        public void ValidateEntries_CalledWith_ENTRIES_WITH_INVALID_SPECIFIERS_Returns_Result_With_Errors()
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_INVALID_SPECIFIERS;
-            List<IValidationFunction> functions = [new InvalidSpecifier()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.InvalidSpecifier];
             ValidationReport report = new();
 
             // Act
@@ -131,7 +137,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_PARAM_SECTIONS;
-            List<IValidationFunction> functions = [new IllegalSymbolsInKeyParamSection()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalSymbolsInKeyParamSection];
             ValidationReport report = new();
 
             // Act
@@ -142,13 +149,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             Assert.IsInstanceOfType(report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackIllegalSymbolsInParamSections));
             Assert.IsInstanceOfType(report.FeedbackItems?[2].Feedback, typeof(SyntaxValidationFeedbackIllegalSymbolsInParamSections));
         }
-
+        
         [TestMethod]
         public void ValidateEntries_CalledWith_ENTRIES_WITH_CORRECTLY_FORMATTED_LIST_AND_MULTILINE_STRING_Returns_No_Feedback()
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_CORRECTLY_FORMATTED_LIST_AND_MULTILINE_STRING;
-            List<IValidationFunction> functions = [new IllegalValueFormat()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalValueFormat];
             ValidationReport report = new();
 
             // Act
@@ -163,7 +171,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
 
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_BAD_VALUES;
-            List<IValidationFunction> functions = [new IllegalValueFormat()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalValueFormat];
             ValidationReport report = new();
 
             // Act
@@ -181,7 +190,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_EXCESS_LIST_VALUE_WHITESPACE;
-            List<IValidationFunction> functions = [new ExcessWhitespaceInValue()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.ExcessWhitespaceInValue];
             ValidationReport report = new();
 
             // Act
@@ -192,11 +202,28 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
+        public void ValidateEntries_CalledWith_ENTRY_WITH_EXCESS_KEY_WHITESPACE_Returns_Result_With_Warning()
+        {
+            // Arrange
+            List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_EXCESS_KEY_WHITESPACE;
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.KeyContainsExcessWhiteSpace];
+            ValidationReport report = new();
+
+            // Act
+            SyntaxValidation.ValidateEntries(entries, functions, report);
+
+            Assert.AreEqual(1, report.FeedbackItems?.Count);
+            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeyContainsExcessWhitespace));
+        }
+
+        [TestMethod]
         public void ValidateEntries_CalledWith_ENTRY_WITH_SHORT_MULTILINE_VALUES_Returns_Result_With_Warnings()
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_SHORT_MULTILINE_VALUES;
-            List<IValidationFunction> functions = [new ExcessNewLinesInValue()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.ExcessNewLinesInValue];
             ValidationReport report = new();
 
             // Act
@@ -212,7 +239,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_INVALID_KEYWORDS;
-            List<IValidationFunction> functions = [new InvalidKeywordFormat()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.InvalidKeywordFormat];
             ValidationReport report = new();
 
             // Act
@@ -229,7 +257,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_VALID_LANGUAGES;
-            List<IValidationFunction> functions = [new IllegalCharactersInLanguageParameter(), new IncompliantLanguage()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalCharactersInLanguageParameter];
             ValidationReport report = new();
 
             // Act
@@ -243,7 +272,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_INVALID_LANGUAGES;
-            List<IValidationFunction> functions = [new IllegalCharactersInLanguageParameter()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalCharactersInLanguageParameter];
             ValidationReport report = new();
 
             // Act
@@ -259,7 +289,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS;
-            List<IValidationFunction> functions = [new IllegalCharactersInSpecifierParameter()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalCharactersInSpecifierParameter];
             ValidationReport report = new();
 
             // Act
@@ -275,7 +306,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StringValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITHOUT_VALUE;
-            List<IValidationFunction> functions = [new EntryWithoutValue()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.EntryWithoutValue];
             ValidationReport report = new();
 
             // Act
@@ -291,7 +323,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_INCOMPLIANT_LANGUAGES;
-            List<IValidationFunction> functions = [new IncompliantLanguage()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.IncompliantLanguage];
             ValidationReport report = new();
 
             // Act
@@ -304,27 +337,12 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateEntries_CalledWith_ENTRY_WITH_LONG_KEYWORD_Returns_With_Warnings()
-        {
-            // Arrange
-            List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_LONG_KEYWORD;
-            List<IValidationFunction> functions = [new KeywordIsExcessivelyLong()];
-            ValidationReport report = new();
-
-            // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
-
-            // This test also catches an earlier issue with excess whitespace in the key part
-            Assert.AreEqual(1, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeywordIsExcessivelyLong));
-        }
-
-        [TestMethod]
         public void ValidateEntries_CalledWith_ENTRIES_WITH_UNRECOMMENDED_KEYWORD_NAMING_Returns_With_Warnings()
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_UNRECOMMENDED_KEYWORD_NAMING;
-            List<IValidationFunction> functions = [new KeywordHasUnrecommendedCharacters()];
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.KeywordHasUnrecommendedCharacters];
             ValidationReport report = new();
 
             // Act
@@ -334,6 +352,23 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             Assert.AreEqual(2, report.FeedbackItems?.Count);
             Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeywordContainsUnrecommendedCharacters));
             Assert.IsInstanceOfType(report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackKeywordContainsUnrecommendedCharacters));
+        }
+
+        [TestMethod]
+        public void ValidateEntries_CalledWith_ENTRY_WITH_LONG_KEYWORD_Returns_With_Warnings()
+        {
+            // Arrange
+            List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_LONG_KEYWORD;
+            SyntaxValidationFunctions functionsObject = new();
+            List<ValidationFunctionDelegate> functions = [functionsObject.KeywordIsExcessivelyLong];
+            ValidationReport report = new();
+
+            // Act
+            SyntaxValidation.ValidateEntries(entries, functions, report);
+
+            // This test also catches an earlier issue with excess whitespace in the key part
+            Assert.AreEqual(1, report.FeedbackItems?.Count);
+            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeywordIsExcessivelyLong));
         }
 
         [TestMethod]
