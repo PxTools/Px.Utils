@@ -235,27 +235,6 @@ namespace PxUtils.PxFile.Meta
         }
 
         /// <summary>
-        /// Tries to determine the encoding of the provided stream based on the Byte Order Mark (BOM) or the CODEPAGE keyword in the metadata.
-        /// </summary>
-        /// <param name="stream">The stream from which to determine the encoding.</param>
-        /// <param name="encoding">Encoding format the function tries to return</param>
-        /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
-        /// <returns></returns>
-        public static bool TryGetEncoding(Stream stream, out Encoding? encoding, PxFileSyntaxConf? symbolsConf = null)
-        {
-            try
-            {
-                encoding = GetEncoding(stream, symbolsConf);
-                return true;
-            }
-            catch (InvalidPxFileMetadataException)
-            {
-                encoding = null;
-                return false;
-            }
-        }
-
-        /// <summary>
         /// Asynchronously determines the encoding of the provided stream based on the Byte Order Mark (BOM) or the CODEPAGE keyword in the metadata.
         /// If no BOM or CODEPAGE keyword is found, an exception is thrown. If the encoding specified by the CODEPAGE keyword is not available,
         /// it attempts to register it using the CodePagesEncodingProvider.
@@ -281,25 +260,6 @@ namespace PxUtils.PxFile.Meta
                 .FirstOrDefaultAsync(kvp => kvp.Key == symbolsConf.Tokens.KeyWords.CodePage, cancellationToken);
 
             return GetEncodingFromValue(encoding.Value, symbolsConf);
-        }
-
-        /// <summary>
-        /// Asynchronously tries to determine the encoding of the provided stream based on the Byte Order Mark (BOM) or the CODEPAGE keyword in the metadata.
-        /// </summary>
-        /// <param name="stream">The stream from which to determine the encoding.</param>
-        /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
-        /// <returns></returns>
-        public static async Task<(bool, Encoding?)> TryGetEncodingAsync(Stream stream, PxFileSyntaxConf? symbolsConf = null, CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                return (true, await GetEncodingAsync(stream, symbolsConf, cancellationToken));
-            }
-            catch (InvalidPxFileMetadataException)
-            {
-                return (false, null);
-            }
         }
 
         #region Private Methods

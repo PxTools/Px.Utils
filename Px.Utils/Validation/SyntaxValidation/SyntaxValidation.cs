@@ -1,4 +1,5 @@
-﻿using PxUtils.PxFile;
+﻿using PxUtils.Exceptions;
+using PxUtils.PxFile;
 using PxUtils.PxFile.Meta;
 using System.Text;
 
@@ -65,21 +66,24 @@ namespace PxUtils.Validation.SyntaxValidation
             syntaxConf ??= PxFileSyntaxConf.Default;
             ValidationReport report = new();
 
-            bool encodingFound = PxFileMetadataReader.TryGetEncoding(stream, out Encoding? encoding, syntaxConf);
-            if (!encodingFound || encoding is null)
+            try
+            {
+                Encoding encoding = PxFileMetadataReader.GetEncoding(stream, syntaxConf);
+
+                List<StringValidationEntry> stringEntries = BuildStringEntries(stream, encoding, syntaxConf, filename, bufferSize);
+                ValidateEntries(stringEntries, stringValidationFunctions, report);
+                List<KeyValuePairValidationEntry> keyValuePairs = BuildKeyValuePairs(stringEntries, syntaxConf);
+                ValidateEntries(keyValuePairs, keyValueValidationFunctions, report);
+                List<StructuredValidationEntry> structuredEntries = BuildStructuredEntries(keyValuePairs);
+                ValidateEntries(structuredEntries, structuredValidationFunctions, report);
+
+                return new(report, structuredEntries);
+            }
+            catch (InvalidPxFileMetadataException)
             {
                 report.FeedbackItems.Add(new ValidationFeedbackItem(new StringValidationEntry(0, 0, filename, string.Empty, syntaxConf, 0), new SyntaxValidationFeedbackNoEncoding()));
                 return new(report, []);
             }
-
-            List<StringValidationEntry> stringEntries = BuildStringEntries(stream, encoding, syntaxConf, filename, bufferSize);
-            ValidateEntries(stringEntries, stringValidationFunctions, report);
-            List<KeyValuePairValidationEntry> keyValuePairs = BuildKeyValuePairs(stringEntries, syntaxConf);
-            ValidateEntries(keyValuePairs, keyValueValidationFunctions, report);
-            List<StructuredValidationEntry> structuredEntries = BuildStructuredEntries(keyValuePairs);
-            ValidateEntries(structuredEntries, structuredValidationFunctions, report);
-
-            return new(report, structuredEntries);
         }
 
         ///<summary>

@@ -1,4 +1,5 @@
-﻿using PxUtils.PxFile;
+﻿using PxUtils.Exceptions;
+using PxUtils.PxFile;
 using PxUtils.PxFile.Meta;
 using System.Text;
 
@@ -63,21 +64,24 @@ namespace PxUtils.Validation.SyntaxValidation
             syntaxConf ??= PxFileSyntaxConf.Default;
             ValidationReport report = new();
 
-            (bool encodingFound, Encoding? encoding) = await PxFileMetadataReader.TryGetEncodingAsync(stream, syntaxConf, cancellationToken);
-            if (!encodingFound || encoding is null)
+            try
+            {
+                Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream, syntaxConf, cancellationToken);
+
+                List<StringValidationEntry> stringEntries = await BuildStringEntriesAsync(stream, encoding, syntaxConf, filename, bufferSize);
+                SyntaxValidation.ValidateEntries(stringEntries, stringValidationFunctions, report);
+                List<KeyValuePairValidationEntry> keyValuePairs = SyntaxValidation.BuildKeyValuePairs(stringEntries, syntaxConf);
+                SyntaxValidation.ValidateEntries(keyValuePairs, keyValueValidationFunctions, report);
+                List<StructuredValidationEntry> structuredEntries = SyntaxValidation.BuildStructuredEntries(keyValuePairs);
+                SyntaxValidation.ValidateEntries(structuredEntries, structuredValidationFunctions, report);
+
+                return new(report, structuredEntries);
+            }
+            catch (InvalidPxFileMetadataException)
             {
                 report.FeedbackItems.Add(new ValidationFeedbackItem(new StringValidationEntry(0, 0, filename, string.Empty, syntaxConf, 0), new SyntaxValidationFeedbackNoEncoding()));
                 return new(report, []);
             }
-
-            List<StringValidationEntry> stringEntries = await BuildStringEntriesAsync(stream, encoding, syntaxConf, filename, bufferSize);
-            SyntaxValidation.ValidateEntries(stringEntries, stringValidationFunctions, report);
-            List<KeyValuePairValidationEntry> keyValuePairs = SyntaxValidation.BuildKeyValuePairs(stringEntries, syntaxConf);
-            SyntaxValidation.ValidateEntries(keyValuePairs, keyValueValidationFunctions, report);
-            List<StructuredValidationEntry> structuredEntries = SyntaxValidation.BuildStructuredEntries(keyValuePairs);
-            SyntaxValidation.ValidateEntries(structuredEntries, structuredValidationFunctions, report);
-
-            return new(report, structuredEntries);
         }
 
         private static async Task<List<StringValidationEntry>> BuildStringEntriesAsync(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize)
