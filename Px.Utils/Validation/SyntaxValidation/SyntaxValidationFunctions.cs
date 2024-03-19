@@ -514,12 +514,21 @@ namespace PxUtils.Validation.SyntaxValidation
 
             // Check if keyword contains only letters, numbers, - and _
             string legalSymbolsKeyword = @"a-zA-Z0-9_-";
+            // Define a timeout for the regex match
+            TimeSpan timeout = TimeSpan.FromSeconds(1);
             // Find all illegal symbols in keyword
-            var matchesKeyword = Regex.Matches(keyword, $"[^{legalSymbolsKeyword}]");
-            var illegalSymbolsInKeyWord = matchesKeyword.Cast<Match>().Select(m => m.Value).Distinct().ToList();
-            if (illegalSymbolsInKeyWord.Count > 0)
+            try
             {
-                reasons.Add($"Keyword contains illegal characters: {string.Join(", ", illegalSymbolsInKeyWord)}"); 
+                MatchCollection matchesKeyword = Regex.Matches(keyword, $"[^{legalSymbolsKeyword}]", RegexOptions.None, timeout);
+                List<string> illegalSymbolsInKeyWord = matchesKeyword.Cast<Match>().Select(m => m.Value).Distinct().ToList();
+                if (illegalSymbolsInKeyWord.Count > 0)
+                {
+                    reasons.Add($"Keyword contains illegal characters: {string.Join(", ", illegalSymbolsInKeyWord)}");
+                }
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackRegexTimeOut("keyword", keyword));
             }
 
             // Check if keyword starts with a letter
@@ -575,14 +584,23 @@ namespace PxUtils.Validation.SyntaxValidation
 
             // Find illegal characters from language parameter string
             string illegalCharacters = @"[;=\[\]""]";
-            MatchCollection matchesLang = Regex.Matches(lang, illegalCharacters);
-            List<string> foundIllegalCharacters = matchesLang.Cast<Match>().Select(m => m.Value).Distinct().ToList();
-
-            // Check if there are any special characters or whitespace in lang
-            if (foundIllegalCharacters.Count > 0)
+            TimeSpan timeout = TimeSpan.FromSeconds(1);
+            // Find all illegal symbols in keyword
+            try
             {
-                reasons.Add($"Language parameter contains illegal characters: {string.Join(", ", foundIllegalCharacters)}");
+                MatchCollection matchesLang = Regex.Matches(lang, illegalCharacters, RegexOptions.None, timeout);
+                List<string> foundIllegalCharacters = matchesLang.Cast<Match>().Select(m => m.Value).Distinct().ToList();
+                // Check if there are any special characters or whitespace in lang
+                if (foundIllegalCharacters.Count > 0)
+                {
+                    reasons.Add($"Language parameter contains illegal characters: {string.Join(", ", foundIllegalCharacters)}");
+                }
             }
+            catch (RegexMatchTimeoutException)
+            {
+                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackRegexTimeOut("language", lang));
+            }
+
             if (lang.Contains(' '))
             {
                 reasons.Add("Language parameter contains whitespace character(s)");

@@ -113,4 +113,10 @@
         public ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Warning;
         public string Rule { get; } = "The keyword is excessively long. Recommended length of up to 20 characters";
     }
+
+    public class SyntaxValidationFeedbackRegexTimeOut(string type, string content) : IValidationFeedback
+    {
+        public ValidationFeedbackLevel Level { get; } = ValidationFeedbackLevel.Error;
+        public string Rule { get; } = $"The regex pattern for {type}: {content} has timed out. This might be as a result of a too long or too complex {type}.";
+    }
 }
