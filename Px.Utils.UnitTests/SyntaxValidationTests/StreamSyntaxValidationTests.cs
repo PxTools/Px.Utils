@@ -378,5 +378,49 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeywordExcessivelyLong, feedback[0].Feedback.Rule);
         }
+
+        [TestMethod]
+        public void ValidateObjects_CalledWith_KEYVALUEPAIRS_WITH_TIMEVALS_Returns_With_Valid_Result()
+        {
+            // Arrange
+            List<ValidationKeyValuePair> keyValuePairs = SyntaxValidationFixtures.KEYVALUEPAIRS_WITH_TIMEVALS;
+            List<KeyValuePairValidationFunctionDelegate> functions = [SyntaxValidationFunctions.InvalidValueFormat];
+
+            // Act
+            kvpValidationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
+
+            Assert.AreEqual(0, feedback.Count);
+            for (int i = 0; i < keyValuePairs.Count; i++)
+            {
+                Validation.ValueType? valueType = SyntaxValidationUtilityMethods.GetValueTypeFromString(keyValuePairs[i].KeyValuePair.Value, PxFileSyntaxConf.Default);
+                if (i <= 6)
+                {
+                    Assert.AreEqual(Validation.ValueType.TimeValSeries, valueType);
+                }
+                else
+                {
+                    Assert.AreEqual(Validation.ValueType.TimeValRange, valueType);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ValidateObjects_CalledWith_KEYVALUEPAIRS_WITH_BAD_TIMEVALS_Returns_With_Errors()
+        {
+            // Arrange
+            List<ValidationKeyValuePair> keyValuePairs = SyntaxValidationFixtures.KEYVALUEPAIRS_WITH_BAD_TIMEVALS;
+            List<KeyValuePairValidationFunctionDelegate> functions = [SyntaxValidationFunctions.InvalidValueFormat];
+
+            // Act
+            kvpValidationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
+            Validation.ValueType? valueType = SyntaxValidationUtilityMethods.GetValueTypeFromString(keyValuePairs[1].KeyValuePair.Value, PxFileSyntaxConf.Default);
+
+            Assert.AreEqual(13, feedback.Count);
+            for (int i = 0; i < feedback.Count; i++)
+            {
+                Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, feedback[i].Feedback.Rule);
+            }
+            Assert.AreEqual(Validation.ValueType.ListOfStrings, valueType);
+        }
     }
 }

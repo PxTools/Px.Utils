@@ -122,6 +122,68 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             new("foo", new KeyValuePair<string, string>("BAR", shortListValueWithNewLine), 0, [], 0)
         ];
 
+        private const string seriesTimeValA1 = "TLIST(A1),\"2000\",\"2001\",\"2003\"";
+        private const string seriesTimeValH1 = "TLIST(H1),\"20001\", \"20002\", \"20011\", \"20012\""; // has spaces inbetween
+        private const string seriesTimeValT1 = "TLIST(T1),\"20001\",\"20002\",\"20003\"";
+        private const string seriesTimeValQ1 = "TLIST(Q1),\"20001\",\"20002\",\"20003\",\"20004\"";
+        private const string seriesTimeValM1 = "TLIST(M1),\"200001\",\"200002\",\n\"200003\""; // has a linechange
+        private const string seriesTimeValW1 = "TLIST(W1),\"200050\",\"200051\",\"200052\"";
+        private const string seriesTimeValD1 = "TLIST(D1),\"20001010\",\"20001011\",\"20001012\"";
+        private const string rangeTimeValA1 = "TLIST(A1, \"2000-2003\")";
+        private const string rangeTimeValH1 = "TLIST(H1, \"20001-20012\")";
+        private const string rangeTimeValT1 = "TLIST(T1, \"20001-20003\")";
+        private const string rangeTimeValQ1 = "TLIST(Q1, \"20001-20004\")";
+        private const string rangeTimeValM1 = "TLIST(M1, \"200001-200003\")";
+        private const string rangeTimeValW1 = "TLIST(W1, \"200050-200052\")";
+        private const string rangeTimeValD1 = "TLIST(D1, \"20001010-20001012\")";
+        internal static List<ValidationKeyValuePair> KEYVALUEPAIRS_WITH_TIMEVALS => [
+            new(0, 0, "foo", new KeyValuePair<string, string>("FOOA1", seriesTimeValA1)),
+            new(1, 0, "foo", new KeyValuePair<string, string>("FOOH1", seriesTimeValH1)),
+            new(2, 0, "foo", new KeyValuePair<string, string>("FOOT1", seriesTimeValT1)),
+            new(3, 0, "foo", new KeyValuePair<string, string>("FOOQ1", seriesTimeValQ1)),
+            new(4, 0, "foo", new KeyValuePair<string, string>("FOOM1", seriesTimeValM1)),
+            new(5, 0, "foo", new KeyValuePair<string, string>("FOOW1", seriesTimeValW1)),
+            new(6, 0, "foo", new KeyValuePair<string, string>("FOOD1", seriesTimeValD1)),
+            new(7, 0, "foo", new KeyValuePair<string, string>("BARA1", rangeTimeValA1)),
+            new(8, 0, "foo", new KeyValuePair<string, string>("BARH1", rangeTimeValH1)),
+            new(9, 0, "foo", new KeyValuePair<string, string>("BART1", rangeTimeValT1)),
+            new(10, 0, "foo", new KeyValuePair<string, string>("BARQ1", rangeTimeValQ1)),
+            new(11, 0, "foo", new KeyValuePair<string, string>("BARM1", rangeTimeValM1)),
+            new(12, 0, "foo", new KeyValuePair<string, string>("BARW1", rangeTimeValW1)),
+            new(13, 0, "foo", new KeyValuePair<string, string>("BARD1", rangeTimeValD1)),
+        ];
+
+        private const string badSeriesTimeValA1 = "TLIST(A1),2000,2001,2003";
+        private const string badSeriesTimeValH1 = "\"TLIST(H1)\",\"20001\", \"20002\", \"20011\", \"20012\"";
+        private const string badSeriesTimeValT1 = "TLIST(T1)=\"20001\",\"20002\",\"20003\"";
+        private const string badSeriesTimeValQ1 = "TLIST(Q1):\"20001\",\"20002\",\"20003\",\"20004\"";
+        private const string badSeriesTimeValM1 = "TLIST(M1),\"20001\",\"20002\",\"20003\"";
+        private const string badSeriesTimeValW1 = "TLIST(W1),\"2000-50\",\"2000-51\",\"2000-52\"";
+        private const string badSeriesTimeValD1 = "TLIST(D1),\"2000/1010\",\"2000/1011\",\"2000/1012\"";
+        private const string badRangeTimeValA1 = "TLIST(A1, 2000-2003)";
+        private const string badRangeTimeValH1 = "TLIST(H1, \"20001,20012\")";
+        private const string badRangeTimeValT1 = "TLIST(T1, \"20001/20003\")";
+        private const string badRangeTimeValQ1 = "TLIST(Q1, \"2001-2004\")";
+        private const string badRangeTimeValM1 = "TLIST(M1, \"2000/01-2000/03\")";
+        private const string badRangeTimeValW1 = "TLIST(W1, \"2000.50-2000.52\")";
+        private const string badRangeTimeValD1 = "TLIST(D1, \"10/10/2000-10/11/2000\")";
+        internal static List<ValidationKeyValuePair> KEYVALUEPAIRS_WITH_BAD_TIMEVALS => [
+            new(0, 0, "foo", new KeyValuePair<string, string>("FOOA1", badSeriesTimeValA1)),
+            new(1, 0, "foo", new KeyValuePair<string, string>("FOOH1", badSeriesTimeValH1)),
+            new(2, 0, "foo", new KeyValuePair<string, string>("FOOT1", badSeriesTimeValT1)),
+            new(3, 0, "foo", new KeyValuePair<string, string>("FOOQ1", badSeriesTimeValQ1)),
+            new(4, 0, "foo", new KeyValuePair<string, string>("FOOM1", badSeriesTimeValM1)),
+            new(5, 0, "foo", new KeyValuePair<string, string>("FOOW1", badSeriesTimeValW1)),
+            new(6, 0, "foo", new KeyValuePair<string, string>("FOOD1", badSeriesTimeValD1)),
+            new(7, 0, "foo", new KeyValuePair<string, string>("BARA1", badRangeTimeValA1)),
+            new(8, 0, "foo", new KeyValuePair<string, string>("BARH1", badRangeTimeValH1)),
+            new(9, 0, "foo", new KeyValuePair<string, string>("BART1", badRangeTimeValT1)),
+            new(10, 0, "foo", new KeyValuePair<string, string>("BARQ1", badRangeTimeValQ1)),
+            new(11, 0, "foo", new KeyValuePair<string, string>("BARM1", badRangeTimeValM1)),
+            new(12, 0, "foo", new KeyValuePair<string, string>("BARW1", badRangeTimeValW1)),
+            new(13, 0, "foo", new KeyValuePair<string, string>("BARD1", badRangeTimeValD1)),
+        ];
+
         private readonly static ValidationStructuredEntryKey numberInKeyword = new("1FOO");
         private readonly static ValidationStructuredEntryKey slashInKeyword = new("B/AR");
         private readonly static ValidationStructuredEntryKey colonInKeyword = new("B:AZ");

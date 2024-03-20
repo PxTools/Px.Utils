@@ -175,7 +175,11 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>Returns a <see cref="ValueType"/> object that represents the type of the value in the input string. If the type cannot be determined, null is returned.</returns>
         internal static ValueType? GetValueTypeFromString(string input, PxFileSyntaxConf syntaxConf)
         {
-            if (IsStringListFormat(input, syntaxConf.Symbols.Value.ListSeparator, syntaxConf.Symbols.Key.StringDelimeter))
+            if (TryGetTimeValueFormat(input, out ValueType? valueFormat, syntaxConf))
+            {
+                return valueFormat;
+            }
+            else if (IsStringListFormat(input, syntaxConf.Symbols.Value.ListSeparator, syntaxConf.Symbols.Key.StringDelimeter))
             {
                 return ValueType.ListOfStrings;
             }
@@ -347,6 +351,130 @@ namespace PxUtils.Validation.SyntaxValidation
             while (symbolIndex == -1); 
 
             return symbolIndex;
+        }
+
+        private static bool TryGetTimeValueFormat(string input, out ValueType? valueFormat, PxFileSyntaxConf syntaxConf)
+        {
+            if (!input.StartsWith(syntaxConf.Tokens.Time.TimeIntervalIndicator))
+            {
+                valueFormat = null;
+                return false;
+            }
+
+            ExtractSectionResult intervalSection = ExtractSectionFromString(input, syntaxConf.Symbols.Value.TimeSeriesIntervalStart, syntaxConf, syntaxConf.Symbols.Value.TimeSeriesIntervalEnd);
+            // There can only be one time interval specifier section
+            if (intervalSection.Sections.Length != 1)
+            {
+                valueFormat = null;
+                return false;
+            }
+            string[] splitIntervalSection = intervalSection.Sections[0].Split(syntaxConf.Symbols.Value.ListSeparator);
+            string intervalToken = splitIntervalSection[0];
+            string? timeRange = splitIntervalSection.Length == 2 ? splitIntervalSection[1] : null;
+            if (!IsValidationTokenValid(intervalToken, syntaxConf))
+            {
+                valueFormat = null;
+                return false;
+            }
+            string remainder = intervalSection.Remainder.Remove(0, syntaxConf.Tokens.Time.TimeIntervalIndicator.Length);
+            return timeRange is not null ? TryGetTimeValueRangeFormat(timeRange, intervalToken, out valueFormat, syntaxConf) : TryGetTimeValueSeriesFormat(remainder, intervalToken, out valueFormat, syntaxConf);
+        }
+
+        private static bool IsValidationTokenValid(string intervalToken, PxFileSyntaxConf syntaxConf)
+        {
+            if (syntaxConf.Tokens.Time.TimeIntervalTokens.Contains(intervalToken))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }   
+        }
+
+        private static bool TryGetTimeValueSeriesFormat(string input, string timeInterval, out ValueType? valueFormat, PxFileSyntaxConf syntaxConf)
+        {
+            if (input.Length == 0 || input[0] != syntaxConf.Symbols.Value.ListSeparator)
+            {
+                valueFormat = null;
+                return false;
+            }
+
+            // Remove preceding list separator from input
+            input = input.Remove(0, 1);
+            if (!IsStringListFormat(input, syntaxConf.Symbols.Value.ListSeparator, syntaxConf.Symbols.Value.StringDelimeter))
+            {
+                valueFormat = null;
+                return false;
+            }
+
+            string[] timeValSeries = input.Split(syntaxConf.Symbols.Value.ListSeparator);
+            if (Array.TrueForAll(timeValSeries, x => IsValidTimestampFormat(CleanString(x, syntaxConf, true), timeInterval, syntaxConf)))
+            {
+                valueFormat = ValueType.TimeValSeries;
+                return true;
+            }
+            else
+            {
+                valueFormat = null;
+                return false;
+            }
+        }
+
+        private static bool IsValidTimestampFormat(string input, string timeInterval, PxFileSyntaxConf syntaxConf)
+        {
+            // TODO: Make all of this look less vomitious, use Regular Expressions for stuff
+            if (input.Length < 4)
+            {
+                return false;
+            }
+            if (!input[..4].All(c => char.IsDigit(c)))
+            {
+                return false;
+            }
+            if (timeInterval == syntaxConf.Tokens.Time.YearInterval)
+            {
+                return true;
+            }
+            else if (
+                timeInterval == syntaxConf.Tokens.Time.HalfYearInterval ||
+                timeInterval == syntaxConf.Tokens.Time.TrimesterInterval ||
+                timeInterval == syntaxConf.Tokens.Time.QuarterYearInterval)
+            {
+                return input.Length == 5 && "1234".Contains(input[4]);
+            }
+            else if (
+                timeInterval == syntaxConf.Tokens.Time.MonthInterval ||
+                timeInterval == syntaxConf.Tokens.Time.WeekInterval)
+            {
+                return input.Length == 6 && int.TryParse(input[4..], out int result) && result > 0 && result <= 52;
+            }
+            else
+            {
+                return input.Length == 8 && int.TryParse(input[4..6], out int month) && month > 0 && month <= 12 && int.TryParse(input[6..], out int day) && day > 0 && day <= 31;
+            }
+        }
+
+        private static bool TryGetTimeValueRangeFormat(string input, string timeInterval, out ValueType? valueFormat, PxFileSyntaxConf syntaxConf)
+        {
+            input = input.TrimStart();
+            string[] timeValRange = input.Split(syntaxConf.Symbols.Value.TimeSeriesLimitsSeparator);
+            if (timeValRange.Length != 2 || !IsStringFormat(input, syntaxConf.Symbols.Value.StringDelimeter))
+            {                
+                valueFormat = null;
+                return false;
+            }
+            if (IsValidTimestampFormat(CleanString(timeValRange[0], syntaxConf, true), timeInterval, syntaxConf) &&
+                IsValidTimestampFormat(CleanString(timeValRange[1], syntaxConf, true), timeInterval, syntaxConf))
+            {
+                valueFormat = ValueType.TimeValRange;
+                return true;
+            }
+            else
+            {
+                valueFormat = null;
+                return false;
+            }
         }
 
         /// <summary>
