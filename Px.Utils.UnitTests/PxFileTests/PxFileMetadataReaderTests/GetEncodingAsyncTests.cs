@@ -1,4 +1,4 @@
-﻿using PxUtils.PxFile.Meta;
+﻿using PxUtils.PxFile.Metadata;
 using PxUtils.UnitTests.PxFileTests.Fixtures;
 using System.Text;
 
