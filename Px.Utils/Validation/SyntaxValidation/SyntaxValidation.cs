@@ -38,7 +38,7 @@ namespace PxUtils.Validation.SyntaxValidation
         ///</summary>
         /// <param name="stream">The stream of the PX file to be validated.</param>
         /// <param name="filename">The name of the file to be validated.</param>
-        /// <param name="syntaxConf">An optional <see cref="pxsynta"/> parameter that specifies the syntax configuration for the PX file. If not provided, the default syntax configuration is used.</param>
+        /// <param name="syntaxConf">An optional <see cref="PxFileSyntaxConf"/> parameter that specifies the syntax configuration for the PX file. If not provided, the default syntax configuration is used.</param>
         /// <param name="bufferSize">An optional parameter that specifies the buffer size for reading the file. If not provided, a default buffer size of 4096 is used.</param>
         /// <param name="customValidationFunctions">An optional <see cref="CustomValidationFunctions"/> parameter that specifies custom validation functions to be used during validation. If not provided, the default validation functions are used.</param>
         /// <returns>A <see cref="SyntaxValidationResult"/> object which contains a <see cref="SyntaxValidationResult"/> and a list of <see cref="StructuredValidationEntry"/> objects. The ValidationReport contains feedback items that provide information about any syntax errors or warnings found during validation. The list of StructuredValidationEntry objects represents the structured entries in the PX file that were validated.</returns>
