@@ -48,11 +48,11 @@ namespace PxUtils.Validation.SyntaxValidation
                 Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream, syntaxConf, cancellationToken);
 
                 List<StringValidationEntry> stringEntries = await BuildStringEntriesAsync(stream, encoding, syntaxConf, filename, bufferSize);
-                SyntaxValidation.ValidateEntries(stringEntries, stringValidationFunctions, report, syntaxConf);
+                ValidateEntries(stringEntries, stringValidationFunctions, report, syntaxConf);
                 List<KeyValuePairValidationEntry> keyValuePairs = SyntaxValidation.BuildKeyValuePairs(stringEntries, syntaxConf);
-                SyntaxValidation.ValidateEntries(keyValuePairs, keyValueValidationFunctions, report, syntaxConf);
+                ValidateEntries(keyValuePairs, keyValueValidationFunctions, report, syntaxConf);
                 List<StructuredValidationEntry> structuredEntries = SyntaxValidation.BuildStructuredEntries(keyValuePairs, syntaxConf);
-                SyntaxValidation.ValidateEntries(structuredEntries, structuredValidationFunctions, report, syntaxConf);
+                ValidateEntries(structuredEntries, structuredValidationFunctions, report, syntaxConf);
 
                 return new(report, structuredEntries);
             }
@@ -65,7 +65,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static async Task<List<StringValidationEntry>> BuildStringEntriesAsync(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize)
         {
-            SyntaxValidation.LineCharacterState state = new() { Line = 0, Character = 0 };
+            LineCharacterState state = new() { Line = 0, Character = 0 };
             stream.Seek(0, SeekOrigin.Begin);
             using StreamReader reader = new(stream, encoding);
             List<StringValidationEntry> stringEntries = [];
@@ -74,7 +74,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             while (await reader.ReadAsync(buffer, 0, bufferSize) > 0)
             {
-                SyntaxValidation.ProcessBuffer(buffer, syntaxConf, state, filename, stringEntries, entryBuilder);
+                ProcessBuffer(buffer, syntaxConf, state, filename, stringEntries, entryBuilder);
                 Array.Clear(buffer, 0, buffer.Length);
             }
             return stringEntries;
