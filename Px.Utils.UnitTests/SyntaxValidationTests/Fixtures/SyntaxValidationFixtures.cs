@@ -54,10 +54,15 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             new(2, 0, "foo", new KeyValuePair<string, string>("BAZ[fi](\"first_specifier\" \"second_specifier\")", "NO\n"), PxFileSyntaxConf.Default)
                 ];
 
-        internal static List<KeyValuePairValidationEntry> ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_PARAM_SECTIONS => [
+        internal static List<KeyValuePairValidationEntry> ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_LANGUAGE_SECTIONS => [
             new(0, 0, "foo", new KeyValuePair<string, string>("FOO[\"fi\"](\"first_specifier\", \"second_specifier\")", "YES\n"), PxFileSyntaxConf.Default),
             new(1, 0, "foo", new KeyValuePair<string, string>("BAR[\"[first_specifier]\", \"second_specifier\"]", "NO\n"), PxFileSyntaxConf.Default),
             new(2, 0, "foo", new KeyValuePair<string, string>("BAZ[fi, en]", "NO\n"), PxFileSyntaxConf.Default)
+            ];
+
+        internal static List<KeyValuePairValidationEntry> ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS => [
+            new(0, 0, "foo", new KeyValuePair<string, string>("FOO([\"first_specifier\"], [\"second_specifier\"])", "YES\n"), PxFileSyntaxConf.Default),
+            new(2, 0, "foo", new KeyValuePair<string, string>("BAZ(\"spe(cifier\")", "NO\n"), PxFileSyntaxConf.Default)
             ];
 
         private const string multilineStringValue = "\"dis parturient montes nascetur ridiculus mus\"\n" +
@@ -81,6 +86,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             "\"id\", \"ornare\";\n";
         internal static List<KeyValuePairValidationEntry> ENTRIES_WITH_BAD_VALUES => [
             new(0, 0, "foo", new KeyValuePair<string, string>("CHARSET", "ANSI"), PxFileSyntaxConf.Default),
+            new(0, 0, "foo", new KeyValuePair<string, string>("FOO", "1 2 3"), PxFileSyntaxConf.Default),
             new(1, 0, "foo", new KeyValuePair<string, string>("FOO", badMultilineStringValue), PxFileSyntaxConf.Default),
             new(2, 0, "foo", new KeyValuePair<string, string>("BAR", badMultilineListValue), PxFileSyntaxConf.Default),
         ];

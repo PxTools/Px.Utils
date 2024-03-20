@@ -37,8 +37,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             SyntaxValidation.ValidateEntries(entries, functions, report);
 
             Assert.AreEqual(2, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackMultipleEntriesOnLine));
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackMultipleEntriesOnLine));
+            Assert.AreEqual(ValidationFeedbackRule.MultipleEntriesOnOneLine, report.FeedbackItems?[1].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.MultipleEntriesOnOneLine, report.FeedbackItems?[0].Feedback.Rule);
         }
 
         [TestMethod]
@@ -76,7 +76,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             SyntaxValidation.ValidateEntries(entries, functions, report);
 
             Assert.AreEqual(1, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackMoreThanOneLanguage));
+            Assert.AreEqual(ValidationFeedbackRule.MoreThanOneLanguageParameterSection, report.FeedbackItems?[0].Feedback.Rule);
         }
 
 
@@ -93,7 +93,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             SyntaxValidation.ValidateEntries(entries, functions, report);
 
             Assert.AreEqual(1, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackMoreThanOneSpecifier));
+            Assert.AreEqual(ValidationFeedbackRule.MoreThanOneSpecifierParameterSection, report.FeedbackItems?[0].Feedback.Rule);
         }
 
         [TestMethod]
@@ -109,9 +109,9 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             SyntaxValidation.ValidateEntries(entries, functions, report);
 
             Assert.AreEqual(3, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeyHasWrongOrder));
-            Assert.IsInstanceOfType(report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackKeyHasWrongOrder));
-            Assert.IsInstanceOfType(report.FeedbackItems?[2].Feedback, typeof(SyntaxValidationFeedbackMissingKeyword));
+            Assert.AreEqual(ValidationFeedbackRule.KeyHasWrongOrder, report.FeedbackItems?[0].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.KeyHasWrongOrder, report.FeedbackItems?[1].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.MissingKeyword, report.FeedbackItems?[2].Feedback.Rule);
         }
 
         [TestMethod]
@@ -120,69 +120,71 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_INVALID_SPECIFIERS;
             SyntaxValidationFunctions functionsObject = new();
-            List<ValidationFunctionDelegate> functions = [functionsObject.InvalidSpecifier];
+            List<ValidationFunctionDelegate> functions = [functionsObject.MoreThanTwoSpecifierParts, functionsObject.SpecifierPartNotEnclosed, functionsObject.NoDelimiterBetweenSpecifierParts];
             ValidationReport report = new();
 
             // Act
             SyntaxValidation.ValidateEntries(entries, functions, report);
 
             Assert.AreEqual(3, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackInvalidSpecifier));
-            Assert.IsInstanceOfType(report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackInvalidSpecifier));
-            Assert.IsInstanceOfType(report.FeedbackItems?[2].Feedback, typeof(SyntaxValidationFeedbackInvalidSpecifier));
+            Assert.AreEqual(ValidationFeedbackRule.TooManySpecifiers, report.FeedbackItems?[0].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.SpecifierPartNotEnclosed, report.FeedbackItems?[1].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.SpecifierDelimiterMissing, report.FeedbackItems?[2].Feedback.Rule);
         }
 
         [TestMethod]
-        public void ValidateEntries_CalledWith_ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_PARAM_SECTIONS_Returns_Result_With_Errors()
+        public void ValidateEntries_CalledWith_ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_LANGUAGE_SECTION_Returns_Result_With_Errors()
         {
             // Arrange
-            List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_PARAM_SECTIONS;
+            List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_LANGUAGE_SECTIONS;
             SyntaxValidationFunctions functionsObject = new();
-            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalSymbolsInKeyParamSection];
+            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalSymbolsInLanguageParamSection];
             ValidationReport report = new();
 
             // Act
             SyntaxValidation.ValidateEntries(entries, functions, report);
 
             Assert.AreEqual(3, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackIllegalSymbolsInParamSections));
-            Assert.IsInstanceOfType(report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackIllegalSymbolsInParamSections));
-            Assert.IsInstanceOfType(report.FeedbackItems?[2].Feedback, typeof(SyntaxValidationFeedbackIllegalSymbolsInParamSections));
+            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageParameter, report.FeedbackItems?[0].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageParameter, report.FeedbackItems?[1].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageParameter, report.FeedbackItems?[2].Feedback.Rule);
         }
-        
+
         [TestMethod]
-        public void ValidateEntries_CalledWith_ENTRIES_WITH_CORRECTLY_FORMATTED_LIST_AND_MULTILINE_STRING_Returns_No_Feedback()
+        public void ValidateEntries_CalledWith_ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS_Returns_Result_With_Errors()
         {
             // Arrange
-            List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_CORRECTLY_FORMATTED_LIST_AND_MULTILINE_STRING;
+            List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS;
             SyntaxValidationFunctions functionsObject = new();
-            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalValueFormat];
+            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalSymbolsInSpecifierParamSection];
             ValidationReport report = new();
 
             // Act
             SyntaxValidation.ValidateEntries(entries, functions, report);
 
-            Assert.AreEqual(0, report.FeedbackItems?.Count);
+            Assert.AreEqual(2, report.FeedbackItems?.Count);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, report.FeedbackItems?[0].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, report.FeedbackItems?[1].Feedback.Rule);
         }
 
         [TestMethod]
-        public void ValidateEntries_CalledWith_ENTRIES_WITH_BAD_VALUES_Returns_Valid_Errors()
+        public void ValidateEntries_CalledWith_ENTRIES_WITH_BAD_VALUES_Returns_Errors()
         {
 
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_BAD_VALUES;
             SyntaxValidationFunctions functionsObject = new();
-            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalValueFormat];
+            List<ValidationFunctionDelegate> functions = [functionsObject.InvalidValueFormat];
             ValidationReport report = new();
 
             // Act
             SyntaxValidation.ValidateEntries(entries, functions, report);
 
-            Assert.AreEqual(3, report.FeedbackItems?.Count);
-
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackInvalidValueSection));
-            Assert.IsInstanceOfType(report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackInvalidValueSection));
-            Assert.IsInstanceOfType(report.FeedbackItems?[2].Feedback, typeof(SyntaxValidationFeedbackInvalidValueSection));
+            Assert.AreEqual(4, report.FeedbackItems?.Count);
+            Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, report.FeedbackItems?[0].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, report.FeedbackItems?[1].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, report.FeedbackItems?[0].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, report.FeedbackItems?[1].Feedback.Rule);
         }
 
         [TestMethod]
@@ -198,7 +200,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             SyntaxValidation.ValidateEntries(entries, functions, report);
 
             Assert.AreEqual(1, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackValueContainsExcessWhitespace));
+            Assert.AreEqual(ValidationFeedbackRule.ExcessWhitespaceInValue, report.FeedbackItems?[0].Feedback.Rule);
         }
 
         [TestMethod]
@@ -214,7 +216,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             SyntaxValidation.ValidateEntries(entries, functions, report);
 
             Assert.AreEqual(1, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeyContainsExcessWhitespace));
+            Assert.AreEqual(ValidationFeedbackRule.KeyContainsExcessWhiteSpace, report.FeedbackItems?[0].Feedback.Rule);
         }
 
         [TestMethod]
@@ -230,8 +232,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             SyntaxValidation.ValidateEntries(entries, functions, report);
 
             Assert.AreEqual(2, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackExcessNewLinesInValue));
-            Assert.IsInstanceOfType(report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackExcessNewLinesInValue));
+            Assert.AreEqual(ValidationFeedbackRule.ExcessNewLinesInValue, report.FeedbackItems?[0].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.ExcessNewLinesInValue, report.FeedbackItems?[1].Feedback.Rule);
         }
 
         [TestMethod]
@@ -240,16 +242,16 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_INVALID_KEYWORDS;
             SyntaxValidationFunctions functionsObject = new();
-            List<ValidationFunctionDelegate> functions = [functionsObject.InvalidKeywordFormat];
+            List<ValidationFunctionDelegate> functions = [functionsObject.KeywordDoesntStartWithALetter, functionsObject.KeywordContainsIllegalCharacters];
             ValidationReport report = new();
 
             // Act
             SyntaxValidation.ValidateEntries(entries, functions, report);
 
             Assert.AreEqual(3, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackInvalidKeywordFormat));
-            Assert.IsInstanceOfType(report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackInvalidKeywordFormat));
-            Assert.IsInstanceOfType(report.FeedbackItems?[2].Feedback, typeof(SyntaxValidationFeedbackInvalidKeywordFormat));
+            Assert.AreEqual(ValidationFeedbackRule.KeywordDoesntStartWithALetter, report.FeedbackItems?[0].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInKeyword, report.FeedbackItems?[1].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInKeyword, report.FeedbackItems?[2].Feedback.Rule);
         }
 
         [TestMethod]
@@ -281,7 +283,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
 
             // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(1, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackInvalidLanguageFormat));
+            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageParameter, report.FeedbackItems?[0].Feedback.Rule);
         }
 
         [TestMethod]
@@ -298,7 +300,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
 
             // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(1, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackIllegalCharactersInSpecifier));
+            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, report.FeedbackItems?[0].Feedback.Rule);
         }
 
         [TestMethod]
@@ -315,7 +317,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
 
             // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(1, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackEntryWithoutValue));
+            Assert.AreEqual(ValidationFeedbackRule.EntryWithoutValue, report.FeedbackItems?[0].Feedback.Rule);
         }
 
         [TestMethod]
@@ -332,8 +334,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
 
             // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(2, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackIncompliantLanguageParam));
-            Assert.IsInstanceOfType(report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackIncompliantLanguageParam));
+            Assert.AreEqual(ValidationFeedbackRule.IncompliantLanguage, report.FeedbackItems?[0].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.IncompliantLanguage, report.FeedbackItems?[1].Feedback.Rule);
         }
 
         [TestMethod]
@@ -342,16 +344,15 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_UNRECOMMENDED_KEYWORD_NAMING;
             SyntaxValidationFunctions functionsObject = new();
-            List<ValidationFunctionDelegate> functions = [functionsObject.KeywordHasUnrecommendedCharacters];
+            List<ValidationFunctionDelegate> functions = [functionsObject.KeywordContainsUnderscore, functionsObject.KeywordIsNotInUpperCase];
             ValidationReport report = new();
 
             // Act
             SyntaxValidation.ValidateEntries(entries, functions, report);
 
-            // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(2, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeywordContainsUnrecommendedCharacters));
-            Assert.IsInstanceOfType(report.FeedbackItems?[1].Feedback, typeof(SyntaxValidationFeedbackKeywordContainsUnrecommendedCharacters));
+            Assert.AreEqual(ValidationFeedbackRule.KeywordIsNotInUpperCase, report.FeedbackItems?[0].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.KeywordContainsUnderscore, report.FeedbackItems?[1].Feedback.Rule);
         }
 
         [TestMethod]
@@ -368,7 +369,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
 
             // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(1, report.FeedbackItems?.Count);
-            Assert.IsInstanceOfType(report.FeedbackItems?[0].Feedback, typeof(SyntaxValidationFeedbackKeywordIsExcessivelyLong));
+            Assert.AreEqual(ValidationFeedbackRule.KeywordExcessivelyLong, report.FeedbackItems?[0].Feedback.Rule);
         }
 
         [TestMethod]
@@ -384,6 +385,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, filename);
 
             Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
+            Assert.AreEqual(ValidationFeedbackRule.NoEncoding, result.Report.FeedbackItems?[0].Feedback.Rule);
         }
     }
 }

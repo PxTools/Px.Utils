@@ -32,9 +32,10 @@ namespace PxUtils.Validation.SyntaxValidation
             CancellationToken cancellationToken = default)
         {
             SyntaxValidationFunctions validationFunctions = new();
+
             IEnumerable<ValidationFunctionDelegate> stringValidationFunctions = [
-            validationFunctions.MultipleEntriesOnLine,
-                validationFunctions.EntryWithoutValue
+                validationFunctions.MultipleEntriesOnLine,
+                validationFunctions.EntryWithoutValue,
             ];
             stringValidationFunctions = stringValidationFunctions.Concat(customStringValidationFunctions ?? []);
 
@@ -42,9 +43,12 @@ namespace PxUtils.Validation.SyntaxValidation
                 validationFunctions.MoreThanOneLanguageParameter,
                 validationFunctions.MoreThanOneSpecifierParameter,
                 validationFunctions.WrongKeyOrderOrMissingKeyword,
-                validationFunctions.InvalidSpecifier,
-                validationFunctions.IllegalSymbolsInKeyParamSection,
-                validationFunctions.IllegalValueFormat,
+                validationFunctions.SpecifierPartNotEnclosed,
+                validationFunctions.MoreThanTwoSpecifierParts,
+                validationFunctions.NoDelimiterBetweenSpecifierParts,
+                validationFunctions.IllegalSymbolsInLanguageParamSection,
+                validationFunctions.IllegalSymbolsInSpecifierParamSection,
+                validationFunctions.InvalidValueFormat,
                 validationFunctions.ExcessWhitespaceInValue,
                 validationFunctions.KeyContainsExcessWhiteSpace,
                 validationFunctions.ExcessNewLinesInValue
@@ -52,11 +56,13 @@ namespace PxUtils.Validation.SyntaxValidation
             keyValueValidationFunctions = keyValueValidationFunctions.Concat(customKeyValueValidationFunctions ?? []);
 
             IEnumerable<ValidationFunctionDelegate> structuredValidationFunctions = [
-                validationFunctions.InvalidKeywordFormat,
+                validationFunctions.KeywordContainsIllegalCharacters,
+                validationFunctions.KeywordDoesntStartWithALetter,
                 validationFunctions.IllegalCharactersInLanguageParameter,
                 validationFunctions.IllegalCharactersInSpecifierParameter,
                 validationFunctions.IncompliantLanguage,
-                validationFunctions.KeywordHasUnrecommendedCharacters,
+                validationFunctions.KeywordContainsUnderscore,
+                validationFunctions.KeywordIsNotInUpperCase,
                 validationFunctions.KeywordIsExcessivelyLong
             ];
             structuredValidationFunctions = structuredValidationFunctions.Concat(customStructuredValidationFunctions ?? []);
@@ -79,7 +85,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
             catch (InvalidPxFileMetadataException)
             {
-                report.FeedbackItems.Add(new ValidationFeedbackItem(new StringValidationEntry(0, 0, filename, string.Empty, syntaxConf, 0), new SyntaxValidationFeedbackNoEncoding()));
+                report.FeedbackItems.Add(new ValidationFeedbackItem(new StringValidationEntry(0, 0, filename, string.Empty, syntaxConf, 0), new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.NoEncoding)));
                 return new(report, []);
             }
         }

@@ -24,7 +24,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
             else
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackMultipleEntriesOnLine());
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.MultipleEntriesOnOneLine));
             }
         };
 
@@ -45,7 +45,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             if (hasMultipleParameters)
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackMoreThanOneLanguage());
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MoreThanOneLanguageParameterSection));
             }
             else
             {
@@ -70,7 +70,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             if (hasMultipleParameters)
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackMoreThanOneSpecifier());
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MoreThanOneSpecifierParameterSection));
             }
             else
             {
@@ -95,7 +95,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             if (keyword.Trim() == string.Empty)
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackMissingKeyword());
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingKeyword));
             }
 
             int langParamStartIndex = key.IndexOf(syntaxConf.Symbols.Key.LangParamStart);
@@ -111,7 +111,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 key.Trim().StartsWith(syntaxConf.Symbols.Key.LangParamStart)
                 )
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackKeyHasWrongOrder());
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.KeyHasWrongOrder));
             }
             else
             {
@@ -120,11 +120,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="ValidationEntry"/> entry. If the specifier is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the key contains more than two specifiers, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier is not following a valid format, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate InvalidSpecifier = (ValidationEntry entry) =>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if more than two specifiers are found, null otherwise.</returns>
+        public readonly ValidationFunctionDelegate MoreThanTwoSpecifierParts = (ValidationEntry entry) =>
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -138,6 +138,7 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 return null;
             }
+
             ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                 specifierParamSection,
                 keyValueValidationEntry.SyntaxConf.Symbols.Key.StringDelimeter
@@ -145,30 +146,44 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string[] specifiers = specifierResult.Sections;
 
-            List<string> validationFailureReasons = [];
-
             if (specifiers.Length > 2)
             {
-                validationFailureReasons.Add("More than two specifier parts.");
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.TooManySpecifiers));
             }
 
-            if (specifiers.Length > 1 && !specifierResult.Remainder.Contains(','))
+            return null;
+        };
+
+        /// <summary>
+        /// Validates the given <see cref="ValidationEntry"/> entry. If there is no delimeter between specifier parts, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if there is no delimeter between specifier parts, null otherwise.</returns>
+        public readonly ValidationFunctionDelegate NoDelimiterBetweenSpecifierParts = (ValidationEntry entry) =>
+        {
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+
+            string? specifierParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
+                                    keyValueValidationEntry.KeyValueEntry.Key,
+                                    keyValueValidationEntry.SyntaxConf.Symbols.Key.SpecifierParamStart,
+                                    keyValueValidationEntry.SyntaxConf.Symbols.Key.SpecifierParamEnd
+                                ).Sections.FirstOrDefault();
+
+            if (specifierParamSection is null)
             {
-                validationFailureReasons.Add("Specifiers are not separated with a \",\"");
+                return null;
             }
 
-            foreach (string specifier in specifierParamSection.Split(","))
-            {
-                string trimmedSpecifier = specifier.Trim();
-                if (!trimmedSpecifier.StartsWith(keyValueValidationEntry.SyntaxConf.Symbols.Key.StringDelimeter) || !trimmedSpecifier.EndsWith(keyValueValidationEntry.SyntaxConf.Symbols.Key.StringDelimeter))
-                {
-                    validationFailureReasons.Add($"{specifier} is not enclosed with \"\".");
-                }
-            }
+            ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(
+                specifierParamSection,
+                keyValueValidationEntry.SyntaxConf.Symbols.Key.StringDelimeter
+                );
 
-            if (validationFailureReasons.Count > 0)
+            string[] specifiers = specifierResult.Sections;
+
+            if (specifiers.Length > 1 && !specifierResult.Remainder.Contains(keyValueValidationEntry.SyntaxConf.Symbols.Key.ListSeparator))
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackInvalidSpecifier([.. validationFailureReasons]));
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.SpecifierDelimiterMissing));
             }
             else
             {
@@ -177,11 +192,43 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="ValidationEntry"/> entry. If the key parameter section contains illegal symbols, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If any of the specifiers are not enclosed a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key parameter section contains illegal symbols, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate IllegalSymbolsInKeyParamSection = (ValidationEntry entry) =>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if specifier parts are not enclosed, null otherwise.</returns>
+        public readonly ValidationFunctionDelegate SpecifierPartNotEnclosed = (ValidationEntry entry) =>
+        {
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+
+            string? specifierParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
+                                    keyValueValidationEntry.KeyValueEntry.Key,
+                                    keyValueValidationEntry.SyntaxConf.Symbols.Key.SpecifierParamStart,
+                                    keyValueValidationEntry.SyntaxConf.Symbols.Key.SpecifierParamEnd
+                                ).Sections.FirstOrDefault();
+
+            if (specifierParamSection == null)
+            {
+                return null;
+            }
+
+            foreach (string specifier in specifierParamSection.Split(keyValueValidationEntry.SyntaxConf.Symbols.Key.ListSeparator))
+            {
+                string trimmedSpecifier = specifier.Trim();
+                if (!trimmedSpecifier.StartsWith(keyValueValidationEntry.SyntaxConf.Symbols.Key.StringDelimeter) || !trimmedSpecifier.EndsWith(keyValueValidationEntry.SyntaxConf.Symbols.Key.StringDelimeter))
+                {
+                    return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.SpecifierPartNotEnclosed));
+                }
+            }
+
+            return null;
+        };
+
+        /// <summary>
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the key language section contains illegal symbols, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key language section contains illegal symbols, null otherwise.</returns>
+        public readonly ValidationFunctionDelegate IllegalSymbolsInLanguageParamSection = (ValidationEntry entry) =>
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -189,9 +236,6 @@ namespace PxUtils.Validation.SyntaxValidation
             PxFileSyntaxConf syntaxConf = keyValueValidationEntry.SyntaxConf;
 
             string languageParamSections = string.Join("", SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.LangParamStart, syntaxConf.Symbols.Key.LangParamEnd).Sections);
-            string specifierParamSections = string.Join("", SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf.Symbols.Key.SpecifierParamEnd).Sections);
-
-            List<string> reasons = [];
 
             char[] languageParamIllegalSymbols = [
                 syntaxConf.Symbols.Key.LangParamStart,
@@ -201,27 +245,43 @@ namespace PxUtils.Validation.SyntaxValidation
                 syntaxConf.Symbols.Key.ListSeparator
                 ];
 
+            char[] illegalSymbolsFoundInLanguageParam = languageParamIllegalSymbols.Where(languageParamSections.Contains).ToArray();
+
+            if (illegalSymbolsFoundInLanguageParam.Length > 0)
+            {
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInLanguageParameter));
+            }
+            else
+            {
+                return null;
+            }
+        };
+
+        /// <summary>
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the key specifier section contains illegal symbols, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key specifier section contains illegal symbols, null otherwise.</returns>
+        public readonly ValidationFunctionDelegate IllegalSymbolsInSpecifierParamSection = (ValidationEntry entry) =>
+        {
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+
+            string key = keyValueValidationEntry.KeyValueEntry.Key;
+            PxFileSyntaxConf syntaxConf = keyValueValidationEntry.SyntaxConf;
+
+            string specifierParamSections = string.Join("", SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf.Symbols.Key.SpecifierParamEnd).Sections);
+
             char[] specifierParamIllegalSymbols = [
                 syntaxConf.Symbols.Key.SpecifierParamStart,
                 syntaxConf.Symbols.Key.LangParamStart,
                 syntaxConf.Symbols.Key.LangParamEnd
             ];
 
-            char[] illegalSymbolsFoundInLanguageParam = languageParamIllegalSymbols.Where(languageParamSections.Contains).ToArray();
             char[] illegalSymbolsFoundInSpecifierParam = specifierParamIllegalSymbols.Where(specifierParamSections.Contains).ToArray();
 
-            if (illegalSymbolsFoundInLanguageParam.Length > 0)
-            {
-                reasons.Add($"Illegal symbols found in language parameter section: {string.Join(", ", illegalSymbolsFoundInLanguageParam)}");
-            }
             if (illegalSymbolsFoundInSpecifierParam.Length > 0)
             {
-                reasons.Add($"Illegal symbols found in specifier parameter section: {string.Join(", ", illegalSymbolsFoundInSpecifierParam)}");
-            }
-
-            if (reasons.Count > 0)
-            {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackIllegalSymbolsInParamSections([.. reasons]));
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInSpecifierParameter));
             }
             else
             {
@@ -234,7 +294,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section is not following a valid format, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate IllegalValueFormat = (ValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate InvalidValueFormat = (ValidationEntry entry) =>
         {
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
 
@@ -245,14 +305,12 @@ namespace PxUtils.Validation.SyntaxValidation
 
             if (type is null)
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackInvalidValueSection("No compliant format was found."));
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.InvalidValueFormat));
             }
-            else if ((type == ValueType.ListOfStrings || type == ValueType.String) && !SyntaxValidationUtilityMethods.ValueLineChangesAreCompliant(value, syntaxConf, type == ValueType.ListOfStrings))
+            else
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackInvalidValueSection("Uncompliant line changes found."));
+                return null;
             }
-
-            return null;
         };
 
         /// <summary>
@@ -280,7 +338,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string stripItems = SyntaxValidationUtilityMethods.ExtractSectionFromString(value, keyValueValidationEntry.SyntaxConf.Symbols.Key.StringDelimeter).Remainder;
             if (stripItems.Contains("  "))
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackValueContainsExcessWhitespace());
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessWhitespaceInValue));
             }
             else
             {
@@ -307,12 +365,12 @@ namespace PxUtils.Validation.SyntaxValidation
             // There should be only one whitespace in the key part, separating specifier parts
             else if (whiteSpaces.Count() > 1)
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackKeyContainsExcessWhitespace());
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.KeyContainsExcessWhiteSpace));
             }
             // If whitespace is found without a comma separating the specifier parts, it is considered excess
             else if (!key.Contains($"{keyValueValidationEntry.SyntaxConf.Symbols.Key.ListSeparator} "))
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackKeyContainsExcessWhitespace());
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.KeyContainsExcessWhiteSpace));
             }
             else
             {
@@ -343,7 +401,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             if (value.Contains(keyValueValidationEntry.SyntaxConf.Symbols.LineSeparator))
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackExcessNewLinesInValue());
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessNewLinesInValue));
             }
             else
             {
@@ -352,11 +410,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="ValidationEntry"/> entry. If the keyword is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the keyword contains illegal characters, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword is not following a valid format, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate InvalidKeywordFormat = (ValidationEntry entry) =>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword contains illegal characters, null otherwise.</returns>
+        public readonly ValidationFunctionDelegate KeywordContainsIllegalCharacters = (ValidationEntry entry) =>
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
 
@@ -366,8 +424,6 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 return null;
             }
-
-            List<string> reasons = [];
 
             // Check if keyword contains only letters, numbers, - and _
             string legalSymbolsKeyword = @"a-zA-Z0-9_-";
@@ -380,23 +436,37 @@ namespace PxUtils.Validation.SyntaxValidation
                 List<string> illegalSymbolsInKeyWord = matchesKeyword.Cast<Match>().Select(m => m.Value).Distinct().ToList();
                 if (illegalSymbolsInKeyWord.Count > 0)
                 {
-                    reasons.Add($"Keyword contains illegal characters: {string.Join(", ", illegalSymbolsInKeyWord)}");
+                    return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInKeyword, string.Join(", ", illegalSymbolsInKeyWord)));
                 }
             }
             catch (RegexMatchTimeoutException)
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackRegexTimeOut("keyword", keyword));
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.KeyworRegexTimeout));
+            }
+
+            return null;
+        };
+
+        /// <summary>
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the doesn't start with a letter, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword doesn't start with a letter, null otherwise.</returns>
+        public readonly ValidationFunctionDelegate KeywordDoesntStartWithALetter = (ValidationEntry entry) =>
+        {
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+
+            string keyword = structuredValidationEntry.Key.Keyword;
+            // Missing keyword is catched earlier
+            if (keyword.Length == 0)
+            {
+                return null;
             }
 
             // Check if keyword starts with a letter
             if (!char.IsLetter(keyword[0]))
             {
-                reasons.Add("Keyword doesn't start with a letter");
-            }
-
-            if (reasons.Count > 0)
-            {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackInvalidKeywordFormat([.. reasons]));
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.KeywordDoesntStartWithALetter));
             }
             else
             {
@@ -420,10 +490,8 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string lang = structuredValidationEntry.Key.Language;
 
-            List<string> reasons = [];
-
             // Find illegal characters from language parameter string
-            string illegalCharacters = @"[;=\[\]""]";
+            string illegalCharacters = @"[;=\[\]"" ]";
             TimeSpan timeout = TimeSpan.FromSeconds(1);
             // Find all illegal symbols in keyword
             try
@@ -433,27 +501,15 @@ namespace PxUtils.Validation.SyntaxValidation
                 // Check if there are any special characters or whitespace in lang
                 if (foundIllegalCharacters.Count > 0)
                 {
-                    reasons.Add($"Language parameter contains illegal characters: {string.Join(", ", foundIllegalCharacters)}");
+                    return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInLanguageParameter, string.Join(", ", foundIllegalCharacters)));
                 }
             }
             catch (RegexMatchTimeoutException)
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackRegexTimeOut("language", lang));
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.LanguageRegexTimeout));
             }
 
-            if (lang.Contains(' '))
-            {
-                reasons.Add("Language parameter contains whitespace character(s)");
-            }
-
-            if (reasons.Count > 0)
-            {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackInvalidLanguageFormat([.. reasons]));
-            }
-            else
-            {
-                return null;
-            }
+            return null;
         };
 
         /// <summary>
@@ -470,23 +526,14 @@ namespace PxUtils.Validation.SyntaxValidation
                 return null;
             }
 
-            List<string> reasons = [];
+            List<string> characters = [];
 
-            char[] illegalCharactersFoundInFirstSpecifier = FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.FirstSpecifier);
-            char[] illegalCharactersFoundInSecondSpecifier = FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.SecondSpecifier);
+            characters.AddRange(FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.FirstSpecifier));
+            characters.AddRange(FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.SecondSpecifier));
 
-            if (illegalCharactersFoundInFirstSpecifier.Length > 0)
+            if (characters.Count > 0)
             {
-                reasons.Add($"Illegal characters found in first specifier: {string.Join(", ", illegalCharactersFoundInFirstSpecifier)}");
-            }
-            if (illegalCharactersFoundInSecondSpecifier.Length > 0)
-            {
-                reasons.Add($"Illegal characters found in second specifier: {string.Join(", ", illegalCharactersFoundInSecondSpecifier)}");
-            }
-
-            if (reasons.Count > 0)
-            {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackIllegalCharactersInSpecifier([.. reasons]));
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, string.Join(", ", characters)));
             }
             else
             {
@@ -494,14 +541,14 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         };
 
-        private static char[] FindIllegalCharactersInSpecifierPart(string? specifier)
+        private static string[] FindIllegalCharactersInSpecifierPart(string? specifier)
         {
             if (specifier is null)
             {
                 return [];
             }
 
-            char[] illegalCharacters = [';', '"', ','];
+            string[] illegalCharacters = [";", "\"", ","];
             return illegalCharacters.Where(specifier.Contains).ToArray();
         }
 
@@ -516,7 +563,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             if (!stringEntry.EntryString.Contains(stringEntry.SyntaxConf.Symbols.KeywordSeparator))
             {                 
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackEntryWithoutValue());
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.EntryWithoutValue));
             }
             else
             {
@@ -549,7 +596,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
             else
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackIncompliantLanguageParam());
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.IncompliantLanguage));
             }
 
         };
@@ -559,26 +606,36 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword contains unrecommended characters, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate KeywordHasUnrecommendedCharacters = (ValidationEntry entry) =>
+        public readonly ValidationFunctionDelegate KeywordContainsUnderscore = (ValidationEntry entry) =>
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
 
             string keyword = structuredValidationEntry.Key.Keyword;
-            List<string> reasons = [];
+            if (keyword.Contains('_'))
+            {
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.KeywordContainsUnderscore));
+            }
+            else
+            {
+                return null;
+            }
+        };
+
+        /// <summary>
+        /// Validates the given <see cref="ValidationEntry"/> entry. If the keyword is not in upper case, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// </summary>
+        /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate</param>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword is not in upper case, otherwise null</returns>
+        public readonly ValidationFunctionDelegate KeywordIsNotInUpperCase = (ValidationEntry entry) =>
+        {
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+
+            string keyword = structuredValidationEntry.Key.Keyword;
             string uppercaseKeyword = keyword.ToUpper();
 
             if (uppercaseKeyword != keyword)
             {
-                reasons.Add("Keyword should be in upper case");    
-            }
-            if (keyword.Contains('_'))
-            {
-                reasons.Add("Keyword should not contain _. Using - is recommended instead");
-            }
-
-            if (reasons.Count > 0)
-            {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackKeywordContainsUnrecommendedCharacters([.. reasons]));
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.KeywordIsNotInUpperCase));
             }
             else
             {
@@ -599,7 +656,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             if (keyword.Length > 20)
             {
-                return new ValidationFeedbackItem(entry, new SyntaxValidationFeedbackKeywordIsExcessivelyLong());
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.KeywordExcessivelyLong));
             }
             else
             {

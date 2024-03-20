@@ -21,4 +21,32 @@
         DateTime,
         Timeval
     }
+
+    public enum ValidationFeedbackRule
+    {
+        MultipleEntriesOnOneLine,
+        NoEncoding,
+        MoreThanOneLanguageParameterSection,
+        MoreThanOneSpecifierParameterSection,
+        KeyHasWrongOrder,
+        MissingKeyword,
+        TooManySpecifiers,
+        SpecifierDelimiterMissing,
+        SpecifierPartNotEnclosed,
+        InvalidValueFormat,
+        ExcessWhitespaceInValue,
+        KeyContainsExcessWhiteSpace,
+        ExcessNewLinesInValue,
+        IllegalCharactersInKeyword,
+        KeywordDoesntStartWithALetter,
+        KeyworRegexTimeout,
+        LanguageRegexTimeout,
+        IllegalCharactersInLanguageParameter,
+        IllegalCharactersInSpecifierParameter,
+        EntryWithoutValue,
+        IncompliantLanguage,
+        KeywordContainsUnderscore,
+        KeywordIsNotInUpperCase,
+        KeywordExcessivelyLong
+    }
 }
