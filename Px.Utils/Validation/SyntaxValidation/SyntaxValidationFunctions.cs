@@ -573,13 +573,12 @@ namespace PxUtils.Validation.SyntaxValidation
                 return null;
             }
 
-            List<string> characters = [];
+            string[] illegalcharactersInFirstSpecifier = FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.FirstSpecifier);
+            string[] illegalcharactersInSecondSpecifier = FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.SecondSpecifier);
 
-            characters.AddRange(FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.FirstSpecifier));
-            characters.AddRange(FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.SecondSpecifier));
-
-            if (characters.Count > 0)
+            if (illegalcharactersInFirstSpecifier.Length > 0 || illegalcharactersInSecondSpecifier.Length > 0)
             {
+                string[] characters = [.. illegalcharactersInFirstSpecifier, .. illegalcharactersInSecondSpecifier];
                 return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, string.Join(", ", characters)));
             }
             else
