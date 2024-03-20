@@ -202,7 +202,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>Returns a boolean which is true if the line changes in the input string are compliant with the syntax configuration</returns>
         public static bool ValueLineChangesAreCompliant(string input, PxFileSyntaxConf syntaxConf, bool isList)
         {
-            int lineChangeIndex = input.IndexOf(syntaxConf.Symbols.LineBreak);
+            int lineChangeIndex = input.IndexOf(syntaxConf.Symbols.Linebreak);
             while (lineChangeIndex != -1)
             {
                 char symbolBefore = isList ? syntaxConf.Symbols.Key.ListSeparator : syntaxConf.Symbols.Key.StringDelimeter;
@@ -210,7 +210,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 {
                     return false;
                 }
-                lineChangeIndex = input.IndexOf(syntaxConf.Symbols.LineBreak, lineChangeIndex + 1);
+                lineChangeIndex = input.IndexOf(syntaxConf.Symbols.Linebreak, lineChangeIndex + 1);
             }
             return true;
         }

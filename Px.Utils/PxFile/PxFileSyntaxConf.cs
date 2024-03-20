@@ -49,11 +49,13 @@
             private const char KEYWORD_SEPARATOR_DEFAULT = '=';
             private const char ENTRY_SEPARATOR_DEFAULT = ';';
             private const char LINE_BREAK_DEFAULT = '\n';
+            private const string WINDOWS_LINE_BREAK_DEFAULT = "\r\n";
             private const char END_OF_STREAM_DEFAULT = '\0';
 
             public char KeywordSeparator { get; set; } = KEYWORD_SEPARATOR_DEFAULT;
             public char EntrySeparator { get; set; } = ENTRY_SEPARATOR_DEFAULT;
-            public char LineBreak { get; set; } = LINE_BREAK_DEFAULT;
+            public char Linebreak { get; set; } = LINE_BREAK_DEFAULT;
+            public string WindowsLinebreak { get; set; } = WINDOWS_LINE_BREAK_DEFAULT;
             public char EndOfStream { get; set; } = END_OF_STREAM_DEFAULT;
 
             public KeySymbols Key { get; set; }

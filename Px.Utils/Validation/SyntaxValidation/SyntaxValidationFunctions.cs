@@ -70,7 +70,10 @@ namespace PxUtils.Validation.SyntaxValidation
             StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRING_ENTRY);
 
             // If the entry does not start with a line separator, it is not on its own line. For the first entry this is not relevant.
-            if (stringEntry.EntryIndex == 0 || stringEntry.EntryString.StartsWith(syntaxConf.Symbols.LineBreak))
+            if (
+            stringEntry.EntryIndex == 0 || 
+            stringEntry.EntryString.StartsWith(syntaxConf.Symbols.Linebreak) ||
+            stringEntry.EntryString.StartsWith(syntaxConf.Symbols.WindowsLinebreak))
             {
                 return null;
             }
@@ -415,8 +418,9 @@ namespace PxUtils.Validation.SyntaxValidation
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
 
             string key = keyValueValidationEntry.KeyValueEntry.Key;
+            string stripSpecifiers = SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.StringDelimeter).Remainder;
 
-            IEnumerable<char> whiteSpaces = key.Where(c => c == ' ');
+            IEnumerable<char> whiteSpaces = stripSpecifiers.Where(c => c == ' ');
             if (!whiteSpaces.Any())
             {
                 return null;
@@ -459,7 +463,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string value = keyValueValidationEntry.KeyValueEntry.Value;
 
-            if (value.Contains(syntaxConf.Symbols.LineBreak))
+            if (value.Contains(syntaxConf.Symbols.Linebreak))
             {
                 return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessNewLinesInValue));
             }

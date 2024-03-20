@@ -226,14 +226,14 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static void ProcessBuffer(char[] buffer, PxFileSyntaxConf syntaxConf, LineCharacterState state, string filename, List<StringValidationEntry> stringEntries, StringBuilder entryBuilder)
         {
-            foreach (char currentCharacter in buffer)
+            for (int i = 0; i < buffer.Length; i++)
             {
-                if (IsEndOfMetadataSection(currentCharacter, syntaxConf, entryBuilder))
+                if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder))
                 {
                     break;
                 }
-                UpdateLineAndCharacter(currentCharacter, syntaxConf, state);
-                CheckForEntryEnd(currentCharacter, syntaxConf, state, filename, stringEntries, entryBuilder);
+                UpdateLineAndCharacter(buffer[i], syntaxConf, state);
+                CheckForEntryEnd(buffer[i], syntaxConf, state, filename, stringEntries, entryBuilder);
             }
         }
 
@@ -250,7 +250,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static void UpdateLineAndCharacter(char currentCharacter, PxFileSyntaxConf syntaxConf, LineCharacterState state)
         {
-            if (currentCharacter == syntaxConf.Symbols.LineBreak)
+            if (currentCharacter == syntaxConf.Symbols.Linebreak)
             {
                 state.Line++;
                 state.Character = 0;
