@@ -8,7 +8,7 @@ namespace PxUtils.Validation.SyntaxValidation
     public static class Bcp47Codes
     {
         /// <summary>
-        /// An immutable hash set of BCP-47 language codes.
+        /// Set of BCP-47 language codes.
         /// </summary>
         public static readonly ImmutableHashSet<string> Codes =
         [

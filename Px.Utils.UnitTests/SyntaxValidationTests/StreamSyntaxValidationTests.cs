@@ -2,12 +2,18 @@
 using PxUtils.UnitTests.SyntaxValidationTests.Fixtures;
 using System.Text;
 using PxUtils.Validation;
+using PxUtils.PxFile;
 
 namespace PxUtils.UnitTests.SyntaxValidationTests
 {
     [TestClass]
     public class StreamSyntaxValidationTests
     {
+        private readonly string filename = "foo";
+        private readonly ValidationReport report = new();
+        private readonly SyntaxValidationFunctions functionsObject = new();
+        private readonly PxFileSyntaxConf syntaxConf = PxFileSyntaxConf.Default;
+
         [TestMethod]
         public void ValidatePxFileSyntax_CalledWith_MINIMAL_UTF8_Returns_Valid_Result()
         {
@@ -15,7 +21,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N);
             using Stream stream = new MemoryStream(data);
             stream.Seek(0, SeekOrigin.Begin);
-            string filename = "foo";
 
             // Act
             SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, filename);
@@ -29,12 +34,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StringValidationEntry> entries = SyntaxValidationFixtures.MULTIPLE_ENTRIES_IN_SINGLE_LINE;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.MultipleEntriesOnLine];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(2, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.MultipleEntriesOnOneLine, report.FeedbackItems?[1].Feedback.Rule);
@@ -48,7 +51,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_SPECIFIERS);
             using Stream stream = new MemoryStream(data);
             stream.Seek(0, SeekOrigin.Begin);
-            string filename = "foo";
 
             // Act
             SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, filename);
@@ -68,12 +70,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_MULTIPLE_LANGUAGE_PARAMETERS;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.MoreThanOneLanguageParameter];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(1, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.MoreThanOneLanguageParameterSection, report.FeedbackItems?[0].Feedback.Rule);
@@ -85,12 +85,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_MULTIPLE_SPECIFIER_PARAMETER_SECTIONS;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.MoreThanOneSpecifierParameter];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(1, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.MoreThanOneSpecifierParameterSection, report.FeedbackItems?[0].Feedback.Rule);
@@ -101,12 +99,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_IN_WRONG_ORDER_AND_MISSING_KEYWORD;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.WrongKeyOrderOrMissingKeyword];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(3, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeyHasWrongOrder, report.FeedbackItems?[0].Feedback.Rule);
@@ -119,12 +115,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_INVALID_SPECIFIERS;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.MoreThanTwoSpecifierParts, functionsObject.SpecifierPartNotEnclosed, functionsObject.NoDelimiterBetweenSpecifierParts];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(3, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.TooManySpecifiers, report.FeedbackItems?[0].Feedback.Rule);
@@ -137,12 +131,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_LANGUAGE_SECTIONS;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.IllegalSymbolsInLanguageParamSection];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(3, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageParameter, report.FeedbackItems?[0].Feedback.Rule);
@@ -155,12 +147,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.IllegalSymbolsInSpecifierParamSection];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(2, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, report.FeedbackItems?[0].Feedback.Rule);
@@ -173,12 +163,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
 
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_BAD_VALUES;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.InvalidValueFormat];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(4, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, report.FeedbackItems?[0].Feedback.Rule);
@@ -192,12 +180,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_EXCESS_LIST_VALUE_WHITESPACE;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.ExcessWhitespaceInValue];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(1, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.ExcessWhitespaceInValue, report.FeedbackItems?[0].Feedback.Rule);
@@ -208,12 +194,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_EXCESS_KEY_WHITESPACE;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.KeyContainsExcessWhiteSpace];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(1, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeyContainsExcessWhiteSpace, report.FeedbackItems?[0].Feedback.Rule);
@@ -224,12 +208,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_SHORT_MULTILINE_VALUES;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.ExcessNewLinesInValue];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(2, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.ExcessNewLinesInValue, report.FeedbackItems?[0].Feedback.Rule);
@@ -241,12 +223,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_INVALID_KEYWORDS;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.KeywordDoesntStartWithALetter, functionsObject.KeywordContainsIllegalCharacters];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(3, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeywordDoesntStartWithALetter, report.FeedbackItems?[0].Feedback.Rule);
@@ -259,12 +239,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_VALID_LANGUAGES;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.IllegalCharactersInLanguageParameter];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(0, report.FeedbackItems?.Count);
         }
@@ -274,12 +252,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_INVALID_LANGUAGES;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.IllegalCharactersInLanguageParameter];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(1, report.FeedbackItems?.Count);
@@ -291,12 +267,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.IllegalCharactersInSpecifierParameter];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(1, report.FeedbackItems?.Count);
@@ -308,12 +282,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StringValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITHOUT_VALUE;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.EntryWithoutValue];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(1, report.FeedbackItems?.Count);
@@ -325,12 +297,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_INCOMPLIANT_LANGUAGES;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.IncompliantLanguage];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(2, report.FeedbackItems?.Count);
@@ -343,12 +313,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_UNRECOMMENDED_KEYWORD_NAMING;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.KeywordContainsUnderscore, functionsObject.KeywordIsNotInUpperCase];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             Assert.AreEqual(2, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeywordIsNotInUpperCase, report.FeedbackItems?[0].Feedback.Rule);
@@ -360,12 +328,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_LONG_KEYWORD;
-            SyntaxValidationFunctions functionsObject = new();
             List<ValidationFunctionDelegate> functions = [functionsObject.KeywordIsExcessivelyLong];
-            ValidationReport report = new();
 
             // Act
-            SyntaxValidation.ValidateEntries(entries, functions, report);
+            SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(1, report.FeedbackItems?.Count);
@@ -379,7 +345,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UNKNOWN_ENCODING);
             using Stream stream = new MemoryStream(data);
             stream.Seek(0, SeekOrigin.Begin);
-            string filename = "foo";
 
             // Act
             SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, filename);

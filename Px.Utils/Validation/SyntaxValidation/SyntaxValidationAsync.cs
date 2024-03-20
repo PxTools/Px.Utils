@@ -75,17 +75,17 @@ namespace PxUtils.Validation.SyntaxValidation
                 Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream, syntaxConf, cancellationToken);
 
                 List<StringValidationEntry> stringEntries = await BuildStringEntriesAsync(stream, encoding, syntaxConf, filename, bufferSize);
-                SyntaxValidation.ValidateEntries(stringEntries, stringValidationFunctions, report);
+                SyntaxValidation.ValidateEntries(stringEntries, stringValidationFunctions, report, syntaxConf);
                 List<KeyValuePairValidationEntry> keyValuePairs = SyntaxValidation.BuildKeyValuePairs(stringEntries, syntaxConf);
-                SyntaxValidation.ValidateEntries(keyValuePairs, keyValueValidationFunctions, report);
-                List<StructuredValidationEntry> structuredEntries = SyntaxValidation.BuildStructuredEntries(keyValuePairs);
-                SyntaxValidation.ValidateEntries(structuredEntries, structuredValidationFunctions, report);
+                SyntaxValidation.ValidateEntries(keyValuePairs, keyValueValidationFunctions, report, syntaxConf);
+                List<StructuredValidationEntry> structuredEntries = SyntaxValidation.BuildStructuredEntries(keyValuePairs, syntaxConf);
+                SyntaxValidation.ValidateEntries(structuredEntries, structuredValidationFunctions, report, syntaxConf);
 
                 return new(report, structuredEntries);
             }
             catch (InvalidPxFileMetadataException)
             {
-                report.FeedbackItems.Add(new ValidationFeedbackItem(new StringValidationEntry(0, 0, filename, string.Empty, syntaxConf, 0), new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.NoEncoding)));
+                report.FeedbackItems.Add(new ValidationFeedbackItem(new StringValidationEntry(0, 0, filename, string.Empty, 0), new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.NoEncoding)));
                 return new(report, []);
             }
         }
@@ -124,7 +124,7 @@ namespace PxUtils.Validation.SyntaxValidation
                     if (currentCharacter == syntaxConf.Symbols.SectionSeparator)
                     {
                         string stringEntry = entryBuilder.ToString();
-                        stringEntries.Add(new StringValidationEntry(line, character, filename, stringEntry, syntaxConf, stringEntries.Count));
+                        stringEntries.Add(new StringValidationEntry(line, character, filename, stringEntry, stringEntries.Count));
                         entryBuilder.Clear();
                     }
                     else

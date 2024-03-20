@@ -1,12 +1,16 @@
 ﻿using PxUtils.Validation.SyntaxValidation;
 using PxUtils.UnitTests.SyntaxValidationTests.Fixtures;
 using System.Text;
+using PxUtils.PxFile;
+using PxUtils.Validation;
 
 namespace PxUtils.UnitTests.SyntaxValidationTests
 {
     [TestClass]
     public class StreamSyntaxValidationAsyncTests
     {
+        private readonly string filename = "foo";
+
         [TestMethod]
         public async Task ValidatePxFileSyntaxAsync_CalledWith_MINIMAL_UTF8_Returns_Valid_Result()
         {
@@ -14,7 +18,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N);
             using Stream stream = new MemoryStream(data);
             stream.Seek(0, SeekOrigin.Begin);
-            string filename = "foo";
 
             // Act
             SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileMetadataSyntaxAsync(stream, filename);
@@ -30,7 +33,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_SPECIFIERS);
             using Stream stream = new MemoryStream(data);
             stream.Seek(0, SeekOrigin.Begin);
-            string filename = "foo";
 
             // Act
             SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileMetadataSyntaxAsync(stream, filename);
@@ -52,7 +54,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UNKNOWN_ENCODING);
             using Stream stream = new MemoryStream(data);
             stream.Seek(0, SeekOrigin.Begin);
-            string filename = "foo";
 
             // Act
             SyntaxValidationResult result = await SyntaxValidationAsync.ValidatePxFileMetadataSyntaxAsync(stream, filename);

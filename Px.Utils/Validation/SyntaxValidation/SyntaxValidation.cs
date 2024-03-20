@@ -76,17 +76,17 @@ namespace PxUtils.Validation.SyntaxValidation
                 Encoding encoding = PxFileMetadataReader.GetEncoding(stream, syntaxConf);
 
                 List<StringValidationEntry> stringEntries = BuildStringEntries(stream, encoding, syntaxConf, filename, bufferSize);
-                ValidateEntries(stringEntries, stringValidationFunctions, report);
+                ValidateEntries(stringEntries, stringValidationFunctions, report, syntaxConf);
                 List<KeyValuePairValidationEntry> keyValuePairs = BuildKeyValuePairs(stringEntries, syntaxConf);
-                ValidateEntries(keyValuePairs, keyValueValidationFunctions, report);
-                List<StructuredValidationEntry> structuredEntries = BuildStructuredEntries(keyValuePairs);
-                ValidateEntries(structuredEntries, structuredValidationFunctions, report);
+                ValidateEntries(keyValuePairs, keyValueValidationFunctions, report, syntaxConf);
+                List<StructuredValidationEntry> structuredEntries = BuildStructuredEntries(keyValuePairs, syntaxConf);
+                ValidateEntries(structuredEntries, structuredValidationFunctions, report, syntaxConf);
 
                 return new(report, structuredEntries);
             }
             catch (InvalidPxFileMetadataException)
             {
-                report.FeedbackItems.Add(new ValidationFeedbackItem(new StringValidationEntry(0, 0, filename, string.Empty, syntaxConf, 0), new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.NoEncoding)));
+                report.FeedbackItems.Add(new ValidationFeedbackItem(new StringValidationEntry(0, 0, filename, string.Empty, 0), new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.NoEncoding)));
                 return new(report, []);
             }
         }
@@ -97,13 +97,13 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="entries">The collection of <see cref="ValidationEntry"/> entries to be validated.</param>
         /// <param name="validationFunctions">The collection of <see cref="IValidationFunction"/> validation functions to be used for validation.</param>
         /// <param name="report">The <see cref="ValidationReport"/> report where validation feedback will be added.</param>
-        public static void ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<ValidationFunctionDelegate> validationFunctions, ValidationReport report)
+        public static void ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<ValidationFunctionDelegate> validationFunctions, ValidationReport report, PxFileSyntaxConf syntaxConf)
         {
             foreach (var entry in entries)
             {
                 foreach (ValidationFunctionDelegate function in validationFunctions)
                 {
-                    ValidationFeedbackItem? feedback = function(entry);
+                    ValidationFeedbackItem? feedback = function(entry, syntaxConf);
                     if (feedback is not null)
                     {
                         report.FeedbackItems.Add((ValidationFeedbackItem)feedback);
@@ -124,7 +124,7 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 string[] split = entry.EntryString.Split(syntaxConf.Symbols.KeywordSeparator);
                 string value = split.Length > 1 ? split[1] : string.Empty;
-                return new KeyValuePairValidationEntry(entry.Line, entry.Character, entry.File, new KeyValuePair<string, string>(split[0], value), entry.SyntaxConf);
+                return new KeyValuePairValidationEntry(entry.Line, entry.Character, entry.File, new KeyValuePair<string, string>(split[0], value));
             }).ToList();
         }
 
@@ -133,11 +133,11 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="keyValuePairs">The list of <see cref="KeyValuePairValidationEntry"/> objects to be converted.</param>
         /// <returns>A list of <see cref="StructuredValidationEntry"/> objects built from the provided list of <see cref="KeyValuePairValidationEntry"/> objects.</returns>
-        public static List<StructuredValidationEntry> BuildStructuredEntries(List<KeyValuePairValidationEntry> keyValuePairs)
+        public static List<StructuredValidationEntry> BuildStructuredEntries(List<KeyValuePairValidationEntry> keyValuePairs, PxFileSyntaxConf syntaxConf)
         {
             return keyValuePairs.Select(entry =>
             {
-                ValidationEntryKey key = ParseValidationEntryKey(entry.KeyValueEntry.Key, entry.SyntaxConf);
+                ValidationEntryKey key = ParseValidationEntryKey(entry.KeyValueEntry.Key, syntaxConf);
                 return new StructuredValidationEntry(entry.Line, entry.Character, entry.File, key, entry.KeyValueEntry.Value);
             }).ToList();
         }
@@ -177,7 +177,7 @@ namespace PxUtils.Validation.SyntaxValidation
                     if (currentCharacter == syntaxConf.Symbols.SectionSeparator)
                     {
                         string stringEntry = entryBuilder.ToString();
-                        stringEntries.Add(new StringValidationEntry(line, character, filename, stringEntry, syntaxConf, stringEntries.Count));
+                        stringEntries.Add(new StringValidationEntry(line, character, filename, stringEntry, stringEntries.Count));
                         entryBuilder.Clear();
                     }
                     else
