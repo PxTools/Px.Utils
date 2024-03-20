@@ -22,6 +22,9 @@
         Timeval
     }
 
+    /// <summary>
+    /// Defines the types of validation feedback rules. Can be used to categorize feedback by rule type or for translations.
+    /// </summary>
     public enum ValidationFeedbackRule
     {
         MultipleEntriesOnOneLine,

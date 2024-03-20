@@ -16,7 +16,7 @@ namespace PxUtils.Validation.SyntaxValidation
         public IEnumerable<ValidationFunctionDelegate> DefaultStructuredValidationFunctions { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SyntaxValidationFunctions"/> class.
+        /// Initializes a new instance of the <see cref="SyntaxValidationFunctions"/> class with default validation functions.
         /// </summary>
         public SyntaxValidationFunctions()
         {
@@ -63,6 +63,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given entry. If the entry does not start with a line separator, it is considered as not being on its own line, and a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the entry does not start with a line separator, null otherwise.</returns>
         public readonly ValidationFunctionDelegate MultipleEntriesOnLine = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -83,6 +84,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the key contains more than one language parameter, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains more than one language parameter, null otherwise.</returns>
         public readonly ValidationFunctionDelegate MoreThanOneLanguageParameter = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -108,6 +110,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the key contains more than one specifier parameter, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains more than one specifier parameter, null otherwise.</returns>
         public readonly ValidationFunctionDelegate MoreThanOneSpecifierParameter = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -133,6 +136,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the key is not defined in the order of KEYWORD[language](\"specifier\"), a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key is not defined in the order of KEYWORD[language](\"specifier\"), null otherwise.</returns>
         public readonly ValidationFunctionDelegate WrongKeyOrderOrMissingKeyword = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -173,6 +177,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the key contains more than two specifiers, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if more than two specifiers are found, null otherwise.</returns>
         public readonly ValidationFunctionDelegate MoreThanTwoSpecifierParts = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -208,6 +213,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If there is no delimeter between specifier parts, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if there is no delimeter between specifier parts, null otherwise.</returns>
         public readonly ValidationFunctionDelegate NoDelimiterBetweenSpecifierParts = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -245,6 +251,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If any of the specifiers are not enclosed a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if specifier parts are not enclosed, null otherwise.</returns>
         public readonly ValidationFunctionDelegate SpecifierPartNotEnclosed = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -277,6 +284,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the key language section contains illegal symbols, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key language section contains illegal symbols, null otherwise.</returns>
         public readonly ValidationFunctionDelegate IllegalSymbolsInLanguageParamSection = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -310,6 +318,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the key specifier section contains illegal symbols, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key specifier section contains illegal symbols, null otherwise.</returns>
         public readonly ValidationFunctionDelegate IllegalSymbolsInSpecifierParamSection = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -341,6 +350,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the value section is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section is not following a valid format, null otherwise.</returns>
         public readonly ValidationFunctionDelegate InvalidValueFormat = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -364,6 +374,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the value section contains excess whitespace, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section contains excess whitespace, null otherwise.</returns>
         public readonly ValidationFunctionDelegate ExcessWhitespaceInValue = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -397,6 +408,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the key contains excess whitespace, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains excess whitespace, null otherwise.</returns>
         public readonly ValidationFunctionDelegate KeyContainsExcessWhiteSpace = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -429,6 +441,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the value section contains excess new lines, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section contains excess new lines, null otherwise.</returns>
         public readonly ValidationFunctionDelegate ExcessNewLinesInValue = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -460,6 +473,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the keyword contains illegal characters, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword contains illegal characters, null otherwise.</returns>
         public readonly ValidationFunctionDelegate KeywordContainsIllegalCharacters = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -498,6 +512,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the doesn't start with a letter, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword doesn't start with a letter, null otherwise.</returns>
         public readonly ValidationFunctionDelegate KeywordDoesntStartWithALetter = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -525,6 +540,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the language parameter is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the language parameter is not following a valid format, null otherwise.</returns>
         public readonly ValidationFunctionDelegate IllegalCharactersInLanguageParameter = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -563,6 +579,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the specifier parameter is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier parameter is not following a valid format, null otherwise.</returns>
         public readonly ValidationFunctionDelegate IllegalCharactersInSpecifierParameter = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -602,6 +619,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If there is no value section, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if there is no value section, null otherwise.</returns>
         public readonly ValidationFunctionDelegate EntryWithoutValue = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -621,6 +639,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the language parameter is not compliant with ISO 639 or BCP 47, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the language parameter is not compliant with ISO 639 or BCP 47, null otherwise.</returns>
         public readonly ValidationFunctionDelegate IncompliantLanguage = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -651,6 +670,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the keyword contains unrecommended characters, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword contains unrecommended characters, null otherwise.</returns>
         public readonly ValidationFunctionDelegate KeywordContainsUnderscore = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -671,6 +691,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the keyword is not in upper case, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword is not in upper case, otherwise null</returns>
         public readonly ValidationFunctionDelegate KeywordIsNotInUpperCase = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
@@ -693,6 +714,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the given <see cref="ValidationEntry"/> entry. If the keyword is excessively long, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword is excessively long, otherwise null</returns>
         public readonly ValidationFunctionDelegate KeywordIsExcessivelyLong = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {

@@ -11,7 +11,7 @@
         public ValidationFeedbackLevel Level { get; } = level;
 
         /// <summary>
-        /// Gets the description of the rule that was applied during validation. This can be used to identify which validation rule produced the feedback.
+        /// Enum that defines the type of validation feedback rule. Can be used to categorize feedback by rule type or for translations.
         /// </summary>
         public ValidationFeedbackRule Rule { get; } = rule;
 

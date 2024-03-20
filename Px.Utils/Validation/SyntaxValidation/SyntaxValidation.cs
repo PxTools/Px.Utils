@@ -90,6 +90,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="entries">The collection of <see cref="ValidationEntry"/> entries to be validated.</param>
         /// <param name="validationFunctions">The collection of <see cref="IValidationFunction"/> validation functions to be used for validation.</param>
         /// <param name="report">The <see cref="ValidationReport"/> report where validation feedback will be added.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         public static void ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<ValidationFunctionDelegate> validationFunctions, ValidationReport report, PxFileSyntaxConf syntaxConf)
         {
             foreach (var entry in entries)
@@ -125,6 +126,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Builds a list of <see cref="StructuredValidationEntry"/> objects from a list of <see cref="KeyValuePairValidationEntry"/> objects.
         /// </summary>
         /// <param name="keyValuePairs">The list of <see cref="KeyValuePairValidationEntry"/> objects to be converted.</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A list of <see cref="StructuredValidationEntry"/> objects built from the provided list of <see cref="KeyValuePairValidationEntry"/> objects.</returns>
         public static List<StructuredValidationEntry> BuildStructuredEntries(List<KeyValuePairValidationEntry> keyValuePairs, PxFileSyntaxConf syntaxConf)
         {
@@ -140,7 +142,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="buffer">The character buffer to process</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> configuration object</param>
-        /// <param name="state"><see cref="LineCharacterState"/> object that stores the current indeces of line and character being processed</see></param>
+        /// <param name="state"><see cref="LineCharacterState"/> object that stores the current indeces of line and character being processed/param>
         /// <param name="filename">Name of the file being processed</param>
         /// <param name="stringEntries">List of string entries to be populated by the method</param>
         /// <param name="entryBuilder">String builder that contains the current entry</param>
