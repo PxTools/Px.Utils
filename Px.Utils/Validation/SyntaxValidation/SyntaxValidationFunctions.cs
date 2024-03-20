@@ -6,8 +6,59 @@ namespace PxUtils.Validation.SyntaxValidation
 {
     public delegate ValidationFeedbackItem? ValidationFunctionDelegate(ValidationEntry entry, PxFileSyntaxConf syntaxConf);
 
+    /// <summary>
+    /// Contains the default validation functions for syntax validation.
+    /// </summary>
     public class SyntaxValidationFunctions
     {
+        public IEnumerable<ValidationFunctionDelegate> DefaultStringValidationFunctions { get; }
+        public IEnumerable<ValidationFunctionDelegate> DefaultKeyValueValidationFunctions { get; }
+        public IEnumerable<ValidationFunctionDelegate> DefaultStructuredValidationFunctions { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SyntaxValidationFunctions"/> class.
+        /// </summary>
+        public SyntaxValidationFunctions()
+        {
+            DefaultStringValidationFunctions = new List<ValidationFunctionDelegate>
+            {
+                MultipleEntriesOnLine,
+                EntryWithoutValue,
+            };
+
+            DefaultKeyValueValidationFunctions = new List<ValidationFunctionDelegate>
+            {
+                MoreThanOneLanguageParameter,
+                MoreThanOneSpecifierParameter,
+                WrongKeyOrderOrMissingKeyword,
+                SpecifierPartNotEnclosed,
+                MoreThanTwoSpecifierParts,
+                NoDelimiterBetweenSpecifierParts,
+                IllegalSymbolsInLanguageParamSection,
+                IllegalSymbolsInSpecifierParamSection,
+                InvalidValueFormat,
+                ExcessWhitespaceInValue,
+                KeyContainsExcessWhiteSpace,
+                ExcessNewLinesInValue
+            };
+
+            DefaultStructuredValidationFunctions = new List<ValidationFunctionDelegate>
+            {
+                KeywordContainsIllegalCharacters,
+                KeywordDoesntStartWithALetter,
+                IllegalCharactersInLanguageParameter,
+                IllegalCharactersInSpecifierParameter,
+                IncompliantLanguage,
+                KeywordContainsUnderscore,
+                KeywordIsNotInUpperCase,
+                KeywordIsExcessivelyLong
+            };
+        }
+
+        private const string ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY = "Entry is not of type KeyValueValidationEntry";
+        private const string ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRING_ENTRY = "Entry is not of type StringValidationEntry";
+        private const string ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRUCTURED_ENTRY = "Entry is not of type StructuredValidationEntry";
+
         /// <summary>
         /// Validates the given entry. If the entry does not start with a line separator, it is considered as not being on its own line, and a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
@@ -15,7 +66,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the entry does not start with a line separator, null otherwise.</returns>
         public readonly ValidationFunctionDelegate MultipleEntriesOnLine = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException("Entry is not of type StringValidationEntry");
+            StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRING_ENTRY);
 
             // If the entry does not start with a line separator, it is not on its own line. For the first entry this is not relevant.
             if (stringEntry.EntryIndex == 0 || stringEntry.EntryString.StartsWith(syntaxConf.Symbols.LineSeparator))
@@ -35,7 +86,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains more than one language parameter, null otherwise.</returns>
         public readonly ValidationFunctionDelegate MoreThanOneLanguageParameter = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
 
             bool hasMultipleParameters = SyntaxValidationUtilityMethods.HasMoreThanOneSection(
                 keyValueValidationEntry.KeyValueEntry.Key,
@@ -60,7 +111,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains more than one specifier parameter, null otherwise.</returns>
         public readonly ValidationFunctionDelegate MoreThanOneSpecifierParameter = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
 
             bool hasMultipleParameters = SyntaxValidationUtilityMethods.HasMoreThanOneSection(
                 keyValueValidationEntry.KeyValueEntry.Key,
@@ -85,7 +136,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key is not defined in the order of KEYWORD[language](\"specifier\"), null otherwise.</returns>
         public readonly ValidationFunctionDelegate WrongKeyOrderOrMissingKeyword = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
 
             string key = keyValueValidationEntry.KeyValueEntry.Key;
 
@@ -125,7 +176,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if more than two specifiers are found, null otherwise.</returns>
         public readonly ValidationFunctionDelegate MoreThanTwoSpecifierParts = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
 
             string? specifierParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     keyValueValidationEntry.KeyValueEntry.Key,
@@ -160,7 +211,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if there is no delimeter between specifier parts, null otherwise.</returns>
         public readonly ValidationFunctionDelegate NoDelimiterBetweenSpecifierParts = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
 
             string? specifierParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     keyValueValidationEntry.KeyValueEntry.Key,
@@ -197,7 +248,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if specifier parts are not enclosed, null otherwise.</returns>
         public readonly ValidationFunctionDelegate SpecifierPartNotEnclosed = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
 
             string? specifierParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     keyValueValidationEntry.KeyValueEntry.Key,
@@ -229,7 +280,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key language section contains illegal symbols, null otherwise.</returns>
         public readonly ValidationFunctionDelegate IllegalSymbolsInLanguageParamSection = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
 
             string key = keyValueValidationEntry.KeyValueEntry.Key;
 
@@ -262,7 +313,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key specifier section contains illegal symbols, null otherwise.</returns>
         public readonly ValidationFunctionDelegate IllegalSymbolsInSpecifierParamSection = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
 
             string key = keyValueValidationEntry.KeyValueEntry.Key;
 
@@ -293,7 +344,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section is not following a valid format, null otherwise.</returns>
         public readonly ValidationFunctionDelegate InvalidValueFormat = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
 
             string value = keyValueValidationEntry.KeyValueEntry.Value;
 
@@ -316,7 +367,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section contains excess whitespace, null otherwise.</returns>
         public readonly ValidationFunctionDelegate ExcessWhitespaceInValue = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
             
             // Validation only matters if the value is a list of strings
             if (!SyntaxValidationUtilityMethods.IsStringListFormat(
@@ -349,7 +400,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains excess whitespace, null otherwise.</returns>
         public readonly ValidationFunctionDelegate KeyContainsExcessWhiteSpace = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
 
             string key = keyValueValidationEntry.KeyValueEntry.Key;
 
@@ -381,7 +432,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section contains excess new lines, null otherwise.</returns>
         public readonly ValidationFunctionDelegate ExcessNewLinesInValue = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException("Entry is not of type KeyValueValidationEntry");
+            KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
             
             // We only need to run this validation if the value is less than 150 characters long and it is a string or list
             ValueType? type = SyntaxValidationUtilityMethods.GetValueTypeFromString(keyValueValidationEntry.KeyValueEntry.Value, syntaxConf);
@@ -412,7 +463,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword contains illegal characters, null otherwise.</returns>
         public readonly ValidationFunctionDelegate KeywordContainsIllegalCharacters = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRUCTURED_ENTRY);
 
             string keyword = structuredValidationEntry.Key.Keyword;
             // Missing keyword is catched earlier
@@ -450,7 +501,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword doesn't start with a letter, null otherwise.</returns>
         public readonly ValidationFunctionDelegate KeywordDoesntStartWithALetter = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRUCTURED_ENTRY);
 
             string keyword = structuredValidationEntry.Key.Keyword;
             // Missing keyword is catched earlier
@@ -477,7 +528,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the language parameter is not following a valid format, null otherwise.</returns>
         public readonly ValidationFunctionDelegate IllegalCharactersInLanguageParameter = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRUCTURED_ENTRY);
             // Running this validation is relevant only for entries with a language parameter
             if (structuredValidationEntry.Key.Language is null)
             {
@@ -515,7 +566,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier parameter is not following a valid format, null otherwise.</returns>
         public readonly ValidationFunctionDelegate IllegalCharactersInSpecifierParameter = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRUCTURED_ENTRY);
             // Running this validation is relevant only for entries with a specifier
             if (structuredValidationEntry.Key.FirstSpecifier is null)
             {
@@ -574,7 +625,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the language parameter is not compliant with ISO 639 or BCP 47, null otherwise.</returns>
         public readonly ValidationFunctionDelegate IncompliantLanguage = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRUCTURED_ENTRY);
             // Running this validation is relevant only for entries with a language
             if (structuredValidationEntry.Key.Language is null)
             {
@@ -604,7 +655,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword contains unrecommended characters, null otherwise.</returns>
         public readonly ValidationFunctionDelegate KeywordContainsUnderscore = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRUCTURED_ENTRY);
 
             string keyword = structuredValidationEntry.Key.Keyword;
             if (keyword.Contains('_'))
@@ -624,7 +675,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword is not in upper case, otherwise null</returns>
         public readonly ValidationFunctionDelegate KeywordIsNotInUpperCase = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRUCTURED_ENTRY);
 
             string keyword = structuredValidationEntry.Key.Keyword;
             string uppercaseKeyword = keyword.ToUpper();
@@ -646,7 +697,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword is excessively long, otherwise null</returns>
         public readonly ValidationFunctionDelegate KeywordIsExcessivelyLong = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
-            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException("Entry is not of type StructuredValidationEntry");
+            StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRUCTURED_ENTRY);
 
             string keyword = structuredValidationEntry.Key.Keyword;
 
