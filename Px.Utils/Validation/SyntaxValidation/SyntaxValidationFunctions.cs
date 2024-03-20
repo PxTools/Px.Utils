@@ -70,7 +70,7 @@ namespace PxUtils.Validation.SyntaxValidation
             StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRING_ENTRY);
 
             // If the entry does not start with a line separator, it is not on its own line. For the first entry this is not relevant.
-            if (stringEntry.EntryIndex == 0 || stringEntry.EntryString.StartsWith(syntaxConf.Symbols.LineSeparator))
+            if (stringEntry.EntryIndex == 0 || stringEntry.EntryString.StartsWith(syntaxConf.Symbols.LineBreak))
             {
                 return null;
             }
@@ -459,7 +459,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string value = keyValueValidationEntry.KeyValueEntry.Value;
 
-            if (value.Contains(syntaxConf.Symbols.LineSeparator))
+            if (value.Contains(syntaxConf.Symbols.LineBreak))
             {
                 return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessNewLinesInValue));
             }

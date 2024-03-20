@@ -189,7 +189,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static void UpdateLineAndCharacter(char currentCharacter, PxFileSyntaxConf syntaxConf, LineCharacterState state)
         {
-            if (currentCharacter == syntaxConf.Symbols.LineSeparator)
+            if (currentCharacter == syntaxConf.Symbols.LineBreak)
             {
                 state.Line++;
                 state.Character = 0;
@@ -202,7 +202,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static void CheckForEntryEnd(char currentCharacter, PxFileSyntaxConf syntaxConf, LineCharacterState state, string filename, List<StringValidationEntry> stringEntries, StringBuilder entryBuilder)
         {
-            if (currentCharacter == syntaxConf.Symbols.SectionSeparator)
+            if (currentCharacter == syntaxConf.Symbols.EntrySeparator)
             {
                 string stringEntry = entryBuilder.ToString();
                 stringEntries.Add(new StringValidationEntry(state.Line, state.Character, filename, stringEntry, stringEntries.Count));

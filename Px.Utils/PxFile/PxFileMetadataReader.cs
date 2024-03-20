@@ -25,7 +25,7 @@ namespace PxUtils.PxFile.Meta
             symbolsConf ??= PxFileSyntaxConf.Default;
 
             char keywordSeperator = symbolsConf.Symbols.KeywordSeparator;
-            char sectionSeparator = symbolsConf.Symbols.SectionSeparator;
+            char sectionSeparator = symbolsConf.Symbols.EntrySeparator;
             char stringDelimeter = symbolsConf.Symbols.Value.StringDelimeter;
             string dataKeyword = symbolsConf.Tokens.KeyWords.Data;
 
@@ -101,7 +101,7 @@ namespace PxUtils.PxFile.Meta
             symbolsConf ??= PxFileSyntaxConf.Default;
 
             char keywordSeperator = symbolsConf.Symbols.KeywordSeparator;
-            char sectionSeparator = symbolsConf.Symbols.SectionSeparator;
+            char sectionSeparator = symbolsConf.Symbols.EntrySeparator;
             char stringDelimeter = symbolsConf.Symbols.Value.StringDelimeter;
             string dataKeyword = symbolsConf.Tokens.KeyWords.Data;
 
