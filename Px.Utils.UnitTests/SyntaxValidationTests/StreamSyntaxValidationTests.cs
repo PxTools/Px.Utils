@@ -358,10 +358,3 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         }
     }
 }
-
-
-            Assert.AreEqual(1, result.Report.FeedbackItems?.Count);
-            Assert.AreEqual(ValidationFeedbackRule.NoEncoding, result.Report.FeedbackItems?[0].Feedback.Rule);
-        }
-    }
-}

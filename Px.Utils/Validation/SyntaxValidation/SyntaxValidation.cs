@@ -1,6 +1,7 @@
 ﻿using PxUtils.Exceptions;
 using PxUtils.PxFile;
 using PxUtils.PxFile.Meta;
+using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace PxUtils.Validation.SyntaxValidation
@@ -10,16 +11,6 @@ namespace PxUtils.Validation.SyntaxValidation
     /// </summary>
     public static class SyntaxValidation
     {
-        /// <summary>
-        /// Represents the state of the line and character position in the file as it's being processed by the stream reader
-        /// </summary>
-        public class LineCharacterState
-        {
-            public int Line { get; set; } = 0;
-            public int Character { get; set; } = 0;
-            public bool IsProcessingString { get; set; } = false;
-        }
-
         /// <summary>
         /// Collection of custom validation functions to be used during validation.
         /// </summary>
@@ -212,7 +203,10 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static List<ValidationEntry> BuildValidationEntries(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize)
         {
-            LineCharacterState state = new();
+            int line = 0;
+            int character = 0;
+            bool isProcessingString = false;
+
             using StreamReader reader = new(stream, encoding);
             List<ValidationEntry> entries = [];
             StringBuilder entryBuilder = new();
@@ -220,7 +214,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             while (reader.Read(buffer, 0, bufferSize) > 0)
             {
-                ProcessBuffer(buffer, syntaxConf, state, filename, entries, entryBuilder);
+                ProcessBuffer(buffer, syntaxConf, filename, entries, entryBuilder, ref line, ref character, ref isProcessingString);
                 Array.Clear(buffer, 0, buffer.Length);
             }
             return entries;
@@ -228,7 +222,10 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static async Task<List<ValidationEntry>> BuildValidationEntriesAsync(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize, CancellationToken cancellationToken)
         {
-            LineCharacterState state = new();
+            int line = 0;
+            int character = 0;
+            bool isProcessingString = false;
+
             using StreamReader reader = new(stream, encoding);
             List<ValidationEntry> entries = [];
             StringBuilder entryBuilder = new();
@@ -236,28 +233,28 @@ namespace PxUtils.Validation.SyntaxValidation
 
             while (await reader.ReadAsync(buffer.AsMemory(), cancellationToken) > 0)
             {
-                ProcessBuffer(buffer, syntaxConf, state, filename, entries, entryBuilder);
+                ProcessBuffer(buffer, syntaxConf, filename, entries, entryBuilder, ref line, ref character, ref isProcessingString);
                 Array.Clear(buffer, 0, buffer.Length);
             }
             return entries;
         }
 
-        private static void ProcessBuffer(char[] buffer, PxFileSyntaxConf syntaxConf, LineCharacterState state, string filename, List<ValidationEntry> stringEntries, StringBuilder entryBuilder)
+        private static void ProcessBuffer(char[] buffer, PxFileSyntaxConf syntaxConf, string filename, List<ValidationEntry> stringEntries, StringBuilder entryBuilder, ref int line, ref int character, ref bool isProcessingString)
         {
             for (int i = 0; i < buffer.Length; i++)
             {
-                if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, state))
+                if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
                 {
                     break;
                 }
-                UpdateLineAndCharacter(buffer[i], syntaxConf, state);
-                CheckForEntryEnd(buffer[i], syntaxConf, state, filename, stringEntries, entryBuilder);
+                UpdateLineAndCharacter(buffer[i], syntaxConf, ref line, ref character);
+                CheckForEntryEnd(buffer[i], syntaxConf, filename, stringEntries, entryBuilder, ref line, ref character, ref isProcessingString);
             }
         }
 
-        private static bool IsEndOfMetadataSection(char currentCharacter, PxFileSyntaxConf syntaxConf, StringBuilder entryBuilder, LineCharacterState state)
+        private static bool IsEndOfMetadataSection(char currentCharacter, PxFileSyntaxConf syntaxConf, StringBuilder entryBuilder, bool isProcessingString)
         {
-            if (!state.IsProcessingString && currentCharacter == syntaxConf.Symbols.KeywordSeparator)
+            if (!isProcessingString && currentCharacter == syntaxConf.Symbols.KeywordSeparator)
             {
                 string stringEntry = entryBuilder.ToString();
                 // When DATA keyword is reached, metadata parsing is complete
@@ -266,32 +263,32 @@ namespace PxUtils.Validation.SyntaxValidation
             return false;
         }
 
-        private static void UpdateLineAndCharacter(char currentCharacter, PxFileSyntaxConf syntaxConf, LineCharacterState state)
+        private static void UpdateLineAndCharacter(char currentCharacter, PxFileSyntaxConf syntaxConf, ref int line, ref int character)
         {
             if (currentCharacter == syntaxConf.Symbols.Linebreak)
             {
-                state.Line++;
-                state.Character = 0;
+                line++;
+                character = 0;
             }
             else
             {
-                state.Character++;
+                character++;
             }
         }
 
-        private static void CheckForEntryEnd(char currentCharacter, PxFileSyntaxConf syntaxConf, LineCharacterState state, string filename, List<ValidationEntry> stringEntries, StringBuilder entryBuilder)
+        private static void CheckForEntryEnd(char currentCharacter, PxFileSyntaxConf syntaxConf, string filename, List<ValidationEntry> stringEntries, StringBuilder entryBuilder, ref int line, ref int character, ref bool isProcessingString)
         {
-            if (!state.IsProcessingString && currentCharacter == syntaxConf.Symbols.EntrySeparator)
+            if (!isProcessingString && currentCharacter == syntaxConf.Symbols.EntrySeparator)
             {
                 string stringEntry = entryBuilder.ToString();
-                stringEntries.Add(new ValidationEntry(state.Line, state.Character, filename, stringEntry, stringEntries.Count));
+                stringEntries.Add(new ValidationEntry(line, character, filename, stringEntry, stringEntries.Count));
                 entryBuilder.Clear();
             }
             else
             {
                 if (currentCharacter == syntaxConf.Symbols.Key.StringDelimeter)
                 {
-                    state.IsProcessingString = !state.IsProcessingString;
+                    isProcessingString = !isProcessingString;
                 }
                 entryBuilder.Append(currentCharacter);
             }
