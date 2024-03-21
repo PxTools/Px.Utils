@@ -22,7 +22,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidationResult result = await SyntaxValidation.ValidatePxFileMetadataSyntaxAsync(stream, filename);
 
-            Assert.AreEqual(8, result.StructuredEntries.Count);
+            Assert.AreEqual(8, result.Result.Count);
             Assert.AreEqual(0, result.Report.FeedbackItems?.Count);
         }
 
@@ -37,14 +37,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidationResult result = await SyntaxValidation.ValidatePxFileMetadataSyntaxAsync(stream, filename);
 
-            Assert.AreEqual(10, result.StructuredEntries.Count);
-            Assert.AreEqual("YES", result.StructuredEntries[8].Value);
-            Assert.AreEqual("NO", result.StructuredEntries[9].Value);
-            Assert.AreEqual("fi", result.StructuredEntries[8].Key.Language);
-            Assert.AreEqual("fi", result.StructuredEntries[9].Key.Language);
-            Assert.AreEqual("first_specifier", result.StructuredEntries[8].Key.FirstSpecifier);
-            Assert.AreEqual("first_specifier", result.StructuredEntries[9].Key.FirstSpecifier);
-            Assert.AreEqual("second_specifier", result.StructuredEntries[8].Key.SecondSpecifier);
+            Assert.AreEqual(10, result.Result.Count);
+            Assert.AreEqual("YES", result.Result[8].Value);
+            Assert.AreEqual("NO", result.Result[9].Value);
+            Assert.AreEqual("fi", result.Result[8].Key.Language);
+            Assert.AreEqual("fi", result.Result[9].Key.Language);
+            Assert.AreEqual("first_specifier", result.Result[8].Key.FirstSpecifier);
+            Assert.AreEqual("first_specifier", result.Result[9].Key.FirstSpecifier);
+            Assert.AreEqual("second_specifier", result.Result[8].Key.SecondSpecifier);
         }
 
         [TestMethod]

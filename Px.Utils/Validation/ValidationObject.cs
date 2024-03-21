@@ -1,9 +1,9 @@
 ﻿namespace PxUtils.Validation
 {
     /// <summary>
-    /// Defines an abstract class for validation entries. A validation entry represents a piece of data that is subject to validation.
+    /// Defines an abstract class for validation objects. A validation object represents a piece of data that is subject to validation.
     /// </summary>
-    public abstract class ValidationEntry(int line, int character, string file)
+    public abstract class ValidationObject(int line, int character, string file)
     {
         /// <summary>
         /// Line number in the file where the entry is located.

@@ -33,7 +33,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="input">The input string to check</param>
         /// <param name="startSymbol">Symbol that starts enclosement</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file that this validation entry is part of. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
+        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <param name="endSymbol">Symbols that closes the enclosement</param>
         /// <returns>Returns a boolean which is true if the input string contains more than one section</returns>
         public static bool HasMoreThanOneSection(string input, char startSymbol, char endSymbol, PxFileSyntaxConf syntaxConf)
@@ -47,7 +47,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="input">The input string to extract from</param>
         /// <param name="startSymbol">Symbol that starts enclosement</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file that this validation entry is part of. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
+        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <param name="optionalEndSymbol">Optional symbol that closes the enclosement. If none given, startSymbol is used for both starting and ending the enclosement</param>
         /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the extracted sections and the string that remains after the operation</return>
         public static ExtractSectionResult ExtractSectionFromString(string input, char startSymbol, PxFileSyntaxConf syntaxConf, char? optionalEndSymbol = null)
@@ -87,7 +87,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="input">The input string to extract from</param>
         /// <param name="stringDelimeter">The delimeter that encloses the specifier part</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file that this validation entry is part of. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
+        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the sections and the string that remains after the operation</return>
         public static string[] GetSpecifiersFromParameter(string? input, char stringDelimeter, PxFileSyntaxConf syntaxConf)
         {
@@ -206,7 +206,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Determines whether the line changes in a string are compliant with the syntax configuration.
         /// </summary>
         /// <param name="input">The input string to check</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file that this validation entry is part of. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
+        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <param name="isList">A boolean that is true if the input string is a list</param>
         /// <returns>Returns a boolean which is true if the line changes in the input string are compliant with the syntax configuration</returns>
         public static bool ValueLineChangesAreCompliant(string input, PxFileSyntaxConf syntaxConf, bool isList)
@@ -228,7 +228,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Determines the type of a value from a string.
         /// </summary>
         /// <param name="input">The input string to check</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file that this validation entry is part of. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
+        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <returns>Returns a <see cref="ValueType"/> object that represents the type of the value in the input string. If the type cannot be determined, null is returned.</returns>
         public static ValueType? GetValueTypeFromString(string input, PxFileSyntaxConf syntaxConf)
         {
