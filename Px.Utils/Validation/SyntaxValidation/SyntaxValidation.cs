@@ -214,7 +214,24 @@ namespace PxUtils.Validation.SyntaxValidation
 
             while (reader.Read(buffer, 0, bufferSize) > 0)
             {
-                ProcessBuffer(buffer, syntaxConf, filename, entries, entryBuilder, ref line, ref character, ref isProcessingString);
+                for (int i = 0; i < buffer.Length; i++)
+                {
+                    if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
+                    {
+                        break;
+                    }
+                    UpdateLineAndCharacter(buffer[i], syntaxConf, ref line, ref character, ref isProcessingString);
+                    if (IsEndOfEntry(buffer[i], syntaxConf, isProcessingString))
+                    {
+                        string stringEntry = entryBuilder.ToString();
+                        entries.Add(new ValidationEntry(line, character, filename, stringEntry, entries.Count));
+                        entryBuilder.Clear();
+                    }
+                    else
+                    {
+                        entryBuilder.Append(buffer[i]);
+                    }
+                }
                 Array.Clear(buffer, 0, buffer.Length);
             }
             return entries;
@@ -230,26 +247,33 @@ namespace PxUtils.Validation.SyntaxValidation
             List<ValidationEntry> entries = [];
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
-
-            while (await reader.ReadAsync(buffer.AsMemory(), cancellationToken) > 0)
+            int read = 0;
+            do
             {
-                ProcessBuffer(buffer, syntaxConf, filename, entries, entryBuilder, ref line, ref character, ref isProcessingString);
+                read = await reader.ReadAsync(buffer.AsMemory(), cancellationToken);
+                for (int i = 0; i < buffer.Length; i++)
+                {
+                    if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
+                    {
+                        break;
+                    }
+                    UpdateLineAndCharacter(buffer[i], syntaxConf, ref line, ref character, ref isProcessingString);
+                    if (IsEndOfEntry(buffer[i], syntaxConf, isProcessingString))
+                    {
+                        string stringEntry = entryBuilder.ToString();
+                        entries.Add(new ValidationEntry(line, character, filename, stringEntry, entries.Count));
+                        entryBuilder.Clear();
+                    }
+                    else
+                    {
+                        entryBuilder.Append(buffer[i]);
+                    }
+                }
                 Array.Clear(buffer, 0, buffer.Length);
             }
-            return entries;
-        }
+            while (read > 0);
 
-        private static void ProcessBuffer(char[] buffer, PxFileSyntaxConf syntaxConf, string filename, List<ValidationEntry> stringEntries, StringBuilder entryBuilder, ref int line, ref int character, ref bool isProcessingString)
-        {
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
-                {
-                    break;
-                }
-                UpdateLineAndCharacter(buffer[i], syntaxConf, ref line, ref character);
-                CheckForEntryEnd(buffer[i], syntaxConf, filename, stringEntries, entryBuilder, ref line, ref character, ref isProcessingString);
-            }
+            return entries;
         }
 
         private static bool IsEndOfMetadataSection(char currentCharacter, PxFileSyntaxConf syntaxConf, StringBuilder entryBuilder, bool isProcessingString)
@@ -263,7 +287,7 @@ namespace PxUtils.Validation.SyntaxValidation
             return false;
         }
 
-        private static void UpdateLineAndCharacter(char currentCharacter, PxFileSyntaxConf syntaxConf, ref int line, ref int character)
+        private static void UpdateLineAndCharacter(char currentCharacter, PxFileSyntaxConf syntaxConf, ref int line, ref int character, ref bool isProcessingString)
         {
             if (currentCharacter == syntaxConf.Symbols.Linebreak)
             {
@@ -272,25 +296,23 @@ namespace PxUtils.Validation.SyntaxValidation
             }
             else
             {
-                character++;
-            }
-        }
-
-        private static void CheckForEntryEnd(char currentCharacter, PxFileSyntaxConf syntaxConf, string filename, List<ValidationEntry> stringEntries, StringBuilder entryBuilder, ref int line, ref int character, ref bool isProcessingString)
-        {
-            if (!isProcessingString && currentCharacter == syntaxConf.Symbols.EntrySeparator)
-            {
-                string stringEntry = entryBuilder.ToString();
-                stringEntries.Add(new ValidationEntry(line, character, filename, stringEntry, stringEntries.Count));
-                entryBuilder.Clear();
-            }
-            else
-            {
                 if (currentCharacter == syntaxConf.Symbols.Key.StringDelimeter)
                 {
                     isProcessingString = !isProcessingString;
                 }
-                entryBuilder.Append(currentCharacter);
+                character++;
+            }
+        }
+
+        private static bool IsEndOfEntry(char currentCharacter, PxFileSyntaxConf syntaxConf, bool isProcessingString)
+        {
+            if (!isProcessingString && currentCharacter == syntaxConf.Symbols.EntrySeparator)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
