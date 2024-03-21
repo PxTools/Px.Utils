@@ -79,7 +79,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 remainder = remainder.Remove(startIndex, endIndex - startIndex + 1);
                 startIndex = FindSymbolIndex(remainder, startSymbol, stringIndeces);
             }
-            return new ExtractSectionResult(sections.ToArray(), remainder);
+            return new ExtractSectionResult([.. sections], remainder);
         }
 
         /// <summary>

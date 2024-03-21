@@ -38,14 +38,18 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the syntax of a PX file's metadata.
         ///</summary>
         /// <param name="stream">The stream of the PX file to be validated.</param>
+        /// <param name="encoding">The encoding format to use for the PX file reading</param>
         /// <param name="filename">The name of the file to be validated.</param>
+        /// <param name="report">The <see cref="ValidationReport"/> report where validation feedback will be added.</param>
         /// <param name="syntaxConf">An optional <see cref="PxFileSyntaxConf"/> parameter that specifies the syntax configuration for the PX file. If not provided, the default syntax configuration is used.</param>
         /// <param name="bufferSize">An optional parameter that specifies the buffer size for reading the file. If not provided, a default buffer size of 4096 is used.</param>
         /// <param name="customValidationFunctions">An optional <see cref="CustomValidationFunctions"/> parameter that specifies custom validation functions to be used during validation. If not provided, the default validation functions are used.</param>
         /// <returns>A <see cref="SyntaxValidationResult"/> object which contains a <see cref="SyntaxValidationResult"/> and a list of <see cref="ValidationStruct"/> objects. The ValidationReport contains feedback items that provide information about any syntax errors or warnings found during validation. The list of ValidationStruct objects represents the structured objects in the PX file that were validated.</returns>
         public static SyntaxValidationResult ValidatePxFileMetadataSyntax(
             Stream stream,
+            Encoding encoding,
             string filename,
+            ValidationReport report,
             PxFileSyntaxConf? syntaxConf = null,
             int bufferSize = DEFAULT_BUFFER_SIZE,
             CustomValidationFunctions? customValidationFunctions = null)
@@ -63,33 +67,45 @@ namespace PxUtils.Validation.SyntaxValidation
             }
 
             syntaxConf ??= PxFileSyntaxConf.Default;
-            ValidationReport report = new();
 
+            List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, syntaxConf, filename, bufferSize);
+            ValidateObjects(stringEntries, stringValidationFunctions, report, syntaxConf);
+            List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(stringEntries, syntaxConf);
+            ValidateObjects(keyValuePairs, keyValueValidationFunctions, report, syntaxConf);
+            List<ValidationStruct> structuredEntries = BuildValidationStructs(keyValuePairs, syntaxConf);
+            ValidateObjects(structuredEntries, structuredValidationFunctions, report, syntaxConf);
+
+            return new(report, structuredEntries);
+        }
+
+        /// <summary>
+        /// Gets the encoding of a PX file stream
+        /// </summary>
+        /// <param name="stream">The stream to be validated</param>
+        /// <param name="syntaxConf">Syntax configuration object</param>
+        /// <param name="report">Report object that stores any issues that were ran into during validation process</param>
+        /// <param name="filename">Name of the PX file being validated</param>
+        /// <returns>Character encoding if found</returns>
+        public static Encoding? GetEncoding(Stream stream, PxFileSyntaxConf syntaxConf, ValidationReport report, string filename)
+        {
             try
             {
-                Encoding encoding = PxFileMetadataReader.GetEncoding(stream, syntaxConf);
-
-                List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, syntaxConf, filename, bufferSize);
-                ValidateObjects(stringEntries, stringValidationFunctions, report, syntaxConf);
-                List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(stringEntries, syntaxConf);
-                ValidateObjects(keyValuePairs, keyValueValidationFunctions, report, syntaxConf);
-                List<ValidationStruct> structuredEntries = BuildValidationStructs(keyValuePairs, syntaxConf);
-                ValidateObjects(structuredEntries, structuredValidationFunctions, report, syntaxConf);
-
-                return new(report, structuredEntries);
+                return PxFileMetadataReader.GetEncoding(stream, syntaxConf);
             }
             catch (InvalidPxFileMetadataException)
             {
                 report.FeedbackItems.Add(new ValidationFeedbackItem(new ValidationEntry(0, 0, filename, string.Empty, 0), new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.NoEncoding)));
-                return new(report, []);
             }
+            return null;
         }
 
         /// <summary>
         /// Asynchronously validates the syntax of a PX file's metadata.
         /// </summary>
         /// <param name="stream">The stream of the PX file to be validated.</param>
+        /// <param name="encoding">The encoding format to use for the PX file reading</param>
         /// <param name="filename">The name of the file to be validated.</param>
+        /// <param name="report">The <see cref="ValidationReport"/> report where validation feedback will be added.</param>
         /// <param name="syntaxConf">An optional <see cref="PxFileSyntaxConf"/> parameter that specifies the syntax configuration for the PX file. If not provided, the default syntax configuration is used.</param>
         /// <param name="bufferSize">An optional parameter that specifies the buffer size for reading the file. If not provided, a default buffer size of 4096 is used.</param>
         /// <param name="customValidationFunctions">An optional <see cref="CustomValidationFunctions"/> parameter that specifies custom validation functions to be used during validation. If not provided, the default validation functions are used.</param>
@@ -97,7 +113,9 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="Task"/> that represents the asynchronous operation. The task result contains a <see cref="SyntaxValidationResult"/> object which includes a <see cref="ValidationReport"/> and a list of <see cref="ValidationStruct"/> objects. The ValidationReport contains feedback items that provide information about any syntax errors or warnings found during validation. The list of ValidationStruct objects represents the structured objects in the PX file that were validated.</returns>
         public static async Task<SyntaxValidationResult> ValidatePxFileMetadataSyntaxAsync(
             Stream stream,
+            Encoding encoding,
             string filename,
+            ValidationReport report,
             PxFileSyntaxConf? syntaxConf = null,
             int bufferSize = DEFAULT_BUFFER_SIZE,
             CustomValidationFunctions? customValidationFunctions = null,
@@ -116,26 +134,37 @@ namespace PxUtils.Validation.SyntaxValidation
             }
 
             syntaxConf ??= PxFileSyntaxConf.Default;
-            ValidationReport report = new();
 
+            List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, syntaxConf, filename, bufferSize, cancellationToken);
+            ValidateObjects(entries, stringValidationFunctions, report, syntaxConf);
+            List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, syntaxConf);
+            ValidateObjects(keyValuePairs, keyValueValidationFunctions, report, syntaxConf);
+            List<ValidationStruct> structs = BuildValidationStructs(keyValuePairs, syntaxConf);
+            ValidateObjects(structs, structuredValidationFunctions, report, syntaxConf);
+
+            return new(report, structs);
+        }
+
+        /// <summary>
+        /// Gets the encoding of a PX file stream asynchronously
+        /// </summary>
+        /// <param name="stream">The stream to be validated</param>
+        /// <param name="syntaxConf">Syntax configuration object</param>
+        /// <param name="report">Report object that stores any issues that were ran into during validation process</param>
+        /// <param name="filename">Name of the PX file being validated</param>
+        /// <returns>Character encoding if found</returns>
+        public static async Task<Encoding?> GetEncodingAsync(Stream stream, PxFileSyntaxConf syntaxConf, ValidationReport report, string filename)
+        {
             try
             {
-                Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream, syntaxConf, cancellationToken);
-
-                List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, syntaxConf, filename, bufferSize);
-                ValidateObjects(entries, stringValidationFunctions, report, syntaxConf);
-                List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, syntaxConf);
-                ValidateObjects(keyValuePairs, keyValueValidationFunctions, report, syntaxConf);
-                List<ValidationStruct> structs = BuildValidationStructs(keyValuePairs, syntaxConf);
-                ValidateObjects(structs, structuredValidationFunctions, report, syntaxConf);
-
-                return new(report, structs);
+                return await PxFileMetadataReader.GetEncodingAsync(stream, syntaxConf);
             }
             catch (InvalidPxFileMetadataException)
             {
                 report.FeedbackItems.Add(new ValidationFeedbackItem(new ValidationEntry(0, 0, filename, string.Empty, 0), new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.NoEncoding)));
-                return new(report, []);
+
             }
+            return null;
         }
 
         ///<summary>
@@ -184,7 +213,6 @@ namespace PxUtils.Validation.SyntaxValidation
         private static List<ValidationEntry> BuildValidationEntries(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize)
         {
             LineCharacterState state = new();
-            stream.Seek(0, SeekOrigin.Begin);
             using StreamReader reader = new(stream, encoding);
             List<ValidationEntry> entries = [];
             StringBuilder entryBuilder = new();
@@ -198,16 +226,15 @@ namespace PxUtils.Validation.SyntaxValidation
             return entries;
         }
 
-        private static async Task<List<ValidationEntry>> BuildValidationEntriesAsync(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize)
+        private static async Task<List<ValidationEntry>> BuildValidationEntriesAsync(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize, CancellationToken cancellationToken)
         {
-            LineCharacterState state = new() { Line = 0, Character = 0 };
-            stream.Seek(0, SeekOrigin.Begin);
+            LineCharacterState state = new();
             using StreamReader reader = new(stream, encoding);
             List<ValidationEntry> entries = [];
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
 
-            while (await reader.ReadAsync(buffer, 0, bufferSize) > 0)
+            while (await reader.ReadAsync(buffer.AsMemory(), cancellationToken) > 0)
             {
                 ProcessBuffer(buffer, syntaxConf, state, filename, entries, entryBuilder);
                 Array.Clear(buffer, 0, buffer.Length);
