@@ -33,7 +33,7 @@ public class DataValidationTest
         stream.Seek(6, 0);
 
         var validationFeedbackItems =
-            DataValidation.Validate(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
+            DataValidation.Validate(stream, "filename", 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
 
 
         Assert.AreEqual(0, validationFeedbackItems.Count());
@@ -51,7 +51,7 @@ public class DataValidationTest
         stream.Seek(6, 0);
 
         var validationFeedbackItems =
-            DataValidation.Validate(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
+            DataValidation.Validate(stream, "filename", 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
 
 
         Assert.AreEqual(10, validationFeedbackItems.Count());
@@ -91,7 +91,7 @@ public class DataValidationTest
         stream.Seek(77677,0);
 
         var validationFeedbackItems =
-            DataValidation.Validate(stream, 2821, 44712, 1, streamEncoding, PxFileSyntaxConf.Default);
+            DataValidation.Validate(stream, "filename", 2821, 44712, 1, streamEncoding, PxFileSyntaxConf.Default);
 
         foreach (var validationFeedbackItem in validationFeedbackItems)
         {

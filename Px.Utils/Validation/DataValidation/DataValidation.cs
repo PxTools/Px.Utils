@@ -6,42 +6,28 @@ using PxUtils.Validation;
 
 namespace PxUtils.Validation.DataValidation
 {
-
-    public enum TokenType
+    /// <summary>
+    /// The DataValidation class is used to validate the data section of a PX file.
+    /// </summary>
+    public static class DataValidation
     {
-        EmptyToken,
-        InvalidDataChar,
-        NumDataItem,
-        StringDataItem,
-        DataItemSeparator,
-        LineSeparator,
-        EndOfData,
-        EndOfStream
-    }
-    public readonly struct Token(TokenType type, string value, int lineNumber, int charPosition)
-    {
-        public TokenType Type { get; } = type;
-        public string Value { get; } = value;
-        public int LineNumber { get; } = lineNumber;
-        public int CharPosition { get; } = charPosition;
+        private static readonly char[] ValidDataCharacters = ['1', '2', '3', '4', '5','6','7','8','9','0','-','.','"'];
 
-        [ExcludeFromCodeCoverage]
-        public override string ToString()
-        {
-            return $"token: {Type}, value: {Value}, line: {LineNumber}, pos: {CharPosition}";
-        }
-    }
-
-    internal interface IDataValidator
-    {
-        internal IEnumerable<ValidationFeedback> Validate(Token token);
-    }
-
-    public static class DataValidation 
-    {
-        private static readonly char[] ValidDataCharacters = ['1','2','3','4','5','6','7','8','9','0','-','.','"'];
-
-        public static IEnumerable<ValidationFeedbackItem> Validate(Stream stream, int rowLen, int numOfRows,
+        /// <summary>
+        /// Validates the data in the stream according to the specified parameters and returns a collection of validation feedback items.
+        /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword).
+        /// </summary>
+        /// <param name="stream">The stream containing the data to be validated.</param>
+        /// <param name="fileName">Name of the file of the stream (only used for reporting)</param>
+        /// <param name="rowLen">The expected length of each row in the data.</param>
+        /// <param name="numOfRows">The expected number of rows in the data.</param>
+        /// <param name="startRow">The starting row number.</param>
+        /// <param name="streamEncoding">The encoding of the stream. Set to null if the default encoding should be used.</param>
+        /// <param name="conf">The syntax configuration for the PX file. Set to null to use the default configuration.</param>
+        /// <returns>
+        /// A collection of ValidationFeedbackItem objects representing the feedback for the data validation.
+        /// </returns>
+        public static IEnumerable<ValidationFeedbackItem> Validate(Stream stream, string fileName, int rowLen, int numOfRows,
             int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null)
         {
             conf ??= PxFileSyntaxConf.Default;
@@ -63,7 +49,7 @@ namespace PxUtils.Validation.DataValidation
             {
                 if (token.Type == TokenType.InvalidDataChar)
                 {
-                    var validationEntry = new DataValidationEntry("filename", startRow + token.LineNumber, token.CharPosition);
+                    var validationEntry = new DataValidationEntry(fileName, startRow + token.LineNumber, token.CharPosition);
                     feedbackItems.Add(new ValidationFeedbackItem(validationEntry, new ValidationFeedback(ValidationFeedbackLevel.Error, 
                         ValidationFeedbackRule.DataValidationFeedbackInvalidChar, $"{token.Value}")));
                     continue;
@@ -76,20 +62,28 @@ namespace PxUtils.Validation.DataValidation
                 
                 if (feedbacks.Count > 0)
                 {
-                    var validationEntry = new DataValidationEntry("filename", startRow + token.LineNumber, token.CharPosition);
+                    var validationEntry = new DataValidationEntry(fileName, startRow + token.LineNumber, token.CharPosition);
                     feedbackItems.AddRange(feedbacks.Select(feedback => new ValidationFeedbackItem(validationEntry, feedback)));
                 }
             }
 
             return feedbackItems;
         }
-        
+
+
+        /// <summary>
+        /// Tokenizes the given stream according to the specified configuration and encoding.
+        /// </summary>
+        /// <param name="stream">The stream to tokenize.</param>
+        /// <param name="conf">The configuration for tokenizing the stream.</param>
+        /// <param name="streamEncoding">The encoding of the stream. It can be null for the default encoding.</param>
+        /// <returns>An enumerable collection of tokens.</returns>
         public static IEnumerable<Token> Tokenize(Stream stream, PxFileSyntaxConf conf, Encoding? streamEncoding)
         {
             const int streamBufferSize = 1024;
             var charPosition = 0;
             var lineNumber = 1;
-            StreamReader reader = new(stream, streamEncoding, false, streamBufferSize, true);
+            using StreamReader reader = new(stream, streamEncoding, false, streamBufferSize, true);
             var valueBuilder = new StringBuilder();
 
             while (!reader.EndOfStream)
@@ -140,6 +134,36 @@ namespace PxUtils.Validation.DataValidation
             }
             yield return new Token(TokenType.EndOfStream, valueBuilder.ToString(), lineNumber, charPosition);
         }
+    }
+
+    public enum TokenType
+    {
+        EmptyToken,
+        InvalidDataChar,
+        NumDataItem,
+        StringDataItem,
+        DataItemSeparator,
+        LineSeparator,
+        EndOfData,
+        EndOfStream
+    }
+    public readonly struct Token(TokenType type, string value, int lineNumber, int charPosition)
+    {
+        public TokenType Type { get; } = type;
+        public string Value { get; } = value;
+        public int LineNumber { get; } = lineNumber;
+        public int CharPosition { get; } = charPosition;
+
+        [ExcludeFromCodeCoverage]
+        public override string ToString()
+        {
+            return $"token: {Type}, value: {Value}, line: {LineNumber}, pos: {CharPosition}";
+        }
+    }
+
+    internal interface IDataValidator
+    {
+        internal IEnumerable<ValidationFeedback> Validate(Token token);
     }
 
     public class DataValidationEntry(string file, int line, int character) : ValidationObject(line, character, file);
