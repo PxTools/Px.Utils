@@ -2,6 +2,9 @@
 
 namespace PxUtils.Validation.DataValidation;
 
+/// <summary>
+/// Class for validating the count of rows in a data set.
+/// </summary>
 public class DataRowCountValidator(int numOfRows): IDataValidator
 {
     private int _currentRow;
