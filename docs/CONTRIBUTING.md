@@ -14,7 +14,7 @@ When the `test` branch has been tested and is ready for release, a pull request 
 ## Code quality
 
 ### Unit testing
-Unit tests are written using [xUnit](https://xunit.github.io/) and can be found in the `Px.Utils.UnitTests` project. The goal is that every line of code is covered by at least one unit test if possible. The code author is responsible for checking the coverage before submitting a pull request. Pull requests that do not meet the coverage requirements will usually not be merged.
+Unit tests are written using [MSText](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-with-mstest) and can be found in the `Px.Utils.UnitTests` project. The goal is that every line of code is covered by at least one unit test if possible. The code author is responsible for checking the coverage before submitting a pull request. Pull requests that do not meet the coverage requirements will usually not be merged.
 
 If you are making changes to a section of code that is not already covered by unit tests for some reason, coverage of that section will still be checked when the pull request is reviewed. It is also highly recommended that you add unit tests any time you come across a untested section that is somehow relevant to your changes, EVEN IF your changes will not directly affect that section of code.
 

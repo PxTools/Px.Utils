@@ -52,6 +52,13 @@
         KeywordIsNotInUpperCase = 22,
         KeywordExcessivelyLong = 23,
         IllegalCharactersInSpecifierPart = 24,
-        EntryWithMultipleValues = 25
+        EntryWithMultipleValues = 25,
+        DataValidationFeedbackInvalidStructure,
+        DataValidationFeedbackInvalidRowCount,
+        DataValidationFeedbackInvalidRowLength,
+        DataValidationFeedbackInconsistentSeparator,
+        DataValidationFeedbackInvalidString,
+        DataValidationFeedbackInvalidNumber,
+        DataValidationFeedbackInvalidChar
     }
 }
