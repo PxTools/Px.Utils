@@ -11,7 +11,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
     {
         private readonly string filename = "foo";
         private readonly ValidationReport report = new();
-        private readonly SyntaxValidationFunctions functionsObject = new();
         private readonly PxFileSyntaxConf syntaxConf = PxFileSyntaxConf.Default;
 
         [TestMethod]
@@ -37,7 +36,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationEntry> entries = SyntaxValidationFixtures.MULTIPLE_ENTRIES_IN_SINGLE_LINE;
-            List<ValidationFunctionDelegate> functions = [functionsObject.MultipleEntriesOnLine];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.MultipleEntriesOnLine];
 
             // Act
             SyntaxValidation.ValidateObjects(entries, functions, report, syntaxConf);
@@ -76,7 +75,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = SyntaxValidationFixtures.KEYVALUEPAIR_WITH_MULTIPLE_LANGUAGE_PARAMETERS;
-            List<ValidationFunctionDelegate> functions = [functionsObject.MoreThanOneLanguageParameter];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.MoreThanOneLanguageParameter];
 
             // Act
             SyntaxValidation.ValidateObjects(keyValuePairs, functions, report, syntaxConf);
@@ -91,7 +90,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = SyntaxValidationFixtures.KEYVALUEPAIR_WITH_MULTIPLE_SPECIFIER_PARAMETER_SECTIONS;
-            List<ValidationFunctionDelegate> functions = [functionsObject.MoreThanOneSpecifierParameter];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.MoreThanOneSpecifierParameter];
 
             // Act
             SyntaxValidation.ValidateObjects(keyValuePairs, functions, report, syntaxConf);
@@ -105,7 +104,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = SyntaxValidationFixtures.KEYVALUEPAIRS_IN_WRONG_ORDER_AND_MISSING_KEYWORD;
-            List<ValidationFunctionDelegate> functions = [functionsObject.WrongKeyOrderOrMissingKeyword];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.WrongKeyOrderOrMissingKeyword];
 
             // Act
             SyntaxValidation.ValidateObjects(keyValuePairs, functions, report, syntaxConf);
@@ -121,7 +120,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = SyntaxValidationFixtures.KEYVALUEPAIRS_WITH_INVALID_SPECIFIERS;
-            List<ValidationFunctionDelegate> functions = [functionsObject.MoreThanTwoSpecifierParts, functionsObject.SpecifierPartNotEnclosed, functionsObject.NoDelimiterBetweenSpecifierParts];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.MoreThanTwoSpecifierParts, SyntaxValidationFunctions.SpecifierPartNotEnclosed, SyntaxValidationFunctions.NoDelimiterBetweenSpecifierParts];
 
             // Act
             SyntaxValidation.ValidateObjects(keyValuePairs, functions, report, syntaxConf);
@@ -137,7 +136,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = SyntaxValidationFixtures.KEYVALUEPAIRS_WITH_ILLEGAL_SYMBOLS_IN_LANGUAGE_SECTIONS;
-            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalSymbolsInLanguageParamSection];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IllegalSymbolsInLanguageParamSection];
 
             // Act
             SyntaxValidation.ValidateObjects(keyValuePairs, functions, report, syntaxConf);
@@ -153,7 +152,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = SyntaxValidationFixtures.KEYVALUEPAIR_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS;
-            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalSymbolsInSpecifierParamSection];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IllegalSymbolsInSpecifierParamSection];
 
             // Act
             SyntaxValidation.ValidateObjects(keyValuePairs, functions, report, syntaxConf);
@@ -168,7 +167,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
 
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = SyntaxValidationFixtures.KEYVALUEPAIRS_WITH_BAD_VALUES;
-            List<ValidationFunctionDelegate> functions = [functionsObject.InvalidValueFormat];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.InvalidValueFormat];
 
             // Act
             SyntaxValidation.ValidateObjects(keyValuePairs, functions, report, syntaxConf);
@@ -185,7 +184,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = SyntaxValidationFixtures.KEYVALUEPAIR_WITH_EXCESS_LIST_VALUE_WHITESPACE;
-            List<ValidationFunctionDelegate> functions = [functionsObject.ExcessWhitespaceInValue];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.ExcessWhitespaceInValue];
 
             // Act
             SyntaxValidation.ValidateObjects(keyValuePairs, functions, report, syntaxConf);
@@ -199,7 +198,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = SyntaxValidationFixtures.KEYVALUEPAIR_WITH_EXCESS_KEY_WHITESPACE;
-            List<ValidationFunctionDelegate> functions = [functionsObject.KeyContainsExcessWhiteSpace];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.KeyContainsExcessWhiteSpace];
 
             // Act
             SyntaxValidation.ValidateObjects(keyValuePairs, functions, report, syntaxConf);
@@ -213,7 +212,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = SyntaxValidationFixtures.KEYVALUEPAIRS_WITH_SHORT_MULTILINE_VALUES;
-            List<ValidationFunctionDelegate> functions = [functionsObject.ExcessNewLinesInValue];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.ExcessNewLinesInValue];
 
             // Act
             SyntaxValidation.ValidateObjects(keyValuePairs, functions, report, syntaxConf);
@@ -228,7 +227,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCTS_WITH_INVALID_KEYWORDS;
-            List<ValidationFunctionDelegate> functions = [functionsObject.KeywordDoesntStartWithALetter, functionsObject.KeywordContainsIllegalCharacters];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.KeywordDoesntStartWithALetter, SyntaxValidationFunctions.KeywordContainsIllegalCharacters];
 
             // Act
             SyntaxValidation.ValidateObjects(structs, functions, report, syntaxConf);
@@ -244,7 +243,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCTS_WITH_VALID_LANGUAGES;
-            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalCharactersInLanguageParameter];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IllegalCharactersInLanguageParameter];
 
             // Act
             SyntaxValidation.ValidateObjects(structs, functions, report, syntaxConf);
@@ -257,7 +256,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCTS_WITH_INVALID_LANGUAGES;
-            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalCharactersInLanguageParameter];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IllegalCharactersInLanguageParameter];
 
             // Act
             SyntaxValidation.ValidateObjects(structs, functions, report, syntaxConf);
@@ -272,7 +271,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCT_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS;
-            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalCharactersInSpecifierParts];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IllegalCharactersInSpecifierParts];
 
             // Act
             SyntaxValidation.ValidateObjects(structs, functions, report, syntaxConf);
@@ -287,7 +286,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITHOUT_VALUE;
-            List<ValidationFunctionDelegate> functions = [functionsObject.EntryWithoutValue];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.EntryWithoutValue];
 
             // Act
             SyntaxValidation.ValidateObjects(entries, functions, report, syntaxConf);
@@ -302,7 +301,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCTS_WITH_INCOMPLIANT_LANGUAGES;
-            List<ValidationFunctionDelegate> functions = [functionsObject.IncompliantLanguage];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IncompliantLanguage];
 
             // Act
             SyntaxValidation.ValidateObjects(structs, functions, report, syntaxConf);
@@ -318,7 +317,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCTS_WITH_UNRECOMMENDED_KEYWORD_NAMING;
-            List<ValidationFunctionDelegate> functions = [functionsObject.KeywordContainsUnderscore, functionsObject.KeywordIsNotInUpperCase];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.KeywordContainsUnderscore, SyntaxValidationFunctions.KeywordIsNotInUpperCase];
 
             // Act
             SyntaxValidation.ValidateObjects(structs, functions, report, syntaxConf);
@@ -333,7 +332,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCT_WITH_LONG_KEYWORD;
-            List<ValidationFunctionDelegate> functions = [functionsObject.KeywordIsExcessivelyLong];
+            List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.KeywordIsExcessivelyLong];
 
             // Act
             SyntaxValidation.ValidateObjects(structs, functions, report, syntaxConf);
