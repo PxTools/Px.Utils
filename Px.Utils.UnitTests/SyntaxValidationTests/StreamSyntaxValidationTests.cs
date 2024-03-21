@@ -146,15 +146,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         public void ValidateEntries_CalledWith_ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS_Returns_Result_With_Errors()
         {
             // Arrange
-            List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS;
+            List<KeyValuePairValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS;
             List<ValidationFunctionDelegate> functions = [functionsObject.IllegalSymbolsInSpecifierParamSection];
 
             // Act
             SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
-            Assert.AreEqual(2, report.FeedbackItems?.Count);
+            Assert.AreEqual(1, report.FeedbackItems?.Count);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, report.FeedbackItems?[0].Feedback.Rule);
-            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, report.FeedbackItems?[1].Feedback.Rule);
         }
 
         [TestMethod]
@@ -267,14 +266,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<StructuredValidationEntry> entries = SyntaxValidationFixtures.ENTRY_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS;
-            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalCharactersInSpecifierParameter];
+            List<ValidationFunctionDelegate> functions = [functionsObject.IllegalCharactersInSpecifierParts];
 
             // Act
             SyntaxValidation.ValidateEntries(entries, functions, report, syntaxConf);
 
             // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(1, report.FeedbackItems?.Count);
-            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, report.FeedbackItems?[0].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierPart, report.FeedbackItems?[0].Feedback.Rule);
         }
 
         [TestMethod]

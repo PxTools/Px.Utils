@@ -15,8 +15,9 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         public class LineCharacterState
         {
-            public int Line { get; set; }
-            public int Character { get; set; }
+            public int Line { get; set; } = 0;
+            public int Character { get; set; } = 0;
+            public bool IsProcessingString { get; set; } = false;
         }
 
         /// <summary>
@@ -169,7 +170,9 @@ namespace PxUtils.Validation.SyntaxValidation
         {
             return stringEntries.Select(entry =>
             {
-                string[] split = entry.EntryString.Split(syntaxConf.Symbols.KeywordSeparator);
+                // Split the entry string into a key and a value from the first valid keyword separator
+                int[] keywordSeparatorIndeces = SyntaxValidationUtilityMethods.FindKeywordSeparatorIndeces(entry.EntryString, syntaxConf);
+                string[] split = entry.EntryString.Split(entry.EntryString[keywordSeparatorIndeces[0]]);
                 string value = split.Length > 1 ? split[1] : string.Empty;
                 return new KeyValuePairValidationEntry(entry.Line, entry.Character, entry.File, new KeyValuePair<string, string>(split[0], value));
             }).ToList();
@@ -192,7 +195,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static List<StringValidationEntry> BuildStringEntries(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize)
         {
-            SyntaxValidation.LineCharacterState state = new() { Line = 0, Character = 0 };
+            LineCharacterState state = new();
             stream.Seek(0, SeekOrigin.Begin);
             using StreamReader reader = new(stream, encoding);
             List<StringValidationEntry> stringEntries = [];
@@ -228,7 +231,7 @@ namespace PxUtils.Validation.SyntaxValidation
         {
             for (int i = 0; i < buffer.Length; i++)
             {
-                if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder))
+                if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, state))
                 {
                     break;
                 }
@@ -237,13 +240,13 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         }
 
-        private static bool IsEndOfMetadataSection(char currentCharacter, PxFileSyntaxConf syntaxConf, StringBuilder entryBuilder)
+        private static bool IsEndOfMetadataSection(char currentCharacter, PxFileSyntaxConf syntaxConf, StringBuilder entryBuilder, LineCharacterState state)
         {
-            if (currentCharacter == syntaxConf.Symbols.KeywordSeparator)
+            if (!state.IsProcessingString && currentCharacter == syntaxConf.Symbols.KeywordSeparator)
             {
                 string stringEntry = entryBuilder.ToString();
                 // When DATA keyword is reached, metadata parsing is complete
-                return SyntaxValidationUtilityMethods.CleanString(stringEntry).Equals(syntaxConf.Tokens.KeyWords.Data);
+                return SyntaxValidationUtilityMethods.CleanString(stringEntry, syntaxConf).Equals(syntaxConf.Tokens.KeyWords.Data);
             }
             return false;
         }
@@ -263,7 +266,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static void CheckForEntryEnd(char currentCharacter, PxFileSyntaxConf syntaxConf, LineCharacterState state, string filename, List<StringValidationEntry> stringEntries, StringBuilder entryBuilder)
         {
-            if (currentCharacter == syntaxConf.Symbols.EntrySeparator)
+            if (!state.IsProcessingString && currentCharacter == syntaxConf.Symbols.EntrySeparator)
             {
                 string stringEntry = entryBuilder.ToString();
                 stringEntries.Add(new StringValidationEntry(state.Line, state.Character, filename, stringEntry, stringEntries.Count));
@@ -271,19 +274,23 @@ namespace PxUtils.Validation.SyntaxValidation
             }
             else
             {
+                if (currentCharacter == syntaxConf.Symbols.Key.StringDelimeter)
+                {
+                    state.IsProcessingString = !state.IsProcessingString;
+                }
                 entryBuilder.Append(currentCharacter);
             }
         }
 
         private static ValidationEntryKey ParseValidationEntryKey(string input, PxFileSyntaxConf syntaxConf)
         {
-            ExtractSectionResult languageResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(input, syntaxConf.Symbols.Key.LangParamStart, syntaxConf.Symbols.Key.LangParamEnd);
-            string? language = languageResult.Sections.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(languageResult.Sections[0]) : null;
-            ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageResult.Remainder, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf.Symbols.Key.SpecifierParamEnd);
-            string[] specifiers = SyntaxValidationUtilityMethods.GetSpecifiersFromParameter(specifierResult.Sections.FirstOrDefault(), syntaxConf.Symbols.Key.StringDelimeter);
-            string? firstSpecifier = specifiers.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(specifiers[0]) : null;
-            string? secondSpecifier = specifiers.Length > 1 ? SyntaxValidationUtilityMethods.CleanString(specifiers[1]) : null;
-            string keyword = SyntaxValidationUtilityMethods.CleanString(specifierResult.Remainder);
+            ExtractSectionResult languageResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(input, syntaxConf.Symbols.Key.LangParamStart, syntaxConf, syntaxConf.Symbols.Key.LangParamEnd);
+            string? language = languageResult.Sections.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(languageResult.Sections[0], syntaxConf) : null;
+            ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageResult.Remainder, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf, syntaxConf.Symbols.Key.SpecifierParamEnd);
+            string[] specifiers = SyntaxValidationUtilityMethods.GetSpecifiersFromParameter(specifierResult.Sections.FirstOrDefault(), syntaxConf.Symbols.Key.StringDelimeter, syntaxConf);
+            string? firstSpecifier = specifiers.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(specifiers[0], syntaxConf) : null;
+            string? secondSpecifier = specifiers.Length > 1 ? SyntaxValidationUtilityMethods.CleanString(specifiers[1], syntaxConf) : null;
+            string keyword = SyntaxValidationUtilityMethods.CleanString(specifierResult.Remainder, syntaxConf);
 
             return new(keyword, language, firstSpecifier, secondSpecifier);
         }

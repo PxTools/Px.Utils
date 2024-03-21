@@ -1,6 +1,7 @@
 ﻿using PxUtils.PxFile;
 using System.Globalization;
 using System;
+using System.Linq;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
@@ -32,11 +33,12 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="input">The input string to check</param>
         /// <param name="startSymbol">Symbol that starts enclosement</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file that this validation entry is part of. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <param name="endSymbol">Symbols that closes the enclosement</param>
         /// <returns>Returns a boolean which is true if the input string contains more than one section</returns>
-        public static bool HasMoreThanOneSection(string input, char startSymbol, char endSymbol)
+        public static bool HasMoreThanOneSection(string input, char startSymbol, char endSymbol, PxFileSyntaxConf syntaxConf)
         {
-            ExtractSectionResult searchResult = ExtractSectionFromString(input, startSymbol, endSymbol);
+            ExtractSectionResult searchResult = ExtractSectionFromString(input, startSymbol, syntaxConf, endSymbol);
             return searchResult.Sections.Length > 1;
         }
 
@@ -45,33 +47,39 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="input">The input string to extract from</param>
         /// <param name="startSymbol">Symbol that starts enclosement</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file that this validation entry is part of. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <param name="optionalEndSymbol">Optional symbol that closes the enclosement. If none given, startSymbol is used for both starting and ending the enclosement</param>
         /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the extracted sections and the string that remains after the operation</return>
-        public static ExtractSectionResult ExtractSectionFromString(string input, char startSymbol, char? optionalEndSymbol = null)
+        public static ExtractSectionResult ExtractSectionFromString(string input, char startSymbol, PxFileSyntaxConf syntaxConf, char? optionalEndSymbol = null)
         {
             char endSymbol = optionalEndSymbol ?? startSymbol;
 
-            List<string> parameters = [];
+            List<string> sections = [];
             string remainder = input;
-            int startIndex = remainder.IndexOf(startSymbol);
-            int endIndex;
+
+            Dictionary<int, int> stringIndeces = [];
+            // If we are not searching for strings, any instances of start or end symbols enclosed within string delimeters are to be ignored
+            if (startSymbol != syntaxConf.Symbols.Key.StringDelimeter)
+            {
+                stringIndeces =  GetEnclosingCharacterIndeces(input, syntaxConf.Symbols.Key.StringDelimeter);
+            }
+
+            int startIndex = FindSymbolIndex(remainder, startSymbol, stringIndeces);
 
             while (startIndex != -1)
             {
-                endIndex = remainder.IndexOf(endSymbol, startIndex + 1);
+                int endIndex = FindSymbolIndex(remainder, endSymbol, stringIndeces, startIndex + 1);
                 if (endIndex == -1)
                 {
                     break;
                 }
-                else
-                {
-                    string parameter = remainder[(startIndex + 1)..endIndex];
-                    parameters.Add(parameter);
-                    remainder = remainder.Remove(startIndex, endIndex - startIndex + 1);
-                    startIndex = remainder.IndexOf(startSymbol);
-                }
+
+                string section = remainder[(startIndex + 1)..endIndex];
+                sections.Add(section);
+                remainder = remainder.Remove(startIndex, endIndex - startIndex + 1);
+                startIndex = FindSymbolIndex(remainder, startSymbol, stringIndeces);
             }
-            return new ExtractSectionResult([.. parameters], remainder);
+            return new ExtractSectionResult(sections.ToArray(), remainder);
         }
 
         /// <summary>
@@ -79,15 +87,16 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="input">The input string to extract from</param>
         /// <param name="stringDelimeter">The delimeter that encloses the specifier part</param>
-        /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the parameters and the string that remains after the operation</return>
-        public static string[] GetSpecifiersFromParameter(string? input, char stringDelimeter)
+        /// <param name="syntaxConf">The syntax configuration for the PX file that this validation entry is part of. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
+        /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the sections and the string that remains after the operation</return>
+        public static string[] GetSpecifiersFromParameter(string? input, char stringDelimeter, PxFileSyntaxConf syntaxConf)
         {
             if (input is null)
             {
                 return [];
             }
 
-            return ExtractSectionFromString(input, stringDelimeter).Sections;
+            return ExtractSectionFromString(input, stringDelimeter, syntaxConf).Sections;
         }
 
         /// <summary>
@@ -252,16 +261,95 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <summary>
         /// Cleans a string from new line characters and quotation marks.
         /// </summary>
-        public static string CleanString(string input)
+        /// <param name="input">The input string to clean</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
+        /// <returns>Returns a string that is the input string cleaned from new line characters and quotation marks</returns>
+        public static string CleanString(string input, PxFileSyntaxConf syntaxConf)
         {
-            if (input is null)
+            return input
+                .Trim(syntaxConf.Symbols.Linebreak)
+                .Replace(syntaxConf.Symbols.WindowsLinebreak, "")
+                .Trim(syntaxConf.Symbols.Key.StringDelimeter);
+        }
+
+        /// <summary>
+        /// Gets the indeces of the enclosing characters in a string.
+        /// </summary>
+        /// <param name="input">String to process</param>
+        /// <param name="startSymbol">Symbol that starts an enclosement</param>
+        /// <param name="endSymbol">Optional symbol that closes the enclosement. If not provided, startSymbol will be used for both.</param>
+        /// <returns>A dictionary in which keys are the indeces of opening characters and values are the corresponding closing characters.</returns>
+        public static Dictionary<int, int> GetEnclosingCharacterIndeces(string input, char startSymbol, char? endSymbol = null)
+        {
+            Dictionary<int, int> enclosingCharacterIndeces = [];
+            endSymbol ??= startSymbol;
+            int startIndex = input.IndexOf(startSymbol);
+            while(startIndex != -1)
             {
-                return string.Empty;
+                int endIndex = input.IndexOf((char)endSymbol, startIndex + 1);
+                if (endIndex == -1)
+                {
+                    break;
+                }
+                enclosingCharacterIndeces.Add(startIndex, endIndex);
+                startIndex = input.IndexOf(startSymbol, endIndex + 1);
             }
-            else
+            return enclosingCharacterIndeces;
+        }
+
+        /// <summary>
+        /// Finds the keyword separators in a string. Only indeces that are not enclosed within strings are returned.
+        /// </summary>
+        /// <param name="input">The input string to search</param>
+        /// <param name="syntaxConf">The syntax configuration for the PX file. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
+        /// <returns>An array of integers representing the indeces of keyword separators which are not enclosed by string delimeters from the input string</returns>
+        public static int[] FindKeywordSeparatorIndeces(string input, PxFileSyntaxConf syntaxConf)
+        {
+            Dictionary<int, int> stringIndeces = GetEnclosingCharacterIndeces(input, syntaxConf.Symbols.Key.StringDelimeter);
+            List<int> separators = [];
+
+            // Find all indeces of syntaxConf.Symbols.KeywordSeparator in the input string that are not enclosed within strings using FindSymbolIndex method
+            int separatorIndex = -1;
+            do
             {
-                return input.Replace("\n", "").Replace("\"", "");
+                separatorIndex = FindSymbolIndex(input, syntaxConf.Symbols.KeywordSeparator, stringIndeces, separatorIndex + 1);
+                if (separatorIndex != -1)
+                {
+                    separators.Add(separatorIndex);
+                }
             }
+            while (separatorIndex != -1);
+
+            return [..separators];
+        }
+
+        private static int FindSymbolIndex(string remainder, char symbol, Dictionary<int, int> stringIndeces, int startSearchIndex = 0)
+        {
+            // If there's no string sections to be excluded from the search, we can just use the regular IndexOf method
+            if (stringIndeces.Count == 0)
+            {
+                return remainder.IndexOf(symbol, startSearchIndex);
+            }
+
+            int symbolIndex = -1;
+            int searchIndex = startSearchIndex;
+            do
+            {
+                symbolIndex = remainder.IndexOf(symbol, searchIndex);
+                searchIndex = symbolIndex + 1;
+                if (symbolIndex == -1)
+                {
+                    break;
+                }
+                // If the symbol is enclosed within a string, we need to search again
+                if (stringIndeces.Any(i => i.Key < symbolIndex && i.Value > symbolIndex))
+                {
+                    symbolIndex = -1;
+                }
+            }
+            while (symbolIndex == -1); 
+
+            return symbolIndex;
         }
     }
 }

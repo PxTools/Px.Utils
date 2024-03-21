@@ -47,7 +47,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 KeywordContainsIllegalCharacters,
                 KeywordDoesntStartWithALetter,
                 IllegalCharactersInLanguageParameter,
-                IllegalCharactersInSpecifierParameter,
+                IllegalCharactersInSpecifierParts,
                 IncompliantLanguage,
                 KeywordContainsUnderscore,
                 KeywordIsNotInUpperCase,
@@ -96,7 +96,8 @@ namespace PxUtils.Validation.SyntaxValidation
             bool hasMultipleParameters = SyntaxValidationUtilityMethods.HasMoreThanOneSection(
                 keyValueValidationEntry.KeyValueEntry.Key,
                 syntaxConf.Symbols.Key.LangParamStart,
-                syntaxConf.Symbols.Key.LangParamEnd
+                syntaxConf.Symbols.Key.LangParamEnd,
+                syntaxConf
             );
 
             if (hasMultipleParameters)
@@ -122,7 +123,8 @@ namespace PxUtils.Validation.SyntaxValidation
             bool hasMultipleParameters = SyntaxValidationUtilityMethods.HasMoreThanOneSection(
                 keyValueValidationEntry.KeyValueEntry.Key,
                 syntaxConf.Symbols.Key.SpecifierParamStart,
-                syntaxConf.Symbols.Key.SpecifierParamEnd
+                syntaxConf.Symbols.Key.SpecifierParamEnd,
+                syntaxConf
                 );
 
             if (hasMultipleParameters)
@@ -147,8 +149,8 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string key = keyValueValidationEntry.KeyValueEntry.Key;
 
-            string languageRemoved = SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.LangParamStart, syntaxConf.Symbols.Key.LangParamEnd).Remainder;
-            string keyword = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageRemoved, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf.Symbols.Key.SpecifierParamEnd).Remainder;
+            string languageRemoved = SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.LangParamStart, syntaxConf, syntaxConf.Symbols.Key.LangParamEnd).Remainder;
+            string keyword = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageRemoved, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf, syntaxConf.Symbols.Key.SpecifierParamEnd).Remainder;
 
             if (keyword.Trim() == string.Empty)
             {
@@ -189,6 +191,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string? specifierParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     keyValueValidationEntry.KeyValueEntry.Key,
                                     syntaxConf.Symbols.Key.SpecifierParamStart,
+                                    syntaxConf,
                                     syntaxConf.Symbols.Key.SpecifierParamEnd
                                 ).Sections.FirstOrDefault();
 
@@ -199,7 +202,8 @@ namespace PxUtils.Validation.SyntaxValidation
 
             ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                 specifierParamSection,
-                syntaxConf.Symbols.Key.StringDelimeter
+                syntaxConf.Symbols.Key.StringDelimeter,
+                syntaxConf
                 );
 
             string[] specifiers = specifierResult.Sections;
@@ -225,6 +229,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string? specifierParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     keyValueValidationEntry.KeyValueEntry.Key,
                                     syntaxConf.Symbols.Key.SpecifierParamStart,
+                                    syntaxConf,
                                     syntaxConf.Symbols.Key.SpecifierParamEnd
                                 ).Sections.FirstOrDefault();
 
@@ -235,7 +240,8 @@ namespace PxUtils.Validation.SyntaxValidation
 
             ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                 specifierParamSection,
-                syntaxConf.Symbols.Key.StringDelimeter
+                syntaxConf.Symbols.Key.StringDelimeter,
+                syntaxConf
                 );
 
             string[] specifiers = specifierResult.Sections;
@@ -263,6 +269,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string? specifierParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     keyValueValidationEntry.KeyValueEntry.Key,
                                     syntaxConf.Symbols.Key.SpecifierParamStart,
+                                    syntaxConf,
                                     syntaxConf.Symbols.Key.SpecifierParamEnd
                                 ).Sections.FirstOrDefault();
 
@@ -295,7 +302,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string key = keyValueValidationEntry.KeyValueEntry.Key;
 
-            string languageParamSections = string.Join("", SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.LangParamStart, syntaxConf.Symbols.Key.LangParamEnd).Sections);
+            string languageParamSections = string.Join("", SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.LangParamStart, syntaxConf, syntaxConf.Symbols.Key.LangParamEnd).Sections);
 
             char[] languageParamIllegalSymbols = [
                 syntaxConf.Symbols.Key.LangParamStart,
@@ -329,10 +336,10 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string key = keyValueValidationEntry.KeyValueEntry.Key;
 
-            string specifierParamSections = string.Join("", SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf.Symbols.Key.SpecifierParamEnd).Sections);
+            string specifierParamSections = string.Join("", SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf, syntaxConf.Symbols.Key.SpecifierParamEnd).Sections);
 
             char[] specifierParamIllegalSymbols = [
-                syntaxConf.Symbols.Key.SpecifierParamStart,
+                syntaxConf.Symbols.EntrySeparator,
                 syntaxConf.Symbols.Key.LangParamStart,
                 syntaxConf.Symbols.Key.LangParamEnd
             ];
@@ -396,7 +403,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string value = keyValueValidationEntry.KeyValueEntry.Value;
 
             // Remove elements from the list. We only want to check whitespace between elements
-            string stripItems = SyntaxValidationUtilityMethods.ExtractSectionFromString(value, syntaxConf.Symbols.Key.StringDelimeter).Remainder;
+            string stripItems = SyntaxValidationUtilityMethods.ExtractSectionFromString(value, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf).Remainder;
             if (stripItems.Contains("  "))
             {
                 return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessWhitespaceInValue));
@@ -418,7 +425,7 @@ namespace PxUtils.Validation.SyntaxValidation
             KeyValuePairValidationEntry? keyValueValidationEntry = entry as KeyValuePairValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP_ENTRY);
 
             string key = keyValueValidationEntry.KeyValueEntry.Key;
-            string stripSpecifiers = SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.StringDelimeter).Remainder;
+            string stripSpecifiers = SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf).Remainder;
 
             IEnumerable<char> whiteSpaces = stripSpecifiers.Where(c => c == ' ');
             if (!whiteSpaces.Any())
@@ -585,7 +592,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="entry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier parameter is not following a valid format, null otherwise.</returns>
-        public readonly ValidationFunctionDelegate IllegalCharactersInSpecifierParameter = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
+        public readonly ValidationFunctionDelegate IllegalCharactersInSpecifierParts = (ValidationEntry entry, PxFileSyntaxConf syntaxConf) =>
         {
             StructuredValidationEntry? structuredValidationEntry = entry as StructuredValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRUCTURED_ENTRY);
             // Running this validation is relevant only for entries with a specifier
@@ -594,13 +601,13 @@ namespace PxUtils.Validation.SyntaxValidation
                 return null;
             }
 
-            string[] illegalcharactersInFirstSpecifier = FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.FirstSpecifier);
-            string[] illegalcharactersInSecondSpecifier = FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.SecondSpecifier);
+            char[] illegalcharactersInFirstSpecifier = FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.FirstSpecifier, syntaxConf);
+            char[] illegalcharactersInSecondSpecifier = FindIllegalCharactersInSpecifierPart(structuredValidationEntry.Key.SecondSpecifier, syntaxConf);
 
             if (illegalcharactersInFirstSpecifier.Length > 0 || illegalcharactersInSecondSpecifier.Length > 0)
             {
-                string[] characters = [.. illegalcharactersInFirstSpecifier, .. illegalcharactersInSecondSpecifier];
-                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, string.Join(", ", characters)));
+                char[] characters = [.. illegalcharactersInFirstSpecifier, .. illegalcharactersInSecondSpecifier];
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInSpecifierPart, string.Join(", ", characters)));
             }
             else
             {
@@ -608,14 +615,14 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         };
 
-        private static string[] FindIllegalCharactersInSpecifierPart(string? specifier)
+        private static char[] FindIllegalCharactersInSpecifierPart(string? specifier, PxFileSyntaxConf syntaxConf)
         {
             if (specifier is null)
             {
                 return [];
             }
 
-            string[] illegalCharacters = [";", "\"", ","];
+            char[] illegalCharacters = [syntaxConf.Symbols.EntrySeparator, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.ListSeparator];
             return illegalCharacters.Where(specifier.Contains).ToArray();
         }
 
@@ -629,9 +636,15 @@ namespace PxUtils.Validation.SyntaxValidation
         {
             StringValidationEntry? stringEntry = entry as StringValidationEntry ?? throw new ArgumentException("Entry is not of type StringValidationEntry");
 
-            if (!stringEntry.EntryString.Contains(syntaxConf.Symbols.KeywordSeparator))
+            int[] keywordSeparatorIndeces = SyntaxValidationUtilityMethods.FindKeywordSeparatorIndeces(stringEntry.EntryString, syntaxConf);
+
+            if (keywordSeparatorIndeces.Length == 0)
             {                 
                 return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.EntryWithoutValue));
+            }
+            else if (keywordSeparatorIndeces.Length > 1)
+            {
+                return new ValidationFeedbackItem(entry, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.EntryWithMultipleValues));
             }
             else
             {

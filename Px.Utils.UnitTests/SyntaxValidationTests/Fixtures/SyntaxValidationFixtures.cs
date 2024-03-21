@@ -60,9 +60,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             new(2, 0, "foo", new KeyValuePair<string, string>("BAZ[fi, en]", "NO\n"))
             ];
 
-        internal static List<KeyValuePairValidationEntry> ENTRIES_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS => [
+        internal static List<KeyValuePairValidationEntry> ENTRY_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS => [
             new(0, 0, "foo", new KeyValuePair<string, string>("FOO([\"first_specifier\"], [\"second_specifier\"])", "YES\n")),
-            new(2, 0, "foo", new KeyValuePair<string, string>("BAZ(\"spe(cifier\")", "NO\n"))
             ];
 
         private const string multilineStringValue = "\"dis parturient montes nascetur ridiculus mus\"\n" +
