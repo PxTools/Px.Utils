@@ -8,6 +8,10 @@ namespace PxFileTests.DataTests
     [TestClass]
     public class StreamUtilitiesTests
     {
+        /*
+         * THIS TEST SET ASSUMES THAT THE INPUT IS VALIDATED AND DOES NOT CONTAIN ANY ERRORS
+         */
+
         [TestMethod]
         public void FindKeywordTest_DataKeywordAtStartOfStream_ReturnsZero()
         {
