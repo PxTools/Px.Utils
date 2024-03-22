@@ -393,7 +393,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             if (type is null)
             {
-                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.InvalidValueFormat));
+                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.InvalidValueFormat, value));
             }
             else
             {

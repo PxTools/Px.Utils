@@ -185,15 +185,24 @@ namespace PxUtils.Validation.SyntaxValidation
         {
             return validationEntries.Select(entry =>
             {
+                if (entry.Line == 691)
+                {
+                    int i = 0;
+                }
                 // Split the entry string into a key and a value from the first valid keyword separator
                 int[] keywordSeparatorIndeces = SyntaxValidationUtilityMethods.FindKeywordSeparatorIndeces(entry.EntryString, syntaxConf);
-                string[] split = entry.EntryString.Split(entry.EntryString[keywordSeparatorIndeces[0]]);
-                string value = split.Length > 1 ? split[1] : string.Empty;
+
+                // Key is the part of the entry string before the first keyword separator index
+                string key = entry.EntryString[..keywordSeparatorIndeces[0]];
                 // Remove preceding linebreaks and carriage returns from the key
-                split[0] = split[0]
+                key = key
                     .TrimStart(syntaxConf.Symbols.CarriageReturn)
                     .TrimStart(syntaxConf.Symbols.Linebreak);
-                return new ValidationKeyValuePair(entry.Line, entry.Character, entry.File, new KeyValuePair<string, string>(split[0], value));
+                // Value is the part of the entry string after the first keyword separator index
+                int startIndex = keywordSeparatorIndeces[0] + 1;
+                string value = entry.EntryString[startIndex..];
+
+                return new ValidationKeyValuePair(entry.Line, entry.Character, entry.File, new KeyValuePair<string, string>(key, value));
             }).ToList();
         }
 
@@ -208,7 +217,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static List<ValidationEntry> BuildValidationEntries(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize)
         {
-            int line = 0;
+            int line = 1;
             int character = 0;
             bool isProcessingString = false;
 
@@ -296,7 +305,7 @@ namespace PxUtils.Validation.SyntaxValidation
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void UpdateLineAndCharacter(char currentCharacter, PxFileSyntaxConf syntaxConf, ref int line, ref int character, ref bool isProcessingString)
         {
-            if (currentCharacter == syntaxConf.Symbols.Linebreak || currentCharacter == syntaxConf.Symbols.CarriageReturn)
+            if (currentCharacter == syntaxConf.Symbols.Linebreak)
             {
                 line++;
                 character = 0;

@@ -160,7 +160,7 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 return false;
             }
-            if (decimal.TryParse(input, out decimal _))
+            if (!decimal.TryParse(input, out decimal _))
             {
                 return false;
             }
