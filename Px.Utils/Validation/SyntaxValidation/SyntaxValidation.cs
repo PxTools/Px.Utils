@@ -185,10 +185,6 @@ namespace PxUtils.Validation.SyntaxValidation
         {
             return validationEntries.Select(entry =>
             {
-                if (entry.Line == 691)
-                {
-                    int i = 0;
-                }
                 // Split the entry string into a key and a value from the first valid keyword separator
                 int[] keywordSeparatorIndeces = SyntaxValidationUtilityMethods.FindKeywordSeparatorIndeces(entry.EntryString, syntaxConf);
 
