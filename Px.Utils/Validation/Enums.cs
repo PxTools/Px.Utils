@@ -18,7 +18,6 @@
         ListOfStrings,
         Number,
         Boolean,
-        DateTime,
         Timeval
     }
 
@@ -42,8 +41,7 @@
         ExcessNewLinesInValue = 12,
         IllegalCharactersInKeyword = 13,
         KeywordDoesntStartWithALetter = 14,
-        KeyworRegexTimeout = 15,
-        LanguageRegexTimeout = 16,
+        RegexTimeout = 15,
         IllegalCharactersInLanguageParameter = 17,
         IllegalCharactersInSpecifierParameter = 18,
         EntryWithoutValue = 19,

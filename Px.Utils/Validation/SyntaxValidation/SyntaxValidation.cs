@@ -188,6 +188,10 @@ namespace PxUtils.Validation.SyntaxValidation
                 int[] keywordSeparatorIndeces = SyntaxValidationUtilityMethods.FindKeywordSeparatorIndeces(entry.EntryString, syntaxConf);
                 string[] split = entry.EntryString.Split(entry.EntryString[keywordSeparatorIndeces[0]]);
                 string value = split.Length > 1 ? split[1] : string.Empty;
+                // Remove preceding linebreaks and carriage returns from the key
+                split[0] = split[0]
+                    .TrimStart(syntaxConf.Symbols.CarriageReturn)
+                    .TrimStart(syntaxConf.Symbols.Linebreak);
                 return new ValidationKeyValuePair(entry.Line, entry.Character, entry.File, new KeyValuePair<string, string>(split[0], value));
             }).ToList();
         }
@@ -289,7 +293,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static void UpdateLineAndCharacter(char currentCharacter, PxFileSyntaxConf syntaxConf, ref int line, ref int character, ref bool isProcessingString)
         {
-            if (currentCharacter == syntaxConf.Symbols.Linebreak)
+            if (currentCharacter == syntaxConf.Symbols.Linebreak || currentCharacter == syntaxConf.Symbols.CarriageReturn)
             {
                 line++;
                 character = 0;

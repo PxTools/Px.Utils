@@ -2,6 +2,7 @@
 using System.Globalization;
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
@@ -28,6 +29,8 @@ namespace PxUtils.Validation.SyntaxValidation
     /// </summary>
     public static class SyntaxValidationUtilityMethods
     {
+        private const int DEFAULT_TIMEOUT = 1;
+
         /// <summary>
         /// Determines whether a string contains more than one section enclosed with given symbols.
         /// </summary>
@@ -100,22 +103,6 @@ namespace PxUtils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// Determines whether a string is in a date-time format.
-        /// </summary>
-        /// <param name="input">The input string to check</param>
-        /// <param name="stringDelimeter">The delimeter that encloses the string</param>
-        /// <param name="dateTimeFormat">The format that the date-time should be in</param>
-        /// <returns>Returns a boolean which is true if the input string is in the given date-time format</returns>
-        public static bool IsDateTimeFormat(string input, char stringDelimeter, string dateTimeFormat)
-        {
-            if (!IsStringFormat(input, stringDelimeter))
-            {
-                return false;
-            }
-            return DateTime.TryParseExact(input.Trim(stringDelimeter), dateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
-        }
-
-        /// <summary>
         /// Determines whether a string is in a string format.
         /// </summary>
         /// <param name="input">The input string to check</param>
@@ -169,37 +156,29 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>Returns a boolean which is true if the input string is in a number format</returns>
         public static bool IsNumberFormat(string input)
         {
-            char[] allowedSymbols = [
-                '0',
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '.',
-                '-'
-            ];
-
-            if (input.Any(c => !allowedSymbols.Contains(c)))
+            if (input.Length > 29)
             {
                 return false;
             }
-            
-            if (input.Count(c => c == '.') > 1 || input.Count(c => c == '-') > 1)
+            if (decimal.TryParse(input, out decimal _))
             {
                 return false;
             }
 
-            if (input.Contains('-') && !input.StartsWith('-'))
+            // Create a regex pattern to match valid number format
+            string pattern = @"^-?(\d+\.?\d*|\.\d+)$";
+
+
+            TimeSpan timeout = TimeSpan.FromSeconds(1);
+            try
             {
+                return Regex.IsMatch(input, pattern, RegexOptions.Singleline, timeout);
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                // If the regex times out, we can't be sure if the input is a valid number
                 return false;
             }
-
-            return true;
         }
 
         /// <summary>
@@ -211,7 +190,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>Returns a boolean which is true if the line changes in the input string are compliant with the syntax configuration</returns>
         public static bool ValueLineChangesAreCompliant(string input, PxFileSyntaxConf syntaxConf, bool isList)
         {
-            int lineChangeIndex = input.IndexOf(syntaxConf.Symbols.Linebreak);
+            int lineChangeIndex = GetNextLineChangeIndex(input, syntaxConf);
             while (lineChangeIndex != -1)
             {
                 char symbolBefore = isList ? syntaxConf.Symbols.Key.ListSeparator : syntaxConf.Symbols.Key.StringDelimeter;
@@ -219,7 +198,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 {
                     return false;
                 }
-                lineChangeIndex = input.IndexOf(syntaxConf.Symbols.Linebreak, lineChangeIndex + 1);
+                lineChangeIndex = GetNextLineChangeIndex(input, syntaxConf, lineChangeIndex + 1);
             }
             return true;
         }
@@ -235,10 +214,6 @@ namespace PxUtils.Validation.SyntaxValidation
             if (IsStringListFormat(input, syntaxConf.Symbols.Value.ListSeparator, syntaxConf.Symbols.Key.StringDelimeter))
             {
                 return ValueType.ListOfStrings;
-            }
-            else if (IsDateTimeFormat(input, syntaxConf.Symbols.Value.StringDelimeter, syntaxConf.Symbols.Value.DateTimeFormat))
-            {
-                return ValueType.DateTime;
             }
             else if (IsStringFormat(input, syntaxConf.Symbols.Value.StringDelimeter))
             {
@@ -267,8 +242,8 @@ namespace PxUtils.Validation.SyntaxValidation
         public static string CleanString(string input, PxFileSyntaxConf syntaxConf)
         {
             return input
+                .Trim(syntaxConf.Symbols.CarriageReturn)
                 .Trim(syntaxConf.Symbols.Linebreak)
-                .Replace(syntaxConf.Symbols.WindowsLinebreak, "")
                 .Trim(syntaxConf.Symbols.Key.StringDelimeter);
         }
 
@@ -321,6 +296,77 @@ namespace PxUtils.Validation.SyntaxValidation
             while (separatorIndex != -1);
 
             return [..separators];
+        }
+
+        /// <summary>
+        /// Finds the illegal characters in a string using a regular expression pattern.
+        /// </summary>
+        /// <param name="input">The input string to search</param>
+        /// <param name="illegalCharacters">An array of characters that are considered illegal</param>
+        /// <param name="foundIllegalCharacters">An array of characters that were found in the input string</param>
+        /// <returns>Returns a boolean which is true if the search was successful. If the search times out, false is returned.</returns>
+        public static bool FindIllegalCharactersInString(string input, char[] illegalCharacters, out char[] foundIllegalCharacters, int customTimeout = DEFAULT_TIMEOUT)
+        {
+            string processedCharacters = ProcessCharsForRegexPattern(illegalCharacters);
+            string pattern = $"[{processedCharacters}]";
+
+            TimeSpan timeout = TimeSpan.FromSeconds(customTimeout);
+            try
+            {
+                MatchCollection matches = Regex.Matches(input, pattern, RegexOptions.Singleline, timeout);
+                foundIllegalCharacters = matches.Cast<Match>().Select(m => m.Value[0]).ToArray();
+                return true;
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                foundIllegalCharacters = [];
+                return false;
+            }
+        }
+        private static int GetNextLineChangeIndex(string input, PxFileSyntaxConf syntaxConf, int startIndex = 0)
+        {
+            int lineBreakIndex = input.IndexOf(syntaxConf.Symbols.Linebreak, startIndex);
+            int carriageReturnIndex = input.IndexOf(syntaxConf.Symbols.CarriageReturn, startIndex);
+
+            // If neither character was found, return -1
+            if (lineBreakIndex == -1 && carriageReturnIndex == -1)
+            {
+                return -1;
+            }
+
+            // If only one character was found, return its index
+            if (lineBreakIndex == -1)
+            {
+                return carriageReturnIndex;
+            }
+            if (carriageReturnIndex == -1)
+            {
+                return lineBreakIndex;
+            }
+
+            // If both characters were found, return the index of the one that appears first
+            return Math.Min(lineBreakIndex, carriageReturnIndex);
+        }
+
+        private static string ProcessCharsForRegexPattern(char[] illegalCharacters)
+        {
+            string[] specialCharacters = [ "\\", "^", "$", ".", "|", "?", "*", "+", "(", ")", "[", "]", "[", "]" ];
+            string[] processedCharacters = new string[illegalCharacters.Length];
+
+            for (int i = 0; i < illegalCharacters.Length; i++)
+            {
+                string character = illegalCharacters[i].ToString();
+
+                if (specialCharacters.Contains(character))
+                {
+                    // If the character is a special character, escape it
+                    character = "\\" + character;
+                }
+
+                processedCharacters[i] = character;
+            }
+
+            return string.Join("", processedCharacters);
         }
 
         private static int FindSymbolIndex(string remainder, char symbol, Dictionary<int, int> stringIndeces, int startSearchIndex = 0)

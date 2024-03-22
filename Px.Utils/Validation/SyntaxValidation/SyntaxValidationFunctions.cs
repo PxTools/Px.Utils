@@ -1,5 +1,6 @@
 ﻿using PxUtils.PxFile;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace PxUtils.Validation.SyntaxValidation
@@ -60,20 +61,20 @@ namespace PxUtils.Validation.SyntaxValidation
         private const string ARGUMENT_EXCEPTION_MESSAGE_NOT_A_VALIDATIONSTRUCT = "ValidationObject is not of type ValidationStruct";
 
         /// <summary>
-        /// Validates the given <see cref="ValidationObject"/> If the validationObject does not start with a line separator, it is considered as not being on its own line, and a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationObject"/> If the entry does not start with a line separator, it is considered as not being on its own line, and a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="validationObject">The <see cref="ValidationObject"/> validationObject to validate.</param>
+        /// <param name="validationObject">The <see cref="ValidationObject"/> entry to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the validationObject does not start with a line separator, null otherwise.</returns>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the entry does not start with a line separator, null otherwise.</returns>
         public static ValidationFunctionDelegate MultipleEntriesOnLine { get; } = (ValidationObject validationObject, PxFileSyntaxConf syntaxConf) =>
         {
             ValidationEntry? validationEntry = validationObject as ValidationEntry ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_STRING_ENTRY);
 
-            // If the validationObject does not start with a line separator, it is not on its own line. For the first validationObject this is not relevant.
+            // If the entry does not start with a line separator, it is not on its own line. For the first entry this is not relevant.
             if (
             validationEntry.EntryIndex == 0 || 
             validationEntry.EntryString.StartsWith(syntaxConf.Symbols.Linebreak) ||
-            validationEntry.EntryString.StartsWith(syntaxConf.Symbols.WindowsLinebreak))
+            validationEntry.EntryString.StartsWith(syntaxConf.Symbols.CarriageReturn))
             {
                 return null;
             }
@@ -149,21 +150,27 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string key = validationKeyValuePair.KeyValuePair.Key;
 
+            // Remove language parameter section if it exists
             string languageRemoved = SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.LangParamStart, syntaxConf, syntaxConf.Symbols.Key.LangParamEnd).Remainder;
+            // Same for specifier section
             string keyword = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageRemoved, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf, syntaxConf.Symbols.Key.SpecifierParamEnd).Remainder;
 
+            // Check for missing keyword
             if (keyword.Trim() == string.Empty)
             {
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingKeyword));
             }
 
+            // Check where language and parameter sections start
             int langParamStartIndex = key.IndexOf(syntaxConf.Symbols.Key.LangParamStart);
             int specifierParamStartIndex = key.IndexOf(syntaxConf.Symbols.Key.SpecifierParamStart);
 
-            if (langParamStartIndex == -1)
+            // If the key contains no language or specifier section, it is in the correct order
+            if (langParamStartIndex == -1 && specifierParamStartIndex == -1)
             {
                 return null;
             }
+            // Check if the specifier section comes before the language section or that the key starts with a specifier or language section
             else if (
                 specifierParamStartIndex != -1 && langParamStartIndex > specifierParamStartIndex ||
                 key.Trim().StartsWith(syntaxConf.Symbols.Key.SpecifierParamStart) ||
@@ -302,7 +309,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string key = validationKeyValuePair.KeyValuePair.Key;
 
-            string languageParamSections = string.Join("", SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.LangParamStart, syntaxConf, syntaxConf.Symbols.Key.LangParamEnd).Sections);
+            string languageParamSections = string.Join(' ', SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.LangParamStart, syntaxConf, syntaxConf.Symbols.Key.LangParamEnd).Sections);
 
             char[] languageParamIllegalSymbols = [
                 syntaxConf.Symbols.Key.LangParamStart,
@@ -312,15 +319,22 @@ namespace PxUtils.Validation.SyntaxValidation
                 syntaxConf.Symbols.Key.ListSeparator
                 ];
 
-            char[] illegalSymbolsFoundInLanguageParam = languageParamIllegalSymbols.Where(languageParamSections.Contains).ToArray();
-
-            if (illegalSymbolsFoundInLanguageParam.Length > 0)
+            // If FindIllegalCharactersInString returns false, it means that the regex has timed out
+            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(languageParamSections, languageParamIllegalSymbols, out char[] foundIllegalSymbols))
             {
-                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInLanguageParameter));
+                if (foundIllegalSymbols.Length > 0)
+                {
+                    string foundSymbols = string.Join(", ", foundIllegalSymbols);
+                    return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInLanguageParameter, foundSymbols));
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
-                return null;
+                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.RegexTimeout, languageParamSections));
             }
         };
 
@@ -336,7 +350,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string key = validationKeyValuePair.KeyValuePair.Key;
 
-            string specifierParamSections = string.Join("", SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf, syntaxConf.Symbols.Key.SpecifierParamEnd).Sections);
+            string specifierParamSections = string.Join(' ', SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf, syntaxConf.Symbols.Key.SpecifierParamEnd).Sections);
 
             char[] specifierParamIllegalSymbols = [
                 syntaxConf.Symbols.EntrySeparator,
@@ -344,15 +358,22 @@ namespace PxUtils.Validation.SyntaxValidation
                 syntaxConf.Symbols.Key.LangParamEnd
             ];
 
-            char[] illegalSymbolsFoundInSpecifierParam = specifierParamIllegalSymbols.Where(specifierParamSections.Contains).ToArray();
-
-            if (illegalSymbolsFoundInSpecifierParam.Length > 0)
+            // If FindIllegalCharactersInString returns false, it means that the regex has timed out
+            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(specifierParamSections, specifierParamIllegalSymbols, out char[] foundIllegalSymbols))
             {
-                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInSpecifierParameter));
+                if (foundIllegalSymbols.Length > 0)
+                {
+                    string foundSymbols = string.Join(", ", foundIllegalSymbols);
+                    return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, foundSymbols));
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
-                return null;
+                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.RegexTimeout, specifierParamSections));
             }
         };
 
@@ -404,7 +425,12 @@ namespace PxUtils.Validation.SyntaxValidation
 
             // Remove elements from the list. We only want to check whitespace between elements
             string stripItems = SyntaxValidationUtilityMethods.ExtractSectionFromString(value, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf).Remainder;
-            if (stripItems.Contains("  "))
+            if (
+                stripItems.Contains($"{syntaxConf.Symbols.Space}{syntaxConf.Symbols.Space}") ||
+                stripItems.Contains($"{syntaxConf.Symbols.HorizontalTab}") ||
+                stripItems.Contains($"{syntaxConf.Symbols.CarriageReturn}") ||
+                stripItems.Contains($"{syntaxConf.Symbols.LineFeed}")
+                )
             {
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessWhitespaceInValue));
             }
@@ -427,7 +453,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string key = validationKeyValuePair.KeyValuePair.Key;
             string stripSpecifiers = SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf).Remainder;
 
-            IEnumerable<char> whiteSpaces = stripSpecifiers.Where(c => c == ' ');
+            IEnumerable<char> whiteSpaces = stripSpecifiers.Where(c => syntaxConf.Symbols.WhitespaceCharacters.Contains(c));
             if (!whiteSpaces.Any())
             {
                 return null;
@@ -470,7 +496,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string value = validationKeyValuePair.KeyValuePair.Value;
 
-            if (value.Contains(syntaxConf.Symbols.Linebreak))
+            if (value.Contains(syntaxConf.Symbols.Linebreak) || value.Contains(syntaxConf.Symbols.CarriageReturn))
             {
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessNewLinesInValue));
             }
@@ -513,7 +539,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
             catch (RegexMatchTimeoutException)
             {
-                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.KeyworRegexTimeout));
+                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.RegexTimeout));
             }
 
             return null;
@@ -565,25 +591,35 @@ namespace PxUtils.Validation.SyntaxValidation
             string lang = validationStruct.Key.Language;
 
             // Find illegal characters from language parameter string
-            string illegalCharacters = @"[;=\[\]"" ]";
-            TimeSpan timeout = TimeSpan.FromSeconds(1);
-            // Find all illegal symbols in keyword
-            try
+            char[] illegalCharacters = [
+                syntaxConf.Symbols.Key.LangParamStart,
+                syntaxConf.Symbols.Key.LangParamEnd,
+                syntaxConf.Symbols.Key.StringDelimeter,
+                syntaxConf.Symbols.EntrySeparator,
+                syntaxConf.Symbols.KeywordSeparator,
+                syntaxConf.Symbols.Space,
+                syntaxConf.Symbols.CarriageReturn,
+                syntaxConf.Symbols.LineFeed,
+                syntaxConf.Symbols.HorizontalTab
+            ];
+
+            // If FindIllegalCharactersInString returns false, it means that the regex has timed out
+            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(lang, illegalCharacters, out char[] foundIllegalCharacters))
             {
-                MatchCollection matchesLang = Regex.Matches(lang, illegalCharacters, RegexOptions.None, timeout);
-                List<string> foundIllegalCharacters = matchesLang.Cast<Match>().Select(m => m.Value).Distinct().ToList();
-                // Check if there are any special characters or whitespace in lang
-                if (foundIllegalCharacters.Count > 0)
+                if (foundIllegalCharacters.Length > 0)
                 {
-                    return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInLanguageParameter, string.Join(", ", foundIllegalCharacters)));
+                    string foundSymbols = string.Join(", ", foundIllegalCharacters);
+                    return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInLanguageParameter, foundSymbols));
+                }
+                else
+                {
+                    return null;
                 }
             }
-            catch (RegexMatchTimeoutException)
+            else
             {
-                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.LanguageRegexTimeout));
+                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.RegexTimeout, lang));
             }
-
-            return null;
         };
 
         /// <summary>
@@ -601,8 +637,26 @@ namespace PxUtils.Validation.SyntaxValidation
                 return null;
             }
 
-            char[] illegalcharactersInFirstSpecifier = FindIllegalCharactersInSpecifierPart(validationStruct.Key.FirstSpecifier, syntaxConf);
-            char[] illegalcharactersInSecondSpecifier = FindIllegalCharactersInSpecifierPart(validationStruct.Key.SecondSpecifier, syntaxConf);
+            char[] illegalCharacters = [syntaxConf.Symbols.EntrySeparator, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.ListSeparator];
+            bool firstSpecifierChecked = FindIllegalCharactersInSpecifierPart(validationStruct.Key.FirstSpecifier, illegalCharacters, out char[] illegalcharactersInFirstSpecifier);
+            bool secondSpecifierChecked = FindIllegalCharactersInSpecifierPart(validationStruct.Key.SecondSpecifier, illegalCharacters, out char[] illegalcharactersInSecondSpecifier);
+
+            if (!firstSpecifierChecked || !secondSpecifierChecked)
+            {
+                StringBuilder specifiersThatFailedRegex = firstSpecifierChecked
+                    ? new StringBuilder()
+                    : new StringBuilder(validationStruct.Key.FirstSpecifier);
+                if (!secondSpecifierChecked)
+                {
+                    if (specifiersThatFailedRegex.Length > 0)
+                    {
+                        specifiersThatFailedRegex.Append(' ');
+                    }
+                    specifiersThatFailedRegex.Append(validationStruct.Key.SecondSpecifier);
+                }
+
+                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.RegexTimeout, specifiersThatFailedRegex.ToString()));
+            }
 
             if (illegalcharactersInFirstSpecifier.Length > 0 || illegalcharactersInSecondSpecifier.Length > 0)
             {
@@ -615,15 +669,23 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         };
 
-        private static char[] FindIllegalCharactersInSpecifierPart(string? specifier, PxFileSyntaxConf syntaxConf)
+        private static bool FindIllegalCharactersInSpecifierPart(string? specifier, char[] illegalCharacters, out char[] foundIllegalCharacters)
         {
             if (specifier is null)
             {
-                return [];
+                foundIllegalCharacters = [];
+                return true;
             }
 
-            char[] illegalCharacters = [syntaxConf.Symbols.EntrySeparator, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.ListSeparator];
-            return illegalCharacters.Where(specifier.Contains).ToArray();
+            // If FindIllegalCharactersInString returns false, it means that the regex has timed out
+            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(specifier, illegalCharacters, out foundIllegalCharacters))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>

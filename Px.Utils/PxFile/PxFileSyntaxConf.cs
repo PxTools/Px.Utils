@@ -49,14 +49,21 @@
             private const char KEYWORD_SEPARATOR_DEFAULT = '=';
             private const char ENTRY_SEPARATOR_DEFAULT = ';';
             private const char LINE_BREAK_DEFAULT = '\n';
-            private const string WINDOWS_LINE_BREAK_DEFAULT = "\r\n";
             private const char END_OF_STREAM_DEFAULT = '\0';
+            private const int SPACE = 0x20;
+            private const int HORIZONTAL_TAB = 0x09;
+            private const int CARRIAGE_RETURN = 0x0D;
+            private const int LINE_FEED = 0x0A;
 
             public char KeywordSeparator { get; set; } = KEYWORD_SEPARATOR_DEFAULT;
             public char EntrySeparator { get; set; } = ENTRY_SEPARATOR_DEFAULT;
             public char Linebreak { get; set; } = LINE_BREAK_DEFAULT;
-            public string WindowsLinebreak { get; set; } = WINDOWS_LINE_BREAK_DEFAULT;
             public char EndOfStream { get; set; } = END_OF_STREAM_DEFAULT;
+            public char Space { get; set; } = (char)SPACE;
+            public char HorizontalTab { get; set; } = (char)HORIZONTAL_TAB;
+            public char CarriageReturn { get; set; } = (char)CARRIAGE_RETURN;
+            public char LineFeed { get; set; } = (char)LINE_FEED;
+            public char[] WhitespaceCharacters { get; } = [(char)SPACE, (char)HORIZONTAL_TAB, (char)CARRIAGE_RETURN, (char)LINE_FEED];
 
             public KeySymbols Key { get; set; }
             public ValueSymbols Value { get; set; }
