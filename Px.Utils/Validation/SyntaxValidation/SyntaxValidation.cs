@@ -2,6 +2,7 @@
 using PxUtils.PxFile;
 using PxUtils.PxFile.Meta;
 using System.Reflection.PortableExecutable;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace PxUtils.Validation.SyntaxValidation
@@ -280,6 +281,7 @@ namespace PxUtils.Validation.SyntaxValidation
             return entries;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsEndOfMetadataSection(char currentCharacter, PxFileSyntaxConf syntaxConf, StringBuilder entryBuilder, bool isProcessingString)
         {
             if (!isProcessingString && currentCharacter == syntaxConf.Symbols.KeywordSeparator)
@@ -291,6 +293,7 @@ namespace PxUtils.Validation.SyntaxValidation
             return false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void UpdateLineAndCharacter(char currentCharacter, PxFileSyntaxConf syntaxConf, ref int line, ref int character, ref bool isProcessingString)
         {
             if (currentCharacter == syntaxConf.Symbols.Linebreak || currentCharacter == syntaxConf.Symbols.CarriageReturn)
@@ -308,6 +311,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsEndOfEntry(char currentCharacter, PxFileSyntaxConf syntaxConf, bool isProcessingString)
         {
             if (!isProcessingString && currentCharacter == syntaxConf.Symbols.EntrySeparator)
