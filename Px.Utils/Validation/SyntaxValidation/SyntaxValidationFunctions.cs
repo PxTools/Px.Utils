@@ -410,7 +410,7 @@ namespace PxUtils.Validation.SyntaxValidation
         public static ValidationFunctionDelegate ExcessWhitespaceInValue { get; } = (ValidationObject validationObject, PxFileSyntaxConf syntaxConf) =>
         {
             ValidationKeyValuePair? validationKeyValuePair = validationObject as ValidationKeyValuePair ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP);
-            
+
             // Validation only matters if the value is a list of strings
             if (!SyntaxValidationUtilityMethods.IsStringListFormat(
                 validationKeyValuePair.KeyValuePair.Value,
@@ -427,9 +427,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string stripItems = SyntaxValidationUtilityMethods.ExtractSectionFromString(value, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf).Remainder;
             if (
                 stripItems.Contains($"{syntaxConf.Symbols.Space}{syntaxConf.Symbols.Space}") ||
-                stripItems.Contains($"{syntaxConf.Symbols.HorizontalTab}") ||
-                stripItems.Contains($"{syntaxConf.Symbols.CarriageReturn}") ||
-                stripItems.Contains($"{syntaxConf.Symbols.LineFeed}")
+                stripItems.Contains($"{syntaxConf.Symbols.HorizontalTab}")
                 )
             {
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessWhitespaceInValue));
