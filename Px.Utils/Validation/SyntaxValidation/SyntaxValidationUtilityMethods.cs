@@ -1,10 +1,5 @@
 ﻿using PxUtils.PxFile;
-using System.Globalization;
-using System;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
