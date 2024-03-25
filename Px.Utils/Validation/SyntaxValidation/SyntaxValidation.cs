@@ -37,7 +37,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="syntaxConf">An optional <see cref="PxFileSyntaxConf"/> parameter that specifies the syntax configuration for the PX file. If not provided, the default syntax configuration is used.</param>
         /// <param name="bufferSize">An optional parameter that specifies the buffer size for reading the file. If not provided, a default buffer size of 4096 is used.</param>
         /// <param name="customValidationFunctions">An optional <see cref="CustomValidationFunctions"/> parameter that specifies custom validation functions to be used during validation. If not provided, the default validation functions are used.</param>
-        /// <returns>A <see cref="SyntaxValidationResult"/> object which contains a list of <see cref="ValidationStruct"/> objects and a list of <see cref="ValidationFeedbackItem"/> objects accumulated during the validation.</returns>
+        /// <returns>A <see cref="SyntaxValidationResult"/> object which contains a list of <see cref="ValidationStructuredEntry"/> objects and a list of <see cref="ValidationFeedbackItem"/> objects accumulated during the validation.</returns>
         public static SyntaxValidationResult ValidatePxFileMetadataSyntax(
             Stream stream,
             Encoding encoding,
@@ -65,7 +65,7 @@ namespace PxUtils.Validation.SyntaxValidation
             ValidateEntries(stringEntries, stringValidationFunctions, validationFeedback, syntaxConf);
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(stringEntries, syntaxConf);
             ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, validationFeedback, syntaxConf);
-            List<ValidationStruct> structuredEntries = BuildValidationStructs(keyValuePairs, syntaxConf);
+            List<ValidationStructuredEntry> structuredEntries = BuildvalidationStructuredEntryuredEntrys(keyValuePairs, syntaxConf);
             ValidateStructs(structuredEntries, structuredValidationFunctions, validationFeedback, syntaxConf);
 
             return new([.. validationFeedback], structuredEntries);
@@ -81,7 +81,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="bufferSize">An optional parameter that specifies the buffer size for reading the file. If not provided, a default buffer size of 4096 is used.</param>
         /// <param name="customValidationFunctions">An optional <see cref="CustomValidationFunctions"/> parameter that specifies custom validation functions to be used during validation. If not provided, the default validation functions are used.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> parameter that can be used to cancel the operation.</param>
-        /// <returns>A task that contains a <see cref="SyntaxValidationResult"/> object, which contains the structured validation objects and a list of <see cref="ValidationStruct"/> objects accumulated during the validation.</returns>
+        /// <returns>A task that contains a <see cref="SyntaxValidationResult"/> object, which contains the structured validation objects and a list of <see cref="ValidationStructuredEntry"/> objects accumulated during the validation.</returns>
         public static async Task<SyntaxValidationResult> ValidatePxFileMetadataSyntaxAsync(
             Stream stream,
             Encoding encoding,
@@ -110,10 +110,10 @@ namespace PxUtils.Validation.SyntaxValidation
             ValidateEntries(entries, stringValidationFunctions, validationFeedback, syntaxConf);
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, syntaxConf);
             ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, validationFeedback, syntaxConf);
-            List<ValidationStruct> structs = BuildValidationStructs(keyValuePairs, syntaxConf);
-            ValidateStructs(structs, structuredValidationFunctions, validationFeedback, syntaxConf);
+            List<ValidationStructuredEntry> structuredEntries = BuildvalidationStructuredEntryuredEntrys(keyValuePairs, syntaxConf);
+            ValidateStructs(structuredEntries, structuredValidationFunctions, validationFeedback, syntaxConf);
 
-            return new([.. validationFeedback], structs);
+            return new([.. validationFeedback], structuredEntries);
         }
 
         private static void ValidateEntries(IEnumerable<ValidationEntry> objects, IEnumerable<EntryValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf)
@@ -146,7 +146,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         }
 
-        private static void ValidateStructs(IEnumerable<ValidationStruct> objects, IEnumerable<StructuredValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf)
+        private static void ValidateStructs(IEnumerable<ValidationStructuredEntry> objects, IEnumerable<StructuredValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf)
         {
             foreach (var @object in objects)
             {
@@ -186,12 +186,12 @@ namespace PxUtils.Validation.SyntaxValidation
             }).ToList();
         }
 
-        private static List<ValidationStruct> BuildValidationStructs(List<ValidationKeyValuePair> keyValuePairs, PxFileSyntaxConf syntaxConf)
+        private static List<ValidationStructuredEntry> BuildvalidationStructuredEntryuredEntrys(List<ValidationKeyValuePair> keyValuePairs, PxFileSyntaxConf syntaxConf)
         {
             return keyValuePairs.Select(entry =>
             {
-                ValidationStructKey key = ParseValidationStructKey(entry.KeyValuePair.Key, syntaxConf);
-                return new ValidationStruct(entry.Line, entry.Character, entry.File, key, entry.KeyValuePair.Value);
+                ValidationStructuredEntryKey key = ParsevalidationStructuredEntryuredEntryKey(entry.KeyValuePair.Key, syntaxConf);
+                return new ValidationStructuredEntry(entry.Line, entry.Character, entry.File, key, entry.KeyValuePair.Value);
             }).ToList();
         }
 
@@ -298,7 +298,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         }
 
-        private static ValidationStructKey ParseValidationStructKey(string input, PxFileSyntaxConf syntaxConf)
+        private static ValidationStructuredEntryKey ParsevalidationStructuredEntryuredEntryKey(string input, PxFileSyntaxConf syntaxConf)
         {
             ExtractSectionResult languageResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(input, syntaxConf.Symbols.Key.LangParamStart, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.LangParamEnd);
             string? language = languageResult.Sections.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(languageResult.Sections[0], syntaxConf) : null;

@@ -105,31 +105,31 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             new(1, 0, "foo", new KeyValuePair<string, string>("BAR", shortListValueWithNewLine))
         ];
 
-        private readonly static ValidationStructKey numberInKeyword = new("1FOO");
-        private readonly static ValidationStructKey slashInKeyword = new("B/AR");
-        private readonly static ValidationStructKey colonInKeyword = new("B:AZ");
-        internal static List<ValidationStruct> STRUCTS_WITH_INVALID_KEYWORDS => [
+        private readonly static ValidationStructuredEntryKey numberInKeyword = new("1FOO");
+        private readonly static ValidationStructuredEntryKey slashInKeyword = new("B/AR");
+        private readonly static ValidationStructuredEntryKey colonInKeyword = new("B:AZ");
+        internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_INVALID_KEYWORDS => [
             new(0, 0, "foo", numberInKeyword, "foo"),
             new(1, 0, "foo", slashInKeyword, "bar"),
             new(2, 0, "foo", colonInKeyword, "baz")
         ];
 
-        private readonly static ValidationStructKey fi = new("FOO", "fi");
-        private readonly static ValidationStructKey fin = new("BAR", "fin");
-        private readonly static ValidationStructKey fiFi = new("BAZ", "fi-FI");
-        internal static List<ValidationStruct> STRUCTS_WITH_VALID_LANGUAGES => [
+        private readonly static ValidationStructuredEntryKey fi = new("FOO", "fi");
+        private readonly static ValidationStructuredEntryKey fin = new("BAR", "fin");
+        private readonly static ValidationStructuredEntryKey fiFi = new("BAZ", "fi-FI");
+        internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_VALID_LANGUAGES => [
             new(0, 0, "foo", fi, "foo"),
             new(1, 0, "foo", fin, "bar"),
             new(2, 0, "foo", fiFi, "baz")
         ];
 
-        private readonly static ValidationStructKey fien = new("FOO", "fi en");
-        internal static List<ValidationStruct> STRUCTS_WITH_INVALID_LANGUAGES => [
+        private readonly static ValidationStructuredEntryKey fien = new("FOO", "fi en");
+        internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_INVALID_LANGUAGES => [
             new(0, 0, "foo", fien, "foo"),
         ];
 
-        private readonly static ValidationStructKey illegalSpecifier = new("FOO", "fi", "first\"specifier");
-        internal static List<ValidationStruct> STRUCT_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS => [
+        private readonly static ValidationStructuredEntryKey illegalSpecifier = new("FOO", "fi", "first\"specifier");
+        internal static List<ValidationStructuredEntry> STRUCTIRED_ENTRIES_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS => [
             new(0, 0, "foo", illegalSpecifier, "foo"),
         ];
 
@@ -137,21 +137,21 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
            new(0, 0, "LANGUAGES", "", 0)
         ];
 
-        private readonly static ValidationStructKey finnish = new("FOO", "finnish");
-        private readonly static ValidationStructKey engl = new("BAR", "engl");
-        internal static List<ValidationStruct> STRUCTS_WITH_INCOMPLIANT_LANGUAGES => [
+        private readonly static ValidationStructuredEntryKey finnish = new("FOO", "finnish");
+        private readonly static ValidationStructuredEntryKey engl = new("BAR", "engl");
+        internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_INCOMPLIANT_LANGUAGES => [
             new(0, 0, "foo", finnish, "foo"),
             new(1, 0, "foo", engl, "foo"),
         ];
 
-        private readonly static ValidationStructKey longKeyword = new("THISISALONGKEYWORDWHICHISNOTRECOMMENDED");
-        internal static List<ValidationStruct> STRUCT_WITH_LONG_KEYWORD => [
+        private readonly static ValidationStructuredEntryKey longKeyword = new("THISISALONGKEYWORDWHICHISNOTRECOMMENDED");
+        internal static List<ValidationStructuredEntry> STRUCTS_WITH_LONG_KEYWORD => [
             new(0, 0, "foo", longKeyword, "foo"),
         ];
 
-        private readonly static ValidationStructKey pascalCaseKeyword = new("PascalCase");
-        private readonly static ValidationStructKey screamingSnakeCaseKeyword = new("SCREAMING_SNAKE");
-        internal static List<ValidationStruct> STRUCTS_WITH_UNRECOMMENDED_KEYWORD_NAMING => [
+        private readonly static ValidationStructuredEntryKey pascalCaseKeyword = new("PascalCase");
+        private readonly static ValidationStructuredEntryKey screamingSnakeCaseKeyword = new("SCREAMING_SNAKE");
+        internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_UNRECOMMENDED_KEYWORD_NAMING => [
             new(0, 0, "foo", pascalCaseKeyword, "foo"),
             new(1, 0, "foo", screamingSnakeCaseKeyword, "foo")
         ];

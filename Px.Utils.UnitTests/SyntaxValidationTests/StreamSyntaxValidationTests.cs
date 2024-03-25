@@ -240,14 +240,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateObjects_CalledWith_STRUCTS_WITH_INVALID_KEYWORDS_Returns_Result_With_Errors()
+        public void ValidateObjects_CalledWith_STRUCTURED_ENTRIES_WITH_INVALID_KEYWORDS_Returns_Result_With_Errors()
         {
             // Arrange
-            List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCTS_WITH_INVALID_KEYWORDS;
+            List<ValidationStructuredEntry> structuredEntries = SyntaxValidationFixtures.STRUCTURED_ENTRIES_WITH_INVALID_KEYWORDS;
             List<StructuredValidationFunctionDelegate> functions = [SyntaxValidationFunctions.KeywordDoesntStartWithALetter, SyntaxValidationFunctions.KeywordContainsIllegalCharacters];
 
             // Act
-            structuredValidationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
+            structuredValidationMethod?.Invoke(null, new object[] { structuredEntries, functions, feedback, syntaxConf });
 
             Assert.AreEqual(3, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeywordDoesntStartWithALetter, feedback[0].Feedback.Rule);
@@ -256,41 +256,41 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateObjects_CalledWith_STRUCTS_WITH_VALID_LANGUAGES_Returns_With_No_Feedback()
+        public void ValidateObjects_CalledWith_STRUCTURED_ENTRIES_WITH_VALID_LANGUAGES_Returns_With_No_Feedback()
         {
             // Arrange
-            List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCTS_WITH_VALID_LANGUAGES;
+            List<ValidationStructuredEntry> structuredEntries = SyntaxValidationFixtures.STRUCTURED_ENTRIES_WITH_VALID_LANGUAGES;
             List<StructuredValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IllegalCharactersInLanguageParameter];
 
             // Act
-            structuredValidationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
+            structuredValidationMethod?.Invoke(null, new object[] { structuredEntries, functions, feedback, syntaxConf });
 
             Assert.AreEqual(0, feedback.Count);
         }
 
         [TestMethod]
-        public void ValidateObjects_CalledWith_STRUCTS_WITH_INVALID_LANGUAGES_Returns_Result_With_Errors()
+        public void ValidateObjects_CalledWith_STRUCTURED_ENTRIES_WITH_INVALID_LANGUAGES_Returns_Result_With_Errors()
         {
             // Arrange
-            List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCTS_WITH_INVALID_LANGUAGES;
+            List<ValidationStructuredEntry> structuredEntries = SyntaxValidationFixtures.STRUCTURED_ENTRIES_WITH_INVALID_LANGUAGES;
             List<StructuredValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IllegalCharactersInLanguageParameter];
 
             // Act
-            structuredValidationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
+            structuredValidationMethod?.Invoke(null, new object[] { structuredEntries, functions, feedback, syntaxConf });
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageParameter, feedback[0].Feedback.Rule);
         }
 
         [TestMethod]
-        public void ValidateObjects_CalledWith_STRUCTS_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS_Returns_With_Errors()
+        public void ValidateObjects_CalledWith_STRUCTURED_ENTRIES_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS_Returns_With_Errors()
         {
             // Arrange
-            List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCT_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS;
+            List<ValidationStructuredEntry> structuredEntries = SyntaxValidationFixtures.STRUCTIRED_ENTRIES_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS;
             List<StructuredValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IllegalCharactersInSpecifierParts];
 
             // Act
-            structuredValidationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
+            structuredValidationMethod?.Invoke(null, new object[] { structuredEntries, functions, feedback, syntaxConf });
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierPart, feedback[0].Feedback.Rule);
@@ -311,14 +311,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateObjects_CalledWith_STRUCTS_WITH_INCOMPLIANT_LANGUAGES_Returns_With_Warnings()
+        public void ValidateObjects_CalledWith_STRUCTURED_ENTRIES_WITH_INCOMPLIANT_LANGUAGES_Returns_With_Warnings()
         {
             // Arrange
-            List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCTS_WITH_INCOMPLIANT_LANGUAGES;
+            List<ValidationStructuredEntry> structuredEntries = SyntaxValidationFixtures.STRUCTURED_ENTRIES_WITH_INCOMPLIANT_LANGUAGES;
             List<StructuredValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IncompliantLanguage];
 
             // Act
-            structuredValidationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
+            structuredValidationMethod?.Invoke(null, new object[] { structuredEntries, functions, feedback, syntaxConf });
 
             Assert.AreEqual(2, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.IncompliantLanguage, feedback[0].Feedback.Rule);
@@ -326,14 +326,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateObjects_CalledWith_STRUCTS_WITH_UNRECOMMENDED_KEYWORD_NAMING_Returns_With_Warnings()
+        public void ValidateObjects_CalledWith_STRUCTURED_ENTRIES_WITH_UNRECOMMENDED_KEYWORD_NAMING_Returns_With_Warnings()
         {
             // Arrange
-            List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCTS_WITH_UNRECOMMENDED_KEYWORD_NAMING;
+            List<ValidationStructuredEntry> structuredEntries = SyntaxValidationFixtures.STRUCTURED_ENTRIES_WITH_UNRECOMMENDED_KEYWORD_NAMING;
             List<StructuredValidationFunctionDelegate> functions = [SyntaxValidationFunctions.KeywordContainsUnderscore, SyntaxValidationFunctions.KeywordIsNotInUpperCase];
 
             // Act
-            structuredValidationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
+            structuredValidationMethod?.Invoke(null, new object[] { structuredEntries, functions, feedback, syntaxConf });
 
             Assert.AreEqual(2, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeywordIsNotInUpperCase, feedback[0].Feedback.Rule);
@@ -341,14 +341,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidateObjects_CalledWith_STRUCT_WITH_LONG_KEYWORD_Returns_With_Warnings()
+        public void ValidateObjects_CalledWith_STRUCTS_WITH_LONG_KEYWORD_Returns_With_Warnings()
         {
             // Arrange
-            List<ValidationStruct> structs = SyntaxValidationFixtures.STRUCT_WITH_LONG_KEYWORD;
+            List<ValidationStructuredEntry> structuredEntries = SyntaxValidationFixtures.STRUCTS_WITH_LONG_KEYWORD;
             List<StructuredValidationFunctionDelegate> functions = [SyntaxValidationFunctions.KeywordIsExcessivelyLong];
 
             // Act
-            structuredValidationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
+            structuredValidationMethod?.Invoke(null, new object[] { structuredEntries, functions, feedback, syntaxConf });
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeywordExcessivelyLong, feedback[0].Feedback.Rule);

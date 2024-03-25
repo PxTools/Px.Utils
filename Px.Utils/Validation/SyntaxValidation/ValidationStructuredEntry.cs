@@ -1,9 +1,9 @@
 ﻿namespace PxUtils.Validation.SyntaxValidation
 {
     /// <summary>
-    /// Represents a key for a <see cref="ValidationStruct"/>. A key consists of a keyword and two optional language and specifier strings.
+    /// Represents a key for a <see cref="ValidationStructuredEntry"/>. A key consists of a keyword and two optional language and specifier strings.
     /// </summary>
-    public readonly record struct ValidationStructKey
+    public readonly record struct ValidationStructuredEntryKey
     {
         /// <summary>
         /// Keyword of the entry
@@ -26,13 +26,13 @@
         public string? SecondSpecifier { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValidationStructKey"/> struct.
+        /// Initializes a new instance of the <see cref="ValidationStructuredEntryKey"/> struct.
         /// </summary>
         /// <param name="keyword">Keyword of the entry.</param>
         /// <param name="language">Language of the entry, if any.</param>
         /// <param name="firstSpecifier">First, dimension level specifier of the entry, if any.</param>
         /// <param name="secondSpecifier">Second, value level specifier of the entry, if any.</param>
-        public ValidationStructKey(string keyword, string? language = null, string? firstSpecifier = null, string? secondSpecifier = null)
+        public ValidationStructuredEntryKey(string keyword, string? language = null, string? firstSpecifier = null, string? secondSpecifier = null)
         {
             Keyword = keyword;
             Language = language;
@@ -47,14 +47,14 @@
     /// <param name="line">The line number in the file where the entry is located.</param>
     /// <param name="character">The character position in the line where the entry starts.</param>
     /// <param name="file">The name of the file where the entry is located.</param>
-    /// <param name="key">The key part of the entry, represented by a <see cref="ValidationStructKey"/> object.</param>
+    /// <param name="key">The key part of the entry, represented by a <see cref="ValidationStructuredEntryKey"/> object.</param>
     /// <param name="value">The value part of the entry.</param>
-    public class ValidationStruct(int line, int character, string file, ValidationStructKey key, string value) : ValidationObject(line, character, file)
+    public class ValidationStructuredEntry(int line, int character, string file, ValidationStructuredEntryKey key, string value) : ValidationObject(line, character, file)
     {
         /// <summary>
-        /// The key part of the entry, represented by a <see cref="ValidationStructKey"/> object.
+        /// The key part of the entry, represented by a <see cref="ValidationStructuredEntryKey"/> object.
         /// </summary>
-        public ValidationStructKey Key { get; } = key;
+        public ValidationStructuredEntryKey Key { get; } = key;
 
         /// <summary>
         /// The value part of the entry.

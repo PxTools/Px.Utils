@@ -4,8 +4,8 @@
     /// Represents the result of a syntax validation operation. This struct contains a validation report and a list of structured validation entries.
     /// </summary>
     /// <param name="report">The <see cref="ValidationReport"/> produced by the syntax validation operation.</param>
-    /// <param name="result">A list of <see cref="ValidationStruct"/> objects produced by the syntax validation operation.</param>
-    public class SyntaxValidationResult(ValidationFeedbackItem[] feedbackItems, List<ValidationStruct> result)
+    /// <param name="result">A list of <see cref="ValidationStructuredEntry"/> objects produced by the syntax validation operation.</param>
+    public class SyntaxValidationResult(ValidationFeedbackItem[] feedbackItems, List<ValidationStructuredEntry> result)
     {
 
         /// <summary>
@@ -14,8 +14,8 @@
         public IReadOnlyList<ValidationFeedbackItem> FeedbackItems { get; } = feedbackItems;
 
         /// <summary>
-        /// Gets the list of <see cref="ValidationStruct"/> objects produced by the syntax validation operation.
+        /// Gets the list of <see cref="ValidationStructuredEntry"/> objects produced by the syntax validation operation.
         /// </summary>
-        public List<ValidationStruct> Result { get; } = result;
+        public List<ValidationStructuredEntry> Result { get; } = result;
     }
 }
