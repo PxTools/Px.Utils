@@ -184,7 +184,7 @@ namespace PxUtils.Validation.SyntaxValidation
                         break;
                     }
                     UpdateLineAndCharacter(buffer[i], syntaxConf, ref line, ref character, ref isProcessingString);
-                    if (IsEndOfEntry(buffer[i], syntaxConf, isProcessingString))
+                    if (!isProcessingString && buffer[i] == syntaxConf.Symbols.EntrySeparator)
                     {
                         string stringEntry = entryBuilder.ToString();
                         entries.Add(new ValidationEntry(line, character, filename, stringEntry, entries.Count));
@@ -220,7 +220,7 @@ namespace PxUtils.Validation.SyntaxValidation
                         break;
                     }
                     UpdateLineAndCharacter(buffer[i], syntaxConf, ref line, ref character, ref isProcessingString);
-                    if (IsEndOfEntry(buffer[i], syntaxConf, isProcessingString))
+                    if (!isProcessingString && buffer[i] == syntaxConf.Symbols.EntrySeparator)
                     {
                         string stringEntry = entryBuilder.ToString();
                         entries.Add(new ValidationEntry(line, character, filename, stringEntry, entries.Count));
@@ -264,19 +264,6 @@ namespace PxUtils.Validation.SyntaxValidation
                     isProcessingString = !isProcessingString;
                 }
                 character++;
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsEndOfEntry(char currentCharacter, PxFileSyntaxConf syntaxConf, bool isProcessingString)
-        {
-            if (!isProcessingString && currentCharacter == syntaxConf.Symbols.EntrySeparator)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
             }
         }
 
