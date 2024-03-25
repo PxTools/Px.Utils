@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
@@ -114,18 +115,6 @@ namespace PxUtils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// Determines whether a string is in a boolean format.
-        /// </summary>
-        /// <param name="input">The input string to check</param>
-        /// <param name="booleanYes">The string that represents a boolean true value</param>
-        /// <param name="booleanNo">The string that represents a boolean false value</param>
-        /// <returns>Returns a boolean which is true if the input string is in a boolean format</returns>
-        internal static bool IsBooleanFormat(string input, string booleanYes, string booleanNo)
-        {
-            return input == booleanYes || input == booleanNo;
-        }
-
-        /// <summary>
         /// Determines whether a string is in a number format.
         /// </summary>
         /// <param name="input">The input string to check</param>
@@ -202,7 +191,7 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 return ValueType.String;
             }
-            else if (IsBooleanFormat(input, syntaxConf.Tokens.Booleans.Yes, syntaxConf.Tokens.Booleans.No))
+            else if (input == syntaxConf.Tokens.Booleans.Yes || input == syntaxConf.Tokens.Booleans.No)
             {
                 return ValueType.Boolean;
             }
