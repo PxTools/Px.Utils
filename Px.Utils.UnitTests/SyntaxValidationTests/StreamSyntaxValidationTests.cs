@@ -19,14 +19,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = SyntaxValidation.GetEncoding(stream, PxFileSyntaxConf.Default, feedback, filename);
+            Encoding? encoding = SyntaxValidation.GetEncoding(stream, PxFileSyntaxConf.Default);
             stream.Seek(0, SeekOrigin.Begin);
 
             // Assert
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename, feedback);
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename);
             Assert.AreEqual(8, result.Result.Count);
             Assert.AreEqual(0, feedback.Count);
         }
@@ -52,14 +52,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_SPECIFIERS);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = SyntaxValidation.GetEncoding(stream, PxFileSyntaxConf.Default, feedback, filename);
+            Encoding? encoding = SyntaxValidation.GetEncoding(stream, PxFileSyntaxConf.Default);
             stream.Seek(0, SeekOrigin.Begin);
 
             // Assert
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename, feedback);
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename);
             Assert.AreEqual(10, result.Result.Count);
             Assert.AreEqual("YES", result.Result[8].Value);
             Assert.AreEqual("NO", result.Result[9].Value);
@@ -343,18 +343,15 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public void ValidatePxFileSyntax_CalledWith_UNKNOWN_ENCODING_Returns_With_Error()
+        public void ValidatePxFileSyntax_CalledWith_UNKNOWN_ENCODING_Returns_Null()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UNKNOWN_ENCODING);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = SyntaxValidation.GetEncoding(stream, PxFileSyntaxConf.Default, feedback, filename);
-            stream.Seek(0, SeekOrigin.Begin);
+            Encoding? encoding = SyntaxValidation.GetEncoding(stream, PxFileSyntaxConf.Default);
 
             // Assert
             Assert.IsNull(encoding);
-            Assert.AreEqual(1, feedback.Count);
-            Assert.AreEqual(ValidationFeedbackRule.NoEncoding, feedback[0].Feedback.Rule);
         }
     }
 }

@@ -72,9 +72,9 @@ namespace PxUtils.Validation.SyntaxValidation
 
             // If the entry does not start with a line separator, it is not on its own line. For the first entry this is not relevant.
             if (
-            validationEntry.EntryIndex == 0 || 
-            validationEntry.EntryString.StartsWith(syntaxConf.Symbols.Linebreak) ||
-            validationEntry.EntryString.StartsWith(syntaxConf.Symbols.CarriageReturn))
+                validationEntry.EntryIndex == 0 || 
+                validationEntry.EntryString.StartsWith(syntaxConf.Symbols.Linebreak) ||
+                validationEntry.EntryString.StartsWith(syntaxConf.Symbols.CarriageReturn))
             {
                 return null;
             }
@@ -153,10 +153,10 @@ namespace PxUtils.Validation.SyntaxValidation
             // Remove language parameter section if it exists
             string languageRemoved = SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.LangParamStart, syntaxConf, syntaxConf.Symbols.Key.LangParamEnd).Remainder;
             // Same for specifier section
-            string keyword = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageRemoved, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf, syntaxConf.Symbols.Key.SpecifierParamEnd).Remainder;
+            ExtractSectionResult specifierRemoved = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageRemoved, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf, syntaxConf.Symbols.Key.SpecifierParamEnd);
 
-            // Check for missing keyword
-            if (keyword.Trim() == string.Empty)
+            // Check for missing specifierRemoved. Keyword is the remainder of the string after removing language and specifier sections
+            if (specifierRemoved.Remainder.Trim() == string.Empty)
             {
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingKeyword));
             }
@@ -202,11 +202,13 @@ namespace PxUtils.Validation.SyntaxValidation
                                     syntaxConf.Symbols.Key.SpecifierParamEnd
                                 ).Sections.FirstOrDefault();
 
+            // If no parameter section is found, there are no specifiers
             if (specifierParamSection is null)
             {
                 return null;
             }
 
+            // Extract specifiers from the specifier section
             ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                 specifierParamSection,
                 syntaxConf.Symbols.Key.StringDelimeter,
@@ -240,11 +242,13 @@ namespace PxUtils.Validation.SyntaxValidation
                                     syntaxConf.Symbols.Key.SpecifierParamEnd
                                 ).Sections.FirstOrDefault();
 
+            // If no specifier section is found, there are no specifiers
             if (specifierParamSection is null)
             {
                 return null;
             }
 
+            // Extract specifiers from the specifier section
             ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                 specifierParamSection,
                 syntaxConf.Symbols.Key.StringDelimeter,
@@ -253,6 +257,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string[] specifiers = specifierResult.Sections;
 
+            // If there are more than one specifier and the remainder of the specifier section does not contain a list separator, a delimiter is missing
             if (specifiers.Length > 1 && !specifierResult.Remainder.Contains(syntaxConf.Symbols.Key.ListSeparator))
             {
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.SpecifierDelimiterMissing));
@@ -280,11 +285,13 @@ namespace PxUtils.Validation.SyntaxValidation
                                     syntaxConf.Symbols.Key.SpecifierParamEnd
                                 ).Sections.FirstOrDefault();
 
+            // If specifier section is not found, there are no specifiers
             if (specifierParamSection == null)
             {
                 return null;
             }
 
+            // Check if specifiers are enclosed in string delimeters
             foreach (string specifier in specifierParamSection.Split(syntaxConf.Symbols.Key.ListSeparator))
             {
                 string trimmedSpecifier = specifier.Trim();
@@ -309,10 +316,22 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string key = validationKeyValuePair.KeyValuePair.Key;
 
-            string languageParamSections = string.Join(' ', SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.LangParamStart, syntaxConf, syntaxConf.Symbols.Key.LangParamEnd).Sections);
+            string? languageParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
+                                    key,
+                                    syntaxConf.Symbols.Key.LangParamStart,
+                                    syntaxConf,
+                                    syntaxConf.Symbols.Key.LangParamEnd
+                                ).Sections.FirstOrDefault();
 
-            char[] languageParamIllegalSymbols = [
+            // If language section is not found, the validation is not relevant
+            if (languageParamSection == null)
+            {
+                return null;
+            }
+
+            char[] languageIllegalSymbols = [
                 syntaxConf.Symbols.Key.LangParamStart,
+                syntaxConf.Symbols.Key.LangParamEnd,
                 syntaxConf.Symbols.Key.SpecifierParamStart,
                 syntaxConf.Symbols.Key.SpecifierParamEnd,
                 syntaxConf.Symbols.Key.StringDelimeter,
@@ -320,7 +339,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 ];
 
             // If FindIllegalCharactersInString returns false, it means that the regex has timed out
-            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(languageParamSections, languageParamIllegalSymbols, out char[] foundIllegalSymbols))
+            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(languageParamSection, languageIllegalSymbols, out char[] foundIllegalSymbols))
             {
                 if (foundIllegalSymbols.Length > 0)
                 {
@@ -334,7 +353,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
             else
             {
-                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.RegexTimeout, languageParamSections));
+                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.RegexTimeout, languageParamSection));
             }
         };
 
@@ -350,7 +369,18 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string key = validationKeyValuePair.KeyValuePair.Key;
 
-            string specifierParamSections = string.Join(' ', SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf, syntaxConf.Symbols.Key.SpecifierParamEnd).Sections);
+            string? specifierParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
+                                    key,
+                                    syntaxConf.Symbols.Key.SpecifierParamStart,
+                                    syntaxConf,
+                                    syntaxConf.Symbols.Key.SpecifierParamEnd
+                                ).Sections.FirstOrDefault();
+
+            // If specifier section is not found, there are no specifiers
+            if (specifierParamSection == null)
+            {
+                return null;
+            }
 
             char[] specifierParamIllegalSymbols = [
                 syntaxConf.Symbols.EntrySeparator,
@@ -359,7 +389,7 @@ namespace PxUtils.Validation.SyntaxValidation
             ];
 
             // If FindIllegalCharactersInString returns false, it means that the regex has timed out
-            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(specifierParamSections, specifierParamIllegalSymbols, out char[] foundIllegalSymbols))
+            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(specifierParamSection, specifierParamIllegalSymbols, out char[] foundIllegalSymbols))
             {
                 if (foundIllegalSymbols.Length > 0)
                 {
@@ -373,7 +403,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
             else
             {
-                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.RegexTimeout, specifierParamSections));
+                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.RegexTimeout, specifierParamSection));
             }
         };
 
@@ -389,6 +419,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string value = validationKeyValuePair.KeyValuePair.Value;
 
+            // Try to parse the value section to a ValueType
             ValueType? type = SyntaxValidationUtilityMethods.GetValueTypeFromString(value, syntaxConf);
 
             if (type is null)
@@ -462,7 +493,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.KeyContainsExcessWhiteSpace));
             }
             // If whitespace is found without a comma separating the specifier parts, it is considered excess
-            else if (!key.Contains($"{syntaxConf.Symbols.Key.ListSeparator} "))
+            else if (!key.Contains($"{syntaxConf.Symbols.Key.ListSeparator}{syntaxConf.Symbols.Space}"))
             {
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.KeyContainsExcessWhiteSpace));
             }
@@ -505,32 +536,32 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="ValidationObject"/> validationObject. If the keyword contains illegal characters, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationObject"/> validationObject. If the specifierRemoved contains illegal characters, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="validationObject">The <see cref="ValidationObject"/> validationObject to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword contains illegal characters, null otherwise.</returns>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifierRemoved contains illegal characters, null otherwise.</returns>
         public static ValidationFunctionDelegate KeywordContainsIllegalCharacters { get; } = (ValidationObject validationObject, PxFileSyntaxConf syntaxConf) =>
         {
             ValidationStruct? validationStruct = validationObject as ValidationStruct ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_VALIDATIONSTRUCT);
 
             string keyword = validationStruct.Key.Keyword;
-            // Missing keyword is catched earlier
+            // Missing specifierRemoved is catched earlier
             if (keyword.Length == 0)
             {
                 return null;
             }
 
-            // Check if keyword contains only letters, numbers, - and _
+            // Check if specifierRemoved contains only letters, numbers, - and _
             string legalSymbolsKeyword = @"a-zA-Z0-9_-";
             // Define a timeout for the regex match
             TimeSpan timeout = TimeSpan.FromSeconds(1);
-            // Find all illegal symbols in keyword
+            // Find all illegal symbols in specifierRemoved
             try
             {
                 MatchCollection matchesKeyword = Regex.Matches(keyword, $"[^{legalSymbolsKeyword}]", RegexOptions.None, timeout);
-                List<string> illegalSymbolsInKeyWord = matchesKeyword.Cast<Match>().Select(m => m.Value).Distinct().ToList();
-                if (illegalSymbolsInKeyWord.Count > 0)
+                IEnumerable<string> illegalSymbolsInKeyWord = matchesKeyword.Cast<Match>().Select(m => m.Value).Distinct();
+                if (illegalSymbolsInKeyWord.Any())
                 {
                     return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInKeyword, string.Join(", ", illegalSymbolsInKeyWord)));
                 }
@@ -548,19 +579,19 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationObject">The <see cref="ValidationObject"/> validationObject to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword doesn't start with a letter, null otherwise.</returns>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifierRemoved doesn't start with a letter, null otherwise.</returns>
         public static ValidationFunctionDelegate KeywordDoesntStartWithALetter { get; } = (ValidationObject validationObject, PxFileSyntaxConf syntaxConf) =>
         {
             ValidationStruct? validationStruct = validationObject as ValidationStruct ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_VALIDATIONSTRUCT);
 
             string keyword = validationStruct.Key.Keyword;
-            // Missing keyword is catched earlier
+            // Missing specifierRemoved is catched earlier
             if (keyword.Length == 0)
             {
                 return null;
             }
 
-            // Check if keyword starts with a letter
+            // Check if specifierRemoved starts with a letter
             if (!char.IsLetter(keyword[0]))
             {
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.KeywordDoesntStartWithALetter));
@@ -667,25 +698,6 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         };
 
-        private static bool FindIllegalCharactersInSpecifierPart(string? specifier, char[] illegalCharacters, out char[] foundIllegalCharacters)
-        {
-            if (specifier is null)
-            {
-                foundIllegalCharacters = [];
-                return true;
-            }
-
-            // If FindIllegalCharactersInString returns false, it means that the regex has timed out
-            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(specifier, illegalCharacters, out foundIllegalCharacters))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         /// <summary>
         /// Validates the given <see cref="ValidationObject"/> validationObject. If there is no value section, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
@@ -744,11 +756,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="ValidationObject"/> validationObject. If the keyword contains unrecommended characters, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationObject"/> validationObject. If the specifierRemoved contains unrecommended characters, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="validationObject">The <see cref="ValidationObject"/> validationObject to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword contains unrecommended characters, null otherwise.</returns>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifierRemoved contains unrecommended characters, null otherwise.</returns>
         public static ValidationFunctionDelegate KeywordContainsUnderscore { get; } = (ValidationObject validationObject, PxFileSyntaxConf syntaxConf) =>
         {
             ValidationStruct? validationStruct = validationObject as ValidationStruct ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_VALIDATIONSTRUCT);
@@ -765,11 +777,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="ValidationObject"/> validationObject. If the keyword is not in upper case, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationObject"/> validationObject. If the specifierRemoved is not in upper case, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="validationObject">The <see cref="ValidationObject"/> validationObject to validate</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword is not in upper case, otherwise null</returns>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifierRemoved is not in upper case, otherwise null</returns>
         public static ValidationFunctionDelegate KeywordIsNotInUpperCase { get; } = (ValidationObject validationObject, PxFileSyntaxConf syntaxConf) =>
         {
             ValidationStruct? validationStruct = validationObject as ValidationStruct ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_VALIDATIONSTRUCT);
@@ -788,11 +800,11 @@ namespace PxUtils.Validation.SyntaxValidation
         };
 
         /// <summary>
-        /// Validates the given <see cref="ValidationStruct"/> object. If the keyword is excessively long, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Validates the given <see cref="ValidationStruct"/> object. If the specifierRemoved is excessively long, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
         /// <param name="validationObject">The <see cref="ValidationObject"/> object to validate</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the keyword is excessively long, otherwise null</returns>
+        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifierRemoved is excessively long, otherwise null</returns>
         public static ValidationFunctionDelegate KeywordIsExcessivelyLong { get; } = (ValidationObject validationObject, PxFileSyntaxConf syntaxConf) =>
         {
             ValidationStruct? validationStruct = validationObject as ValidationStruct ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_VALIDATIONSTRUCT);
@@ -808,5 +820,24 @@ namespace PxUtils.Validation.SyntaxValidation
                 return null;
             }
         };
+
+        private static bool FindIllegalCharactersInSpecifierPart(string? specifier, char[] illegalCharacters, out char[] foundIllegalCharacters)
+        {
+            if (specifier is null)
+            {
+                foundIllegalCharacters = [];
+                return true;
+            }
+
+            // If FindIllegalCharactersInString returns false, it means that the regex has timed out
+            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(specifier, illegalCharacters, out foundIllegalCharacters))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

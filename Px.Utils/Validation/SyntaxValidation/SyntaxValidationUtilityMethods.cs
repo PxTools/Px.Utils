@@ -55,23 +55,25 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the extracted sections and the string that remains after the operation</return>
         public static ExtractSectionResult ExtractSectionFromString(string input, char startSymbol, PxFileSyntaxConf syntaxConf, char? optionalEndSymbol = null)
         {
+            // If no end symbol is provided, the start symbol is used for both starting and ending the enclosement
             char endSymbol = optionalEndSymbol ?? startSymbol;
 
             List<string> sections = [];
             string remainder = input;
 
-            Dictionary<int, int> stringIndeces = [];
             // If we are not searching for strings, any instances of start or end symbols enclosed within string delimeters are to be ignored
+            Dictionary<int, int> stringDelimeterIndexes = [];
             if (startSymbol != syntaxConf.Symbols.Key.StringDelimeter)
             {
-                stringIndeces =  GetEnclosingCharacterIndeces(input, syntaxConf.Symbols.Key.StringDelimeter);
+                stringDelimeterIndexes =  GetEnclosingCharacterIndexes(input, syntaxConf.Symbols.Key.StringDelimeter);
             }
 
-            int startIndex = FindSymbolIndex(remainder, startSymbol, stringIndeces);
-
-            while (startIndex != -1)
+            // Loop through the string and extract sections until no more start symbols are found
+            int startIndex;
+            do
             {
-                int endIndex = FindSymbolIndex(remainder, endSymbol, stringIndeces, startIndex + 1);
+                startIndex = FindSymbolIndex(remainder, startSymbol, stringDelimeterIndexes);
+                int endIndex = FindSymbolIndex(remainder, endSymbol, stringDelimeterIndexes, startIndex + 1);
                 if (endIndex == -1)
                 {
                     break;
@@ -80,8 +82,9 @@ namespace PxUtils.Validation.SyntaxValidation
                 string section = remainder[(startIndex + 1)..endIndex];
                 sections.Add(section);
                 remainder = remainder.Remove(startIndex, endIndex - startIndex + 1);
-                startIndex = FindSymbolIndex(remainder, startSymbol, stringIndeces);
             }
+            while (startIndex != -1);
+
             return new ExtractSectionResult([.. sections], remainder);
         }
 
@@ -254,7 +257,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="startSymbol">Symbol that starts an enclosement</param>
         /// <param name="endSymbol">Optional symbol that closes the enclosement. If not provided, startSymbol will be used for both.</param>
         /// <returns>A dictionary in which keys are the indeces of opening characters and values are the corresponding closing characters.</returns>
-        public static Dictionary<int, int> GetEnclosingCharacterIndeces(string input, char startSymbol, char? endSymbol = null)
+        public static Dictionary<int, int> GetEnclosingCharacterIndexes(string input, char startSymbol, char? endSymbol = null)
         {
             Dictionary<int, int> enclosingCharacterIndeces = [];
             endSymbol ??= startSymbol;
@@ -280,7 +283,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>An array of integers representing the indeces of keyword separators which are not enclosed by string delimeters from the input string</returns>
         public static int[] FindKeywordSeparatorIndeces(string input, PxFileSyntaxConf syntaxConf)
         {
-            Dictionary<int, int> stringIndeces = GetEnclosingCharacterIndeces(input, syntaxConf.Symbols.Key.StringDelimeter);
+            Dictionary<int, int> stringIndeces = GetEnclosingCharacterIndexes(input, syntaxConf.Symbols.Key.StringDelimeter);
             List<int> separators = [];
 
             // Find all indeces of syntaxConf.Symbols.KeywordSeparator in the input string that are not enclosed within strings using FindSymbolIndex method

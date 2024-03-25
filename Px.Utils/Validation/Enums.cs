@@ -10,7 +10,7 @@
     }
 
     /// <summary>
-    /// Defines the types of values that can be validated. These types correspond to the types of values that can be found in a PX file.
+    /// Defines the types of values found in Px files that can be validated.
     /// </summary>
     public enum ValueType
     {
