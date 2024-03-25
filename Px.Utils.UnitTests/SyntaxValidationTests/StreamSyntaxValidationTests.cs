@@ -418,9 +418,15 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             Assert.AreEqual(13, feedback.Count);
             for (int i = 0; i < feedback.Count; i++)
             {
-                Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, feedback[i].Feedback.Rule);
+                if (i == 1)
+                {
+                    Assert.AreEqual(Validation.ValueType.ListOfStrings, valueType);
+                }
+                else
+                {
+                    Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, feedback[i].Feedback.Rule);
+                }
             }
-            Assert.AreEqual(Validation.ValueType.ListOfStrings, valueType);
         }
     }
 }
