@@ -272,7 +272,13 @@ namespace PxUtils.Validation.SyntaxValidation
             ExtractSectionResult languageResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(input, syntaxConf.Symbols.Key.LangParamStart, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.LangParamEnd);
             string? language = languageResult.Sections.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(languageResult.Sections[0], syntaxConf) : null;
             ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageResult.Remainder, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.SpecifierParamEnd);
-            string[] specifiers = SyntaxValidationUtilityMethods.GetSpecifiersFromParameter(specifierResult.Sections.FirstOrDefault(), syntaxConf.Symbols.Key.StringDelimeter, syntaxConf);
+            string[] specifiers = specifierResult.Sections.Length > 0
+                ? SyntaxValidationUtilityMethods.ExtractSectionFromString(
+                    specifierResult.Sections[0], 
+                    syntaxConf.Symbols.Key.StringDelimeter, 
+                    syntaxConf.Symbols.Key.StringDelimeter)
+                .Sections 
+                : [];
             string? firstSpecifier = specifiers.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(specifiers[0], syntaxConf) : null;
             string? secondSpecifier = specifiers.Length > 1 ? SyntaxValidationUtilityMethods.CleanString(specifiers[1], syntaxConf) : null;
             string keyword = SyntaxValidationUtilityMethods.CleanString(specifierResult.Remainder, syntaxConf);

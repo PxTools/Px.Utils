@@ -89,23 +89,6 @@ namespace PxUtils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// Extracts specifier parts from a parameter string
-        /// </summary>
-        /// <param name="input">The input string to extract from</param>
-        /// <param name="stringDelimeter">The delimeter that encloses the specifier part</param>
-        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
-        /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the sections and the string that remains after the operation</return>
-        internal static string[] GetSpecifiersFromParameter(string? input, char stringDelimeter, PxFileSyntaxConf syntaxConf)
-        {
-            if (input is null)
-            {
-                return [];
-            }
-
-            return ExtractSectionFromString(input, stringDelimeter, syntaxConf.Symbols.Key.StringDelimeter).Sections;
-        }
-
-        /// <summary>
         /// Determines whether a string is in a string format.
         /// </summary>
         /// <param name="input">The input string to check</param>
