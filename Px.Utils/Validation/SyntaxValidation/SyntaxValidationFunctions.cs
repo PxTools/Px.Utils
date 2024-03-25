@@ -151,9 +151,19 @@ namespace PxUtils.Validation.SyntaxValidation
             string key = validationKeyValuePair.KeyValuePair.Key;
 
             // Remove language parameter section if it exists
-            string languageRemoved = SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.LangParamStart, syntaxConf, syntaxConf.Symbols.Key.LangParamEnd).Remainder;
-            // Same for specifier section
-            ExtractSectionResult specifierRemoved = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageRemoved, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf, syntaxConf.Symbols.Key.SpecifierParamEnd);
+            string languageRemoved = SyntaxValidationUtilityMethods.ExtractSectionFromString(
+                key, 
+                syntaxConf.Symbols.Key.LangParamStart,
+                syntaxConf.Symbols.Key.StringDelimeter,
+                syntaxConf.Symbols.Key.LangParamEnd)
+            .Remainder;
+
+            // Remove specifier section
+            ExtractSectionResult specifierRemoved = SyntaxValidationUtilityMethods.ExtractSectionFromString(
+                languageRemoved, 
+                syntaxConf.Symbols.Key.SpecifierParamStart,
+                syntaxConf.Symbols.Key.StringDelimeter,
+                syntaxConf.Symbols.Key.SpecifierParamEnd);
 
             // Check for missing specifierRemoved. Keyword is the remainder of the string after removing language and specifier sections
             if (specifierRemoved.Remainder.Trim() == string.Empty)
@@ -198,7 +208,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string? specifierParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     validationKeyValuePair.KeyValuePair.Key,
                                     syntaxConf.Symbols.Key.SpecifierParamStart,
-                                    syntaxConf,
+                                    syntaxConf.Symbols.Key.StringDelimeter,
                                     syntaxConf.Symbols.Key.SpecifierParamEnd
                                 ).Sections.FirstOrDefault();
 
@@ -212,7 +222,7 @@ namespace PxUtils.Validation.SyntaxValidation
             ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                 specifierParamSection,
                 syntaxConf.Symbols.Key.StringDelimeter,
-                syntaxConf
+                syntaxConf.Symbols.Key.StringDelimeter
                 );
 
             string[] specifiers = specifierResult.Sections;
@@ -238,7 +248,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string? specifierParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     validationKeyValuePair.KeyValuePair.Key,
                                     syntaxConf.Symbols.Key.SpecifierParamStart,
-                                    syntaxConf,
+                                    syntaxConf.Symbols.Key.StringDelimeter,
                                     syntaxConf.Symbols.Key.SpecifierParamEnd
                                 ).Sections.FirstOrDefault();
 
@@ -252,7 +262,7 @@ namespace PxUtils.Validation.SyntaxValidation
             ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                 specifierParamSection,
                 syntaxConf.Symbols.Key.StringDelimeter,
-                syntaxConf
+                syntaxConf.Symbols.Key.StringDelimeter
                 );
 
             string[] specifiers = specifierResult.Sections;
@@ -281,7 +291,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string? specifierParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     validationKeyValuePair.KeyValuePair.Key,
                                     syntaxConf.Symbols.Key.SpecifierParamStart,
-                                    syntaxConf,
+                                    syntaxConf.Symbols.Key.StringDelimeter,
                                     syntaxConf.Symbols.Key.SpecifierParamEnd
                                 ).Sections.FirstOrDefault();
 
@@ -319,7 +329,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string? languageParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     key,
                                     syntaxConf.Symbols.Key.LangParamStart,
-                                    syntaxConf,
+                                    syntaxConf.Symbols.Key.StringDelimeter,
                                     syntaxConf.Symbols.Key.LangParamEnd
                                 ).Sections.FirstOrDefault();
 
@@ -372,7 +382,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string? specifierParamSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     key,
                                     syntaxConf.Symbols.Key.SpecifierParamStart,
-                                    syntaxConf,
+                                    syntaxConf.Symbols.Key.StringDelimeter,
                                     syntaxConf.Symbols.Key.SpecifierParamEnd
                                 ).Sections.FirstOrDefault();
 
@@ -455,7 +465,12 @@ namespace PxUtils.Validation.SyntaxValidation
             string value = validationKeyValuePair.KeyValuePair.Value;
 
             // Remove elements from the list. We only want to check whitespace between elements
-            string stripItems = SyntaxValidationUtilityMethods.ExtractSectionFromString(value, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf).Remainder;
+            string stripItems = SyntaxValidationUtilityMethods.ExtractSectionFromString(
+                value, 
+                syntaxConf.Symbols.Key.StringDelimeter,
+                syntaxConf.Symbols.Key.StringDelimeter)
+            .Remainder;
+            
             if (
                 stripItems.Contains($"{CharacterConstants.Space}{CharacterConstants.Space}") ||
                 stripItems.Contains($"{CharacterConstants.HorizontalTab}")
@@ -480,7 +495,11 @@ namespace PxUtils.Validation.SyntaxValidation
             ValidationKeyValuePair? validationKeyValuePair = validationObject as ValidationKeyValuePair ?? throw new ArgumentException(ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP);
 
             string key = validationKeyValuePair.KeyValuePair.Key;
-            string stripSpecifiers = SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf).Remainder;
+            string stripSpecifiers = SyntaxValidationUtilityMethods.ExtractSectionFromString(
+                key,
+                syntaxConf.Symbols.Key.StringDelimeter,
+                syntaxConf.Symbols.Key.StringDelimeter)
+            .Remainder;
 
             IEnumerable<char> whiteSpaces = stripSpecifiers.Where(c => CharacterConstants.WhitespaceCharacters.Contains(c));
             if (!whiteSpaces.Any())

@@ -11,7 +11,7 @@ namespace PxUtils.Validation.SyntaxValidation
     /// </summary>
     /// <param name="parameters">The sections extracted from the string.</param>
     /// <param name="remainder">The remainder of the string after extraction.</param>
-    public readonly struct ExtractSectionResult(string[] parameters, string remainder)
+    internal readonly struct ExtractSectionResult(string[] parameters, string remainder)
     {
         /// <summary>
         /// Gets the sections extracted from the string.
@@ -27,7 +27,7 @@ namespace PxUtils.Validation.SyntaxValidation
     /// <summary>
     /// Provides a collection of helper methods used during the syntax validation process. These methods include functionality for extracting sections from a string, checking the format of a string, and determining the type of a value from a string.
     /// </summary>
-    public static class SyntaxValidationUtilityMethods
+    internal static class SyntaxValidationUtilityMethods
     {
         private const int DEFAULT_TIMEOUT = 1;
 
@@ -39,9 +39,9 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <param name="endSymbol">Symbols that closes the enclosement</param>
         /// <returns>Returns a boolean which is true if the input string contains more than one section</returns>
-        public static bool HasMoreThanOneSection(string input, char startSymbol, char endSymbol, PxFileSyntaxConf syntaxConf)
+        internal static bool HasMoreThanOneSection(string input, char startSymbol, char endSymbol, PxFileSyntaxConf syntaxConf)
         {
-            ExtractSectionResult searchResult = ExtractSectionFromString(input, startSymbol, syntaxConf, endSymbol);
+            ExtractSectionResult searchResult = ExtractSectionFromString(input, startSymbol, syntaxConf.Symbols.Key.StringDelimeter, endSymbol);
             return searchResult.Sections.Length > 1;
         }
 
@@ -51,21 +51,21 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="input">The input string to extract from</param>
         /// <param name="startSymbol">Symbol that starts enclosement</param>
         /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
-        /// <param name="optionalEndSymbol">Optional symbol that closes the enclosement. If none given, startSymbol is used for both starting and ending the enclosement</param>
+        /// <param name="endSymbol">Optional symbol that closes the enclosement. If none given, startSymbol is used for both starting and ending the enclosement</param>
         /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the extracted sections and the string that remains after the operation</return>
-        public static ExtractSectionResult ExtractSectionFromString(string input, char startSymbol, PxFileSyntaxConf syntaxConf, char? optionalEndSymbol = null)
+        internal static ExtractSectionResult ExtractSectionFromString(string input, char startSymbol, char stringDelimeter, char? endSymbol = null)
         {
             // If no end symbol is provided, the start symbol is used for both starting and ending the enclosement
-            char endSymbol = optionalEndSymbol ?? startSymbol;
+            endSymbol ??= startSymbol;
 
             List<string> sections = [];
             string remainder = input;
 
             // If we are not searching for strings, any instances of start or end symbols enclosed within string delimeters are to be ignored
             Dictionary<int, int> stringDelimeterIndexes = [];
-            if (startSymbol != syntaxConf.Symbols.Key.StringDelimeter)
+            if (startSymbol != stringDelimeter)
             {
-                stringDelimeterIndexes =  GetEnclosingCharacterIndexes(input, syntaxConf.Symbols.Key.StringDelimeter);
+                stringDelimeterIndexes =  GetEnclosingCharacterIndexes(input, stringDelimeter);
             }
 
             // Loop through the string and extract sections until no more start symbols are found
@@ -73,7 +73,7 @@ namespace PxUtils.Validation.SyntaxValidation
             do
             {
                 startIndex = FindSymbolIndex(remainder, startSymbol, stringDelimeterIndexes);
-                int endIndex = FindSymbolIndex(remainder, endSymbol, stringDelimeterIndexes, startIndex + 1);
+                int endIndex = FindSymbolIndex(remainder, (char)endSymbol, stringDelimeterIndexes, startIndex + 1);
                 if (endIndex == -1)
                 {
                     break;
@@ -95,14 +95,14 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="stringDelimeter">The delimeter that encloses the specifier part</param>
         /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the sections and the string that remains after the operation</return>
-        public static string[] GetSpecifiersFromParameter(string? input, char stringDelimeter, PxFileSyntaxConf syntaxConf)
+        internal static string[] GetSpecifiersFromParameter(string? input, char stringDelimeter, PxFileSyntaxConf syntaxConf)
         {
             if (input is null)
             {
                 return [];
             }
 
-            return ExtractSectionFromString(input, stringDelimeter, syntaxConf).Sections;
+            return ExtractSectionFromString(input, stringDelimeter, syntaxConf.Symbols.Key.StringDelimeter).Sections;
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="input">The input string to check</param>
         /// <param name="stringDelimeter">The delimeter that encloses the string</param>
         /// <returns>Returns a boolean which is true if the input string is in a string format</returns>
-        public static bool IsStringFormat(string input, char stringDelimeter)
+        internal static bool IsStringFormat(string input, char stringDelimeter)
         {
             return input.StartsWith(stringDelimeter) && input.EndsWith(stringDelimeter);
         }
@@ -123,7 +123,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="listDelimeter">The delimeter that separates the list items</param>
         /// <param name="stringDelimeter">The delimeter that encloses the string</param>
         /// <returns>Returns a boolean which is true if the input string is in a list format</returns>
-        public static bool IsStringListFormat(string input, char listDelimeter, char stringDelimeter)
+        internal static bool IsStringListFormat(string input, char listDelimeter, char stringDelimeter)
         {
             string[] list = input.Split(listDelimeter);
             if (list.Length <= 1)
@@ -147,7 +147,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="booleanYes">The string that represents a boolean true value</param>
         /// <param name="booleanNo">The string that represents a boolean false value</param>
         /// <returns>Returns a boolean which is true if the input string is in a boolean format</returns>
-        public static bool IsBooleanFormat(string input, string booleanYes, string booleanNo)
+        internal static bool IsBooleanFormat(string input, string booleanYes, string booleanNo)
         {
             return input == booleanYes || input == booleanNo;
         }
@@ -157,7 +157,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="input">The input string to check</param>
         /// <returns>Returns a boolean which is true if the input string is in a number format</returns>
-        public static bool IsNumberFormat(string input)
+        internal static bool IsNumberFormat(string input)
         {
             if (input.Length > 29)
             {
@@ -191,7 +191,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <param name="isList">A boolean that is true if the input string is a list</param>
         /// <returns>Returns a boolean which is true if the line changes in the input string are compliant with the syntax configuration</returns>
-        public static bool ValueLineChangesAreCompliant(string input, PxFileSyntaxConf syntaxConf, bool isList)
+        internal static bool ValueLineChangesAreCompliant(string input, PxFileSyntaxConf syntaxConf, bool isList)
         {
             int lineChangeIndex = GetNextLineChangeIndex(input, syntaxConf);
             while (lineChangeIndex != -1)
@@ -212,7 +212,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="input">The input string to check</param>
         /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <returns>Returns a <see cref="ValueType"/> object that represents the type of the value in the input string. If the type cannot be determined, null is returned.</returns>
-        public static ValueType? GetValueTypeFromString(string input, PxFileSyntaxConf syntaxConf)
+        internal static ValueType? GetValueTypeFromString(string input, PxFileSyntaxConf syntaxConf)
         {
             if (IsStringListFormat(input, syntaxConf.Symbols.Value.ListSeparator, syntaxConf.Symbols.Key.StringDelimeter))
             {
@@ -242,7 +242,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="input">The input string to clean</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <returns>Returns a string that is the input string cleaned from new line characters and quotation marks</returns>
-        public static string CleanString(string input, PxFileSyntaxConf syntaxConf)
+        internal static string CleanString(string input, PxFileSyntaxConf syntaxConf)
         {
             return input
                 .Trim(CharacterConstants.CarriageReturn)
@@ -257,7 +257,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="startSymbol">Symbol that starts an enclosement</param>
         /// <param name="endSymbol">Optional symbol that closes the enclosement. If not provided, startSymbol will be used for both.</param>
         /// <returns>A dictionary in which keys are the indeces of opening characters and values are the corresponding closing characters.</returns>
-        public static Dictionary<int, int> GetEnclosingCharacterIndexes(string input, char startSymbol, char? endSymbol = null)
+        internal static Dictionary<int, int> GetEnclosingCharacterIndexes(string input, char startSymbol, char? endSymbol = null)
         {
             Dictionary<int, int> enclosingCharacterIndeces = [];
             endSymbol ??= startSymbol;
@@ -281,7 +281,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="input">The input string to search</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <returns>An array of integers representing the indeces of keyword separators which are not enclosed by string delimeters from the input string</returns>
-        public static int[] FindKeywordSeparatorIndeces(string input, PxFileSyntaxConf syntaxConf)
+        internal static int[] FindKeywordSeparatorIndeces(string input, PxFileSyntaxConf syntaxConf)
         {
             Dictionary<int, int> stringIndeces = GetEnclosingCharacterIndexes(input, syntaxConf.Symbols.Key.StringDelimeter);
             List<int> separators = [];
@@ -308,7 +308,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="illegalCharacters">An array of characters that are considered illegal</param>
         /// <param name="foundIllegalCharacters">An array of characters that were found in the input string</param>
         /// <returns>Returns a boolean which is true if the search was successful. If the search times out, false is returned.</returns>
-        public static bool FindIllegalCharactersInString(string input, char[] illegalCharacters, out char[] foundIllegalCharacters, int customTimeout = DEFAULT_TIMEOUT)
+        internal static bool FindIllegalCharactersInString(string input, char[] illegalCharacters, out char[] foundIllegalCharacters, int customTimeout = DEFAULT_TIMEOUT)
         {
             string processedCharacters = ProcessCharsForRegexPattern(illegalCharacters);
             string pattern = $"[{processedCharacters}]";
