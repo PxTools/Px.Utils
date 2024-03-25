@@ -36,7 +36,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="syntaxConf">An optional <see cref="PxFileSyntaxConf"/> parameter that specifies the syntax configuration for the PX file. If not provided, the default syntax configuration is used.</param>
         /// <param name="bufferSize">An optional parameter that specifies the buffer size for reading the file. If not provided, a default buffer size of 4096 is used.</param>
         /// <param name="customValidationFunctions">An optional <see cref="CustomValidationFunctions"/> parameter that specifies custom validation functions to be used during validation. If not provided, the default validation functions are used.</param>
-        /// <returns>A <see cref="SyntaxValidationResult"/> object which contains a <see cref="SyntaxValidationResult"/> and a list of <see cref="ValidationStruct"/> objects. The ValidationReport contains feedback items that provide information about any syntax errors or warnings found during validation. The list of ValidationStruct objects represents the structured objects in the PX file that were validated.</returns>
+        /// <returns>A <see cref="SyntaxValidationResult"/> object which contains a list of <see cref="ValidationStruct"/> objects and a list of <see cref="ValidationFeedbackItem"/> objects accumulated during the validation.</returns>
         public static SyntaxValidationResult ValidatePxFileMetadataSyntax(
             Stream stream,
             Encoding encoding,
@@ -80,7 +80,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="bufferSize">An optional parameter that specifies the buffer size for reading the file. If not provided, a default buffer size of 4096 is used.</param>
         /// <param name="customValidationFunctions">An optional <see cref="CustomValidationFunctions"/> parameter that specifies custom validation functions to be used during validation. If not provided, the default validation functions are used.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> parameter that can be used to cancel the operation.</param>
-        /// <returns>A <see cref="Task"/> that represents the asynchronous operation. The task result contains a <see cref="SyntaxValidationResult"/> object which includes a <see cref="ValidationReport"/> and a list of <see cref="ValidationStruct"/> objects. The ValidationReport contains feedback items that provide information about any syntax errors or warnings found during validation. The list of ValidationStruct objects represents the structured objects in the PX file that were validated.</returns>
+        /// <returns>A task that contains a <see cref="SyntaxValidationResult"/> object, which contains the structured validation objects and a list of <see cref="ValidationStruct"/> objects accumulated during the validation.</returns>
         public static async Task<SyntaxValidationResult> ValidatePxFileMetadataSyntaxAsync(
             Stream stream,
             Encoding encoding,
