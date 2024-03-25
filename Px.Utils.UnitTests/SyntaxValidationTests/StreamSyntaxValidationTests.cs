@@ -261,7 +261,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidation.ValidateObjects(structs, functions, feedback, syntaxConf);
 
-            // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageParameter, feedback[0].Feedback.Rule);
         }
@@ -276,7 +275,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidation.ValidateObjects(structs, functions, feedback, syntaxConf);
 
-            // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierPart, feedback[0].Feedback.Rule);
         }
@@ -291,7 +289,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidation.ValidateObjects(entries, functions, feedback, syntaxConf);
 
-            // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.EntryWithoutValue, feedback[0].Feedback.Rule);
         }
@@ -306,7 +303,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidation.ValidateObjects(structs, functions, feedback, syntaxConf);
 
-            // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(2, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.IncompliantLanguage, feedback[0].Feedback.Rule);
             Assert.AreEqual(ValidationFeedbackRule.IncompliantLanguage, feedback[1].Feedback.Rule);
@@ -337,7 +333,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidation.ValidateObjects(structs, functions, feedback, syntaxConf);
 
-            // This test also catches an earlier issue with excess whitespace in the key part
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeywordExcessivelyLong, feedback[0].Feedback.Rule);
         }
