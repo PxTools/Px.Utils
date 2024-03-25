@@ -3,6 +3,7 @@ using System.Globalization;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
@@ -89,17 +90,6 @@ namespace PxUtils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// Determines whether a string is in a string format.
-        /// </summary>
-        /// <param name="input">The input string to check</param>
-        /// <param name="stringDelimeter">The delimeter that encloses the string</param>
-        /// <returns>Returns a boolean which is true if the input string is in a string format</returns>
-        internal static bool IsStringFormat(string input, char stringDelimeter)
-        {
-            return input.StartsWith(stringDelimeter) && input.EndsWith(stringDelimeter);
-        }
-
-        /// <summary>
         /// Determines whether a string is in a list format.
         /// </summary>
         /// <param name="input">The input string to check</param>
@@ -113,7 +103,7 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 return false;
             }
-            else if (Array.TrueForAll(list, x => IsStringFormat(x.Trim(), stringDelimeter)))
+            else if (Array.TrueForAll(list, x => x.TrimStart().StartsWith(stringDelimeter) && x.TrimEnd().EndsWith(stringDelimeter)))
             {                
                 return true;
             }
@@ -176,15 +166,22 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>Returns a boolean which is true if the line changes in the input string are compliant with the syntax configuration</returns>
         internal static bool ValueLineChangesAreCompliant(string input, PxFileSyntaxConf syntaxConf, bool isList)
         {
-            int lineChangeIndex = GetNextLineChangeIndex(input, syntaxConf);
+            string trimmedInput = input.Replace(CharacterConstants.CarriageReturn.ToString(), "");
+            if (trimmedInput.Contains(CharacterConstants.CarriageReturn))
+            {
+                Debug.WriteLine("This is impossible");
+            }
+            int lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LineFeed);
             while (lineChangeIndex != -1)
             {
                 char symbolBefore = isList ? syntaxConf.Symbols.Key.ListSeparator : syntaxConf.Symbols.Key.StringDelimeter;
-                if (input[lineChangeIndex - 1] != symbolBefore || input[lineChangeIndex + 1] != syntaxConf.Symbols.Key.StringDelimeter)
+                if (trimmedInput[lineChangeIndex - 1] != symbolBefore || trimmedInput[lineChangeIndex + 1] != syntaxConf.Symbols.Key.StringDelimeter)
                 {
+                    char a = trimmedInput[lineChangeIndex - 1];
+                    char n = trimmedInput[lineChangeIndex + 1];
                     return false;
                 }
-                lineChangeIndex = GetNextLineChangeIndex(input, syntaxConf, lineChangeIndex + 1);
+                lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LineFeed, lineChangeIndex + 1);
             }
             return true;
         }
@@ -201,7 +198,7 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 return ValueType.ListOfStrings;
             }
-            else if (IsStringFormat(input, syntaxConf.Symbols.Value.StringDelimeter))
+            else if (input.StartsWith(syntaxConf.Symbols.Key.StringDelimeter) && input.EndsWith(syntaxConf.Symbols.Key.StringDelimeter))
             {
                 return ValueType.String;
             }
@@ -308,30 +305,6 @@ namespace PxUtils.Validation.SyntaxValidation
                 foundIllegalCharacters = [];
                 return false;
             }
-        }
-        private static int GetNextLineChangeIndex(string input, PxFileSyntaxConf syntaxConf, int startIndex = 0)
-        {
-            int lineBreakIndex = input.IndexOf(syntaxConf.Symbols.Linebreak, startIndex);
-            int carriageReturnIndex = input.IndexOf(CharacterConstants.CarriageReturn, startIndex);
-
-            // If neither character was found, return -1
-            if (lineBreakIndex == -1 && carriageReturnIndex == -1)
-            {
-                return -1;
-            }
-
-            // If only one character was found, return its index
-            if (lineBreakIndex == -1)
-            {
-                return carriageReturnIndex;
-            }
-            if (carriageReturnIndex == -1)
-            {
-                return lineBreakIndex;
-            }
-
-            // If both characters were found, return the index of the one that appears first
-            return Math.Min(lineBreakIndex, carriageReturnIndex);
         }
 
         private static string ProcessCharsForRegexPattern(char[] illegalCharacters)

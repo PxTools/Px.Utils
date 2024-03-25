@@ -436,10 +436,20 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.InvalidValueFormat, value));
             }
-            else
+
+            if (type is ValueType.String || type is ValueType.ListOfStrings)
             {
-                return null;
+                if (SyntaxValidationUtilityMethods.ValueLineChangesAreCompliant(value, syntaxConf, type is ValueType.ListOfStrings))
+                {
+                    return null;
+                }
+                else
+                {
+                    return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.InvalidValueFormat, value));
+                }
             }
+
+            return null;
         };
 
         /// <summary>
