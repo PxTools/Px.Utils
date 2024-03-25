@@ -348,22 +348,15 @@ namespace PxUtils.Validation.SyntaxValidation
                 syntaxConf.Symbols.Key.ListSeparator
                 ];
 
-            // If FindIllegalCharactersInString returns false, it means that the regex has timed out
-            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(languageParamSection, languageIllegalSymbols, out char[] foundIllegalSymbols))
+            IEnumerable<char> foundIllegalSymbols = languageParamSection.Where(c => languageIllegalSymbols.Contains(c));
+            if (foundIllegalSymbols.Any())
             {
-                if (foundIllegalSymbols.Length > 0)
-                {
-                    string foundSymbols = string.Join(", ", foundIllegalSymbols);
-                    return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInLanguageParameter, foundSymbols));
-                }
-                else
-                {
-                    return null;
-                }
+                string foundSymbols = string.Join(", ", foundIllegalSymbols);
+                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInLanguageParameter, foundSymbols));
             }
             else
             {
-                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.RegexTimeout, languageParamSection));
+                return null;
             }
         };
 
@@ -398,22 +391,15 @@ namespace PxUtils.Validation.SyntaxValidation
                 syntaxConf.Symbols.Key.LangParamEnd
             ];
 
-            // If FindIllegalCharactersInString returns false, it means that the regex has timed out
-            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(specifierParamSection, specifierParamIllegalSymbols, out char[] foundIllegalSymbols))
+            IEnumerable<char> foundIllegalSymbols = specifierParamSection.Where(c => specifierParamIllegalSymbols.Contains(c));
+            if (foundIllegalSymbols.Any())
             {
-                if (foundIllegalSymbols.Length > 0)
-                {
-                    string foundSymbols = string.Join(", ", foundIllegalSymbols);
-                    return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, foundSymbols));
-                }
-                else
-                {
-                    return null;
-                }
+                string foundSymbols = string.Join(", ", foundIllegalSymbols);
+                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, foundSymbols));
             }
             else
             {
-                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.RegexTimeout, specifierParamSection));
+                return null;
             }
         };
 
@@ -661,22 +647,15 @@ namespace PxUtils.Validation.SyntaxValidation
                 CharacterConstants.HorizontalTab
             ];
 
-            // If FindIllegalCharactersInString returns false, it means that the regex has timed out
-            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(lang, illegalCharacters, out char[] foundIllegalCharacters))
+            IEnumerable<char> foundIllegalCharacters = lang.Where(c => illegalCharacters.Contains(c));
+            if (foundIllegalCharacters.Any())
             {
-                if (foundIllegalCharacters.Length > 0)
-                {
-                    string foundSymbols = string.Join(", ", foundIllegalCharacters);
-                    return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInLanguageParameter, foundSymbols));
-                }
-                else
-                {
-                    return null;
-                }
+                string foundSymbols = string.Join(", ", foundIllegalCharacters);
+                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInLanguageParameter, foundSymbols));
             }
             else
             {
-                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.RegexTimeout, lang));
+                return null;
             }
         };
 
@@ -696,27 +675,14 @@ namespace PxUtils.Validation.SyntaxValidation
             }
 
             char[] illegalCharacters = [syntaxConf.Symbols.EntrySeparator, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.ListSeparator];
-            bool firstSpecifierChecked = FindIllegalCharactersInSpecifierPart(validationStruct.Key.FirstSpecifier, illegalCharacters, out char[] illegalcharactersInFirstSpecifier);
-            bool secondSpecifierChecked = FindIllegalCharactersInSpecifierPart(validationStruct.Key.SecondSpecifier, illegalCharacters, out char[] illegalcharactersInSecondSpecifier);
-
-            if (!firstSpecifierChecked || !secondSpecifierChecked)
+            IEnumerable<char> illegalcharactersInFirstSpecifier = validationStruct.Key.FirstSpecifier.Where(c => illegalCharacters.Contains(c));
+            IEnumerable<char> illegalcharactersInSecondSpecifier = [];
+            if (validationStruct.Key.SecondSpecifier is not null)
             {
-                StringBuilder specifiersThatFailedRegex = firstSpecifierChecked
-                    ? new StringBuilder()
-                    : new StringBuilder(validationStruct.Key.FirstSpecifier);
-                if (!secondSpecifierChecked)
-                {
-                    if (specifiersThatFailedRegex.Length > 0)
-                    {
-                        specifiersThatFailedRegex.Append(' ');
-                    }
-                    specifiersThatFailedRegex.Append(validationStruct.Key.SecondSpecifier);
-                }
-
-                return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.RegexTimeout, specifiersThatFailedRegex.ToString()));
+                illegalcharactersInSecondSpecifier = validationStruct.Key.SecondSpecifier.Where(c => illegalCharacters.Contains(c));
             }
 
-            if (illegalcharactersInFirstSpecifier.Length > 0 || illegalcharactersInSecondSpecifier.Length > 0)
+            if (illegalcharactersInFirstSpecifier.Any() || illegalcharactersInSecondSpecifier.Any())
             {
                 char[] characters = [.. illegalcharactersInFirstSpecifier, .. illegalcharactersInSecondSpecifier];
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInSpecifierPart, string.Join(", ", characters)));
@@ -849,24 +815,5 @@ namespace PxUtils.Validation.SyntaxValidation
                 return null;
             }
         };
-
-        private static bool FindIllegalCharactersInSpecifierPart(string? specifier, char[] illegalCharacters, out char[] foundIllegalCharacters)
-        {
-            if (specifier is null)
-            {
-                foundIllegalCharacters = [];
-                return true;
-            }
-
-            // If FindIllegalCharactersInString returns false, it means that the regex has timed out
-            if (SyntaxValidationUtilityMethods.FindIllegalCharactersInString(specifier, illegalCharacters, out foundIllegalCharacters))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
     }
 }

@@ -31,8 +31,6 @@ namespace PxUtils.Validation.SyntaxValidation
     /// </summary>
     internal static class SyntaxValidationUtilityMethods
     {
-        private const int DEFAULT_TIMEOUT = 1;
-
         /// <summary>
         /// Determines whether a string contains more than one section enclosed with given symbols.
         /// </summary>
@@ -166,8 +164,6 @@ namespace PxUtils.Validation.SyntaxValidation
                 char symbolBefore = isList ? syntaxConf.Symbols.Key.ListSeparator : syntaxConf.Symbols.Key.StringDelimeter;
                 if (trimmedInput[lineChangeIndex - 1] != symbolBefore || trimmedInput[lineChangeIndex + 1] != syntaxConf.Symbols.Key.StringDelimeter)
                 {
-                    char a = trimmedInput[lineChangeIndex - 1];
-                    char n = trimmedInput[lineChangeIndex + 1];
                     return false;
                 }
                 lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LineFeed, lineChangeIndex + 1);
@@ -268,53 +264,6 @@ namespace PxUtils.Validation.SyntaxValidation
             while (separatorIndex != -1);
 
             return [..separators];
-        }
-
-        /// <summary>
-        /// Finds the illegal characters in a string using a regular expression pattern.
-        /// </summary>
-        /// <param name="input">The input string to search</param>
-        /// <param name="illegalCharacters">An array of characters that are considered illegal</param>
-        /// <param name="foundIllegalCharacters">An array of characters that were found in the input string</param>
-        /// <returns>Returns a boolean which is true if the search was successful. If the search times out, false is returned.</returns>
-        internal static bool FindIllegalCharactersInString(string input, char[] illegalCharacters, out char[] foundIllegalCharacters, int customTimeout = DEFAULT_TIMEOUT)
-        {
-            string processedCharacters = ProcessCharsForRegexPattern(illegalCharacters);
-            string pattern = $"[{processedCharacters}]";
-
-            TimeSpan timeout = TimeSpan.FromSeconds(customTimeout);
-            try
-            {
-                MatchCollection matches = Regex.Matches(input, pattern, RegexOptions.Singleline, timeout);
-                foundIllegalCharacters = matches.Cast<Match>().Select(m => m.Value[0]).ToArray();
-                return true;
-            }
-            catch (RegexMatchTimeoutException)
-            {
-                foundIllegalCharacters = [];
-                return false;
-            }
-        }
-
-        private static string ProcessCharsForRegexPattern(char[] illegalCharacters)
-        {
-            string[] specialCharacters = [ "\\", "^", "$", ".", "|", "?", "*", "+", "(", ")", "[", "]", "[", "]" ];
-            string[] processedCharacters = new string[illegalCharacters.Length];
-
-            for (int i = 0; i < illegalCharacters.Length; i++)
-            {
-                string character = illegalCharacters[i].ToString();
-
-                if (specialCharacters.Contains(character))
-                {
-                    // If the character is a special character, escape it
-                    character = "\\" + character;
-                }
-
-                processedCharacters[i] = character;
-            }
-
-            return string.Join("", processedCharacters);
         }
 
         private static int FindSymbolIndex(string remainder, char symbol, Dictionary<int, int> stringIndeces, int startSearchIndex = 0)

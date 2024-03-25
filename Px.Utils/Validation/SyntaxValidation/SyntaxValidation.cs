@@ -140,10 +140,10 @@ namespace PxUtils.Validation.SyntaxValidation
                 // Key is the part of the entry string before the first keyword separator index
                 string key = entry.EntryString[..keywordSeparatorIndeces[0]];
                 // Remove preceding linebreaks and carriage returns from the key
-                char[] linebreaks = {
+                char[] linebreaks = [
                     syntaxConf.Symbols.Linebreak,
                     CharacterConstants.CarriageReturn
-                };
+                ];
                 key = key
                     .TrimStart(linebreaks);
 
