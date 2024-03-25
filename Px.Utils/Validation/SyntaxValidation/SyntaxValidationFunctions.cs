@@ -11,23 +11,23 @@ namespace PxUtils.Validation.SyntaxValidation
     /// </summary>
     public class SyntaxValidationFunctions
     {
-        public IEnumerable<ValidationFunctionDelegate> DefaultStringValidationFunctions { get; }
-        public IEnumerable<ValidationFunctionDelegate> DefaultKeyValueValidationFunctions { get; }
-        public IEnumerable<ValidationFunctionDelegate> DefaultStructuredValidationFunctions { get; }
+        public List<ValidationFunctionDelegate> DefaultStringValidationFunctions { get; }
+        public List<ValidationFunctionDelegate> DefaultKeyValueValidationFunctions { get; }
+        public List<ValidationFunctionDelegate> DefaultStructuredValidationFunctions { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyntaxValidationFunctions"/> class with default validation functions.
         /// </summary>
         public SyntaxValidationFunctions()
         {
-            DefaultStringValidationFunctions = new List<ValidationFunctionDelegate>
-            {
+            DefaultStringValidationFunctions =
+            [
                 MultipleEntriesOnLine,
                 EntryWithoutValue,
-            };
+            ];
 
-            DefaultKeyValueValidationFunctions = new List<ValidationFunctionDelegate>
-            {
+            DefaultKeyValueValidationFunctions =
+            [
                 MoreThanOneLanguageParameter,
                 MoreThanOneSpecifierParameter,
                 WrongKeyOrderOrMissingKeyword,
@@ -40,10 +40,10 @@ namespace PxUtils.Validation.SyntaxValidation
                 ExcessWhitespaceInValue,
                 KeyContainsExcessWhiteSpace,
                 ExcessNewLinesInValue
-            };
+            ];
 
-            DefaultStructuredValidationFunctions = new List<ValidationFunctionDelegate>
-            {
+            DefaultStructuredValidationFunctions =
+            [
                 KeywordContainsIllegalCharacters,
                 KeywordDoesntStartWithALetter,
                 IllegalCharactersInLanguageParameter,
@@ -52,7 +52,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 KeywordContainsUnderscore,
                 KeywordIsNotInUpperCase,
                 KeywordIsExcessivelyLong
-            };
+            ];
         }
 
         private const string ARGUMENT_EXCEPTION_MESSAGE_NOT_A_KVP = "ValidationObject is not of type ValidationKeyValuePair";
@@ -72,8 +72,8 @@ namespace PxUtils.Validation.SyntaxValidation
             // If the entry does not start with a line separator, it is not on its own line. For the first entry this is not relevant.
             if (
                 validationEntry.EntryIndex == 0 || 
-                validationEntry.EntryString.StartsWith(syntaxConf.Symbols.Linebreak) ||
-                validationEntry.EntryString.StartsWith(CharacterConstants.CarriageReturn))
+                validationEntry.EntryString.StartsWith(CharacterConstants.UnixNewLine) ||
+                validationEntry.EntryString.StartsWith(CharacterConstants.WindowsNewLine))
             {
                 return null;
             }
@@ -538,7 +538,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string value = validationKeyValuePair.KeyValuePair.Value;
 
-            if (value.Contains(syntaxConf.Symbols.Linebreak) || value.Contains(CharacterConstants.CarriageReturn))
+            if (value.Contains(CharacterConstants.WindowsNewLine) || value.Contains(CharacterConstants.UnixNewLine))
             {
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessNewLinesInValue));
             }
