@@ -5,12 +5,13 @@
     /// </summary>
     /// <param name="report">The <see cref="ValidationReport"/> produced by the syntax validation operation.</param>
     /// <param name="result">A list of <see cref="ValidationStruct"/> objects produced by the syntax validation operation.</param>
-    public readonly struct SyntaxValidationResult(ValidationReport report, List<ValidationStruct> result)
+    public readonly struct SyntaxValidationResult(ValidationFeedbackItem[] feedbackItems, List<ValidationStruct> result)
     {
+
         /// <summary>
-        /// Gets the <see cref="ValidationReport"/> produced by the syntax validation operation.
+        /// Gets or sets the list of <see cref="ValidationFeedbackItem"/> objects that were produced during a validation operation.
         /// </summary>
-        public ValidationReport Report { get; } = report;
+        public ValidationFeedbackItem[] FeedbackItems { get; } = feedbackItems;
 
         /// <summary>
         /// Gets the list of <see cref="ValidationStruct"/> objects produced by the syntax validation operation.
