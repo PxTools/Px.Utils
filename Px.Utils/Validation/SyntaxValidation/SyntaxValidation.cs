@@ -65,7 +65,7 @@ namespace PxUtils.Validation.SyntaxValidation
             ValidateEntries(stringEntries, stringValidationFunctions, validationFeedback, syntaxConf);
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(stringEntries, syntaxConf);
             ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, validationFeedback, syntaxConf);
-            List<ValidationStructuredEntry> structuredEntries = BuildvalidationStructuredEntryuredEntrys(keyValuePairs, syntaxConf);
+            List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
             ValidateStructs(structuredEntries, structuredValidationFunctions, validationFeedback, syntaxConf);
 
             return new([.. validationFeedback], structuredEntries);
@@ -110,7 +110,7 @@ namespace PxUtils.Validation.SyntaxValidation
             ValidateEntries(entries, stringValidationFunctions, validationFeedback, syntaxConf);
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, syntaxConf);
             ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, validationFeedback, syntaxConf);
-            List<ValidationStructuredEntry> structuredEntries = BuildvalidationStructuredEntryuredEntrys(keyValuePairs, syntaxConf);
+            List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
             ValidateStructs(structuredEntries, structuredValidationFunctions, validationFeedback, syntaxConf);
 
             return new([.. validationFeedback], structuredEntries);
@@ -186,11 +186,11 @@ namespace PxUtils.Validation.SyntaxValidation
             }).ToList();
         }
 
-        private static List<ValidationStructuredEntry> BuildvalidationStructuredEntryuredEntrys(List<ValidationKeyValuePair> keyValuePairs, PxFileSyntaxConf syntaxConf)
+        private static List<ValidationStructuredEntry> BuildValidationStructureEntries(List<ValidationKeyValuePair> keyValuePairs, PxFileSyntaxConf syntaxConf)
         {
             return keyValuePairs.Select(entry =>
             {
-                ValidationStructuredEntryKey key = ParsevalidationStructuredEntryuredEntryKey(entry.KeyValuePair.Key, syntaxConf);
+                ValidationStructuredEntryKey key = ParseStructuredValidationEntryKey(entry.KeyValuePair.Key, syntaxConf);
                 return new ValidationStructuredEntry(entry.Line, entry.Character, entry.File, key, entry.KeyValuePair.Value);
             }).ToList();
         }
@@ -298,7 +298,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         }
 
-        private static ValidationStructuredEntryKey ParsevalidationStructuredEntryuredEntryKey(string input, PxFileSyntaxConf syntaxConf)
+        private static ValidationStructuredEntryKey ParseStructuredValidationEntryKey(string input, PxFileSyntaxConf syntaxConf)
         {
             ExtractSectionResult languageResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(input, syntaxConf.Symbols.Key.LangParamStart, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.LangParamEnd);
             string? language = languageResult.Sections.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(languageResult.Sections[0], syntaxConf) : null;
