@@ -74,7 +74,7 @@ namespace PxUtils.Validation.SyntaxValidation
             if (
                 validationEntry.EntryIndex == 0 || 
                 validationEntry.EntryString.StartsWith(syntaxConf.Symbols.Linebreak) ||
-                validationEntry.EntryString.StartsWith(syntaxConf.Symbols.CarriageReturn))
+                validationEntry.EntryString.StartsWith(CharacterConstants.CarriageReturn))
             {
                 return null;
             }
@@ -457,8 +457,8 @@ namespace PxUtils.Validation.SyntaxValidation
             // Remove elements from the list. We only want to check whitespace between elements
             string stripItems = SyntaxValidationUtilityMethods.ExtractSectionFromString(value, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf).Remainder;
             if (
-                stripItems.Contains($"{syntaxConf.Symbols.Space}{syntaxConf.Symbols.Space}") ||
-                stripItems.Contains($"{syntaxConf.Symbols.HorizontalTab}")
+                stripItems.Contains($"{CharacterConstants.Space}{CharacterConstants.Space}") ||
+                stripItems.Contains($"{CharacterConstants.HorizontalTab}")
                 )
             {
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessWhitespaceInValue));
@@ -482,7 +482,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string key = validationKeyValuePair.KeyValuePair.Key;
             string stripSpecifiers = SyntaxValidationUtilityMethods.ExtractSectionFromString(key, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf).Remainder;
 
-            IEnumerable<char> whiteSpaces = stripSpecifiers.Where(c => syntaxConf.Symbols.WhitespaceCharacters.Contains(c));
+            IEnumerable<char> whiteSpaces = stripSpecifiers.Where(c => CharacterConstants.WhitespaceCharacters.Contains(c));
             if (!whiteSpaces.Any())
             {
                 return null;
@@ -493,7 +493,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.KeyContainsExcessWhiteSpace));
             }
             // If whitespace is found without a comma separating the specifier parts, it is considered excess
-            else if (!key.Contains($"{syntaxConf.Symbols.Key.ListSeparator}{syntaxConf.Symbols.Space}"))
+            else if (!key.Contains($"{syntaxConf.Symbols.Key.ListSeparator}{CharacterConstants.Space}"))
             {
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.KeyContainsExcessWhiteSpace));
             }
@@ -525,7 +525,7 @@ namespace PxUtils.Validation.SyntaxValidation
 
             string value = validationKeyValuePair.KeyValuePair.Value;
 
-            if (value.Contains(syntaxConf.Symbols.Linebreak) || value.Contains(syntaxConf.Symbols.CarriageReturn))
+            if (value.Contains(syntaxConf.Symbols.Linebreak) || value.Contains(CharacterConstants.CarriageReturn))
             {
                 return new ValidationFeedbackItem(validationObject, new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessNewLinesInValue));
             }
@@ -626,10 +626,10 @@ namespace PxUtils.Validation.SyntaxValidation
                 syntaxConf.Symbols.Key.StringDelimeter,
                 syntaxConf.Symbols.EntrySeparator,
                 syntaxConf.Symbols.KeywordSeparator,
-                syntaxConf.Symbols.Space,
-                syntaxConf.Symbols.CarriageReturn,
-                syntaxConf.Symbols.LineFeed,
-                syntaxConf.Symbols.HorizontalTab
+                CharacterConstants.Space,
+                CharacterConstants.CarriageReturn,
+                CharacterConstants.LineFeed,
+                CharacterConstants.HorizontalTab
             ];
 
             // If FindIllegalCharactersInString returns false, it means that the regex has timed out

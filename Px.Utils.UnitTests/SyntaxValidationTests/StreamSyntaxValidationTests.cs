@@ -1,8 +1,10 @@
 ﻿using PxUtils.Validation.SyntaxValidation;
 using PxUtils.UnitTests.SyntaxValidationTests.Fixtures;
 using System.Text;
+using System.Reflection;
 using PxUtils.Validation;
 using PxUtils.PxFile;
+using PxUtils.PxFile.Meta;
 
 namespace PxUtils.UnitTests.SyntaxValidationTests
 {
@@ -12,6 +14,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         private readonly string filename = "foo";
         private readonly List<ValidationFeedbackItem> feedback = [];
         private readonly PxFileSyntaxConf syntaxConf = PxFileSyntaxConf.Default;
+        private MethodInfo? validationMethod;
+
+        [TestInitialize]
+        public void Initialize()
+        {
+            validationMethod = typeof(SyntaxValidation)
+                    .GetMethod("ValidateObjects", BindingFlags.NonPublic | BindingFlags.Static);
+        }
 
         [TestMethod]
         public void ValidatePxFileSyntax_CalledWith_MINIMAL_UTF8_Returns_Valid_Result()
@@ -19,7 +29,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = SyntaxValidation.GetEncoding(stream, PxFileSyntaxConf.Default);
+            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
 
             // Assert
@@ -39,7 +49,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.MultipleEntriesOnLine];
 
             // Act
-            SyntaxValidation.ValidateObjects(entries, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { entries, functions, feedback, syntaxConf });
 
             Assert.AreEqual(2, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.MultipleEntriesOnOneLine, feedback[1].Feedback.Rule);
@@ -52,7 +62,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_SPECIFIERS);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = SyntaxValidation.GetEncoding(stream, PxFileSyntaxConf.Default);
+            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
 
             // Assert
@@ -78,7 +88,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.MoreThanOneLanguageParameter];
 
             // Act
-            SyntaxValidation.ValidateObjects(keyValuePairs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.MoreThanOneLanguageParameterSection, feedback[0].Feedback.Rule);
@@ -93,7 +103,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.MoreThanOneSpecifierParameter];
 
             // Act
-            SyntaxValidation.ValidateObjects(keyValuePairs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.MoreThanOneSpecifierParameterSection, feedback[0].Feedback.Rule);
@@ -107,7 +117,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.WrongKeyOrderOrMissingKeyword];
 
             // Act
-            SyntaxValidation.ValidateObjects(keyValuePairs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(3, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeyHasWrongOrder, feedback[0].Feedback.Rule);
@@ -123,7 +133,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.MoreThanTwoSpecifierParts, SyntaxValidationFunctions.SpecifierPartNotEnclosed, SyntaxValidationFunctions.NoDelimiterBetweenSpecifierParts];
 
             // Act
-            SyntaxValidation.ValidateObjects(keyValuePairs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(3, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.TooManySpecifiers, feedback[0].Feedback.Rule);
@@ -139,7 +149,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IllegalSymbolsInLanguageParamSection];
 
             // Act
-            SyntaxValidation.ValidateObjects(keyValuePairs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(3, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageParameter, feedback[0].Feedback.Rule);
@@ -155,7 +165,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IllegalSymbolsInSpecifierParamSection];
 
             // Act
-            SyntaxValidation.ValidateObjects(keyValuePairs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, feedback[0].Feedback.Rule);
@@ -170,7 +180,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.InvalidValueFormat];
 
             // Act
-            SyntaxValidation.ValidateObjects(keyValuePairs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(4, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, feedback[0].Feedback.Rule);
@@ -187,7 +197,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.ExcessWhitespaceInValue];
 
             // Act
-            SyntaxValidation.ValidateObjects(keyValuePairs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.ExcessWhitespaceInValue, feedback[0].Feedback.Rule);
@@ -201,7 +211,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.KeyContainsExcessWhiteSpace];
 
             // Act
-            SyntaxValidation.ValidateObjects(keyValuePairs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeyContainsExcessWhiteSpace, feedback[0].Feedback.Rule);
@@ -215,7 +225,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.ExcessNewLinesInValue];
 
             // Act
-            SyntaxValidation.ValidateObjects(keyValuePairs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(2, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.ExcessNewLinesInValue, feedback[0].Feedback.Rule);
@@ -230,7 +240,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.KeywordDoesntStartWithALetter, SyntaxValidationFunctions.KeywordContainsIllegalCharacters];
 
             // Act
-            SyntaxValidation.ValidateObjects(structs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(3, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeywordDoesntStartWithALetter, feedback[0].Feedback.Rule);
@@ -246,7 +256,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IllegalCharactersInLanguageParameter];
 
             // Act
-            SyntaxValidation.ValidateObjects(structs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(0, feedback.Count);
         }
@@ -259,7 +269,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IllegalCharactersInLanguageParameter];
 
             // Act
-            SyntaxValidation.ValidateObjects(structs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageParameter, feedback[0].Feedback.Rule);
@@ -273,7 +283,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IllegalCharactersInSpecifierParts];
 
             // Act
-            SyntaxValidation.ValidateObjects(structs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierPart, feedback[0].Feedback.Rule);
@@ -287,7 +297,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.EntryWithoutValue];
 
             // Act
-            SyntaxValidation.ValidateObjects(entries, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { entries, functions, feedback, syntaxConf });
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.EntryWithoutValue, feedback[0].Feedback.Rule);
@@ -301,7 +311,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.IncompliantLanguage];
 
             // Act
-            SyntaxValidation.ValidateObjects(structs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(2, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.IncompliantLanguage, feedback[0].Feedback.Rule);
@@ -316,7 +326,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.KeywordContainsUnderscore, SyntaxValidationFunctions.KeywordIsNotInUpperCase];
 
             // Act
-            SyntaxValidation.ValidateObjects(structs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(2, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeywordIsNotInUpperCase, feedback[0].Feedback.Rule);
@@ -331,22 +341,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<ValidationFunctionDelegate> functions = [SyntaxValidationFunctions.KeywordIsExcessivelyLong];
 
             // Act
-            SyntaxValidation.ValidateObjects(structs, functions, feedback, syntaxConf);
+            validationMethod?.Invoke(null, new object[] { structs, functions, feedback, syntaxConf });
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeywordExcessivelyLong, feedback[0].Feedback.Rule);
-        }
-
-        [TestMethod]
-        public void ValidatePxFileSyntax_CalledWith_UNKNOWN_ENCODING_Returns_Null()
-        {
-            // Arrange
-            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UNKNOWN_ENCODING);
-            using Stream stream = new MemoryStream(data);
-            Encoding? encoding = SyntaxValidation.GetEncoding(stream, PxFileSyntaxConf.Default);
-
-            // Assert
-            Assert.IsNull(encoding);
         }
     }
 }

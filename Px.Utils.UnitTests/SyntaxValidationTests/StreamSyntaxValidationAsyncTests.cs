@@ -3,6 +3,7 @@ using PxUtils.UnitTests.SyntaxValidationTests.Fixtures;
 using System.Text;
 using PxUtils.PxFile;
 using PxUtils.Validation;
+using PxUtils.PxFile.Meta;
 
 namespace PxUtils.UnitTests.SyntaxValidationTests
 {
@@ -18,7 +19,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = await SyntaxValidation.GetEncodingAsync(stream, PxFileSyntaxConf.Default);
+            Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
 
             // Assert
@@ -36,7 +37,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_SPECIFIERS);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = await SyntaxValidation.GetEncodingAsync(stream, PxFileSyntaxConf.Default);
+            Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
 
             // Assert
@@ -52,18 +53,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             Assert.AreEqual("first_specifier", result.Result[8].Key.FirstSpecifier);
             Assert.AreEqual("first_specifier", result.Result[9].Key.FirstSpecifier);
             Assert.AreEqual("second_specifier", result.Result[8].Key.SecondSpecifier);
-        }
-
-        [TestMethod]
-        public async Task ValidatePxFileSyntaxAsync_CalledWith_UNKNOWN_ENCODING_Returns_Null()
-        {
-            // Arrange
-            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UNKNOWN_ENCODING);
-            using Stream stream = new MemoryStream(data);
-            Encoding? encoding = await SyntaxValidation.GetEncodingAsync(stream, PxFileSyntaxConf.Default);
-
-            // Assert
-            Assert.IsNull(encoding);
         }
     }
 }

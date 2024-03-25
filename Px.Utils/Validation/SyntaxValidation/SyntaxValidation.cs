@@ -71,26 +71,6 @@ namespace PxUtils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// Gets the encoding of a PX file stream
-        /// </summary>
-        /// <param name="stream">The stream to be validated</param>
-        /// <param name="syntaxConf">Syntax configuration object</param>
-        /// <param name="validationFeedback">List of reports that stores any issues that were ran into during validation process</param>
-        /// <param name="filename">Name of the PX file being validated</param>
-        /// <returns>Character encoding if found</returns>
-        public static Encoding? GetEncoding(Stream stream, PxFileSyntaxConf syntaxConf)
-        {
-            try
-            {
-                return PxFileMetadataReader.GetEncoding(stream, syntaxConf);
-            }
-            catch (InvalidPxFileMetadataException)
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
         /// Asynchronously validates the syntax of a PX file's metadata.
         /// </summary>
         /// <param name="stream">The stream of the PX file to be validated.</param>
@@ -135,34 +115,7 @@ namespace PxUtils.Validation.SyntaxValidation
             return new([.. validationFeedback], structs);
         }
 
-        /// <summary>
-        /// Gets the encoding of a PX file stream asynchronously
-        /// </summary>
-        /// <param name="stream">The stream to be validated</param>
-        /// <param name="syntaxConf">Syntax configuration object</param>
-        /// <param name="report">Report object that stores any issues that were ran into during validation process</param>
-        /// <param name="filename">Name of the PX file being validated</param>
-        /// <returns>Character encoding if found</returns>
-        public static async Task<Encoding?> GetEncodingAsync(Stream stream, PxFileSyntaxConf syntaxConf)
-        {
-            try
-            {
-                return await PxFileMetadataReader.GetEncodingAsync(stream, syntaxConf);
-            }
-            catch (InvalidPxFileMetadataException)
-            {
-                return null;
-            }
-        }
-
-        ///<summary>
-        /// Validates a collection of objects using a collection of validation functions and adds any feedback to the provided validationFeedback.
-        ///</summary>
-        /// <param name="objects">The collection of <see cref="ValidationObject"/> objects to be validated.</param>
-        /// <param name="validationFunctions">The collection of <see cref="IValidationFunction"/> validation functions to be used for validation.</param>
-        /// <param name="report">The <see cref="ValidationReport"/> validationFeedback where validation feedback will be added.</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        public static void ValidateObjects(IEnumerable<ValidationObject> objects, IEnumerable<ValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf)
+        private static void ValidateObjects(IEnumerable<ValidationObject> objects, IEnumerable<ValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf)
         {
             foreach (var @object in objects)
             {
@@ -187,9 +140,13 @@ namespace PxUtils.Validation.SyntaxValidation
                 // Key is the part of the entry string before the first keyword separator index
                 string key = entry.EntryString[..keywordSeparatorIndeces[0]];
                 // Remove preceding linebreaks and carriage returns from the key
+                char[] linebreaks = {
+                    syntaxConf.Symbols.Linebreak,
+                    CharacterConstants.CarriageReturn
+                };
                 key = key
-                    .TrimStart(syntaxConf.Symbols.CarriageReturn)
-                    .TrimStart(syntaxConf.Symbols.Linebreak);
+                    .TrimStart(linebreaks);
+
                 // Value is the part of the entry string after the first keyword separator index
                 int startIndex = keywordSeparatorIndeces[0] + 1;
                 string value = entry.EntryString[startIndex..];
@@ -238,7 +195,6 @@ namespace PxUtils.Validation.SyntaxValidation
                         entryBuilder.Append(buffer[i]);
                     }
                 }
-                Array.Clear(buffer, 0, buffer.Length);
             }
             return entries;
         }
@@ -257,7 +213,7 @@ namespace PxUtils.Validation.SyntaxValidation
             do
             {
                 read = await reader.ReadAsync(buffer.AsMemory(), cancellationToken);
-                for (int i = 0; i < buffer.Length; i++)
+                for (int i = 0; i < read; i++)
                 {
                     if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
                     {
@@ -275,7 +231,6 @@ namespace PxUtils.Validation.SyntaxValidation
                         entryBuilder.Append(buffer[i]);
                     }
                 }
-                Array.Clear(buffer, 0, buffer.Length);
             }
             while (read > 0);
 

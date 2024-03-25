@@ -245,7 +245,7 @@ namespace PxUtils.Validation.SyntaxValidation
         public static string CleanString(string input, PxFileSyntaxConf syntaxConf)
         {
             return input
-                .Trim(syntaxConf.Symbols.CarriageReturn)
+                .Trim(CharacterConstants.CarriageReturn)
                 .Trim(syntaxConf.Symbols.Linebreak)
                 .Trim(syntaxConf.Symbols.Key.StringDelimeter);
         }
@@ -329,7 +329,7 @@ namespace PxUtils.Validation.SyntaxValidation
         private static int GetNextLineChangeIndex(string input, PxFileSyntaxConf syntaxConf, int startIndex = 0)
         {
             int lineBreakIndex = input.IndexOf(syntaxConf.Symbols.Linebreak, startIndex);
-            int carriageReturnIndex = input.IndexOf(syntaxConf.Symbols.CarriageReturn, startIndex);
+            int carriageReturnIndex = input.IndexOf(CharacterConstants.CarriageReturn, startIndex);
 
             // If neither character was found, return -1
             if (lineBreakIndex == -1 && carriageReturnIndex == -1)
