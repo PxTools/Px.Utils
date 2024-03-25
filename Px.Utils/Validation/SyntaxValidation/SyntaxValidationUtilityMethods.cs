@@ -9,10 +9,10 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace PxUtils.Validation.SyntaxValidation
 {
     /// <summary>
-    /// Represents the result of extracting sections from a string. This struct contains an array of the extracted sections and the remainder of the string after extraction.
+    /// Represents the result of extracting sections from a string. This struct contains an array of the extracted sections and the input of the string after extraction.
     /// </summary>
     /// <param name="parameters">The sections extracted from the string.</param>
-    /// <param name="remainder">The remainder of the string after extraction.</param>
+    /// <param name="remainder">The input of the string after extraction.</param>
     internal readonly struct ExtractSectionResult(string[] parameters, string remainder)
     {
         /// <summary>
@@ -21,7 +21,7 @@ namespace PxUtils.Validation.SyntaxValidation
         public string[] Sections { get; } = parameters;
 
         /// <summary>
-        /// Gets the remainder of the string after extraction.
+        /// Gets the input of the string after extraction.
         /// </summary>
         public string Remainder { get; } = remainder;
     }
@@ -154,10 +154,6 @@ namespace PxUtils.Validation.SyntaxValidation
         internal static bool ValueLineChangesAreCompliant(string input, PxFileSyntaxConf syntaxConf, bool isList)
         {
             string trimmedInput = input.Replace(CharacterConstants.CarriageReturn.ToString(), "");
-            if (trimmedInput.Contains(CharacterConstants.CarriageReturn))
-            {
-                Debug.WriteLine("This is impossible");
-            }
             int lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LineFeed);
             while (lineChangeIndex != -1)
             {
@@ -209,10 +205,12 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>Returns a string that is the input string cleaned from new line characters and quotation marks</returns>
         internal static string CleanString(string input, PxFileSyntaxConf syntaxConf)
         {
-            return input
-                .Trim(CharacterConstants.CarriageReturn)
-                .Trim(syntaxConf.Symbols.Linebreak)
-                .Trim(syntaxConf.Symbols.Key.StringDelimeter);
+            char[] charactersToTrim = [
+                CharacterConstants.CarriageReturn,
+                syntaxConf.Symbols.Linebreak,
+                syntaxConf.Symbols.Key.StringDelimeter
+            ];
+            return input.Trim(charactersToTrim);
         }
 
         /// <summary>
@@ -266,26 +264,34 @@ namespace PxUtils.Validation.SyntaxValidation
             return [..separators];
         }
 
-        private static int FindSymbolIndex(string remainder, char symbol, Dictionary<int, int> stringIndeces, int startSearchIndex = 0)
+        /// <summary>
+        /// Finds symbol index in a string. If the symbol is enclosed within a string, the search is repeated until the symbol is found outside of the string.
+        /// </summary>
+        /// <param name="input">The input string to search</param>
+        /// <param name="symbol">The symbol to search for</param>
+        /// <param name="stringIndexes">A dictionary in which keys are the indeces of opening characters and values are the corresponding closing characters.</param>
+        /// <param name="startSearchIndex">The index from which to start the search</param>
+        /// <returns>Returns the index of the symbol in the input string</returns>
+        private static int FindSymbolIndex(string input, char symbol, Dictionary<int, int> stringIndexes, int startSearchIndex = 0)
         {
             // If there's no string sections to be excluded from the search, we can just use the regular IndexOf method
-            if (stringIndeces.Count == 0)
+            if (stringIndexes.Count == 0)
             {
-                return remainder.IndexOf(symbol, startSearchIndex);
+                return input.IndexOf(symbol, startSearchIndex);
             }
 
             int symbolIndex = -1;
             int searchIndex = startSearchIndex;
             do
             {
-                symbolIndex = remainder.IndexOf(symbol, searchIndex);
+                symbolIndex = input.IndexOf(symbol, searchIndex);
                 searchIndex = symbolIndex + 1;
                 if (symbolIndex == -1)
                 {
                     break;
                 }
                 // If the symbol is enclosed within a string, we need to search again
-                if (stringIndeces.Any(i => i.Key < symbolIndex && i.Value > symbolIndex))
+                if (stringIndexes.Any(i => i.Key < symbolIndex && i.Value > symbolIndex))
                 {
                     symbolIndex = -1;
                 }
