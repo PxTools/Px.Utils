@@ -57,6 +57,9 @@ namespace PxUtils.Validation.SyntaxValidation
             ];
         }
 
+        private static readonly TimeSpan regexTimeout = TimeSpan.FromMilliseconds(50);
+        private static readonly Regex keywordIllegalSymbolsRegex = new(@"[^a-zA-Z0-9_-]", RegexOptions.Compiled, regexTimeout);
+
         /// <summary>
         /// If <see cref="ValidationEntry"/> does not start with a line separator, it is considered as not being on its own line, and a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
@@ -535,14 +538,10 @@ namespace PxUtils.Validation.SyntaxValidation
                 return null;
             }
 
-            // Check if specifier contains only letters, numbers, - and _
-            string legalSymbolsKeyword = @"a-zA-Z0-9_-";
-            // Define a timeout for the regex match
-            TimeSpan timeout = TimeSpan.FromMilliseconds(50);
             // Find all illegal symbols in specifier
             try
             {
-                MatchCollection matchesKeyword = Regex.Matches(keyword, $"[^{legalSymbolsKeyword}]", RegexOptions.None, timeout);
+                MatchCollection matchesKeyword = keywordIllegalSymbolsRegex.Matches(keyword, 0);
                 IEnumerable<string> illegalSymbolsInKeyWord = matchesKeyword.Cast<Match>().Select(m => m.Value).Distinct();
                 if (illegalSymbolsInKeyWord.Any())
                 {
