@@ -2,11 +2,11 @@
 
 namespace PxUtils.PxFile.Data
 {
-    public class PxFileStreamDataReader : IDisposable
+    public sealed class PxFileStreamDataReader : IDisposable
     {
-        private Stream _stream;
+        private readonly Stream _stream;
+        private readonly PxFileSyntaxConf _conf;
         private long _readerPosition;
-        PxFileSyntaxConf _conf;
 
         private const int INTERNAL_BUFFER_SIZE = 4096;
         private const char VALUE_SEPARATOR = ' ';
@@ -24,45 +24,57 @@ namespace PxUtils.PxFile.Data
             _conf = conf ?? PxFileSyntaxConf.Default;
         }
 
-        public long ReadUnsafeDoubles(double[] buffer, int offset, int count, IReadOnlyDictionary<string, double> missingDataEncodings)
+        public void ReadUnsafeDoubles(double[] buffer, int offset, int[] rows, int[] cols, double[] missingValueEncodings)
         {
             SetReaderPositionIfZero();
-            throw new NotImplementedException();
+            ReadItemsFromStream(buffer, offset, rows, cols, Parser);
+            
+            double Parser(char[] parseBuffer, int len)
+            {
+                return DataValueParsers.FastParseUnsafeDoubleDangerous(parseBuffer, len, missingValueEncodings);
+            }
         }
 
-        public long ReadDoubleDataValues(DoubleDataValue[] buffer, int offset, int count)
+        public void ReadDoubleDataValues(DoubleDataValue[] buffer, int offset, int[] rows, int[] cols)
         {
             SetReaderPositionIfZero();
-            throw new NotImplementedException();
+            ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDoubleDataValue);
         }
         
-        public long ReadDecimalDataValues(DecimalDataValue[] buffer, int offset, int count)
+        public void ReadDecimalDataValues(DecimalDataValue[] buffer, int offset, int[] rows, int[] cols)
         {
             SetReaderPositionIfZero();
-            throw new NotImplementedException();
+            ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDecimalDataValue);
         }
 
-        public async Task<long> ReadUnsafeDoublesAsync(double[] buffer, int offset, int count, IReadOnlyDictionary<string, double> missingDataEncodings)
+        public async Task ReadUnsafeDoublesAsync(double[] buffer, int offset, int[] rows, int[] cols, double[] missingValueEncodings)
         {
-            SetReaderPositionIfZeroAsync();
-            throw new NotImplementedException();
+            await SetReaderPositionIfZeroAsync();
+            await Task.Factory.StartNew(() =>
+                ReadItemsFromStream(buffer, offset, rows, cols, Parser));
+
+            double Parser(char[] parseBuffer, int len)
+            {
+                return DataValueParsers.FastParseUnsafeDoubleDangerous(parseBuffer, len, missingValueEncodings);
+            }
         }
 
-        public async Task<long> ReadDoubleDataValuesAsync(DoubleDataValue[] buffer, int offset, int count)
+        public async Task ReadDoubleDataValuesAsync(DoubleDataValue[] buffer, int offset, int[] rows, int[] cols)
         {
-            SetReaderPositionIfZeroAsync();
-            throw new NotImplementedException();
+            await SetReaderPositionIfZeroAsync();
+            await Task.Factory.StartNew(() =>
+                ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDoubleDataValue));
         }
 
-        public async Task<long> ReadDecimalDataValuesAsync(DecimalDataValue[] buffer, int offset, int count)
+        public async Task ReadDecimalDataValuesAsync(DecimalDataValue[] buffer, int offset, int[] rows, int[] cols)
         {
-            SetReaderPositionIfZeroAsync();
-            throw new NotImplementedException();
+            await SetReaderPositionIfZeroAsync();
+            await Task.Factory.StartNew(() =>
+                ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDecimalDataValue));
         }
 
         public void Dispose()
         {
-            GC.SuppressFinalize(this);
             _stream.Dispose();
         }
 
@@ -90,7 +102,7 @@ namespace PxUtils.PxFile.Data
             _readerPosition = start + dataKeyword.Length + 1; // +1 to skip the '='
         }
 
-        private void ReadItemsFromStream<T>(T[] buffer, int offset, int[] rows, int[] cols, Func<byte[], int, T> readItem)
+        private void ReadItemsFromStream<T>(T[] buffer, int offset, int[] rows, int[] cols, Func<char[], int, T> readItem)
         {
             _stream.Position = _readerPosition;
 
@@ -98,7 +110,7 @@ namespace PxUtils.PxFile.Data
             int rowsLength = rows.Length;
 
             byte[] internalBuffer = new byte[INTERNAL_BUFFER_SIZE];
-            byte[] valueBuffer = new byte[30]; // separate buffer is needed because a value can be split between two reads
+            char[] valueBuffer = new char[30]; // separate buffer is needed because a value can be split between two reads
 
             int fileRow = 0;
             int fileCol = 0;
@@ -114,7 +126,7 @@ namespace PxUtils.PxFile.Data
                 read = _stream.Read(internalBuffer, 0, INTERNAL_BUFFER_SIZE);
                 for(int i = 0; i < read; i++)
                 {
-                    byte c = internalBuffer[i];
+                    char c = (char)internalBuffer[i];
                     if (c > 0x21) // Every allowed char > 0x21 belongs to a value
                     {
                         valueBuffer[valueIndex] = c;
