@@ -6,7 +6,7 @@ namespace PxUtils.PxFile.Data
     {
         private readonly Stream _stream;
         private readonly PxFileSyntaxConf _conf;
-        private long _readerPosition;
+        private long _dataStart;
 
         private const int INTERNAL_BUFFER_SIZE = 4096;
         private const char VALUE_SEPARATOR = ' ';
@@ -20,13 +20,13 @@ namespace PxUtils.PxFile.Data
         public PxFileStreamDataReader(Stream stream, long dataStart, PxFileSyntaxConf? conf = null)
         {
             _stream = stream;
-            _readerPosition = dataStart;
+            _dataStart = dataStart;
             _conf = conf ?? PxFileSyntaxConf.Default;
         }
 
         public void ReadUnsafeDoubles(double[] buffer, int offset, int[] rows, int[] cols, double[] missingValueEncodings)
         {
-            SetReaderPositionIfZero();
+            SetDataStartIfZero();
             ReadItemsFromStream(buffer, offset, rows, cols, Parser);
             
             double Parser(char[] parseBuffer, int len)
@@ -37,13 +37,13 @@ namespace PxUtils.PxFile.Data
 
         public void ReadDoubleDataValues(DoubleDataValue[] buffer, int offset, int[] rows, int[] cols)
         {
-            SetReaderPositionIfZero();
+            SetDataStartIfZero();
             ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDoubleDataValue);
         }
         
         public void ReadDecimalDataValues(DecimalDataValue[] buffer, int offset, int[] rows, int[] cols)
         {
-            SetReaderPositionIfZero();
+            SetDataStartIfZero();
             ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDecimalDataValue);
         }
 
@@ -78,33 +78,33 @@ namespace PxUtils.PxFile.Data
             _stream.Dispose();
         }
 
-        private void SetReaderPositionIfZero()
+        private void SetDataStartIfZero()
         {
-            if (_readerPosition != 0) return;
+            if (_dataStart != 0) return;
             string dataKeyword = _conf.Tokens.KeyWords.Data;
             long start = StreamUtilities.FindKeywordPosition(_stream, dataKeyword, _conf);
             if (start == -1)
             {
                 throw new ArgumentException($"Could not find data keyword '{dataKeyword}'");
             }
-            _readerPosition = start + dataKeyword.Length + 1; // +1 to skip the '='
+            _dataStart = start + dataKeyword.Length + 1; // +1 to skip the '='
         }
 
         private async Task SetReaderPositionIfZeroAsync()
         {
-            if (_readerPosition != 0) return;
+            if (_dataStart != 0) return;
             string dataKeyword = _conf.Tokens.KeyWords.Data;
             long start = await StreamUtilities.FindKeywordPositionAsync(_stream, dataKeyword, _conf);
             if (start == -1)
             {
                 throw new ArgumentException($"Could not find data keyword '{dataKeyword}'");
             }
-            _readerPosition = start + dataKeyword.Length + 1; // +1 to skip the '='
+            _dataStart = start + dataKeyword.Length + 1; // +1 to skip the '='
         }
 
         private void ReadItemsFromStream<T>(T[] buffer, int offset, int[] rows, int[] cols, Func<char[], int, T> readItem)
         {
-            _stream.Position = _readerPosition;
+            _stream.Position = _dataStart;
 
             int colsLength = cols.Length;
             int rowsLength = rows.Length;
@@ -127,7 +127,7 @@ namespace PxUtils.PxFile.Data
                 for(int i = 0; i < read; i++)
                 {
                     char c = (char)internalBuffer[i];
-                    if (c > 0x21) // Every allowed char > 0x21 belongs to a value
+                    if (c > 0x21)
                     {
                         valueBuffer[valueIndex] = c;
                         valueIndex++;
@@ -145,6 +145,7 @@ namespace PxUtils.PxFile.Data
                                 targetRowIndex++;
                                 if(targetRowIndex == rowsLength)
                                 {
+                                    // All requested values have been read
                                     return;
                                 }
                             }
@@ -152,7 +153,7 @@ namespace PxUtils.PxFile.Data
                         fileCol++;
                         valueIndex = 0;
                     }
-                    else if(c == '\n')
+                    else if(c == '\n' && fileCol > 0) // Ignore empty lines
                     {
                         fileRow++;
                         fileCol = 0;
@@ -160,6 +161,12 @@ namespace PxUtils.PxFile.Data
                 }
             }
             while (read > 0);
+
+            // Read the last value that contains section separator
+            if(valueIndex > 0)
+            {
+                buffer[offset] = readItem(valueBuffer, valueIndex - 1);
+            }
         }
     }
 }
