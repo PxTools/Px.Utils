@@ -12,7 +12,7 @@ namespace Px.Utils.TestingApp
 
         static void StartInteractiveMode()
         {
-            DataReadBenchmarks benchmarks = new();
+            DataReadBenchmark benchmarks = new();
             benchmarks.PrintResults();
         }
 

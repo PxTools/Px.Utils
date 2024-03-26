@@ -1,6 +1,6 @@
 ﻿namespace Px.Utils.TestingApp.Commands
 {
-    internal abstract class Benchmarks
+    internal abstract class Benchmark
     {
         internal class BenchmarkResult
         {

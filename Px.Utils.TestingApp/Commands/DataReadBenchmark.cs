@@ -1,8 +1,8 @@
 ﻿namespace Px.Utils.TestingApp.Commands
 {
-    internal class DataReadBenchmarks : Benchmarks
+    internal class DataReadBenchmark : Benchmark
     {
-        internal DataReadBenchmarks()
+        internal DataReadBenchmark()
         {
         }
 
