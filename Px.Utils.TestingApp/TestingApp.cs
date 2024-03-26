@@ -12,8 +12,8 @@ namespace Px.Utils.TestingApp
 
         static void StartInteractiveMode()
         {
-            DataReadBenchmark benchmarks = new();
-            benchmarks.PrintResults();
+            //DataReadBenchmark benchmarks = new();
+            //benchmarks.PrintResults();
         }
 
         static void StartBatchMode(string[] _)
