@@ -1,5 +1,5 @@
-﻿using PxUtils.PxFile.Metadata;
-using PxUtils.UnitTests.PxFileTests.Fixtures;
+﻿using PxFileTests.Fixtures;
+using PxUtils.PxFile.Metadata;
 using System.Text;
 
 namespace PxFileTests.PxFileMetadataReaderTests
