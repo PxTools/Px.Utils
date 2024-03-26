@@ -109,7 +109,7 @@ namespace PxUtils.Validation.SyntaxValidation
             syntaxConf ??= PxFileSyntaxConf.Default;
             List<int> lineChangeIndexes = [];
             List<ValidationFeedbackItem> validationFeedback = [];
-            List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, syntaxConf, filename, bufferSize, cancellationToken, lineChangeIndexes);
+            List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, syntaxConf, filename, bufferSize, lineChangeIndexes, cancellationToken);
             int[] lineChanges = [..lineChangeIndexes];
             ValidateEntries(entries, stringValidationFunctions, validationFeedback, syntaxConf, lineChanges);
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, syntaxConf);
@@ -229,7 +229,7 @@ namespace PxUtils.Validation.SyntaxValidation
             return entries;
         }
 
-        private static async Task<List<ValidationEntry>> BuildValidationEntriesAsync(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize, CancellationToken cancellationToken, List<int> lineChangeIndexes)
+        private static async Task<List<ValidationEntry>> BuildValidationEntriesAsync(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize, List<int> lineChangeIndexes, CancellationToken cancellationToken)
         {
             bool isProcessingString = false;
             int character = 0;

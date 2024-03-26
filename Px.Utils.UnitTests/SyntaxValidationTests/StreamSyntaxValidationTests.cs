@@ -17,7 +17,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         private MethodInfo? entryValidationMethod;
         private MethodInfo? kvpValidationMethod;
         private MethodInfo? structuredValidationMethod;
-        int[] lineChangeIndexes = [0];
+        private readonly int[] lineChangeIndexes = [0];
 
 
         [TestInitialize]
