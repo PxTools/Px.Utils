@@ -11,9 +11,9 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
 
         internal static List<ValidationEntry> MULTIPLE_ENTRIES_IN_SINGLE_LINE => [
-            new(0, 0, "foo", "CHARSET=\"ANSI\";", 0),
-            new(1, 0, "foo", "AXIS-VERSION=\"2013\";", 1),
-            new(2, 0, "foo", "CODEPAGE=\"utf-8\";", 2),
+            new("foo", "CHARSET=\"ANSI\";", 0, 0),
+            new("foo", "AXIS-VERSION=\"2013\";", 1, 0),
+            new("foo", "CODEPAGE=\"utf-8\";", 2, 0),
         ];
 
         internal static string UTF8_N_WITH_SPECIFIERS =>
@@ -30,33 +30,34 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
 
         internal static List<ValidationKeyValuePair> KEYVALUEPAIR_WITH_MULTIPLE_LANGUAGE_PARAMETERS => [
-            new(0, 0, "foo", new KeyValuePair<string, string>("FOO[fi][en](\"first_specifier\", \"second_specifier\")", "YES\n"))
+            new("foo", new KeyValuePair<string, string>("FOO[fi][en](\"first_specifier\", \"second_specifier\")", "YES\n"), 0, 0)
                 ];
 
         internal static List<ValidationKeyValuePair> KEYVALUEPAIR_WITH_MULTIPLE_SPECIFIER_PARAMETER_SECTIONS => [
-            new(0, 0, "foo", new KeyValuePair<string, string>("FOO[fi](\"first_specifier\")(\"second_specifier\")", "YES\n"))
+            new("foo", new KeyValuePair<string, string>("FOO[fi](\"first_specifier\")(\"second_specifier\")", "YES\n"), 0, 0)
                 ];
 
         internal static List<ValidationKeyValuePair> KEYVALUEPAIRS_IN_WRONG_ORDER_AND_MISSING_KEYWORD => [
-            new(0, 0, "foo", new KeyValuePair<string, string>("FOO(\"first_specifier\")[fi]", "YES\n")),
-            new(1, 0, "foo", new KeyValuePair<string, string>("[en]BAR(\"first_specifier\")", "NO\n")),
-            new(2, 0, "foo", new KeyValuePair<string, string>("[fi](\"first_specifier\")", "baz\n"))
+            new("foo", new KeyValuePair<string, string>("FOO(\"first_specifier\")[fi]", "YES\n"), 0, 0),
+            new("foo", new KeyValuePair<string, string>("[en]BAR(\"first_specifier\")", "NO\n"), 0, 0),
+            new("foo", new KeyValuePair<string, string>("[fi](\"first_specifier\")", "baz\n"), 0, 0)
                 ];
 
         internal static List<ValidationKeyValuePair> KEYVALUEPAIRS_WITH_INVALID_SPECIFIERS => [
-            new(0, 0, "foo", new KeyValuePair<string, string>("FOO[fi](\"first_specifier\", \"second_specifier\", \"third_specifier\")", "YES\n")),
-            new(1, 0, "foo", new KeyValuePair<string, string>("BAR[fi](first_specifier\")", "NO\n")),
-            new(2, 0, "foo", new KeyValuePair<string, string>("BAZ[fi](\"first_specifier\" \"second_specifier\")", "NO\n"))
+            new("foo", new KeyValuePair<string, string>("FOO[fi](\"first_specifier\", \"second_specifier\", \"third_specifier\")", "YES\n"), 0, 0),
+            new("foo", new KeyValuePair<string, string>("BAR[fi](first_specifier)", "NO\n"), 0, 0),
+            new("foo", new KeyValuePair<string, string>("BAR[fi](first_specifier, second_specifier)", "NO\n"), 0, 0),
+            new("foo", new KeyValuePair<string, string>("BAZ[fi](\"first_specifier\" \"second_specifier\")", "NO\n"), 0, 0)
                 ];
 
         internal static List<ValidationKeyValuePair> KEYVALUEPAIRS_WITH_ILLEGAL_SYMBOLS_IN_LANGUAGE_SECTIONS => [
-            new(0, 0, "foo", new KeyValuePair<string, string>("FOO[\"fi\"](\"first_specifier\", \"second_specifier\")", "YES\n")),
-            new(1, 0, "foo", new KeyValuePair<string, string>("BAR[\"[first_specifier]\", \"second_specifier\"]", "NO\n")),
-            new(2, 0, "foo", new KeyValuePair<string, string>("BAZ[fi, en]", "NO\n"))
+            new("foo", new KeyValuePair<string, string>("FOO[\"fi\"](\"first_specifier\", \"second_specifier\")", "YES\n"), 0, 0),
+            new("foo", new KeyValuePair<string, string>("BAR[\"[first_specifier]\", \"second_specifier\"]", "NO\n"), 0, 0),
+            new("foo", new KeyValuePair<string, string>("BAZ[fi, en]", "NO\n"), 0, 0)
             ];
 
         internal static List<ValidationKeyValuePair> KEYVALUEPAIR_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS => [
-            new(0, 0, "foo", new KeyValuePair<string, string>("FOO([\"first_specifier\"], [\"second_specifier\"])", "YES\n")),
+            new("foo", new KeyValuePair<string, string>("FOO([\"first_specifier\"], [\"second_specifier\"])", "YES\n"), 0, 0)
             ];
 
         private const string multilineStringValue = "\"dis parturient montes nascetur ridiculus mus\"\n" +
@@ -67,8 +68,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             "\"maecenas\", \"accumsan\", \"lacus\", \"vel\", \"facilisis\", \"volutpat\", \"est\", \"velit\", \"egestas\", \"dui\",\n" +
             "\"id\", \"ornare\"";
         internal static List<ValidationKeyValuePair> KEYVALUEPAIRS_WITH_CORRECTLY_FORMATTED_LIST_AND_MULTILINE_STRING => [
-            new(0, 0, "foo", new KeyValuePair<string, string>("FOO", multilineStringValue)),
-            new(1, 0, "foo", new KeyValuePair<string, string>("BAR", multilineListValue)),
+            new("foo", new KeyValuePair<string, string>("FOO", multilineStringValue), 0, 0),
+            new("foo", new KeyValuePair<string, string>("BAR", multilineListValue), 0, 0)
             ];
 
         private const string badMultilineStringValue = "\"dis parturient montes nascetur ridiculus mus\"\n" +
@@ -79,10 +80,10 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             "\"maecenas\", \"accumsan\", \"lacus\", \"vel\", \"facilisis\", \"volutpat\", \"est\", \"velit\", \"egestas\", \"dui\",\n" +
             "\"id\", \"ornare\";\n";
         internal static List<ValidationKeyValuePair> KEYVALUEPAIRS_WITH_BAD_VALUES => [
-            new(0, 0, "foo", new KeyValuePair<string, string>("CHARSET", "ANSI")),
-            new(0, 0, "foo", new KeyValuePair<string, string>("FOO", "1 2 3")),
-            new(1, 0, "foo", new KeyValuePair<string, string>("FOO", badMultilineStringValue)),
-            new(2, 0, "foo", new KeyValuePair<string, string>("BAR", badMultilineListValue)),
+            new("foo", new KeyValuePair<string, string>("CHARSET", "ANSI"), 0, 0),
+            new("foo", new KeyValuePair<string, string>("FOO", "1 2 3"), 0, 0),
+            new("foo", new KeyValuePair<string, string>("FOO", badMultilineStringValue), 0, 0),
+            new("foo", new KeyValuePair<string, string>("BAR", badMultilineListValue), 0, 0)
         ];
 
         private const string excessWhitespaceStringValue = "\"dis\", \"parturient\", \"montes\", \"nascetur\", \"ridiculus\", \"mus\",\n" +
@@ -90,70 +91,70 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             "\"maecenas\", \"accumsan\", \"lacus\", \"vel\", \"facilisis\", \"volutpat\", \"est\", \"velit\", \"egestas\", \"dui\",\n" +
             "\"id\", \"ornare\"";
         internal static List<ValidationKeyValuePair> KEYVALUEPAIR_WITH_EXCESS_LIST_VALUE_WHITESPACE => [
-            new(0, 0, "foo", new KeyValuePair<string, string>("FOO", excessWhitespaceStringValue)),
+            new("foo", new KeyValuePair<string, string>("FOO", excessWhitespaceStringValue), 0, 0)
         ];
 
         private const string keyWithExcessWhitespace = "KEYWORD (fi) (\"first_specifier\", \"second_specifier\")";
         internal static List<ValidationKeyValuePair> KEYVALUEPAIR_WITH_EXCESS_KEY_WHITESPACE => [
-            new(0, 0, "foo", new KeyValuePair<string, string>(keyWithExcessWhitespace, "foo")),
+            new("foo", new KeyValuePair<string, string>(keyWithExcessWhitespace, "foo"), 0, 0)
         ];
 
         private const string shortStringValueWithNewLine = "\"foobar foobar\"\n\"foobar foober\"";
         private const string shortListValueWithNewLine = "\"foo\", \"bar\",\n\"baz\"";
         internal static List<ValidationKeyValuePair> KEYVALUEPAIRS_WITH_SHORT_MULTILINE_VALUES => [
-            new(0, 0, "foo", new KeyValuePair<string, string>("FOO", shortStringValueWithNewLine)),
-            new(1, 0, "foo", new KeyValuePair<string, string>("BAR", shortListValueWithNewLine))
+            new("foo", new KeyValuePair<string, string>("FOO", shortStringValueWithNewLine), 0, 0),
+            new("foo", new KeyValuePair<string, string>("BAR", shortListValueWithNewLine), 0, 0)
         ];
 
         private readonly static ValidationStructuredEntryKey numberInKeyword = new("1FOO");
         private readonly static ValidationStructuredEntryKey slashInKeyword = new("B/AR");
         private readonly static ValidationStructuredEntryKey colonInKeyword = new("B:AZ");
         internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_INVALID_KEYWORDS => [
-            new(0, 0, "foo", numberInKeyword, "foo"),
-            new(1, 0, "foo", slashInKeyword, "bar"),
-            new(2, 0, "foo", colonInKeyword, "baz")
+            new("foo", numberInKeyword, "foo", 0, 0),
+            new("foo", slashInKeyword, "bar", 0, 0),
+            new("foo", colonInKeyword, "baz", 0, 0)
         ];
 
         private readonly static ValidationStructuredEntryKey fi = new("FOO", "fi");
         private readonly static ValidationStructuredEntryKey fin = new("BAR", "fin");
         private readonly static ValidationStructuredEntryKey fiFi = new("BAZ", "fi-FI");
         internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_VALID_LANGUAGES => [
-            new(0, 0, "foo", fi, "foo"),
-            new(1, 0, "foo", fin, "bar"),
-            new(2, 0, "foo", fiFi, "baz")
+            new("foo", fi, "foo", 0, 0),
+            new("foo", fin, "bar", 0, 0),
+            new("foo", fiFi, "baz", 0, 0)
         ];
 
         private readonly static ValidationStructuredEntryKey fien = new("FOO", "fi en");
         internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_INVALID_LANGUAGES => [
-            new(0, 0, "foo", fien, "foo"),
+            new("foo", fien, "foo", 0, 0)
         ];
 
         private readonly static ValidationStructuredEntryKey illegalSpecifier = new("FOO", "fi", "first\"specifier");
         internal static List<ValidationStructuredEntry> STRUCTIRED_ENTRIES_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS => [
-            new(0, 0, "foo", illegalSpecifier, "foo"),
+            new("foo", illegalSpecifier, "foo", 0, 0)
         ];
 
         internal static List<ValidationEntry> ENTRY_WITHOUT_VALUE => [
-           new(0, 0, "LANGUAGES", "", 0)
+           new("foo", "LANGUAGES", 0, 0)
         ];
 
         private readonly static ValidationStructuredEntryKey finnish = new("FOO", "finnish");
         private readonly static ValidationStructuredEntryKey engl = new("BAR", "engl");
         internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_INCOMPLIANT_LANGUAGES => [
-            new(0, 0, "foo", finnish, "foo"),
-            new(1, 0, "foo", engl, "foo"),
+            new("foo", finnish, "foo", 0, 0),
+            new("foo", engl, "foo", 0, 0)
         ];
 
         private readonly static ValidationStructuredEntryKey longKeyword = new("THISISALONGKEYWORDWHICHISNOTRECOMMENDED");
         internal static List<ValidationStructuredEntry> STRUCTS_WITH_LONG_KEYWORD => [
-            new(0, 0, "foo", longKeyword, "foo"),
+            new("foo", longKeyword, "foo", 0, 0)
         ];
 
         private readonly static ValidationStructuredEntryKey pascalCaseKeyword = new("PascalCase");
         private readonly static ValidationStructuredEntryKey screamingSnakeCaseKeyword = new("SCREAMING_SNAKE");
         internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_UNRECOMMENDED_KEYWORD_NAMING => [
-            new(0, 0, "foo", pascalCaseKeyword, "foo"),
-            new(1, 0, "foo", screamingSnakeCaseKeyword, "foo")
+            new("foo", pascalCaseKeyword, "foo", 0, 0),
+            new("foo", screamingSnakeCaseKeyword, "foo", 0, 0)
         ];
     }
 }

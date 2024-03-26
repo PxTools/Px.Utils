@@ -44,12 +44,11 @@
     /// <summary>
     /// Represents a structured validation object. A structured validation object contains a structured key and a value. This class implements the <see cref="ValidationObject"/> interface.
     /// </summary>
-    /// <param name="line">The line number in the file where the entry is located.</param>
-    /// <param name="character">The character position in the line where the entry starts.</param>
+    /// <param name="lines">The line numbers in the file where the entry is located.</param>
     /// <param name="file">The name of the file where the entry is located.</param>
     /// <param name="key">The key part of the entry, represented by a <see cref="ValidationStructuredEntryKey"/> object.</param>
     /// <param name="value">The value part of the entry.</param>
-    public class ValidationStructuredEntry(int line, int character, string file, ValidationStructuredEntryKey key, string value) : ValidationObject(line, character, file)
+    public class ValidationStructuredEntry(string file, ValidationStructuredEntryKey key, string value, int keyStartIndex, int valueStartIndex) : ValidationObject(file, keyStartIndex)
     {
         /// <summary>
         /// The key part of the entry, represented by a <see cref="ValidationStructuredEntryKey"/> object.
@@ -60,5 +59,10 @@
         /// The value part of the entry.
         /// </summary>
         public string Value { get; } = value;
+        
+        /// <summary>
+        /// Index of the first character of the value in the entry.
+        /// </summary>
+        public int ValueStartIndex { get; } = valueStartIndex;
     }
 }
