@@ -29,6 +29,22 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             "BAR[fi](\"first_specifier\")=NO;\n" +
             "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
 
+        internal static string UTF8_N_WITH_FEEDBACKS =>
+            "CHARSET=\"ANSI\";\n" +
+            "AXIS-VERSION=\"2013\";\n" +
+            "CODEPAGE=\"utf-8\";\n" +
+            "LANGUAGES=\"aa\",\"åå\",\"öö\";\n" +
+            "NEXT-UPDATE=\"20240131 08:00\";\n" +
+            "SUBJECT-AREA=\"test\";\n" +
+            "SUBJECT-AREA[en]=\"test\";\n" +
+            "COPYRIGHT=YES;\n" +
+            "FOO[fi](\"spec1\",  \"spec2\")=YES;\n" + // Excess whitespace
+            "BAR[fi]=\"dis\", \"parturient\", \"montes\", \"nascetur\", \"ridiculus\", \"mus\",\n" +
+            "\"mauris\", \"vitae\", \"ultricies\", \"leo\", \"integer\", \"malesuada\", \"nunc\", \"vel\", \"commodo\", \"viverra\",\n" +
+            "\"maecenas\", \"accumsan\", \"lacus\", \"vel\",  \"facilisis\", \"volutpat\", \"est\", \"velit\", \"egestas\", \"dui\",\n" + // Excess whitespace
+            "\"id\", \"ornare\";\n" +
+            "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
+
         internal static List<ValidationKeyValuePair> KEYVALUEPAIR_WITH_MULTIPLE_LANGUAGE_PARAMETERS => [
             new("foo", new KeyValuePair<string, string>("FOO[fi][en](\"first_specifier\", \"second_specifier\")", "YES\n"), 0, 0)
                 ];

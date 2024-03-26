@@ -19,7 +19,6 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         private MethodInfo? structuredValidationMethod;
         private readonly int[] lineChangeIndexes = [0];
 
-
         [TestInitialize]
         public void Initialize()
         {
@@ -86,6 +85,27 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             Assert.AreEqual("first_specifier", result.Result[8].Key.FirstSpecifier);
             Assert.AreEqual("first_specifier", result.Result[9].Key.FirstSpecifier);
             Assert.AreEqual("second_specifier", result.Result[8].Key.SecondSpecifier);
+        }
+
+        [TestMethod]
+        public void ValidatePxFileSyntax_CalledWith_UTF8_N_WITH_FEEDBACKS()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_FEEDBACKS);
+            using Stream stream = new MemoryStream(data);
+            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+
+            // Assert
+            Assert.IsNotNull(encoding, "Encoding should not be null");
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename);
+            Assert.AreEqual(2, result.FeedbackItems.Count);
+            Assert.AreEqual(9, result.FeedbackItems[0].Feedback.Line);
+            Assert.AreEqual(19, result.FeedbackItems[0].Feedback.Character);
+            Assert.AreEqual(12, result.FeedbackItems[1].Feedback.Line);
+            Assert.AreEqual(41, result.FeedbackItems[1].Feedback.Character);
         }
 
         [TestMethod]

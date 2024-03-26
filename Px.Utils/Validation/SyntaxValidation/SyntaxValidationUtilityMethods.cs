@@ -31,7 +31,7 @@ namespace PxUtils.Validation.SyntaxValidation
     /// <summary>
     /// Provides a collection of helper methods used during the syntax validation process. These methods include functionality for extracting sections from a string, checking the format of a string, and determining the type of a value from a string.
     /// </summary>
-    internal static class SyntaxValidationUtilityMethods
+    public static class SyntaxValidationUtilityMethods
     {
         /// <summary>
         /// Extracts a section from a string enclosed with given symbols.
@@ -287,7 +287,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="characterIndex">The index of the character in the input string</param>
         /// <param name="lineChangeIndexes">An array of integers representing the indexes of line changes in the input string</param>
         /// <returns>A key-value pair where the key is the line index and the value is the character index</returns>
-        internal static KeyValuePair<int, int> GetLineAndCharacterIndex(int characterIndex, int[] lineChangeIndexes)
+        public static KeyValuePair<int, int> GetLineAndCharacterIndex(int characterIndex, int[] lineChangeIndexes)
         {
             int lineIndex = Array.FindIndex(lineChangeIndexes, x => x > characterIndex);
             if (lineIndex == -1)
@@ -315,7 +315,7 @@ namespace PxUtils.Validation.SyntaxValidation
             int firstIndex = -1;
             foreach (string substring in substrings)
             {
-                int index = FindSymbolIndex(input, substring[0], stringSections);
+                int index = input.IndexOf(substring);
                 if (index != -1 && (index < firstIndex || firstIndex == -1))
                 {
                     firstIndex = index;
