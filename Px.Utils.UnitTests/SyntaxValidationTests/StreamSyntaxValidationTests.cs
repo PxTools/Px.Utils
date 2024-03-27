@@ -387,7 +387,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunctionDelegate> functions = [SyntaxValidationFunctions.InvalidValueFormat];
 
             // Act
-            kvpValidationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
+            kvpValidationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf, lineChangeIndexes });
 
             Assert.AreEqual(0, feedback.Count);
             for (int i = 0; i < keyValuePairs.Count; i++)
@@ -412,7 +412,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunctionDelegate> functions = [SyntaxValidationFunctions.InvalidValueFormat];
 
             // Act
-            kvpValidationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf });
+            kvpValidationMethod?.Invoke(null, new object[] { keyValuePairs, functions, feedback, syntaxConf, lineChangeIndexes });
             Validation.ValueType? valueType = SyntaxValidationUtilityMethods.GetValueTypeFromString(keyValuePairs[1].KeyValuePair.Value, PxFileSyntaxConf.Default);
 
             Assert.AreEqual(13, feedback.Count);

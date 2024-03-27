@@ -219,9 +219,9 @@ namespace PxUtils.Validation.SyntaxValidation
             if (forceful)
             {
                 input = input
-                    .Replace(CharacterConstants.CarriageReturn.ToString(), "")
+                    .Replace(CharacterConstants.CARRIAGE_RETURN.ToString(), "")
                     .Replace(syntaxConf.Symbols.Linebreak.ToString(), "")
-                    .Replace(CharacterConstants.Space.ToString(), "");
+                    .Replace(CharacterConstants.SPACE.ToString(), "");
             }
 
             return input.Trim(charactersToTrim);
@@ -433,7 +433,6 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static bool IsValidTimestampFormat(string input, string timeInterval, PxFileSyntaxConf syntaxConf)
         {
-            string ogInput = input;
             input = CleanString(input, syntaxConf, true);
 
             Dictionary<string, string> regexPatterns = new()
@@ -453,12 +452,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
 
             Regex regex = new(value);
-            // TODO: Remove this stuff
             bool valid = regex.IsMatch(input);
-            if (!valid)
-            {
-                int i = 0;
-            }
             return valid;
         }
 
