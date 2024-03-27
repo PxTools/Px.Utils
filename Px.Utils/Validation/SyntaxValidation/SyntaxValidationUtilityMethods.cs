@@ -363,6 +363,41 @@ namespace PxUtils.Validation.SyntaxValidation
             return symbolIndex;
         }
 
+        /// <summary>
+        /// Determines the validity of line changes in a string or list of strings type value.
+        /// </summary>
+        /// <param name="value">String or list of strings to be validated</param>
+        /// <param name="syntaxConf">PX file syntax configuration object</param>
+        /// <param name="type">Type of the value to be validated. This validation is only relevant to strings or list of strings</param>
+        /// <returns></returns>
+        internal static int GetLineChangesValidity(string value, PxFileSyntaxConf syntaxConf, ValueType type)
+        {
+            bool insideString = false;
+            for (int i = 0; i < value.Length; i++)
+            {
+                char currentCharacter = value[i];
+                if (currentCharacter == syntaxConf.Symbols.Key.StringDelimeter)
+                {
+                    insideString = !insideString;
+                }
+                if (!insideString && currentCharacter == syntaxConf.Symbols.Linebreak)
+                {
+                    char symbolBefore = type is ValueType.ListOfStrings ?
+                        syntaxConf.Symbols.Key.ListSeparator :
+                        syntaxConf.Symbols.Key.StringDelimeter;
+
+                    // In case of Windows linebreak, check if the character before the linebreak is the correct symbol
+                    char characterToInspect = value[i - 1] != CharacterConstants.CARRIAGE_RETURN ? value[i - 1] : value[i - 2];
+
+                    if (characterToInspect != symbolBefore)
+                    {
+                        return i;
+                    }
+                }
+            }
+            return -1;
+        }
+
         private static bool TryGetTimeValueFormat(string input, out ValueType? valueFormat, PxFileSyntaxConf syntaxConf)
         {
             if (!input.StartsWith(syntaxConf.Tokens.Time.TimeIntervalIndicator))
@@ -479,41 +514,6 @@ namespace PxUtils.Validation.SyntaxValidation
                 valueFormat = null;
                 return false;
             }
-        }
-
-        /// <summary>
-        /// Determines the validity of line changes in a string or list of strings type value.
-        /// </summary>
-        /// <param name="value">String or list of strings to be validated</param>
-        /// <param name="syntaxConf">PX file syntax configuration object</param>
-        /// <param name="type">Type of the value to be validated. This validation is only relevant to strings or list of strings</param>
-        /// <returns></returns>
-        internal static int GetLineChangesValidity(string value, PxFileSyntaxConf syntaxConf, ValueType type)
-        {
-            bool insideString = false;
-            for(int i = 0; i < value.Length; i++)
-            {
-                char currentCharacter = value[i];
-                if (currentCharacter == syntaxConf.Symbols.Key.StringDelimeter)
-                {
-                    insideString = !insideString;
-                }
-                if (!insideString && currentCharacter == syntaxConf.Symbols.Linebreak)
-                {
-                    char symbolBefore = type is ValueType.ListOfStrings ?
-                        syntaxConf.Symbols.Key.ListSeparator :
-                        syntaxConf.Symbols.Key.StringDelimeter;
-
-                    // In case of Windows linebreak, check if the character before the linebreak is the correct symbol
-                    char characterToInspect = value[i - 1] != CharacterConstants.CARRIAGE_RETURN ? value[i - 1] : value[i - 2];
-
-                    if (characterToInspect != symbolBefore)
-                    {
-                        return i;
-                    }
-                }
-            }
-            return -1;
         }
 
         private static void HandleStringDelimiter(ref bool insideString, ref bool insideSection, bool ignoreStringContents, StringBuilder sectionBuilder, List<string> sections, List<int> startIndexes, int i)
