@@ -1,8 +1,4 @@
-﻿using PxUtils.Exceptions;
-using PxUtils.PxFile;
-using PxUtils.PxFile.Meta;
-using System.ComponentModel;
-using System.Reflection.PortableExecutable;
+﻿using PxUtils.PxFile;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -62,14 +58,12 @@ namespace PxUtils.Validation.SyntaxValidation
             syntaxConf ??= PxFileSyntaxConf.Default;
 
             List<ValidationFeedbackItem> validationFeedback = [];
-            List<int> lineChangeIndexes = [];
-            List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, syntaxConf, filename, bufferSize, lineChangeIndexes);
-            int[] lineChanges = [..lineChangeIndexes];
-            ValidateEntries(stringEntries, stringValidationFunctions, validationFeedback, syntaxConf, lineChanges);
+            List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, syntaxConf, filename, bufferSize);
+            ValidateEntries(stringEntries, stringValidationFunctions, validationFeedback, syntaxConf);
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(stringEntries, syntaxConf);
-            ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, validationFeedback, syntaxConf, lineChanges);
+            ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, validationFeedback, syntaxConf);
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
-            ValidateStructs(structuredEntries, structuredValidationFunctions, validationFeedback, syntaxConf, lineChanges);
+            ValidateStructs(structuredEntries, structuredValidationFunctions, validationFeedback, syntaxConf);
 
             return new([.. validationFeedback], structuredEntries);
         }
@@ -107,26 +101,24 @@ namespace PxUtils.Validation.SyntaxValidation
             }
 
             syntaxConf ??= PxFileSyntaxConf.Default;
-            List<int> lineChangeIndexes = [];
             List<ValidationFeedbackItem> validationFeedback = [];
-            List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, syntaxConf, filename, bufferSize, lineChangeIndexes, cancellationToken);
-            int[] lineChanges = [..lineChangeIndexes];
-            ValidateEntries(entries, stringValidationFunctions, validationFeedback, syntaxConf, lineChanges);
+            List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, syntaxConf, filename, bufferSize, cancellationToken);
+            ValidateEntries(entries, stringValidationFunctions, validationFeedback, syntaxConf);
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, syntaxConf);
-            ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, validationFeedback, syntaxConf, lineChanges);
+            ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, validationFeedback, syntaxConf);
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
-            ValidateStructs(structuredEntries, structuredValidationFunctions, validationFeedback, syntaxConf, lineChanges);
+            ValidateStructs(structuredEntries, structuredValidationFunctions, validationFeedback, syntaxConf);
 
             return new([.. validationFeedback], structuredEntries);
         }
 
-        private static void ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        private static void ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf)
         {
             foreach (ValidationEntry entry in entries)
             {
                 foreach (EntryValidationFunctionDelegate function in validationFunctions)
                 {
-                    ValidationFeedbackItem? feedback = function(entry, syntaxConf, lineChangeIndexes);
+                    ValidationFeedbackItem? feedback = function(entry, syntaxConf);
                     if (feedback is not null)
                     {
                         validationFeedback.Add((ValidationFeedbackItem)feedback);
@@ -135,13 +127,13 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         }
 
-        private static void ValidateKeyValuePairs(IEnumerable<ValidationKeyValuePair> kvpObjects, IEnumerable<KeyValuePairValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        private static void ValidateKeyValuePairs(IEnumerable<ValidationKeyValuePair> kvpObjects, IEnumerable<KeyValuePairValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf)
         {
             foreach (ValidationKeyValuePair kvpObject in kvpObjects)
             {
                 foreach (KeyValuePairValidationFunctionDelegate function in validationFunctions)
                 {
-                    ValidationFeedbackItem? feedback = function(kvpObject, syntaxConf, lineChangeIndexes);
+                    ValidationFeedbackItem? feedback = function(kvpObject, syntaxConf);
                     if (feedback is not null)
                     {
                         validationFeedback.Add((ValidationFeedbackItem)feedback);
@@ -150,13 +142,13 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         }
 
-        private static void ValidateStructs(IEnumerable<ValidationStructuredEntry> structuredEntries, IEnumerable<StructuredValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        private static void ValidateStructs(IEnumerable<ValidationStructuredEntry> structuredEntries, IEnumerable<StructuredValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf)
         {
             foreach (ValidationStructuredEntry structuredEntry in structuredEntries)
             {
                 foreach (StructuredValidationFunctionDelegate function in validationFunctions)
                 {
-                    ValidationFeedbackItem? feedback = function(structuredEntry, syntaxConf, lineChangeIndexes);
+                    ValidationFeedbackItem? feedback = function(structuredEntry, syntaxConf);
                     if (feedback is not null)
                     {
                         validationFeedback.Add((ValidationFeedbackItem)feedback);
@@ -178,9 +170,8 @@ namespace PxUtils.Validation.SyntaxValidation
                 // Value is the part of the entry string after the first keyword separator index
                 int valueStart = keywordSeparatorIndeces[0] + 1;
                 string value = entry.EntryString[valueStart..];
-                int valueStartIndex = entry.KeyStartIndex + valueStart;
 
-                return new ValidationKeyValuePair(entry.File, new KeyValuePair<string, string>(key, value), entry.KeyStartIndex, valueStartIndex);
+                return new ValidationKeyValuePair(entry.File, new KeyValuePair<string, string>(key, value), entry.KeyStartLineIndex, entry.LineChangeIndexes, valueStart);
             }).ToList();
         }
 
@@ -189,15 +180,17 @@ namespace PxUtils.Validation.SyntaxValidation
             return keyValuePairs.Select(entry =>
             {
                 ValidationStructuredEntryKey key = ParseStructuredValidationEntryKey(entry.KeyValuePair.Key, syntaxConf);
-                return new ValidationStructuredEntry(entry.File, key, entry.KeyValuePair.Value, entry.KeyStartIndex, entry.ValueStartIndex);
+                return new ValidationStructuredEntry(entry.File, key, entry.KeyValuePair.Value, entry.KeyStartLineIndex, entry.LineChangeIndexes, entry.ValueStartIndex);
             }).ToList();
         }
 
-        private static List<ValidationEntry> BuildValidationEntries(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize, List<int> lineChangeIndexes)
+        private static List<ValidationEntry> BuildValidationEntries(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize)
         {
             bool isProcessingString = false;
-            int character = 0;
-            int entryStart = 0;
+            int characterIndex = 0;
+            List<int> lineChangeIndexes = [];
+            int entryStartIndex = 0;
+            int entryStartLineIndex = 0;
 
             using StreamReader reader = new(stream, encoding);
             List<ValidationEntry> entries = [];
@@ -212,13 +205,15 @@ namespace PxUtils.Validation.SyntaxValidation
                     {
                         break;
                     }
-                    UpdateLineAndCharacter(buffer[i], syntaxConf, ref character, ref lineChangeIndexes, ref isProcessingString);
+                    UpdateLineAndCharacter(buffer[i], syntaxConf, ref characterIndex, ref lineChangeIndexes, ref isProcessingString);
                     if (!isProcessingString && buffer[i] == syntaxConf.Symbols.EntrySeparator)
                     {
                         string stringEntry = entryBuilder.ToString();
-                        entries.Add(new ValidationEntry(filename, stringEntry, entries.Count, entryStart));
-                        entryStart = character + 1;
+                        int[] entryLineChangeIndexes = GetStartCharacterAndLineChangeIndexes(entryStartIndex, lineChangeIndexes);
+                        entries.Add(new ValidationEntry(filename, stringEntry, entries.Count, entryStartLineIndex + 1, entryLineChangeIndexes));
                         entryBuilder.Clear();
+                        entryStartIndex = characterIndex;
+                        entryStartLineIndex = lineChangeIndexes.Count;
                     }
                     else
                     {
@@ -229,11 +224,23 @@ namespace PxUtils.Validation.SyntaxValidation
             return entries;
         }
 
-        private static async Task<List<ValidationEntry>> BuildValidationEntriesAsync(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize, List<int> lineChangeIndexes, CancellationToken cancellationToken)
+        private static int[] GetStartCharacterAndLineChangeIndexes(int entryStartIndex, List<int> lineChangeIndexes)
+        {
+            int[] entryLineChangeIndexes = lineChangeIndexes.Where(i => i >= entryStartIndex).ToArray();
+            for (int i = 0; i < entryLineChangeIndexes.Length; i++)
+            {
+                entryLineChangeIndexes[i] -= entryStartIndex;
+            }
+            return entryLineChangeIndexes;
+        }
+
+        private static async Task<List<ValidationEntry>> BuildValidationEntriesAsync(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize, CancellationToken cancellationToken)
         {
             bool isProcessingString = false;
-            int character = 0;
-            int entryStart = 0;
+            int characterIndex = 0;
+            List<int> lineChangeIndexes = [];
+            int entryStartIndex = 0;
+            int entryStartLineIndex = 0;
 
             using StreamReader reader = new(stream, encoding);
             List<ValidationEntry> entries = [];
@@ -249,13 +256,15 @@ namespace PxUtils.Validation.SyntaxValidation
                     {
                         break;
                     }
-                    UpdateLineAndCharacter(buffer[i], syntaxConf, ref character, ref lineChangeIndexes, ref isProcessingString);
+                    UpdateLineAndCharacter(buffer[i], syntaxConf, ref characterIndex, ref lineChangeIndexes, ref isProcessingString);
                     if (!isProcessingString && buffer[i] == syntaxConf.Symbols.EntrySeparator)
                     {
                         string stringEntry = entryBuilder.ToString();
-                        entries.Add(new ValidationEntry(filename, stringEntry, entries.Count, entryStart));
-                        entryStart = character + 1;
+                        int[] entryLineChangeIndexes = GetStartCharacterAndLineChangeIndexes(entryStartIndex, lineChangeIndexes);
+                        entries.Add(new ValidationEntry(filename, stringEntry, entries.Count, entryStartLineIndex + 1, entryLineChangeIndexes));
                         entryBuilder.Clear();
+                        entryStartIndex = characterIndex;
+                        entryStartLineIndex = lineChangeIndexes.Count;
                     }
                     else
                     {
@@ -281,11 +290,11 @@ namespace PxUtils.Validation.SyntaxValidation
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void UpdateLineAndCharacter(char currentCharacter, PxFileSyntaxConf syntaxConf, ref int character, ref List<int> linebreakIndexes, ref bool isProcessingString)
+        private static void UpdateLineAndCharacter(char currentCharacter, PxFileSyntaxConf syntaxConf, ref int characterIndex, ref List<int> linebreakIndexes, ref bool isProcessingString)
         {
             if (currentCharacter == syntaxConf.Symbols.Linebreak)
             {
-                linebreakIndexes.Add(character);
+                linebreakIndexes.Add(characterIndex);
             }
             else
             {
@@ -294,7 +303,7 @@ namespace PxUtils.Validation.SyntaxValidation
                     isProcessingString = !isProcessingString;
                 }
             }
-            character++;
+            characterIndex++;
         }
 
         private static ValidationStructuredEntryKey ParseStructuredValidationEntryKey(string input, PxFileSyntaxConf syntaxConf)

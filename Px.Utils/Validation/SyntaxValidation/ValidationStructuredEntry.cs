@@ -1,4 +1,6 @@
-﻿namespace PxUtils.Validation.SyntaxValidation
+﻿using System.ComponentModel;
+
+namespace PxUtils.Validation.SyntaxValidation
 {
     /// <summary>
     /// Represents a key for a <see cref="ValidationStructuredEntry"/>. A key consists of a keyword and two optional language and specifier strings.
@@ -48,7 +50,7 @@
     /// <param name="file">The name of the file where the entry is located.</param>
     /// <param name="key">The key part of the entry, represented by a <see cref="ValidationStructuredEntryKey"/> object.</param>
     /// <param name="value">The value part of the entry.</param>
-    public class ValidationStructuredEntry(string file, ValidationStructuredEntryKey key, string value, int keyStartIndex, int valueStartIndex) : ValidationObject(file, keyStartIndex)
+    public class ValidationStructuredEntry(string file, ValidationStructuredEntryKey key, string value, int keyStartLineIndex, int[] lineChangeIndexes, int valueStartIndex) : ValidationObject(file, keyStartLineIndex, lineChangeIndexes)
     {
         /// <summary>
         /// The key part of the entry, represented by a <see cref="ValidationStructuredEntryKey"/> object.

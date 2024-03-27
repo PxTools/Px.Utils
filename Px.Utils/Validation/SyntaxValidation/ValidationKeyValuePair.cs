@@ -10,7 +10,7 @@ namespace PxUtils.Validation.SyntaxValidation
     /// <param name="lines">The line numbers in the file where the entry is located in the PX file.</param>
     /// <param name="file">The name of the file where the validation entry is located.</param>
     /// <param name="keyValuePair">The key-value pair that this validation entry represents.</param>
-    public class ValidationKeyValuePair(string file, KeyValuePair<string, string> keyValuePair, int keyStartIndex, int valueStartIndex) : ValidationObject(file, keyStartIndex)
+    public class ValidationKeyValuePair(string file, KeyValuePair<string, string> keyValuePair, int keyStartLineIndex, int[] lineChangeIndexes, int valueStartIndex) : ValidationObject(file, keyStartLineIndex, lineChangeIndexes)
     {
         /// <summary>
         /// Contents of the entry, represented as a key-value pair.

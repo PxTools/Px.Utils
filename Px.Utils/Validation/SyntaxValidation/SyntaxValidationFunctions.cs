@@ -4,9 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
-    public delegate ValidationFeedbackItem? EntryValidationFunctionDelegate(ValidationEntry validationObject, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes);
-    public delegate ValidationFeedbackItem? KeyValuePairValidationFunctionDelegate(ValidationKeyValuePair validationObject, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes);
-    public delegate ValidationFeedbackItem? StructuredValidationFunctionDelegate(ValidationStructuredEntry validationObject, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes);
+    public delegate ValidationFeedbackItem? EntryValidationFunctionDelegate(ValidationEntry validationObject, PxFileSyntaxConf syntaxConf);
+    public delegate ValidationFeedbackItem? KeyValuePairValidationFunctionDelegate(ValidationKeyValuePair validationObject, PxFileSyntaxConf syntaxConf);
+    public delegate ValidationFeedbackItem? StructuredValidationFunctionDelegate(ValidationStructuredEntry validationObject, PxFileSyntaxConf syntaxConf);
 
     /// <summary>
     /// Contains the default validation functions for syntax validation.
@@ -65,9 +65,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationEntry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the entry does not start with a line separator, null otherwise.</returns>
-        public static ValidationFeedbackItem? MultipleEntriesOnLine (ValidationEntry validationEntry, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? MultipleEntriesOnLine (ValidationEntry validationEntry, PxFileSyntaxConf syntaxConf)
         {
             // If the entry does not start with a line separator, it is not on its own line. For the first entry this is not relevant.
             if (
@@ -80,8 +79,9 @@ namespace PxUtils.Validation.SyntaxValidation
             else
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationEntry.KeyStartIndex,
-                    lineChangeIndexes);
+                    validationEntry.KeyStartLineIndex,
+                    0,
+                    validationEntry.LineChangeIndexes);
 
                 return new ValidationFeedbackItem(validationEntry, new ValidationFeedback(
                     ValidationFeedbackLevel.Warning,
@@ -97,9 +97,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains more than one language parameter, null otherwise.</returns>
-        public static ValidationFeedbackItem? MoreThanOneLanguageParameter(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? MoreThanOneLanguageParameter(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             ExtractSectionResult languageSections = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                 validationKeyValuePair.KeyValuePair.Key,
@@ -110,8 +109,9 @@ namespace PxUtils.Validation.SyntaxValidation
             if (languageSections.Sections.Length > 1)
             {
                 KeyValuePair<int, int> lineAndCharacter = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationKeyValuePair.KeyStartIndex + languageSections.StartIndexes[1],
-                    lineChangeIndexes);
+                    validationKeyValuePair.KeyStartLineIndex,
+                    languageSections.StartIndexes[1],
+                    validationKeyValuePair.LineChangeIndexes);
 
                 return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
                     ValidationFeedbackLevel.Error,
@@ -131,9 +131,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains more than one specifier parameter, null otherwise.</returns>
-        public static ValidationFeedbackItem? MoreThanOneSpecifierParameter(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? MoreThanOneSpecifierParameter(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             ExtractSectionResult specifierSpections = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                 validationKeyValuePair.KeyValuePair.Key,
@@ -144,8 +143,9 @@ namespace PxUtils.Validation.SyntaxValidation
             if (specifierSpections.Sections.Length > 1)
             {
                 KeyValuePair<int, int> lineAndCharacter = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationKeyValuePair.KeyStartIndex + specifierSpections.StartIndexes[1], 
-                    lineChangeIndexes);
+                    validationKeyValuePair.KeyStartLineIndex,
+                    specifierSpections.StartIndexes[1],
+                    validationKeyValuePair.LineChangeIndexes);
 
                 return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
                     ValidationFeedbackLevel.Error,
@@ -165,9 +165,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key is not defined in the order of KEYWORD[language](\"specifier\"), null otherwise.</returns>
-        public static ValidationFeedbackItem? WrongKeyOrderOrMissingKeyword(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? WrongKeyOrderOrMissingKeyword(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             string key = validationKeyValuePair.KeyValuePair.Key;
 
@@ -191,8 +190,9 @@ namespace PxUtils.Validation.SyntaxValidation
             if (specifierRemoved.Remainder.Trim() == string.Empty)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationKeyValuePair.KeyStartIndex,
-                    lineChangeIndexes);
+                    validationKeyValuePair.KeyStartLineIndex,
+                    0,
+                    validationKeyValuePair.LineChangeIndexes);
 
                 return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
                     ValidationFeedbackLevel.Error,
@@ -215,8 +215,9 @@ namespace PxUtils.Validation.SyntaxValidation
             else if (specifierParamStartIndex != -1 && langParamStartIndex > specifierParamStartIndex)
             {
                 KeyValuePair<int, int> specifierIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationKeyValuePair.KeyStartIndex + specifierParamStartIndex,
-                    lineChangeIndexes
+                    validationKeyValuePair.KeyStartLineIndex,
+                    specifierParamStartIndex,
+                    validationKeyValuePair.LineChangeIndexes
                     );
 
                 return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
@@ -232,8 +233,9 @@ namespace PxUtils.Validation.SyntaxValidation
                 key.Trim().StartsWith(syntaxConf.Symbols.Key.LangParamStart))
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationKeyValuePair.KeyStartIndex,
-                    lineChangeIndexes
+                    validationKeyValuePair.KeyStartLineIndex,
+                    0,
+                    validationKeyValuePair.LineChangeIndexes
                     );
 
                 return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
@@ -254,9 +256,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if more than two specifiers are found, null otherwise.</returns>
-        public static ValidationFeedbackItem? MoreThanTwoSpecifierParts(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? MoreThanTwoSpecifierParts(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             ExtractSectionResult specifierSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     validationKeyValuePair.KeyValuePair.Key,
@@ -283,8 +284,9 @@ namespace PxUtils.Validation.SyntaxValidation
             if (specifierResult.Sections.Length > 2)
             {
                 KeyValuePair<int, int> secondSpecifierIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationKeyValuePair.KeyStartIndex + specifierSection.StartIndexes[0] + specifierResult.StartIndexes[2],
-                    lineChangeIndexes
+                    validationKeyValuePair.KeyStartLineIndex,
+                    specifierSection.StartIndexes[0] + specifierResult.StartIndexes[2],
+                    validationKeyValuePair.LineChangeIndexes
                     );
 
                 return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
@@ -302,9 +304,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if there is no delimeter between specifier parts, null otherwise.</returns>
-        public static ValidationFeedbackItem? NoDelimiterBetweenSpecifierParts(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? NoDelimiterBetweenSpecifierParts(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             ExtractSectionResult specifierSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     validationKeyValuePair.KeyValuePair.Key,
@@ -334,8 +335,9 @@ namespace PxUtils.Validation.SyntaxValidation
             if (specifiers.Length > 1 && !specifierResult.Remainder.Contains(syntaxConf.Symbols.Key.ListSeparator))
             {
                 KeyValuePair<int, int> specifierIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationKeyValuePair.KeyStartIndex + specifierSection.StartIndexes[0] + specifierResult.StartIndexes[1],
-                    lineChangeIndexes);
+                    validationKeyValuePair.KeyStartLineIndex,
+                    specifierSection.StartIndexes[0] + specifierResult.StartIndexes[1],
+                    validationKeyValuePair.LineChangeIndexes);
 
                 return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
                     ValidationFeedbackLevel.Error,
@@ -354,9 +356,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if specifier parts are not enclosed, null otherwise.</returns>
-        public static ValidationFeedbackItem? SpecifierPartNotEnclosed(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? SpecifierPartNotEnclosed(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             ExtractSectionResult specifierSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     validationKeyValuePair.KeyValuePair.Key,
@@ -382,8 +383,9 @@ namespace PxUtils.Validation.SyntaxValidation
                 if (!trimmedSpecifier.StartsWith(syntaxConf.Symbols.Key.StringDelimeter) || !trimmedSpecifier.EndsWith(syntaxConf.Symbols.Key.StringDelimeter))
                 {
                     KeyValuePair<int, int> specifierIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                        validationKeyValuePair.KeyStartIndex + specifierSection.StartIndexes[0],
-                        lineChangeIndexes
+                        validationKeyValuePair.KeyStartLineIndex,
+                        specifierSection.StartIndexes[0],
+                        validationKeyValuePair.LineChangeIndexes
                     );
 
                     return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
@@ -402,9 +404,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key language section contains illegal symbols, null otherwise.</returns>
-        public static ValidationFeedbackItem? IllegalSymbolsInLanguageParamSection(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? IllegalSymbolsInLanguageParamSection(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             string key = validationKeyValuePair.KeyValuePair.Key;
 
@@ -438,8 +439,9 @@ namespace PxUtils.Validation.SyntaxValidation
                 string foundSymbols = string.Join(", ", foundIllegalSymbols);
                 int indexOfFirstIllegalSymbol = languageParam.StartIndexes[0] + languageParamSection.IndexOf(foundIllegalSymbols.First());
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationKeyValuePair.KeyStartIndex + languageParam.StartIndexes[0] + indexOfFirstIllegalSymbol,
-                    lineChangeIndexes);
+                    validationKeyValuePair.KeyStartLineIndex,
+                    languageParam.StartIndexes[0] + indexOfFirstIllegalSymbol,
+                    validationKeyValuePair.LineChangeIndexes);
 
                 return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
                     ValidationFeedbackLevel.Error,
@@ -459,9 +461,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key specifier section contains illegal symbols, null otherwise.</returns>
-        public static ValidationFeedbackItem? IllegalSymbolsInSpecifierParamSection(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? IllegalSymbolsInSpecifierParamSection(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             string key = validationKeyValuePair.KeyValuePair.Key;
 
@@ -491,8 +492,9 @@ namespace PxUtils.Validation.SyntaxValidation
                 string foundSymbols = string.Join(", ", foundIllegalSymbols);
                 int indexOfFirstIllegalSymbol = specifierParam.StartIndexes[0] + specifierParamSection.IndexOf(foundIllegalSymbols.First());
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationKeyValuePair.KeyStartIndex + specifierParam.StartIndexes[0] + indexOfFirstIllegalSymbol,
-                    lineChangeIndexes);
+                    validationKeyValuePair.KeyStartLineIndex,
+                    specifierParam.StartIndexes[0] + indexOfFirstIllegalSymbol,
+                    validationKeyValuePair.LineChangeIndexes);
 
                 return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
                     ValidationFeedbackLevel.Error,
@@ -512,9 +514,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section is not following a valid format, null otherwise.</returns>
-        public static ValidationFeedbackItem? InvalidValueFormat(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? InvalidValueFormat(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             string value = validationKeyValuePair.KeyValuePair.Value;
 
@@ -524,8 +525,9 @@ namespace PxUtils.Validation.SyntaxValidation
             if (type is null)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
+                    validationKeyValuePair.KeyStartLineIndex,
                     validationKeyValuePair.ValueStartIndex,
-                    lineChangeIndexes);
+                    validationKeyValuePair.LineChangeIndexes);
 
                 return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
                     ValidationFeedbackLevel.Error,
@@ -542,8 +544,9 @@ namespace PxUtils.Validation.SyntaxValidation
                 if (lineChangeValidityIndex != -1)
                 {
                     KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                            validationKeyValuePair.ValueStartIndex + lineChangeValidityIndex,
-                            lineChangeIndexes);
+                        validationKeyValuePair.KeyStartLineIndex,
+                        lineChangeValidityIndex,
+                        validationKeyValuePair.LineChangeIndexes);
 
                     return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
                         ValidationFeedbackLevel.Error,
@@ -561,9 +564,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section contains excess whitespace, null otherwise.</returns>
-        public static ValidationFeedbackItem? ExcessWhitespaceInValue(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? ExcessWhitespaceInValue(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             // Validation only matters if the value is a list of strings
             if (!SyntaxValidationUtilityMethods.IsStringListFormat(
@@ -587,8 +589,9 @@ namespace PxUtils.Validation.SyntaxValidation
             if (firstExcessWhitespaceIndex != -1)
             { 
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
+                    validationKeyValuePair.KeyStartLineIndex,
                     validationKeyValuePair.ValueStartIndex + firstExcessWhitespaceIndex,
-                    lineChangeIndexes);
+                    validationKeyValuePair.LineChangeIndexes);
 
                 return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
                     ValidationFeedbackLevel.Warning,
@@ -606,9 +609,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains excess whitespace, null otherwise.</returns>
-        public static ValidationFeedbackItem? KeyContainsExcessWhiteSpace(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? KeyContainsExcessWhiteSpace(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             string key = validationKeyValuePair.KeyValuePair.Key;
             bool insideString = false;
@@ -635,8 +637,9 @@ namespace PxUtils.Validation.SyntaxValidation
                     if (!insideSpecifierSection)
                     {
                         KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                            validationKeyValuePair.KeyStartIndex + i,
-                            lineChangeIndexes);
+                            validationKeyValuePair.KeyStartLineIndex,
+                            i,
+                            validationKeyValuePair.LineChangeIndexes);
 
                         return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
                             ValidationFeedbackLevel.Warning,
@@ -650,8 +653,9 @@ namespace PxUtils.Validation.SyntaxValidation
                     if (key[i - 1] != syntaxConf.Symbols.Key.ListSeparator)
                     {
                         KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                            validationKeyValuePair.KeyStartIndex + i,
-                            lineChangeIndexes);
+                            validationKeyValuePair.KeyStartLineIndex,
+                            i,
+                            validationKeyValuePair.LineChangeIndexes);
 
                         return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
                             ValidationFeedbackLevel.Warning,
@@ -671,9 +675,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section contains excess new lines, null otherwise.</returns>
-        public static ValidationFeedbackItem? ExcessNewLinesInValue(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? ExcessNewLinesInValue(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             // We only need to run this validation if the value is less than 150 characters long and it is a string or list
             ValueType? type = SyntaxValidationUtilityMethods.GetValueTypeFromString(validationKeyValuePair.KeyValuePair.Value, syntaxConf);
@@ -698,8 +701,9 @@ namespace PxUtils.Validation.SyntaxValidation
             if (firstNewLineIndex != -1)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
+                    validationKeyValuePair.KeyStartLineIndex,
                     validationKeyValuePair.ValueStartIndex + firstNewLineIndex,
-                    lineChangeIndexes);
+                    validationKeyValuePair.LineChangeIndexes);
 
                 return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
                     ValidationFeedbackLevel.Warning,
@@ -716,13 +720,12 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <summary>
         /// If the <see cref="ValidationStructuredEntry"/> specifier contains illegal characters, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="validationStructedEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
+        /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier contains illegal characters, null otherwise.</returns>
-        public static ValidationFeedbackItem? KeywordContainsIllegalCharacters(ValidationStructuredEntry validationStructedEntry, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? KeywordContainsIllegalCharacters(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
-            string keyword = validationStructedEntry.Key.Keyword;
+            string keyword = validationStructuredEntry.Key.Keyword;
             // Missing specifier is catched earlier
             if (keyword.Length == 0)
             {
@@ -737,10 +740,11 @@ namespace PxUtils.Validation.SyntaxValidation
                 if (illegalSymbolsInKeyWord.Any())
                 {
                     KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                        validationStructedEntry.KeyStartIndex + keyword.IndexOf(illegalSymbolsInKeyWord.First()),
-                        lineChangeIndexes);
+                        validationStructuredEntry.KeyStartLineIndex,
+                        keyword.IndexOf(illegalSymbolsInKeyWord.First()),
+                        validationStructuredEntry.LineChangeIndexes);
 
-                    return new ValidationFeedbackItem(validationStructedEntry, new ValidationFeedback(
+                    return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.IllegalCharactersInKeyword,
                         feedbackIndexes.Key,
@@ -751,10 +755,11 @@ namespace PxUtils.Validation.SyntaxValidation
             catch (RegexMatchTimeoutException)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationStructedEntry.KeyStartIndex,
-                    lineChangeIndexes);
+                    validationStructuredEntry.KeyStartLineIndex,
+                    0,
+                    validationStructuredEntry.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationStructedEntry, new ValidationFeedback(
+                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
                     ValidationFeedbackLevel.Error,
                     ValidationFeedbackRule.RegexTimeout,
                     feedbackIndexes.Key,
@@ -767,22 +772,22 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <summary>
         /// If the <see cref="ValidationStructuredEntry"/> keyword doesn't start with a letter, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="validationStructedEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
+        /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier doesn't start with a letter, null otherwise.</returns>
-        public static ValidationFeedbackItem? KeywordDoesntStartWithALetter(ValidationStructuredEntry validationStructedEntry, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? KeywordDoesntStartWithALetter(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
-            string keyword = validationStructedEntry.Key.Keyword;
+            string keyword = validationStructuredEntry.Key.Keyword;
 
             // Check if keyword starts with a letter
             if (!char.IsLetter(keyword[0]))
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationStructedEntry.KeyStartIndex,
-                    lineChangeIndexes);
+                    validationStructuredEntry.KeyStartLineIndex,
+                    0,
+                    validationStructuredEntry.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationStructedEntry, new ValidationFeedback(
+                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
                     ValidationFeedbackLevel.Error, 
                     ValidationFeedbackRule.KeywordDoesntStartWithALetter,
                     feedbackIndexes.Key,
@@ -798,19 +803,18 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <summary>
         /// If the <see cref="ValidationStructuredEntry"/> language parameter is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="validationStructedEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
+        /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the language parameter is not following a valid format, null otherwise.</returns>
-        public static ValidationFeedbackItem? IllegalCharactersInLanguageParameter(ValidationStructuredEntry validationStructedEntry, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? IllegalCharactersInLanguageParameter(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
             // Running this validation is relevant only for objects with a language parameter
-            if (validationStructedEntry.Key.Language is null)
+            if (validationStructuredEntry.Key.Language is null)
             {
                 return null;
             }
 
-            string lang = validationStructedEntry.Key.Language;
+            string lang = validationStructuredEntry.Key.Language;
 
             // Find illegal characters from language parameter string
             char[] illegalCharacters = [
@@ -831,11 +835,12 @@ namespace PxUtils.Validation.SyntaxValidation
                 int indexOfFirstIllegalCharacter = lang.IndexOf(foundIllegalCharacters.First());
 
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationStructedEntry.KeyStartIndex + validationStructedEntry.Key.Keyword.Length + indexOfFirstIllegalCharacter + 1,
-                    lineChangeIndexes);
+                    validationStructuredEntry.KeyStartLineIndex,
+                    validationStructuredEntry.Key.Keyword.Length + indexOfFirstIllegalCharacter + 1,
+                    validationStructuredEntry.LineChangeIndexes);
 
                 string foundSymbols = string.Join(", ", foundIllegalCharacters);
-                return new ValidationFeedbackItem(validationStructedEntry, new ValidationFeedback(
+                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
                     ValidationFeedbackLevel.Error,
                     ValidationFeedbackRule.IllegalCharactersInLanguageParameter,
                     feedbackIndexes.Key,
@@ -851,36 +856,36 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <summary>
         /// If the <see cref="ValidationStructuredEntry"/> specifier parameter is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="validationStructedEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
+        /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier parameter is not following a valid format, null otherwise.</returns>
-        public static ValidationFeedbackItem? IllegalCharactersInSpecifierParts(ValidationStructuredEntry validationStructedEntry, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? IllegalCharactersInSpecifierParts(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
             // Running this validation is relevant only for objects with a specifier
-            if (validationStructedEntry.Key.FirstSpecifier is null)
+            if (validationStructuredEntry.Key.FirstSpecifier is null)
             {
                 return null;
             }
 
             char[] illegalCharacters = [syntaxConf.Symbols.EntrySeparator, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.ListSeparator];
-            IEnumerable<char> illegalcharactersInFirstSpecifier = validationStructedEntry.Key.FirstSpecifier.Where(c => illegalCharacters.Contains(c));
+            IEnumerable<char> illegalcharactersInFirstSpecifier = validationStructuredEntry.Key.FirstSpecifier.Where(c => illegalCharacters.Contains(c));
             IEnumerable<char> illegalcharactersInSecondSpecifier = [];
-            if (validationStructedEntry.Key.SecondSpecifier is not null)
+            if (validationStructuredEntry.Key.SecondSpecifier is not null)
             {
-                illegalcharactersInSecondSpecifier = validationStructedEntry.Key.SecondSpecifier.Where(c => illegalCharacters.Contains(c));
+                illegalcharactersInSecondSpecifier = validationStructuredEntry.Key.SecondSpecifier.Where(c => illegalCharacters.Contains(c));
             }
 
             if (illegalcharactersInFirstSpecifier.Any() || illegalcharactersInSecondSpecifier.Any())
             {
-                int languageSectionLength = validationStructedEntry.Key.Language is not null ? validationStructedEntry.Key.Language.Length + 3 : 1;
+                int languageSectionLength = validationStructuredEntry.Key.Language is not null ? validationStructuredEntry.Key.Language.Length + 3 : 1;
 
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationStructedEntry.KeyStartIndex + validationStructedEntry.Key.Keyword.Length + languageSectionLength,
-                    lineChangeIndexes);
+                    validationStructuredEntry.KeyStartLineIndex,
+                    validationStructuredEntry.Key.Keyword.Length + languageSectionLength,
+                    validationStructuredEntry.LineChangeIndexes);
 
                 char[] characters = [..illegalcharactersInFirstSpecifier, ..illegalcharactersInSecondSpecifier];
-                return new ValidationFeedbackItem(validationStructedEntry, new ValidationFeedback(
+                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
                     ValidationFeedbackLevel.Error,
                     ValidationFeedbackRule.IllegalCharactersInSpecifierPart,
                     feedbackIndexes.Key,
@@ -898,17 +903,17 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationEntry">The <see cref="ValidationEntry"/> validationKeyValuePair to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if there is no value section, null otherwise.</returns>
-        public static ValidationFeedbackItem? EntryWithoutValue(ValidationEntry validationEntry, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? EntryWithoutValue(ValidationEntry validationEntry, PxFileSyntaxConf syntaxConf)
         {
             int[] keywordSeparatorIndeces = SyntaxValidationUtilityMethods.FindKeywordSeparatorIndeces(validationEntry.EntryString, syntaxConf);
 
             if (keywordSeparatorIndeces.Length == 0)
             {                 
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationEntry.KeyStartIndex + validationEntry.EntryString.Length,
-                    lineChangeIndexes);
+                    validationEntry.KeyStartLineIndex,
+                    validationEntry.EntryString.Length,
+                    validationEntry.LineChangeIndexes);
 
                 return new ValidationFeedbackItem(validationEntry, new ValidationFeedback(
                     ValidationFeedbackLevel.Error, 
@@ -919,8 +924,9 @@ namespace PxUtils.Validation.SyntaxValidation
             else if (keywordSeparatorIndeces.Length > 1)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationEntry.KeyStartIndex + keywordSeparatorIndeces[1],
-                    lineChangeIndexes);
+                    validationEntry.KeyStartLineIndex,
+                    keywordSeparatorIndeces[1],
+                    validationEntry.LineChangeIndexes);
 
                 return new ValidationFeedbackItem(validationEntry, new ValidationFeedback(
                     ValidationFeedbackLevel.Error,
@@ -937,19 +943,18 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <summary>
         /// If the <see cref="ValidationStructuredEntry"/> language parameter is not compliant with ISO 639 or BCP 47, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="validationStructedEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
+        /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the language parameter is not compliant with ISO 639 or BCP 47, null otherwise.</returns>
-        public static ValidationFeedbackItem? IncompliantLanguage (ValidationStructuredEntry validationStructedEntry, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? IncompliantLanguage (ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
             // Running this validation is relevant only for objects with a language
-            if (validationStructedEntry.Key.Language is null)
+            if (validationStructuredEntry.Key.Language is null)
             {
                 return null;
             }
             
-            string lang = validationStructedEntry.Key.Language;
+            string lang = validationStructuredEntry.Key.Language;
 
             bool iso639OrMsLcidCompliant = CultureInfo.GetCultures(CultureTypes.AllCultures).ToList().Exists(c => c.Name == lang || c.ThreeLetterISOLanguageName == lang);
             bool bcp47Compliant = Bcp47Codes.Codes.Contains(lang);
@@ -961,10 +966,11 @@ namespace PxUtils.Validation.SyntaxValidation
             else
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationStructedEntry.KeyStartIndex + validationStructedEntry.Key.Keyword.Length + 1,
-                    lineChangeIndexes);
+                    validationStructuredEntry.KeyStartLineIndex,
+                    validationStructuredEntry.Key.Keyword.Length + 1,
+                    validationStructuredEntry.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationStructedEntry, new ValidationFeedback(
+                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
                     ValidationFeedbackLevel.Warning,
                     ValidationFeedbackRule.IncompliantLanguage,
                     feedbackIndexes.Key,
@@ -976,19 +982,20 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <summary>
         /// If the <see cref="ValidationStructuredEntry"/> specifier contains unrecommended characters, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="validationStructedEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
+        /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier contains unrecommended characters, null otherwise.</returns>
-        public static ValidationFeedbackItem? KeywordContainsUnderscore (ValidationStructuredEntry validationStructedEntry, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? KeywordContainsUnderscore (ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
-            int underscoreIndex = validationStructedEntry.Key.Keyword.IndexOf('_');
+            int underscoreIndex = validationStructuredEntry.Key.Keyword.IndexOf('_');
             if (underscoreIndex != -1)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationStructedEntry.KeyStartIndex + underscoreIndex,
-                    lineChangeIndexes);
-                return new ValidationFeedbackItem(validationStructedEntry, new ValidationFeedback(
+                    validationStructuredEntry.KeyStartLineIndex,
+                    underscoreIndex,
+                    validationStructuredEntry.LineChangeIndexes);
+
+                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
                     ValidationFeedbackLevel.Warning,
                     ValidationFeedbackRule.KeywordContainsUnderscore,
                     feedbackIndexes.Key,
@@ -1003,21 +1010,22 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <summary>
         /// If the <see cref="ValidationStructuredEntry"/> specifier is not in upper case, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="validationStructedEntry">The <see cref="ValidationStructuredEntry"/> to validate</param>
+        /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier is not in upper case, otherwise null</returns>
-        public static ValidationFeedbackItem? KeywordIsNotInUpperCase(ValidationStructuredEntry validationStructedEntry, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? KeywordIsNotInUpperCase(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
-            string keyword = validationStructedEntry.Key.Keyword;
+            string keyword = validationStructuredEntry.Key.Keyword;
             string uppercaseKeyword = keyword.ToUpper();
 
             if (uppercaseKeyword != keyword)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationStructedEntry.KeyStartIndex,
-                    lineChangeIndexes);
-                return new ValidationFeedbackItem(validationStructedEntry, new ValidationFeedback(
+                    validationStructuredEntry.KeyStartLineIndex,
+                    0,
+                    validationStructuredEntry.LineChangeIndexes);
+
+                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
                     ValidationFeedbackLevel.Warning,
                     ValidationFeedbackRule.KeywordIsNotInUpperCase,
                     feedbackIndexes.Key,
@@ -1032,20 +1040,21 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <summary>
         /// If the <see cref="ValidationStructuredEntry"/> specifier is excessively long, a new <see cref="ValidationFeedbackItem"/> is returned.
         /// </summary>
-        /// <param name="validationStructedEntry">The <see cref="ValidationStructuredEntry"/> object to validate</param>
+        /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> object to validate</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <param name="lineChangeIndexes">The indexes of the line changes in the PX file.</param>
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier is excessively long, otherwise null</returns>
-        public static ValidationFeedbackItem? KeywordIsExcessivelyLong(ValidationStructuredEntry validationStructedEntry, PxFileSyntaxConf syntaxConf, int[] lineChangeIndexes)
+        public static ValidationFeedbackItem? KeywordIsExcessivelyLong(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
-            string keyword = validationStructedEntry.Key.Keyword;
+            string keyword = validationStructuredEntry.Key.Keyword;
 
             if (keyword.Length > 20)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    validationStructedEntry.KeyStartIndex + keyword.Length,
-                    lineChangeIndexes);
-                return new ValidationFeedbackItem(validationStructedEntry, new ValidationFeedback(
+                    validationStructuredEntry.KeyStartLineIndex,
+                    keyword.Length,
+                    validationStructuredEntry.LineChangeIndexes);
+
+                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
                     ValidationFeedbackLevel.Warning,
                     ValidationFeedbackRule.KeywordExcessivelyLong,
                     feedbackIndexes.Key,

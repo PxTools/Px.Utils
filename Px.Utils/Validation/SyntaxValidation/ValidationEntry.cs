@@ -9,7 +9,7 @@ namespace PxUtils.Validation.SyntaxValidation
     /// <param name="file">The name of the file where the validation entry is located.</param>
     /// <param name="entry">The string that this validation entry represents.</param>
     /// <param name="entryIndex">The index of the entry in the file.</param>
-    public class ValidationEntry(string file, string entry, int entryIndex, int startIndex) : ValidationObject(file, startIndex)
+    public class ValidationEntry(string file, string entry, int entryIndex, int keyStartLineIndex, int[] lineChangeIndexes) : ValidationObject(file, keyStartLineIndex, lineChangeIndexes)
     {
         /// <summary>
         /// Gets the string that this validation entry represents.

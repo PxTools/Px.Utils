@@ -267,21 +267,23 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <summary>
         /// Gets the position of a character as a line and character index.
         /// </summary>
-        /// <param name="characterIndex">The index of the character in the input string</param>
-        /// <param name="lineChangeIndexes">An array of integers representing the indexes of line changes in the input string</param>
+        /// <param name="startLine">The line index of the first character of the entry</param>
+        /// <param name="characterIndex">The index of the character starting from the entry start</param>
+        /// <param name="lineChangeIndexes">An array of integers representing the indexes of line changes in the entry</param>
         /// <returns>A key-value pair where the key is the line index and the value is the character index</returns>
-        public static KeyValuePair<int, int> GetLineAndCharacterIndex(int characterIndex, int[] lineChangeIndexes)
+        public static KeyValuePair<int, int> GetLineAndCharacterIndex(int startLine, int characterIndex, int[] lineChangeIndexes)
         {
-            int lineIndex = Array.FindIndex(lineChangeIndexes, x => x > characterIndex);
+            int lineIndex = Array.FindLastIndex(lineChangeIndexes, x => x < characterIndex);
             if (lineIndex == -1)
             {
-                lineIndex = 1;
+                lineIndex = 0;
             }
             else
             { 
-                characterIndex -= lineChangeIndexes[lineIndex - 1];
+                characterIndex -= lineChangeIndexes[lineIndex];
                 lineIndex += 1;
             }
+            lineIndex += startLine;
             return new KeyValuePair<int, int>(lineIndex, characterIndex);
         }
 
