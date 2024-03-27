@@ -378,7 +378,6 @@ namespace PxUtils.Validation.SyntaxValidation
                         return i;
                     }
                 }
-                i++;
             }
             return -1;
         }
