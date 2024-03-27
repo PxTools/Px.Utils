@@ -54,29 +54,14 @@ namespace PxUtils.Validation.SyntaxValidation
             bool ignoreStringContents = startSymbol != stringDelimeter;
             bool insideString = false;
             bool insideSection = false;
-            int i = 0;
 
             // Iterate through the input string and extract sections enclosed with start and end symbols
-            do
+            for(int i = 0; i < input.Length; i++)
             {
                 char currentCharacter = input[i];
                 if (currentCharacter == stringDelimeter)
                 {
-                    insideString = !insideString;
-                    if (!ignoreStringContents)
-                    {
-                        insideSection = !insideSection;
-                        if (!insideSection)
-                        {
-                            sectionBuilder.Append(currentCharacter);
-                            sections.Add(sectionBuilder.ToString());
-                            sectionBuilder.Clear();
-                        }
-                        else
-                        {
-                            startIndexes.Add(i);
-                        }
-                    }
+                    HandleStringDelimiter(ref insideString, ref insideSection, ignoreStringContents, sectionBuilder, sections, startIndexes, i);
                 }
                  
                 if (ignoreStringContents && (currentCharacter == startSymbol && !insideString))
@@ -98,9 +83,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 {
                     remainder.Append(currentCharacter);
                 }
-                i++;
             }
-            while (i < input.Length);
 
             return new ExtractSectionResult([..sections], remainder.ToString(), [..startIndexes]);
         }
@@ -316,7 +299,10 @@ namespace PxUtils.Validation.SyntaxValidation
             foreach (string substring in substrings)
             {
                 int index = input.IndexOf(substring);
-                if (index != -1 && (index < firstIndex || firstIndex == -1))
+                if (
+                    index != -1 && 
+                    (index < firstIndex || firstIndex == -1) &&
+                    !stringSections.Any(x => x.Key < index && x.Value > index))
                 {
                     firstIndex = index;
                 }
@@ -359,6 +345,60 @@ namespace PxUtils.Validation.SyntaxValidation
             while (symbolIndex == -1); 
 
             return symbolIndex;
+        }
+
+        /// <summary>
+        /// Determines the validity of line changes in a string or list of strings type value.
+        /// </summary>
+        /// <param name="value">String or list of strings to be validated</param>
+        /// <param name="syntaxConf">PX file syntax configuration object</param>
+        /// <param name="type">Type of the value to be validated. This validation is only relevant to strings or list of strings</param>
+        /// <returns></returns>
+        internal static int GetLineChangesValidity(string value, PxFileSyntaxConf syntaxConf, ValueType type)
+        {
+            bool insideString = false;
+            for(int i = 0; i < value.Length; i++)
+            {
+                char currentCharacter = value[i];
+                if (currentCharacter == syntaxConf.Symbols.Key.StringDelimeter)
+                {
+                    insideString = !insideString;
+                }
+                if (!insideString && currentCharacter == syntaxConf.Symbols.Linebreak)
+                {
+                    char symbolBefore = type is ValueType.ListOfStrings ?
+                        syntaxConf.Symbols.Key.ListSeparator :
+                        syntaxConf.Symbols.Key.StringDelimeter;
+
+                    // In case of Windows linebreak, check if the character before the linebreak is the correct symbol
+                    char characterToInspect = value[i - 1] != CharacterConstants.CARRIAGE_RETURN ? value[i - 1] : value[i - 2];
+
+                    if (characterToInspect != symbolBefore)
+                    {
+                        return i;
+                    }
+                }
+                i++;
+            }
+            return -1;
+        }
+
+        private static void HandleStringDelimiter(ref bool insideString, ref bool insideSection, bool ignoreStringContents, StringBuilder sectionBuilder, List<string> sections, List<int> startIndexes, int i)
+        {
+            insideString = !insideString;
+            if (!ignoreStringContents)
+            {
+                insideSection = !insideSection;
+                if (!insideSection)
+                {
+                    sections.Add(sectionBuilder.ToString());
+                    sectionBuilder.Clear();
+                }
+                else
+                {
+                    startIndexes.Add(i);
+                }
+            }
         }
     }
 }

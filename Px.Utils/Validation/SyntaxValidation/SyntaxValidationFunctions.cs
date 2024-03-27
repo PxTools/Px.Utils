@@ -538,42 +538,21 @@ namespace PxUtils.Validation.SyntaxValidation
             // If value is of type String or ListOfStrings, check if the line changes are compliant to the specification
             if (type is ValueType.String || type is ValueType.ListOfStrings)
             {
-                bool insideString = false;
-                int i = 0;
-                while (i < value.Length)
+                int lineChangeValidityIndex = SyntaxValidationUtilityMethods.GetLineChangesValidity(value, syntaxConf, (ValueType)type);
+                if (lineChangeValidityIndex != -1)
                 {
-                    char currentCharacter = value[i];
-                    if (currentCharacter == syntaxConf.Symbols.Key.StringDelimeter)
-                    {
-                        insideString = !insideString;
-                    }
-                    if (!insideString && currentCharacter == syntaxConf.Symbols.Linebreak)
-                    {
-                        char symbolBefore = type is ValueType.ListOfStrings ? 
-                            syntaxConf.Symbols.Key.ListSeparator :
-                            syntaxConf.Symbols.Key.StringDelimeter;
+                    KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
+                            validationKeyValuePair.ValueStartIndex + lineChangeValidityIndex,
+                            lineChangeIndexes);
 
-                        // In case of Windows linebreak, check if the character before the linebreak is the correct symbol
-                        char characterToInspect = value[i - 1] != CharacterConstants.CARRIAGE_RETURN ? value[i - 1] : value[i - 2];
-
-                        if (characterToInspect != symbolBefore)
-                        {
-                            KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                                validationKeyValuePair.ValueStartIndex + i,
-                                lineChangeIndexes);
-
-                            return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                                ValidationFeedbackLevel.Error,
-                                ValidationFeedbackRule.InvalidValueFormat,
-                                feedbackIndexes.Key,
-                                feedbackIndexes.Value,
-                                value));
-                        }
-                    }
-                    i++;
+                    return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
+                        ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.InvalidValueFormat,
+                        feedbackIndexes.Key,
+                        feedbackIndexes.Value,
+                        value));
                 }
             }
-
             return null;
         }
 
