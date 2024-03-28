@@ -428,5 +428,45 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
                 }
             }
         }
+
+        [TestMethod]
+        public void ValidatePxFileSyntax_CalledWith_UTF8_N_WITH_TIMEVALS_Returns_With_Valid_Result()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_TIMEVALS);
+            using Stream stream = new MemoryStream(data);
+            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+
+            // Assert
+            Assert.IsNotNull(encoding, "Encoding should not be null");
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename);
+            Assert.AreEqual(0, result.FeedbackItems.Count);
+        }
+
+        [TestMethod]
+        public void ValidatePxFileSyntax_CalledWith_UTF8_N_WITH_BAD_TIMEVALS_Returns_Errors()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_BAD_TIMEVALS);
+            using Stream stream = new MemoryStream(data);
+            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+
+            // Assert
+            Assert.IsNotNull(encoding, "Encoding should not be null");
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename);
+            Assert.AreEqual(2, result.FeedbackItems.Count);
+            Assert.AreEqual(9, result.FeedbackItems[0].Feedback.Line);
+            Assert.AreEqual(16, result.FeedbackItems[0].Feedback.Character);
+            Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, result.FeedbackItems[0].Feedback.Rule);
+            Assert.AreEqual(10, result.FeedbackItems[1].Feedback.Line);
+            Assert.AreEqual(16, result.FeedbackItems[1].Feedback.Character);
+            Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, result.FeedbackItems[1].Feedback.Rule);
+        }
     }
 }
