@@ -51,6 +51,23 @@
         KeywordIsNotInUpperCase = 22,
         KeywordExcessivelyLong = 23,
         IllegalCharactersInSpecifierPart = 24,
-        EntryWithMultipleValues = 25
+        EntryWithMultipleValues = 25,
+        MissingDefaultLanguage = 26,
+        RequiredKeyMissing = 27,
+        RecommendedKeyMissing = 28,
+        RequiredLanguageDefinitionMissing = 29,
+        RecommendedLanguageDefinitionMissing = 30,
+        UndefinedLanguageFound = 31,
+        IllegalLanguageDefinitionFound = 32,
+        UnrecommendedLanguageDefinitionFound = 33,
+        RequiredSpecifierDefinitionMissing = 34,
+        RecommendedSpecifierDefinitionMissing = 35,
+        IllegalSpecifierDefinitionFound = 36,
+        UnrecommendedSpecifierDefinitionFound = 37,
+        InvalidValueFound = 38,
+        LowerCaseValueFound = 39,
+        UnmatchingValueType = 40,
+        UnmatchingValueAmount = 41,
+        MultipleInstancesOfUniqueKey = 42
     }
 }
