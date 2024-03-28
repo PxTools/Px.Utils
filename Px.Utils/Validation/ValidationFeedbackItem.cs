@@ -1,7 +1,7 @@
 ﻿namespace PxUtils.Validation
 {
     /// <summary>
-    /// Represents a validation feedback item. A validation feedback item associates a validation object with the feedback from validating that object.
+    /// A validation feedback item associates a <see cref="ValidationObject"/> with the feedback from validating that object.
     /// </summary>
     /// <param name="validationObject">The <see cref="ValidationObject"/> that this feedback item is associated with.</param>
     /// <param name="feedback">The <see cref="ValidationFeedback"/> from validating the object.</param>
