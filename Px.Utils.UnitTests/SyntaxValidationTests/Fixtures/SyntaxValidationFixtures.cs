@@ -137,20 +137,20 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
         private const string rangeTimeValW1 = "TLIST(W1, \"200050-200052\")";
         private const string rangeTimeValD1 = "TLIST(D1, \"20001010-20001012\")";
         internal static List<ValidationKeyValuePair> KEYVALUEPAIRS_WITH_TIMEVALS => [
-            new("foo", new KeyValuePair<string, string>("FOOA1", seriesTimeValA1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("FOOH1", seriesTimeValH1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("FOOT1", seriesTimeValT1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("FOOQ1", seriesTimeValQ1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("FOOM1", seriesTimeValM1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("FOOW1", seriesTimeValW1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("FOOD1", seriesTimeValD1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BARA1", rangeTimeValA1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BARH1", rangeTimeValH1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BART1", rangeTimeValT1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BARQ1", rangeTimeValQ1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BARM1", rangeTimeValM1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BARW1", rangeTimeValW1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BARD1", rangeTimeValD1), 0, 0)
+            new("foo", new KeyValuePair<string, string>("FOOA1", seriesTimeValA1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOOH1", seriesTimeValH1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOOT1", seriesTimeValT1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOOQ1", seriesTimeValQ1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOOM1", seriesTimeValM1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOOW1", seriesTimeValW1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOOD1", seriesTimeValD1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BARA1", rangeTimeValA1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BARH1", rangeTimeValH1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BART1", rangeTimeValT1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BARQ1", rangeTimeValQ1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BARM1", rangeTimeValM1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BARW1", rangeTimeValW1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BARD1", rangeTimeValD1), 0, [], 0)
         ];
 
         private const string badSeriesTimeValA1 = "TLIST(A1),2000,2001,2003";
@@ -168,20 +168,20 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
         private const string badRangeTimeValW1 = "TLIST(W1, \"2000.50-2000.52\")";
         private const string badRangeTimeValD1 = "TLIST(D1, \"10/10/2000-10/11/2000\")";
         internal static List<ValidationKeyValuePair> KEYVALUEPAIRS_WITH_BAD_TIMEVALS => [
-            new("foo", new KeyValuePair<string, string>("FOOA1", badSeriesTimeValA1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("FOOH1", badSeriesTimeValH1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("FOOT1", badSeriesTimeValT1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("FOOQ1", badSeriesTimeValQ1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("FOOM1", badSeriesTimeValM1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("FOOW1", badSeriesTimeValW1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("FOOD1", badSeriesTimeValD1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BARA1", badRangeTimeValA1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BARH1", badRangeTimeValH1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BART1", badRangeTimeValT1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BARQ1", badRangeTimeValQ1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BARM1", badRangeTimeValM1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BARW1", badRangeTimeValW1), 0, 0),
-            new("foo", new KeyValuePair<string, string>("BARD1", badRangeTimeValD1), 0, 0)
+            new("foo", new KeyValuePair<string, string>("FOOA1", badSeriesTimeValA1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOOH1", badSeriesTimeValH1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOOT1", badSeriesTimeValT1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOOQ1", badSeriesTimeValQ1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOOM1", badSeriesTimeValM1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOOW1", badSeriesTimeValW1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOOD1", badSeriesTimeValD1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BARA1", badRangeTimeValA1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BARH1", badRangeTimeValH1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BART1", badRangeTimeValT1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BARQ1", badRangeTimeValQ1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BARM1", badRangeTimeValM1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BARW1", badRangeTimeValW1), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("BARD1", badRangeTimeValD1), 0, [], 0)
         ];
 
         private readonly static ValidationStructuredEntryKey numberInKeyword = new("1FOO");
