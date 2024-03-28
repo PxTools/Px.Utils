@@ -105,6 +105,7 @@ namespace PxUtils.PxFile.Data
         private void ReadItemsFromStream<T>(T[] buffer, int offset, int[] rows, int[] cols, Func<char[], int, T> readItem)
         {
             _stream.Position = _dataStart;
+            int startingIndex = offset;
 
             int colsLength = cols.Length;
             int rowsLength = rows.Length;
@@ -163,9 +164,11 @@ namespace PxUtils.PxFile.Data
             while (read > 0);
 
             // Read the last value that contains section separator
-            if(valueIndex > 0)
+            if(valueIndex > 0) buffer[offset++] = readItem(valueBuffer, valueIndex - 1);
+
+            if (offset - startingIndex < rowsLength * colsLength)
             {
-                buffer[offset] = readItem(valueBuffer, valueIndex - 1);
+                throw new ArgumentException("Some of the requested values were outside the data section.");
             }
         }
     }

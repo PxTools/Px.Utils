@@ -1,4 +1,5 @@
 ﻿using Px.Utils.TestingApp.Commands;
+using PxUtils.TestingApp;
 
 namespace Px.Utils.TestingApp
 {
@@ -6,14 +7,8 @@ namespace Px.Utils.TestingApp
     {
         static void Main(string[] args)
         {
-            if (args.Length == 0) StartInteractiveMode();
+            if (args.Length == 0) new InteractiveFlow().Start();
             else StartBatchMode(args);
-        }
-
-        static void StartInteractiveMode()
-        {
-            //DataReadBenchmark benchmarks = new();
-            //benchmarks.PrintResults();
         }
 
         static void StartBatchMode(string[] _)

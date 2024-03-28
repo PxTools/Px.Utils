@@ -30,7 +30,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadEveryOtherDoubleDataValue_ValidIntegers_ReturnsCorrectDoubleDataValues()
+        public void ReadEveryOtherDoubleDataValueFrom1stRow_ValidIntegers_ReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -71,6 +71,71 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
             Assert.AreEqual(14.0, targetBuffer[2].UnsafeValue);
             Assert.AreEqual(16.0, targetBuffer[3].UnsafeValue);
             Assert.AreEqual(18.0, targetBuffer[4].UnsafeValue);
+        }
+
+        [TestMethod]
+        public void ReadAddDoubleDataValues_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DECIMALVALUES);
+            using Stream stream = new MemoryStream(data);
+            using PxFileStreamDataReader reader = new(stream);
+            DoubleDataValue[] targetBuffer = new DoubleDataValue[20];
+
+            // Act
+            int[] rowRange = DataTestHelpers.BuildRanges(0, 2, 1);
+            int[] colRange = DataTestHelpers.BuildRanges(0, 10, 1);
+            reader.ReadDoubleDataValues(targetBuffer, 0, rowRange, colRange);
+
+            // Assert
+            Assert.AreEqual(0.0, targetBuffer[0].UnsafeValue);
+            Assert.AreEqual(0.09, targetBuffer[9].UnsafeValue);
+            Assert.AreEqual(0.10, targetBuffer[10].UnsafeValue);
+            Assert.AreEqual(0.19, targetBuffer[19].UnsafeValue);
+        }
+
+        [TestMethod]
+        public void ReadEveryOtherDoubleDataValueFrom1stRow_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DECIMALVALUES);
+            using Stream stream = new MemoryStream(data);
+            using PxFileStreamDataReader reader = new(stream);
+            DoubleDataValue[] targetBuffer = new DoubleDataValue[20];
+
+            // Act
+            int[] rowRange = DataTestHelpers.BuildRanges(0, 2, 2);
+            int[] colRange = DataTestHelpers.BuildRanges(0, 10, 2);
+            reader.ReadDoubleDataValues(targetBuffer, 0, rowRange, colRange);
+
+            // Assert
+            Assert.AreEqual(0.00, targetBuffer[0].UnsafeValue);
+            Assert.AreEqual(0.02, targetBuffer[1].UnsafeValue);
+            Assert.AreEqual(0.04, targetBuffer[2].UnsafeValue);
+            Assert.AreEqual(0.06, targetBuffer[3].UnsafeValue);
+            Assert.AreEqual(0.08, targetBuffer[4].UnsafeValue);
+        }
+
+        [TestMethod]
+        public void ReadEveryOtherDoubleDataValueFrom2ndRow_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DECIMALVALUES);
+            using Stream stream = new MemoryStream(data);
+            using PxFileStreamDataReader reader = new(stream);
+            DoubleDataValue[] targetBuffer = new DoubleDataValue[20];
+
+            // Act
+            int[] rowRange = DataTestHelpers.BuildRanges(1, 2, 1);
+            int[] colRange = DataTestHelpers.BuildRanges(0, 10, 2);
+            reader.ReadDoubleDataValues(targetBuffer, 0, rowRange, colRange);
+
+            // Assert
+            Assert.AreEqual(0.10, targetBuffer[0].UnsafeValue);
+            Assert.AreEqual(0.12, targetBuffer[1].UnsafeValue);
+            Assert.AreEqual(0.14, targetBuffer[2].UnsafeValue);
+            Assert.AreEqual(0.16, targetBuffer[3].UnsafeValue);
+            Assert.AreEqual(0.18, targetBuffer[4].UnsafeValue);
         }
     }
 }
