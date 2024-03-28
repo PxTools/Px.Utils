@@ -123,7 +123,7 @@ Some keywords have special value types. These are described in the following sec
 
 ##### TIMEVAL
 - Timeval has two value types unique to the entry:
-	- **Interval specifier** is one of the following: ```A1```, ```H1```, ```Q1```, ```M1``` , ```W1```.
+	- **Interval specifier** is one of the following: ```A1```, ```H1```, ```T1```, ```Q1```, ```M1``` , ```W1```, ```D1```.
 	- The interval specifiers are not strings, so they are not marked by ```"``` characters.
 	- **timestamp** depends on the interval specifier:
 		- A1 -> ```YYYY``` where ```Y``` is ```0-9```.
@@ -226,7 +226,7 @@ More spesific encoding information. The value must be a string that matches the 
 ##### UNITS*
 - The value must be a string.
 - Must be defined for each value of the dimension defined with the CONTVARIABLE keyword.
-- Can be defined for the whole matrix without spesifiers.
+- Can be defined for the whole matrix without spesifiers if CONTVARIABLE is not defined.
 - Recommended to be defined for the content dimension value with two specifiers.
 - Can be defined for the content dimension values with the value name as only the first specifier, but this is not recommended.
 - Language dependant.
