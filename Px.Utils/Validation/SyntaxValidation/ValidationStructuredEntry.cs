@@ -50,7 +50,7 @@
     /// <param name="keyStartLineIndex">Index of the line where the entry starts.</param>
     /// <param name="lineChangeIndexes">Character indexes of the line changes in the entry starting from the entry start.</param>
     /// <param name="valueStartIndex">Index of the first character of the value in the entry.</param>
-    public class ValidationStructuredEntry(string file, ValidationStructuredEntryKey key, string value, int keyStartLineIndex, int[] lineChangeIndexes, int valueStartIndex) : ValidationObject(file, keyStartLineIndex, lineChangeIndexes)
+    public class ValidationStructuredEntry(string file, ValidationStructuredEntryKey key, string value, int keyStartLineIndex, int[] lineChangeIndexes, int valueStartIndex, ValueType? valueType) : ValidationObject(file, keyStartLineIndex, lineChangeIndexes)
     {
         /// <summary>
         /// The key part of the entry, represented by a <see cref="ValidationStructuredEntryKey"/> object.
@@ -66,5 +66,9 @@
         /// Index of the first character of the value in the entry.
         /// </summary>
         public int ValueStartIndex { get; } = valueStartIndex;
+        /// <summary>
+        /// Value type of the value part of the entry, if found.
+        /// </summary>
+        public ValueType? ValueType { get; } = valueType;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using PxUtils.PxFile;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
@@ -179,7 +180,11 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 return ValueType.ListOfStrings;
             }
-            else if (input.StartsWith(syntaxConf.Symbols.Key.StringDelimeter) && input.EndsWith(syntaxConf.Symbols.Key.StringDelimeter))
+            else if (IsDateTimeFormat(input, syntaxConf))
+            {
+                return ValueType.DateTime;
+            }
+            else if (IsStringFormat(input, syntaxConf.Symbols.Key.StringDelimeter))
             {
                 return ValueType.String;
             }
@@ -400,6 +405,22 @@ namespace PxUtils.Validation.SyntaxValidation
                     startIndexes.Add(i);
                 }
             }
+        }
+
+        private static bool IsStringFormat(string input, char stringDelimeter)
+        {
+            return input.StartsWith(stringDelimeter) && input.EndsWith(stringDelimeter);
+        }
+
+        private static bool IsDateTimeFormat(string input, PxFileSyntaxConf syntaxConf)
+        {
+            if (!IsStringFormat(input, syntaxConf.Symbols.Key.StringDelimeter)) return false;
+
+            return DateTime.TryParseExact(
+                input.Trim(syntaxConf.Symbols.Key.StringDelimeter),
+                syntaxConf.Symbols.Value.DateTimeFormat,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out _);
         }
     }
 }
