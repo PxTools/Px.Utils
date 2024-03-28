@@ -78,6 +78,8 @@
                 private const string QUARTER_YEAR_INTERVAL = "Q1";
                 private const string MONTH_INTERVAL = "M1";
                 private const string WEEK_INTERVAL = "W1";
+                private const string TRIMESTER_INTERVAL = "T1";
+                private const string DAY_INTERVAL = "D1";
 
                 private const string DATETIME_FORMAT_STRING = "yyyyMMdd HH:mm";
 
@@ -87,7 +89,16 @@
                 public string QuarterYearInterval { get; set; } = QUARTER_YEAR_INTERVAL;
                 public string MonthInterval { get; set; } = MONTH_INTERVAL;
                 public string WeekInterval { get; set; } = WEEK_INTERVAL;
+                public string TrimesterInterval { get; set; } = TRIMESTER_INTERVAL;
+                public string DayInterval { get; set; } = DAY_INTERVAL;
                 public string DateTimeFormatString { get; set; } = DATETIME_FORMAT_STRING;
+                public string[] TimeIntervalTokens { get; } = [
+                    YEAR_INTERVAL, 
+                    HALF_YEAR_INTERVAL, 
+                    QUARTER_YEAR_INTERVAL, 
+                    MONTH_INTERVAL, WEEK_INTERVAL,
+                    TRIMESTER_INTERVAL, 
+                    DAY_INTERVAL];
 
                 private TimeValue() { }
 

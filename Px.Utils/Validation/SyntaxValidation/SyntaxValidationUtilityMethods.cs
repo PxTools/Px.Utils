@@ -33,6 +33,9 @@ namespace PxUtils.Validation.SyntaxValidation
     /// </summary>
     public static class SyntaxValidationUtilityMethods
     {
+        private static readonly Dictionary<string, Regex> regexPatterns = [];
+        private static readonly TimeSpan timeout = TimeSpan.FromMilliseconds(50);
+
         /// <summary>
         /// Extracts a section from a string enclosed with given symbols.
         /// </summary>
@@ -131,8 +134,6 @@ namespace PxUtils.Validation.SyntaxValidation
             // Create a regex pattern to match valid number format
             string pattern = @"^-?(\d+\.?\d*|\.\d+)$";
 
-
-            TimeSpan timeout = TimeSpan.FromSeconds(1);
             try
             {
                 return Regex.IsMatch(input, pattern, RegexOptions.Singleline, timeout);
@@ -173,9 +174,13 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="input">The input string to check</param>
         /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <returns>Returns a <see cref="ValueType"/> object that represents the type of the value in the input string. If the type cannot be determined, null is returned.</returns>
-        internal static ValueType? GetValueTypeFromString(string input, PxFileSyntaxConf syntaxConf)
+        public static ValueType? GetValueTypeFromString(string input, PxFileSyntaxConf syntaxConf)
         {
-            if (IsStringListFormat(input, syntaxConf.Symbols.Value.ListSeparator, syntaxConf.Symbols.Key.StringDelimeter))
+            if (TryGetTimeValueFormat(input, out ValueType? valueFormat, syntaxConf))
+            {
+                return valueFormat;
+            }
+            else if (IsStringListFormat(input, syntaxConf.Symbols.Value.ListSeparator, syntaxConf.Symbols.Key.StringDelimeter))
             {
                 return ValueType.ListOfStrings;
             }
@@ -202,14 +207,24 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="input">The input string to clean</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
+        /// <param name="forceful">A boolean that can be set true if the cleaning should be done forcefully</param>
         /// <returns>Returns a string that is the input string cleaned from new line characters and quotation marks</returns>
-        internal static string CleanString(string input, PxFileSyntaxConf syntaxConf)
+        internal static string CleanString(string input, PxFileSyntaxConf syntaxConf, bool forceful = false)
         {
             char[] charactersToTrim = [
                 CharacterConstants.CARRIAGE_RETURN,
                 syntaxConf.Symbols.Linebreak,
                 syntaxConf.Symbols.Key.StringDelimeter
             ];
+
+            if (forceful)
+            {
+                input = input
+                    .Replace(CharacterConstants.CARRIAGE_RETURN.ToString(), "")
+                    .Replace(syntaxConf.Symbols.Linebreak.ToString(), "")
+                    .Replace(CharacterConstants.SPACE.ToString(), "");
+            }
+
             return input.Trim(charactersToTrim);
         }
 
@@ -359,7 +374,7 @@ namespace PxUtils.Validation.SyntaxValidation
         internal static int GetLineChangesValidity(string value, PxFileSyntaxConf syntaxConf, ValueType type)
         {
             bool insideString = false;
-            for(int i = 0; i < value.Length; i++)
+            for (int i = 0; i < value.Length; i++)
             {
                 char currentCharacter = value[i];
                 if (currentCharacter == syntaxConf.Symbols.Key.StringDelimeter)
@@ -382,6 +397,150 @@ namespace PxUtils.Validation.SyntaxValidation
                 }
             }
             return -1;
+        }
+
+        private static bool TryGetTimeValueFormat(string input, out ValueType? valueFormat, PxFileSyntaxConf syntaxConf)
+        {
+            // Value has to start with the time interval indicator (TLIST by default)
+            if (!input.StartsWith(syntaxConf.Tokens.Time.TimeIntervalIndicator))
+            {
+                valueFormat = null;
+                return false;
+            }
+
+
+            ExtractSectionResult intervalSection = ExtractSectionFromString(input, syntaxConf.Symbols.Value.TimeSeriesIntervalStart, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Value.TimeSeriesIntervalEnd);
+            // There can only be one time interval specifier section
+            if (intervalSection.Sections.Length != 1)
+            {
+                valueFormat = null;
+                return false;
+            }
+            // Depending on the format, interval section may have the time range specified. Interval token is always the first part of the section
+            string[] splitIntervalSection = intervalSection.Sections[0].Split(syntaxConf.Symbols.Value.ListSeparator);
+            string intervalToken = splitIntervalSection[0];
+            string? timeRange = splitIntervalSection.Length == 2 ? splitIntervalSection[1] : null;
+            if (!IsIntervalTokenValid(intervalToken, syntaxConf))
+            {
+                valueFormat = null;
+                return false;
+            }
+            string remainder = intervalSection.Remainder.Remove(0, syntaxConf.Tokens.Time.TimeIntervalIndicator.Length);
+            return timeRange is not null ? TryGetTimeValueRangeFormat(timeRange, intervalToken, out valueFormat, syntaxConf) : TryGetTimeValueSeriesFormat(remainder, intervalToken, out valueFormat, syntaxConf);
+        }
+
+        private static bool IsIntervalTokenValid(string intervalToken, PxFileSyntaxConf syntaxConf)
+        {
+            if (syntaxConf.Tokens.Time.TimeIntervalTokens.Contains(intervalToken))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }   
+        }
+
+        private static bool TryGetTimeValueSeriesFormat(string input, string timeInterval, out ValueType? valueFormat, PxFileSyntaxConf syntaxConf)
+        {
+            if (input.Length == 0 || input[0] != syntaxConf.Symbols.Value.ListSeparator)
+            {
+                valueFormat = null;
+                return false;
+            }
+
+            // Remove preceding list separator from input
+            input = input.Remove(0, 1);
+            if (!IsStringListFormat(input, syntaxConf.Symbols.Value.ListSeparator, syntaxConf.Symbols.Value.StringDelimeter))
+            {
+                valueFormat = null;
+                return false;
+            }
+
+            // Time value series should be a list of time values
+            string[] timeValSeries = input.Split(syntaxConf.Symbols.Value.ListSeparator);
+            if (Array.TrueForAll(timeValSeries, x => IsValidTimestampFormat(x, timeInterval, syntaxConf)))
+            {
+                valueFormat = ValueType.TimeValSeries;
+                return true;
+            }
+            else
+            {
+                valueFormat = null;
+                return false;
+            }
+        }
+
+        private static bool IsValidTimestampFormat(string input, string timeInterval, PxFileSyntaxConf syntaxConf)
+        {
+            // Timestamp should match with a regex pattern for the given time interval
+            input = CleanString(input, syntaxConf, true);
+            Regex regex = GetRegexForTimeInterval(timeInterval, syntaxConf);
+
+            try
+            {
+                return regex.IsMatch(input);
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                // If the regex times out, we can't be sure if the input is a valid timestamp
+                return false;
+            }
+        }
+
+        private static Regex GetRegexForTimeInterval(string timeInterval, PxFileSyntaxConf syntaxConf)
+        {
+            if (!regexPatterns.TryGetValue(timeInterval, out Regex? regex))
+            {
+                string pattern = GetPatternForTimeInterval(timeInterval, syntaxConf);
+                regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.Singleline, timeout);
+                regexPatterns[timeInterval] = regex;
+            }
+
+            return regex;
+        }
+
+        private static string GetPatternForTimeInterval(string timeInterval, PxFileSyntaxConf syntaxConf)
+        {
+            Dictionary<string, string> patterns = new()
+            {
+                { syntaxConf.Tokens.Time.YearInterval, @"^\d{4}$" },
+                { syntaxConf.Tokens.Time.HalfYearInterval, @"^\d{4}[1-4]$" },
+                { syntaxConf.Tokens.Time.TrimesterInterval, @"^\d{4}[1-4]$" },
+                { syntaxConf.Tokens.Time.QuarterYearInterval, @"^\d{4}[1-4]$" },
+                { syntaxConf.Tokens.Time.MonthInterval, @"^\d{4}(0[1-9]|1[0-2])$" },
+                { syntaxConf.Tokens.Time.WeekInterval, @"^\d{4}(0[1-9]|[1-4][0-9]|5[0-2])$" },
+                { syntaxConf.Tokens.Time.DayInterval, @"^\d{4}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$" }
+            };
+
+            return patterns[timeInterval];
+        }
+
+        private static bool TryGetTimeValueRangeFormat(string input, string timeInterval, out ValueType? valueFormat, PxFileSyntaxConf syntaxConf)
+        {
+            input = input.TrimStart();
+            // Time range is split in to start and end by the time series limits separator
+            string[] timeValRange = input.Split(syntaxConf.Symbols.Value.TimeSeriesLimitsSeparator);
+            if (
+                timeValRange.Length != 2 ||
+                !input.StartsWith(syntaxConf.Symbols.Key.StringDelimeter) || 
+                !input.EndsWith(syntaxConf.Symbols.Key.StringDelimeter))
+            {                
+                valueFormat = null;
+                return false;
+            }
+            // Time range parts should be valid timestamps
+            if (IsValidTimestampFormat(CleanString(timeValRange[0], syntaxConf), timeInterval, syntaxConf) &&
+                IsValidTimestampFormat(CleanString(timeValRange[1], syntaxConf), timeInterval, syntaxConf))
+            {
+                valueFormat = ValueType.TimeValRange;
+                return true;
+            }
+            else
+            {
+                valueFormat = null;
+                return false;
+            }
         }
 
         private static void HandleStringDelimiter(ref bool insideString, ref bool insideSection, bool ignoreStringContents, StringBuilder sectionBuilder, List<string> sections, List<int> startIndexes, int i)
