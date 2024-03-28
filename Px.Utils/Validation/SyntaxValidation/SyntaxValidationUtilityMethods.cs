@@ -1,4 +1,5 @@
 ﻿using PxUtils.PxFile;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -33,6 +34,9 @@ namespace PxUtils.Validation.SyntaxValidation
     /// </summary>
     public static class SyntaxValidationUtilityMethods
     {
+        private static readonly Dictionary<string, Regex> regexPatterns = [];
+        private static readonly TimeSpan timeout = TimeSpan.FromMilliseconds(50);
+
         /// <summary>
         /// Extracts a section from a string enclosed with given symbols.
         /// </summary>
@@ -131,8 +135,6 @@ namespace PxUtils.Validation.SyntaxValidation
             // Create a regex pattern to match valid number format
             string pattern = @"^-?(\d+\.?\d*|\.\d+)$";
 
-
-            TimeSpan timeout = TimeSpan.FromSeconds(1);
             try
             {
                 return Regex.IsMatch(input, pattern, RegexOptions.Singleline, timeout);
@@ -416,7 +418,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string[] splitIntervalSection = intervalSection.Sections[0].Split(syntaxConf.Symbols.Value.ListSeparator);
             string intervalToken = splitIntervalSection[0];
             string? timeRange = splitIntervalSection.Length == 2 ? splitIntervalSection[1] : null;
-            if (!IsValidationTokenValid(intervalToken, syntaxConf))
+            if (!IsIntervalTokenValid(intervalToken, syntaxConf))
             {
                 valueFormat = null;
                 return false;
@@ -425,7 +427,7 @@ namespace PxUtils.Validation.SyntaxValidation
             return timeRange is not null ? TryGetTimeValueRangeFormat(timeRange, intervalToken, out valueFormat, syntaxConf) : TryGetTimeValueSeriesFormat(remainder, intervalToken, out valueFormat, syntaxConf);
         }
 
-        private static bool IsValidationTokenValid(string intervalToken, PxFileSyntaxConf syntaxConf)
+        private static bool IsIntervalTokenValid(string intervalToken, PxFileSyntaxConf syntaxConf)
         {
             if (syntaxConf.Tokens.Time.TimeIntervalTokens.Contains(intervalToken))
             {
@@ -469,8 +471,34 @@ namespace PxUtils.Validation.SyntaxValidation
         private static bool IsValidTimestampFormat(string input, string timeInterval, PxFileSyntaxConf syntaxConf)
         {
             input = CleanString(input, syntaxConf, true);
+            Regex regex = GetRegexForTimeInterval(timeInterval, syntaxConf);
 
-            Dictionary<string, string> regexPatterns = new()
+            try
+            {
+                return regex.IsMatch(input);
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                // If the regex times out, we can't be sure if the input is a valid timestamp
+                return false;
+            }
+        }
+
+        private static Regex GetRegexForTimeInterval(string timeInterval, PxFileSyntaxConf syntaxConf)
+        {
+            if (!regexPatterns.TryGetValue(timeInterval, out Regex? regex))
+            {
+                string pattern = GetPatternForTimeInterval(timeInterval, syntaxConf);
+                regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.Singleline);
+                regexPatterns[timeInterval] = regex;
+            }
+
+            return regex;
+        }
+
+        private static string GetPatternForTimeInterval(string timeInterval, PxFileSyntaxConf syntaxConf)
+        {
+            Dictionary<string, string> patterns = new()
             {
                 { syntaxConf.Tokens.Time.YearInterval, @"^\d{4}$" },
                 { syntaxConf.Tokens.Time.HalfYearInterval, @"^\d{4}[1-4]$" },
@@ -481,14 +509,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 { syntaxConf.Tokens.Time.DayInterval, @"^\d{4}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$" }
             };
 
-            if (!regexPatterns.TryGetValue(timeInterval, out string? value))
-            {
-                return false;
-            }
-
-            Regex regex = new(value);
-            bool valid = regex.IsMatch(input);
-            return valid;
+            return patterns[timeInterval];
         }
 
         private static bool TryGetTimeValueRangeFormat(string input, string timeInterval, out ValueType? valueFormat, PxFileSyntaxConf syntaxConf)
