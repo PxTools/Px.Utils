@@ -96,6 +96,7 @@ Whitespace characters are not significant in the value outside of ```"``` separa
 - Decimal separator is period ```.```.
 - Thousands separator is not allowed.
 - Whitespace characters are not allowed between the characters of the number.
+- Number must be in range of ±7.9228 x 10^28.
 
 #### List of strings
 - List items are separated by a comma ```,```.
