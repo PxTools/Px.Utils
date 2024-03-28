@@ -59,11 +59,11 @@ namespace PxUtils.Validation.SyntaxValidation
 
             List<ValidationFeedbackItem> validationFeedback = [];
             List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, syntaxConf, filename, bufferSize);
-            ValidateEntries(stringEntries, stringValidationFunctions, validationFeedback, syntaxConf);
+            validationFeedback.AddRange(ValidateEntries(stringEntries, stringValidationFunctions, syntaxConf));
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(stringEntries, syntaxConf);
-            ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, validationFeedback, syntaxConf);
+            validationFeedback.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, syntaxConf));
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
-            ValidateStructs(structuredEntries, structuredValidationFunctions, validationFeedback, syntaxConf);
+            validationFeedback.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, syntaxConf));
 
             return new([.. validationFeedback], structuredEntries);
         }
@@ -103,17 +103,18 @@ namespace PxUtils.Validation.SyntaxValidation
             syntaxConf ??= PxFileSyntaxConf.Default;
             List<ValidationFeedbackItem> validationFeedback = [];
             List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, syntaxConf, filename, bufferSize, cancellationToken);
-            ValidateEntries(entries, stringValidationFunctions, validationFeedback, syntaxConf);
+            validationFeedback.AddRange(ValidateEntries(entries, stringValidationFunctions, syntaxConf));
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, syntaxConf);
-            ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, validationFeedback, syntaxConf);
+            validationFeedback.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, syntaxConf));
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
-            ValidateStructs(structuredEntries, structuredValidationFunctions, validationFeedback, syntaxConf);
+            validationFeedback.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, syntaxConf));
 
             return new([.. validationFeedback], structuredEntries);
         }
 
-        private static void ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf)
+        private static List<ValidationFeedbackItem> ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunctionDelegate> validationFunctions, PxFileSyntaxConf syntaxConf)
         {
+            List<ValidationFeedbackItem> validationFeedback = [];
             foreach (ValidationEntry entry in entries)
             {
                 foreach (EntryValidationFunctionDelegate function in validationFunctions)
@@ -125,10 +126,12 @@ namespace PxUtils.Validation.SyntaxValidation
                     }
                 }
             }
+            return validationFeedback;
         }
 
-        private static void ValidateKeyValuePairs(IEnumerable<ValidationKeyValuePair> kvpObjects, IEnumerable<KeyValuePairValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf)
+        private static List<ValidationFeedbackItem> ValidateKeyValuePairs(IEnumerable<ValidationKeyValuePair> kvpObjects, IEnumerable<KeyValuePairValidationFunctionDelegate> validationFunctions, PxFileSyntaxConf syntaxConf)
         {
+            List<ValidationFeedbackItem> validationFeedback = [];
             foreach (ValidationKeyValuePair kvpObject in kvpObjects)
             {
                 foreach (KeyValuePairValidationFunctionDelegate function in validationFunctions)
@@ -140,10 +143,12 @@ namespace PxUtils.Validation.SyntaxValidation
                     }
                 }
             }
+            return validationFeedback;
         }
 
-        private static void ValidateStructs(IEnumerable<ValidationStructuredEntry> structuredEntries, IEnumerable<StructuredValidationFunctionDelegate> validationFunctions, List<ValidationFeedbackItem> validationFeedback, PxFileSyntaxConf syntaxConf)
+        private static List<ValidationFeedbackItem> ValidateStructs(IEnumerable<ValidationStructuredEntry> structuredEntries, IEnumerable<StructuredValidationFunctionDelegate> validationFunctions, PxFileSyntaxConf syntaxConf)
         {
+            List<ValidationFeedbackItem> validationFeedback = [];
             foreach (ValidationStructuredEntry structuredEntry in structuredEntries)
             {
                 foreach (StructuredValidationFunctionDelegate function in validationFunctions)
@@ -155,6 +160,7 @@ namespace PxUtils.Validation.SyntaxValidation
                     }
                 }
             }
+            return validationFeedback;
         }
 
         private static List<ValidationKeyValuePair> BuildKeyValuePairs(List<ValidationEntry> validationEntries, PxFileSyntaxConf syntaxConf)
@@ -201,10 +207,7 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 for (int i = 0; i < buffer.Length; i++)
                 {
-                    if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
-                    {
-                        break;
-                    }
+                    if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString)) break;
                     UpdateLineAndCharacter(buffer[i], syntaxConf, ref characterIndex, ref lineChangeIndexes, ref isProcessingString);
                     if (!isProcessingString && buffer[i] == syntaxConf.Symbols.EntrySeparator)
                     {
@@ -252,10 +255,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 read = await reader.ReadAsync(buffer.AsMemory(), cancellationToken);
                 for (int i = 0; i < read; i++)
                 {
-                    if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
-                    {
-                        break;
-                    }
+                    if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString)) break;
                     UpdateLineAndCharacter(buffer[i], syntaxConf, ref characterIndex, ref lineChangeIndexes, ref isProcessingString);
                     if (!isProcessingString && buffer[i] == syntaxConf.Symbols.EntrySeparator)
                     {
@@ -296,12 +296,9 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 linebreakIndexes.Add(characterIndex);
             }
-            else
+            else if (currentCharacter == syntaxConf.Symbols.Key.StringDelimeter)
             {
-                if (currentCharacter == syntaxConf.Symbols.Key.StringDelimeter)
-                {
-                    isProcessingString = !isProcessingString;
-                }
+                isProcessingString = !isProcessingString;
             }
             characterIndex++;
         }
