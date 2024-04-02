@@ -136,6 +136,8 @@
                 private const string DIMENSION_TYPE = "VARIABLE-TYPE";
                 private const string STUB_DIMENSIONS = "STUB";
                 private const string HEADING_DIMENSIONS = "HEADING";
+                private const string CHARSET = "CHARSET";
+                private const string TABLEID = "TABLEID";
 
                 public string Data { get; set; } = DATA;
                 public string CodePage { get; set; } = CODEPAGE;
@@ -154,6 +156,8 @@
                 public string DimensionType { get; set; } = DIMENSION_TYPE;
                 public string StubDimensions { get; set; } = STUB_DIMENSIONS;
                 public string HeadingDimensions { get; set; } = HEADING_DIMENSIONS;
+                public string Charset { get; set; } = CHARSET;
+                public string TableId { get; set; } = TABLEID;
 
                 private KeyWordTokens() { }
 

@@ -68,6 +68,8 @@
         LowerCaseValueFound = 39,
         UnmatchingValueType = 40,
         UnmatchingValueAmount = 41,
-        MultipleInstancesOfUniqueKey = 42
+        MultipleInstancesOfUniqueKey = 42,
+        MissingStubAndHeading = 43,
+        VariableValuesMissing = 44,
     }
 }
