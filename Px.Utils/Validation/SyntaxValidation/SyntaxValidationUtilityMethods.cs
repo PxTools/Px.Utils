@@ -389,6 +389,16 @@ namespace PxUtils.Validation.SyntaxValidation
             return -1;
         }
 
+        internal static string CleanValue(string value, PxFileSyntaxConf syntaxConf, ValueType? type)
+        {
+            if (type == null || type == ValueType.Boolean || type == ValueType.Number)
+            {
+                return value;
+            }
+
+            return CleanString(value, syntaxConf).Replace(syntaxConf.Symbols.Key.StringDelimeter.ToString(), "");
+        }
+
         private static void HandleStringDelimiter(ref bool insideString, ref bool insideSection, bool ignoreStringContents, StringBuilder sectionBuilder, List<string> sections, List<int> startIndexes, int i)
         {
             insideString = !insideString;
