@@ -138,6 +138,7 @@
                 private const string HEADING_DIMENSIONS = "HEADING";
                 private const string CHARSET = "CHARSET";
                 private const string TABLEID = "TABLEID";
+                private const string DESCRIPTION = "DESCRIPTION";
 
                 public string Data { get; set; } = DATA;
                 public string CodePage { get; set; } = CODEPAGE;
@@ -158,6 +159,7 @@
                 public string HeadingDimensions { get; set; } = HEADING_DIMENSIONS;
                 public string Charset { get; set; } = CHARSET;
                 public string TableId { get; set; } = TABLEID;
+                public string Description { get; set; } = DESCRIPTION;
 
                 private KeyWordTokens() { }
 

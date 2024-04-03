@@ -1,5 +1,6 @@
 ﻿using PxUtils.PxFile;
 using PxUtils.Validation.SyntaxValidation;
+using System.Text;
 
 namespace PxUtils.Validation.ContentValidation
 {
@@ -8,14 +9,15 @@ namespace PxUtils.Validation.ContentValidation
     {
         // TODO: Add summary
         public static void ValidatePxFileContent(
-            string _filename,
-            ValidationStructuredEntry[] entries, 
-            PxFileSyntaxConf syntaxConf, 
+            string filename,
+            ValidationStructuredEntry[] entries,
+            PxFileSyntaxConf syntaxConf,
             ref List<ValidationFeedbackItem> feedbackItems,
+            Encoding encoding,
             CustomContentValidationFunctions? customContentValidationFunctions = null
             )
         {
-            ContentValidationInfo contentValidationInfo = new(_filename);
+            ContentValidationInfo contentValidationInfo = new(filename, encoding);
             ContentValidationFunctions contentValidationFunctions = new();
 
             IEnumerable<ContentValidationEntryFunctionDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;

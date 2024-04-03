@@ -71,5 +71,6 @@
         MultipleInstancesOfUniqueKey = 42,
         MissingStubAndHeading = 43,
         VariableValuesMissing = 44,
+        ValueIsNotInUpperCase = 45
     }
 }
