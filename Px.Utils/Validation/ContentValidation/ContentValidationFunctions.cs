@@ -5,7 +5,9 @@ namespace PxUtils.Validation.ContentValidation
 {
     public delegate ValidationFeedbackItem[]? ContentValidationEntryFunctionDelegate(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info);
     public delegate ValidationFeedbackItem[]? ContentValidationSearchFunctionDelegate(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info); 
-    internal class ContentValidationFunctions
+    
+    // TODO: Summary
+    public class ContentValidationFunctions
     {
         public List<ContentValidationEntryFunctionDelegate> DefaultContentValidationEntryFunctions { get; }
         public List<ContentValidationSearchFunctionDelegate> DefaultContentValidationSearchFunctions { get; }
@@ -125,8 +127,8 @@ namespace PxUtils.Validation.ContentValidation
                     new ValidationFeedbackItem(
                     new ContentValidationObject(info.Filename, 0, []),
                     new ValidationFeedback(
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.RequiredKeyMissing,
+                        ValidationFeedbackLevel.Warning,
+                        ValidationFeedbackRule.RecommendedKeyMissing,
                         0,
                         0,
                         syntaxConf.Tokens.KeyWords.AvailableLanguages
@@ -174,30 +176,35 @@ namespace PxUtils.Validation.ContentValidation
         public static ValidationFeedbackItem[]? ValidateFindContentDimension(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             ValidationStructuredEntry[] contentDimensionEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.ContentVariableIdentifier)).ToArray();
-            if (contentDimensionEntries.Length == 0)
-            {
-                return [
-                    new ValidationFeedbackItem(
-                    new ContentValidationObject(info.Filename, 0, []),
-                    new ValidationFeedback(
-                        ValidationFeedbackLevel.Warning,
-                        ValidationFeedbackRule.RecommendedKeyMissing,
-                        0,
-                        0,
-                        $"{syntaxConf.Tokens.KeyWords.ContentVariableIdentifier}"
-                        )
-                    ),
-                ];
-            }
 
             string defaultLanguage = info.DefaultLanguage is not null ? info.DefaultLanguage : string.Empty;
+            string[] languages = info.AvailableLanguages is not null ? info.AvailableLanguages : [defaultLanguage];
+            foreach (string language in languages)
+            {
+                ValidationStructuredEntry? contentDimension = Array.Find(contentDimensionEntries, c => c.Key.Language == language || (c.Key.Language is null && language == defaultLanguage));
+                if (contentDimension is null)
+                {
+                    return [
+                        new ValidationFeedbackItem(
+                        new ContentValidationObject(info.Filename, 0, []),
+                        new ValidationFeedback(
+                            ValidationFeedbackLevel.Warning,
+                            ValidationFeedbackRule.RecommendedKeyMissing,
+                            0,
+                            0,
+                            $"{syntaxConf.Tokens.KeyWords.ContentVariableIdentifier}, {language}"
+                            )
+                        ),
+                    ];
+                }
+            }
 
-            info.ContentDimensionEntry = contentDimensionEntries.ToDictionary(
+            info.ContentDimensionEntries = contentDimensionEntries.ToDictionary(
                 e => e.Key.Language is not null ? 
                 e.Key.Language : 
                 defaultLanguage, 
                 e => e.Value);
-
+            
             return null;
         }
 
@@ -278,9 +285,9 @@ namespace PxUtils.Validation.ContentValidation
             {
                 foreach (string language in info.AvailableLanguages)
                 {
-                    if ((info.StubDimensions is not null && !info.StubDimensions.ContainsKey(language))
+                    if ((info.StubDimensions is null || !info.StubDimensions.ContainsKey(language))
                         &&
-                        (info.HeadingDimensions is not null && !info.HeadingDimensions.ContainsKey(language)))
+                        (info.HeadingDimensions is null || !info.HeadingDimensions.ContainsKey(language)))
                     {
                         return [
                             new ValidationFeedbackItem(
@@ -400,17 +407,25 @@ namespace PxUtils.Validation.ContentValidation
         // TODO: Summary
         public static ValidationFeedbackItem[]? ValidateFindContentDimensionKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
-            if (info.ContentDimensionEntry is null || info.DimensionValues is null)
+            if (info.ContentDimensionEntries is null || info.DimensionValues is null)
             {
                 return null;
             }
 
             List<ValidationFeedbackItem> feedbackItems = [];
 
-            ValidationStructuredEntry[] unitsEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.Units)).ToArray();
-            ValidationStructuredEntry[] lastUpdatedEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.LastUpdated)).ToArray();
-            ValidationStructuredEntry[] precisionEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.Precision)).ToArray();
-            string[] contentDimensionNames = [.. info.ContentDimensionEntry.Values];
+            string[] languageSpecificKeywords =
+                [
+                    syntaxConf.Tokens.KeyWords.Units,
+                ];
+
+            string[] commonEntries =
+                [
+                    syntaxConf.Tokens.KeyWords.LastUpdated,
+                    syntaxConf.Tokens.KeyWords.Precision
+                ];
+
+            string[] contentDimensionNames = [.. info.ContentDimensionEntries.Values];
 
             Dictionary<KeyValuePair<string, string>, string[]> contentDimensionValueNames = [];
             foreach(KeyValuePair<KeyValuePair<string, string>, string[]> item in info.DimensionValues.Where(
@@ -421,142 +436,58 @@ namespace PxUtils.Validation.ContentValidation
 
             string defaultLanguage = info.DefaultLanguage is not null ? info.DefaultLanguage : string.Empty;
 
-            string[][] dimensionValues = info.DimensionValues.Values.Select(v => v).ToArray();
-
             if (contentDimensionNames.Length > 0)
             {
                 foreach (KeyValuePair<string, string> kvp in contentDimensionValueNames.Keys)
                 {
-                    ValidationStructuredEntry? unitEntry = Array.Find(unitsEntries,
-                        e => (e.Key.Language == kvp.Key || (kvp.Key == defaultLanguage && e.Key.Language is null)) &&
-                        (e.Key.FirstSpecifier == kvp.Value ||
-                        Array.Exists(dimensionValues, v => v.Contains(e.Key.FirstSpecifier is not null ? e.Key.FirstSpecifier : string.Empty))));
-
-                    if (unitEntry is null)
+                    foreach (string keyword in languageSpecificKeywords)
                     {
-                        feedbackItems.Add(
-                            new ValidationFeedbackItem(
-                                new ContentValidationObject(info.Filename, 0, []),
-                                new ValidationFeedback(
-                                    ValidationFeedbackLevel.Error,
-                                    ValidationFeedbackRule.RequiredKeyMissing,
-                                    0,
-                                    0,
-                                    $"{syntaxConf.Tokens.KeyWords.Units}, {kvp.Key}, {kvp.Value}"
-                                    )
-                                )
-                            );
-                    }
-                    else if (unitEntry.Key.SecondSpecifier is null)
-                    {
-                        KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                            unitEntry.KeyStartLineIndex,
-                            0,
-                            unitEntry.LineChangeIndexes);
-
-                        feedbackItems.Add(
-                            new ValidationFeedbackItem(
-                                unitEntry,
-                                new ValidationFeedback(
-                                    ValidationFeedbackLevel.Warning,
-                                    ValidationFeedbackRule.UnrecommendedSpecifierDefinitionFound,
-                                    feedbackIndexes.Key,
-                                    0,
-                                    $"{syntaxConf.Tokens.KeyWords.Units}, {kvp.Key}, {kvp.Value}"
-                                    )
-                                ));
+                        ValidationFeedbackItem? issue = ContentValidationUtilityMethods.FindContentVariableKey(entries, keyword, kvp, defaultLanguage, info.Filename);
+                        if (issue is not null)
+                        {
+                            feedbackItems.Add((ValidationFeedbackItem)issue);
+                        }
                     }
 
                     if (kvp.Key == defaultLanguage)
                     {
-                        ValidationStructuredEntry? lastUpdatedEntry = Array.Find(lastUpdatedEntries,
-                        e => (e.Key.Language == kvp.Key || (kvp.Key == defaultLanguage && e.Key.Language is null)) &&
-                        (e.Key.FirstSpecifier == kvp.Value ||
-                        Array.Exists(dimensionValues, v => v.Contains(e.Key.FirstSpecifier is not null ? e.Key.FirstSpecifier : string.Empty))));
-
-                        if (lastUpdatedEntry is null)
+                        foreach(string keyword in commonEntries)
                         {
-                            feedbackItems.Add(
-                                new ValidationFeedbackItem(
-                                    new ContentValidationObject(info.Filename, 0, []),
-                                    new ValidationFeedback(
-                                        ValidationFeedbackLevel.Error,
-                                        ValidationFeedbackRule.RequiredKeyMissing,
-                                        0,
-                                        0,
-                                        $"{syntaxConf.Tokens.KeyWords.LastUpdated}, {kvp.Key}, {kvp.Value}"
-                                        )
-                                    )
-                                );
-                        }
-
-                        ValidationStructuredEntry? precisionEntry = Array.Find(precisionEntries,
-                        e => (e.Key.Language == kvp.Key || (kvp.Key == defaultLanguage && e.Key.Language is null)) &&
-                        (e.Key.FirstSpecifier == kvp.Value ||
-                        Array.Exists(dimensionValues, v => v.Contains(e.Key.FirstSpecifier is not null ? e.Key.FirstSpecifier : string.Empty))));
-
-                        if (precisionEntry is null)
-                        {
-                            feedbackItems.Add(
-                                    new ValidationFeedbackItem(
-                                        new ContentValidationObject(info.Filename, 0, []),
-                                        new ValidationFeedback(
-                                            ValidationFeedbackLevel.Error,
-                                            ValidationFeedbackRule.RequiredKeyMissing,
-                                            0,
-                                            0,
-                                            $"{syntaxConf.Tokens.KeyWords.Precision}, {kvp.Key}, {kvp.Value}"
-                                            )
-                                        )
-                                    );
+                            ValidationFeedbackItem? issue = ContentValidationUtilityMethods.FindContentVariableKey(entries, keyword, kvp, defaultLanguage, info.Filename);
+                            if (issue is not null)
+                            {
+                                feedbackItems.Add((ValidationFeedbackItem)issue);
+                            }
                         }
                     }
                 }
             }
 
-            ValidationStructuredEntry[] lastUpdatedEntriesWithLanguage = lastUpdatedEntries.Where(e => e.Key.Language is not null).ToArray();
-            ValidationStructuredEntry[] precisionEntriesWithLanguage = precisionEntries.Where(e => e.Key.Language is not null).ToArray();
-
-            foreach(ValidationStructuredEntry entry in lastUpdatedEntriesWithLanguage)
+            foreach (string keyword in commonEntries)
             {
-                KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    entry.KeyStartLineIndex,
-                    0,
-                    entry.LineChangeIndexes);
+                IEnumerable<ValidationStructuredEntry> entriesWithLanguage = entries.Where(
+                    e => e.Key.Keyword.Equals(keyword) && e.Key.Language is not null);
 
-                feedbackItems.Add(
-                    new ValidationFeedbackItem(
-                        entry,
-                        new ValidationFeedback(
-                            ValidationFeedbackLevel.Warning,
-                            ValidationFeedbackRule.UnrecommendedLanguageDefinitionFound,
-                            feedbackIndexes.Key,
-                            0,
-                            entry.Key.Language
+                foreach (ValidationStructuredEntry entry in entriesWithLanguage)
+                {
+                    KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
+                        entry.KeyStartLineIndex,
+                        0,
+                        entry.LineChangeIndexes);
+
+                    feedbackItems.Add(
+                        new ValidationFeedbackItem(
+                            entry,
+                            new ValidationFeedback(
+                                ValidationFeedbackLevel.Warning,
+                                ValidationFeedbackRule.UnrecommendedLanguageDefinitionFound,
+                                feedbackIndexes.Key,
+                                0,
+                                entry.Key.Language
+                                )
                             )
-                        )
-                    );
-            }
-
-            foreach(ValidationStructuredEntry entry in precisionEntriesWithLanguage)
-            {
-                KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    entry.KeyStartLineIndex,
-                    0,
-                    entry.LineChangeIndexes);
-
-                feedbackItems.Add(
-                    new ValidationFeedbackItem(
-                        entry,
-                        new ValidationFeedback(
-                            ValidationFeedbackLevel.Warning,
-                            ValidationFeedbackRule.UnrecommendedLanguageDefinitionFound,
-                            feedbackIndexes.Key,
-                            0,
-                            entry.Key.Language
-                            )
-                        )
-                    );
+                        );
+                }
             }
 
             return [.. feedbackItems];
@@ -565,119 +496,66 @@ namespace PxUtils.Validation.ContentValidation
         // TODO: Summary
         public static ValidationFeedbackItem[]? ValidateFindDimensionRecommendedKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
-            if ((info.StubDimensions is null && info.HeadingDimensions is null) || info.AvailableLanguages is null)
+            if (info.StubDimensions is null && info.HeadingDimensions is null)
             {
                 return null;
             }
 
             List<ValidationFeedbackItem> feedbackItems = [];
 
-            ValidationStructuredEntry[] dimensionCodeEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.DimensionCode)).ToArray();
-            ValidationStructuredEntry[] valueCodeEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.VariableValueCodes)).ToArray();
-            ValidationStructuredEntry[] dimensionTypeEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.DimensionType)).ToArray();
-            ValidationStructuredEntry[] timevalEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.TimeVal)).ToArray();
+            string[] dimensionRecommendedKeywords =
+                [
+                    syntaxConf.Tokens.KeyWords.DimensionCode,
+                    syntaxConf.Tokens.KeyWords.VariableValueCodes
+                ];
 
             Dictionary<string, string[]> stubDimensions = info.StubDimensions is not null ? info.StubDimensions : [];
             Dictionary<string, string[]> headingDimensions = info.HeadingDimensions is not null ? info.HeadingDimensions : [];
-            Dictionary<string, string[]> dimensions = [];
+            Dictionary<string, string[]> allDimensions = [];
             
             foreach(KeyValuePair<string, string[]> item in stubDimensions)
             {
-                dimensions.Add(item.Key, item.Value);
+                allDimensions.Add(item.Key, item.Value);
             }
             foreach(KeyValuePair<string, string[]> item in headingDimensions)
             {
-                if (dimensions.TryGetValue(item.Key, out string[]? value))
+                if (allDimensions.TryGetValue(item.Key, out string[]? value))
                 {
-                    dimensions[item.Key] = [.. value.Concat(item.Value)];
+                    allDimensions[item.Key] = [.. value.Concat(item.Value)];
                 }
                 else
                 {
-                    dimensions.Add(item.Key, item.Value);
+                    allDimensions.Add(item.Key, item.Value);
                 }
             }
 
             string defaultLanguage = info.DefaultLanguage is not null ? info.DefaultLanguage : string.Empty;
 
-            foreach(string language in info.AvailableLanguages)
+            foreach (KeyValuePair<string, string[]> languageDimensions in allDimensions)
             {
-                ValidationStructuredEntry? timevalEntry = Array.Find(timevalEntries,
-                    e => (language == defaultLanguage && e.Key.Language is null) || language == e.Key.Language
-                );
-
-                if (timevalEntry is null)
+                ValidationFeedbackItem? timeValFeedback = ContentValidationUtilityMethods.FindDimensionRecommendedKey(entries, syntaxConf.Tokens.KeyWords.TimeVal, languageDimensions.Key, defaultLanguage, info.Filename);
+                if (timeValFeedback is not null)
                 {
-                    feedbackItems.Add(
-                        new ValidationFeedbackItem(
-                            new ContentValidationObject(info.Filename, 0, []),
-                            new ValidationFeedback(
-                                ValidationFeedbackLevel.Warning,
-                                ValidationFeedbackRule.RecommendedKeyMissing,
-                                0,
-                                0,
-                                $"{language}: {syntaxConf.Tokens.KeyWords.TimeVal}")
-                            )
-                        );
+                    feedbackItems.Add((ValidationFeedbackItem)timeValFeedback);
                 }
 
-                foreach(KeyValuePair<string, string[]> dimension in dimensions.Where(d => d.Key == language))
+                foreach (string dimension in languageDimensions.Value)
                 {
-                    ValidationStructuredEntry? dimensionCodeEntry = Array.Find(dimensionCodeEntries,
-                        e => (language == defaultLanguage && e.Key.Language is null) || language == e.Key.Language
-                    );
-
-                    if (dimensionCodeEntry is null)
+                    foreach (string keyword in dimensionRecommendedKeywords)
                     {
-                        feedbackItems.Add(
-                            new ValidationFeedbackItem(
-                                new ContentValidationObject(info.Filename, 0, []),
-                                new ValidationFeedback(
-                                    ValidationFeedbackLevel.Warning,
-                                    ValidationFeedbackRule.RecommendedKeyMissing,
-                                    0,
-                                    0,
-                                    $"{language}: {syntaxConf.Tokens.KeyWords.DimensionCode}")
-                                )
-                            );
-                    }
-
-                    ValidationStructuredEntry? valueCodeEntry = Array.Find(valueCodeEntries,
-                        e => (language == defaultLanguage && e.Key.Language is null) || language == e.Key.Language
-                    );
-
-                    if (valueCodeEntry is null)
-                    {
-                        feedbackItems.Add(
-                            new ValidationFeedbackItem(
-                                new ContentValidationObject(info.Filename, 0, []),
-                                new ValidationFeedback(
-                                    ValidationFeedbackLevel.Warning,
-                                    ValidationFeedbackRule.RecommendedKeyMissing,
-                                    0,
-                                    0,
-                                    $"{language}: {syntaxConf.Tokens.KeyWords.VariableValueCodes}")
-                                )
-                            );
-                    }
-
-                    if (language == defaultLanguage)
-                    {
-                        ValidationStructuredEntry? dimensionTypeEntry = Array.Find(dimensionTypeEntries,
-                            e => e.Key.Language is null);
-
-                        if (dimensionTypeEntry is null)
+                        ValidationFeedbackItem? keywordFeedback = ContentValidationUtilityMethods.FindDimensionRecommendedKey(entries, keyword, languageDimensions.Key, defaultLanguage, info.Filename, dimension);
+                        if (keywordFeedback is not null)
                         {
-                            feedbackItems.Add(
-                                new ValidationFeedbackItem(
-                                    new ContentValidationObject(info.Filename, 0, []),
-                                    new ValidationFeedback(
-                                        ValidationFeedbackLevel.Warning,
-                                        ValidationFeedbackRule.RecommendedKeyMissing,
-                                        0,
-                                        0,
-                                        $"{language}: {syntaxConf.Tokens.KeyWords.DimensionType}")
-                                    )
-                                );
+                            feedbackItems.Add((ValidationFeedbackItem)keywordFeedback);
+                        }
+                    }
+
+                    if (languageDimensions.Key == defaultLanguage)
+                    {
+                        ValidationFeedbackItem? variableTypeFeedback = ContentValidationUtilityMethods.FindDimensionRecommendedKey(entries, syntaxConf.Tokens.KeyWords.DimensionType, languageDimensions.Key, defaultLanguage, info.Filename, dimension);
+                        if (variableTypeFeedback is not null)
+                        {
+                            feedbackItems.Add((ValidationFeedbackItem)variableTypeFeedback);
                         }
                     }
                 }
@@ -820,12 +698,13 @@ namespace PxUtils.Validation.ContentValidation
         public static ValidationFeedbackItem[]? ValidateSpecifiers(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             List<ValidationFeedbackItem> feedbackItems = [];
-            if (entry.Key.FirstSpecifier is null && entry.Key.SecondSpecifier is null)
+            if ((entry.Key.FirstSpecifier is null && entry.Key.SecondSpecifier is null) || 
+                info.DimensionValues is null)
             {
                 return null;
             }
 
-            // Content dimensions specifiers are allowed to be defined using only the first specifier at value level and are checked separately
+            // Content dimension specifiers are allowed to be defined using only the first specifier at value level and are checked separately
             string[] excludeKeywords =
                 [
                     syntaxConf.Tokens.KeyWords.Precision,
@@ -840,8 +719,8 @@ namespace PxUtils.Validation.ContentValidation
                 return null;
             }
 
-            if ((info.StubDimensions is not null && !info.StubDimensions.Values.Any(v => v.Contains(entry.Key.FirstSpecifier))) &&
-                (info.HeadingDimensions is not null && !info.HeadingDimensions.Values.Any(v => v.Contains(entry.Key.FirstSpecifier))))
+            if ((info.StubDimensions is null || !info.StubDimensions.Values.Any(v => v.Contains(entry.Key.FirstSpecifier))) &&
+                (info.HeadingDimensions is null || !info.HeadingDimensions.Values.Any(v => v.Contains(entry.Key.FirstSpecifier))))
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
@@ -858,8 +737,7 @@ namespace PxUtils.Validation.ContentValidation
                             entry.Key.FirstSpecifier))
                         );
             }
-            else if (info.DimensionValues is not null &&
-                entry.Key.SecondSpecifier is not null && 
+            else if (entry.Key.SecondSpecifier is not null && 
                 !info.DimensionValues.Values.Any(v => v.Contains(entry.Key.SecondSpecifier)))
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
@@ -1100,7 +978,7 @@ namespace PxUtils.Validation.ContentValidation
                     entry,
                     new ValidationFeedback(
                         ValidationFeedbackLevel.Warning,
-                        ValidationFeedbackRule.ValueIsNotInUpperCase,
+                        ValidationFeedbackRule.LowerCaseValueFound,
                         feebackIndexes.Key,
                         0,
                         $"{entry.Key.Keyword}: {entry.Value}"))];
