@@ -5,7 +5,6 @@ using System.Reflection;
 using PxUtils.Validation;
 using PxUtils.PxFile;
 using PxUtils.PxFile.Meta;
-using System.Collections.Generic;
 
 namespace PxUtils.UnitTests.SyntaxValidationTests
 {

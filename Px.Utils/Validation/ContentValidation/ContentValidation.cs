@@ -74,14 +74,14 @@ namespace PxUtils.Validation.ContentValidation
                 contentValidationSearchFunctions = contentValidationSearchFunctions.Concat(customContentValidationFunctions.CustomContentValidationSearchFunctions);
             }
 
-            var searchTasks = contentValidationSearchFunctions.Select(searchFunction => Task.Run(() => searchFunction(entries, syntaxConf, ref contentValidationInfo)));
+            IEnumerable<Task<ValidationFeedbackItem[]?>> searchTasks = contentValidationSearchFunctions.Select(searchFunction => Task.Run(() => searchFunction(entries, syntaxConf, ref contentValidationInfo)));
 
             await Task.WhenAll(searchTasks);
 
             searchTasks.Select(task => task.Result).ToList().ForEach(feedback => 
                 feedbackItems.AddRange(feedback is not null ? feedback : []));
 
-            var entryTasks = contentValidationEntryFunctions.SelectMany(entryFunction => entries.Select(entry => Task.Run(() => entryFunction(entry, syntaxConf, ref contentValidationInfo))));
+            IEnumerable<Task<ValidationFeedbackItem[]?>> entryTasks = contentValidationEntryFunctions.SelectMany(entryFunction => entries.Select(entry => Task.Run(() => entryFunction(entry, syntaxConf, ref contentValidationInfo))));
 
             await Task.WhenAll(entryTasks);
 

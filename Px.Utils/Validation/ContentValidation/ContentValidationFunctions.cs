@@ -141,7 +141,12 @@ namespace PxUtils.Validation.ContentValidation
         {
             if (info.AvailableLanguages is not null && !info.AvailableLanguages.Contains(info.DefaultLanguage))
             {
-                ValidationStructuredEntry defaultLanguageEntry = entries.First(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.DefaultLanguage));
+                ValidationStructuredEntry? defaultLanguageEntry = Array.Find(entries, e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.DefaultLanguage));
+
+                if (defaultLanguageEntry is null)
+                {
+                    return null;
+                }
                 
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     defaultLanguageEntry.KeyStartLineIndex,
@@ -422,7 +427,7 @@ namespace PxUtils.Validation.ContentValidation
             {
                 foreach (KeyValuePair<string, string> kvp in contentDimensionValueNames.Keys)
                 {
-                    var unitEntry = Array.Find(unitsEntries,
+                    ValidationStructuredEntry? unitEntry = Array.Find(unitsEntries,
                         e => (e.Key.Language == kvp.Key || (kvp.Key == defaultLanguage && e.Key.Language is null)) &&
                         (e.Key.FirstSpecifier == kvp.Value ||
                         Array.Exists(dimensionValues, v => v.Contains(e.Key.FirstSpecifier is not null ? e.Key.FirstSpecifier : string.Empty))));
@@ -437,7 +442,7 @@ namespace PxUtils.Validation.ContentValidation
                                     ValidationFeedbackRule.RequiredKeyMissing,
                                     0,
                                     0,
-                                    $"{kvp.Key}, {kvp.Value}"
+                                    $"{syntaxConf.Tokens.KeyWords.Units}, {kvp.Key}, {kvp.Value}"
                                     )
                                 )
                             );
@@ -457,7 +462,7 @@ namespace PxUtils.Validation.ContentValidation
                                     ValidationFeedbackRule.UnrecommendedSpecifierDefinitionFound,
                                     feedbackIndexes.Key,
                                     0,
-                                    $"{kvp.Key}, {kvp.Value}"
+                                    $"{syntaxConf.Tokens.KeyWords.Units}, {kvp.Key}, {kvp.Value}"
                                     )
                                 ));
                     }
@@ -479,7 +484,7 @@ namespace PxUtils.Validation.ContentValidation
                                         ValidationFeedbackRule.RequiredKeyMissing,
                                         0,
                                         0,
-                                        $"{kvp.Key}, {kvp.Value}: {syntaxConf.Tokens.KeyWords.LastUpdated}"
+                                        $"{syntaxConf.Tokens.KeyWords.LastUpdated}, {kvp.Key}, {kvp.Value}"
                                         )
                                     )
                                 );
@@ -500,7 +505,7 @@ namespace PxUtils.Validation.ContentValidation
                                             ValidationFeedbackRule.RequiredKeyMissing,
                                             0,
                                             0,
-                                            $"{kvp.Key}, {kvp.Value}: {syntaxConf.Tokens.KeyWords.Precision}"
+                                            $"{syntaxConf.Tokens.KeyWords.Precision}, {kvp.Key}, {kvp.Value}"
                                             )
                                         )
                                     );
@@ -615,7 +620,7 @@ namespace PxUtils.Validation.ContentValidation
                         );
                 }
 
-                foreach(var dimension in dimensions.Where(d => d.Key == language))
+                foreach(KeyValuePair<string, string[]> dimension in dimensions.Where(d => d.Key == language))
                 {
                     ValidationStructuredEntry? dimensionCodeEntry = Array.Find(dimensionCodeEntries,
                         e => (language == defaultLanguage && e.Key.Language is null) || language == e.Key.Language
@@ -655,23 +660,25 @@ namespace PxUtils.Validation.ContentValidation
                             );
                     }
 
-                    ValidationStructuredEntry? dimensionTypeEntry = Array.Find(dimensionTypeEntries,
-                        e => (language == defaultLanguage && e.Key.Language is null) || language == e.Key.Language
-                    );
-
-                    if (dimensionTypeEntry is null)
+                    if (language == defaultLanguage)
                     {
-                        feedbackItems.Add(
-                            new ValidationFeedbackItem(
-                                new ContentValidationObject(info.Filename, 0, []),
-                                new ValidationFeedback(
-                                    ValidationFeedbackLevel.Warning,
-                                    ValidationFeedbackRule.RecommendedKeyMissing,
-                                    0,
-                                    0,
-                                    $"{language}: {syntaxConf.Tokens.KeyWords.DimensionType}")
-                                )
-                            );
+                        ValidationStructuredEntry? dimensionTypeEntry = Array.Find(dimensionTypeEntries,
+                            e => e.Key.Language is null);
+
+                        if (dimensionTypeEntry is null)
+                        {
+                            feedbackItems.Add(
+                                new ValidationFeedbackItem(
+                                    new ContentValidationObject(info.Filename, 0, []),
+                                    new ValidationFeedback(
+                                        ValidationFeedbackLevel.Warning,
+                                        ValidationFeedbackRule.RecommendedKeyMissing,
+                                        0,
+                                        0,
+                                        $"{language}: {syntaxConf.Tokens.KeyWords.DimensionType}")
+                                    )
+                                );
+                        }
                     }
                 }
             }
