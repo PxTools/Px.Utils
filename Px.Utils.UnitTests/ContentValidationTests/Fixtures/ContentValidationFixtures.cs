@@ -413,7 +413,6 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
             {
                 unitsBarFooEntry,
                 precisionBarFooEntry,
-                precisionBarFooEnEntry
             };
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_INCOMPLETE_VARIABLE_RECOMMENDED_KEYS =>

@@ -1,5 +1,7 @@
-﻿using PxUtils.PxFile;
+﻿using PxUtils.Models.Metadata.Dimensions;
+using PxUtils.PxFile;
 using PxUtils.Validation.SyntaxValidation;
+using System.Collections.Generic;
 
 namespace PxUtils.Validation.ContentValidation
 {
@@ -28,9 +30,15 @@ namespace PxUtils.Validation.ContentValidation
                         e.Key.FirstSpecifier.Equals(dimension));
                     if (valuesEntry is not null)
                     {
+                        string[] values = valuesEntry.Value.Split(syntaxConf.Symbols.Value.ListSeparator);
+                        for(int i = 0; i < values.Length; i++)
+                        {
+                            values[i] = SyntaxValidationUtilityMethods.CleanString(values[i], syntaxConf);
+                        }
+
                         variableValues.Add(
                             new KeyValuePair<string, string> ( language, dimension ),
-                            valuesEntry.Value.Split(syntaxConf.Symbols.Value.ListSeparator)
+                            values
                             );
                     }
                     else
@@ -48,16 +56,16 @@ namespace PxUtils.Validation.ContentValidation
                     }
                 }
             }
-
             return variableValues;
         }
 
-        internal static ValidationFeedbackItem? FindContentVariableKey(ValidationStructuredEntry[] entries, string keyword, KeyValuePair<string, string> kvp, string defaultLanguage, string filename)
+        internal static ValidationFeedbackItem? FindContentVariableKey(ValidationStructuredEntry[] entries, string keyword, string language, string dimensionName, string dimensionValueName, string defaultLanguage, string filename)
         {
             ValidationStructuredEntry? entry = Array.Find(entries,
                             e => e.Key.Keyword.Equals(keyword) &&
-                            (e.Key.Language == kvp.Key || (kvp.Key == defaultLanguage && e.Key.Language is null)) &&
-                            (e.Key.FirstSpecifier == kvp.Value || e.Key.FirstSpecifier is null));
+                            (e.Key.Language == language || (language == defaultLanguage && e.Key.Language is null)) &&
+                            (e.Key.FirstSpecifier == dimensionName || e.Key.FirstSpecifier == dimensionValueName) &&
+                            (e.Key.SecondSpecifier == dimensionValueName || e.Key.SecondSpecifier == null));
 
             if (entry is null)
             {
@@ -69,7 +77,7 @@ namespace PxUtils.Validation.ContentValidation
                             ValidationFeedbackRule.RequiredKeyMissing,
                             0,
                             0,
-                            $"{keyword}, {kvp.Key}, {kvp.Value}"
+                            $"{keyword}, {language}, {dimensionName}, {dimensionValueName}"
                             )
                         );
             }
@@ -88,7 +96,7 @@ namespace PxUtils.Validation.ContentValidation
                             ValidationFeedbackRule.UnrecommendedSpecifierDefinitionFound,
                             feedbackIndexes.Key,
                             0,
-                            $"{keyword}, {kvp.Key}, {kvp.Value}"
+                            $"{keyword}, {language}, {dimensionName}, {dimensionValueName}"
                             )
                         );
             }
@@ -112,7 +120,7 @@ namespace PxUtils.Validation.ContentValidation
                             ValidationFeedbackRule.RecommendedKeyMissing,
                             0,
                             0,
-                            $"{language}: {keyword}")
+                            $"{language}, {keyword}, {dimensionName}")
                         );
             }
 

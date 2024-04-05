@@ -261,8 +261,8 @@ namespace PxUtils.UnitTests.ContentValidationTests
                 },
                 DimensionValues = new()
                 {
-                    { new KeyValuePair<string, string>( "fi", "bar" ), [] },
-                    { new KeyValuePair<string, string>( "en", "bar-en" ), [] },
+                    { new KeyValuePair<string, string>( "fi", "bar" ), ["foo"] },
+                    { new KeyValuePair<string, string>( "en", "bar-en" ), ["foo-en"] },
                 }
             };
 
@@ -275,10 +275,9 @@ namespace PxUtils.UnitTests.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(3, result.Length);
+            Assert.AreEqual(2, result.Length);
             Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result[0].Feedback.Rule);
             Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result[1].Feedback.Rule);
-            Assert.AreEqual(ValidationFeedbackRule.UnrecommendedLanguageDefinitionFound, result[2].Feedback.Rule);
         }
 
         [TestMethod]

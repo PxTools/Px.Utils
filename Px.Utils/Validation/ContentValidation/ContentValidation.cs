@@ -1,14 +1,23 @@
 ﻿using PxUtils.PxFile;
 using PxUtils.Validation.SyntaxValidation;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PxUtils.Validation.ContentValidation
 {
-    // TODO: Add summary
+    /// <summary>
+    /// Methods for validating the content of Px file metadata
+    /// </summary>
     public static class ContentValidation
     {
-        // TODO: Add summary
+        /// <summary>
+        /// Blocking function for validating contents of a Px file metadata
+        /// </summary>
+        /// <param name="filename">Name of the file being validated</param>
+        /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that defines keywords and symbols for Px file syntax</param>
+        /// <param name="feedbackItems">List of <see cref="ValidationFeedbackItem"/> objects. Any issues found during the validation process will be added to this list</param>
+        /// <param name="encoding">Encoding format of the Px file</param>
+        /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
         public static void ValidatePxFileContent(
             string filename,
             ValidationStructuredEntry[] entries,
@@ -51,7 +60,17 @@ namespace PxUtils.Validation.ContentValidation
             }
         }
 
-        // TODO: Add summary
+        /// <summary>
+        /// Asynchronous function for validating contents of a Px file metadata
+        /// </summary>
+        /// <param name="filename">Name of the file being validated</param>
+        /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that defines keywords and symbols for Px file syntax</param>
+        /// <param name="feedbackItems">List of <see cref="ValidationFeedbackItem"/> objects. Any issues found during the validation process will be added to this list</param>
+        /// <param name="encoding">Encoding format of the Px file</param>
+        /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
+        /// <param name="cancellationToken">Cancellation token for cancelling the validation process</param>
+        /// <returns>Array of <see cref="ValidationFeedbackItem"/> objects. Any issues found during validation will be listed here</returns>
         public static async Task<ValidationFeedbackItem[]> ValidatePxFileContentAsync(
             string filename,
             ValidationStructuredEntry[] entries,

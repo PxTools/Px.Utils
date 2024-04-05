@@ -6,7 +6,9 @@ namespace PxUtils.Validation.ContentValidation
     public delegate ValidationFeedbackItem[]? ContentValidationEntryFunctionDelegate(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info);
     public delegate ValidationFeedbackItem[]? ContentValidationSearchFunctionDelegate(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info); 
     
-    // TODO: Summary
+    /// <summary>
+    /// Collection of functions for validating Px file metadata contents
+    /// </summary>
     public class ContentValidationFunctions
     {
         public List<ContentValidationEntryFunctionDelegate> DefaultContentValidationEntryFunctions { get; }
@@ -40,12 +42,12 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Validates that default language is defined properly in the Px file metadata
         /// </summary>
-        /// <param name="entries"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns>Null of no issues are found. <see cref="ValidationFeedbackItem"/> objects are returned if entry defining default language is not found or if more than one are found.</returns>
         public static ValidationFeedbackItem[]? ValidateFindDefaultLanguage(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             ValidationStructuredEntry[] langEntries = entries.Where(
@@ -90,7 +92,13 @@ namespace PxUtils.Validation.ContentValidation
             return null;
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entries"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateFindAvailableLanguages(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             ValidationStructuredEntry[] availableLanguageEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.AvailableLanguages)).ToArray();
@@ -138,7 +146,13 @@ namespace PxUtils.Validation.ContentValidation
             }
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entries"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateDefaultLanguageDefinedInAvailableLanguages(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             if (info.AvailableLanguages is not null && !info.AvailableLanguages.Contains(info.DefaultLanguage))
@@ -172,7 +186,13 @@ namespace PxUtils.Validation.ContentValidation
             return null;
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entries"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateFindContentDimension(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             ValidationStructuredEntry[] contentDimensionEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.ContentVariableIdentifier)).ToArray();
@@ -208,7 +228,13 @@ namespace PxUtils.Validation.ContentValidation
             return null;
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entries"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateFindRequiredCommonKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             List<ValidationFeedbackItem> feedbackItems = [];
@@ -241,7 +267,13 @@ namespace PxUtils.Validation.ContentValidation
             return [.. feedbackItems];
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entries"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateFindStubOrHeading(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             ValidationStructuredEntry[] stubEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.StubDimensions)).ToArray();
@@ -308,7 +340,13 @@ namespace PxUtils.Validation.ContentValidation
             return null;
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entries"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateFindRecommendedKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             List<ValidationFeedbackItem> feedbackItems = [];
@@ -358,7 +396,7 @@ namespace PxUtils.Validation.ContentValidation
                                         ValidationFeedbackRule.RecommendedKeyMissing,
                                         0,
                                         0,
-                                        $"{language}: {keyword}"
+                                        $"{language}, {keyword}"
                                         )
                                     )
                                 );
@@ -370,7 +408,13 @@ namespace PxUtils.Validation.ContentValidation
             return [.. feedbackItems];
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entries"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateFindDimensionValues(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             List<ValidationFeedbackItem> feedbackItems = [];
@@ -404,7 +448,13 @@ namespace PxUtils.Validation.ContentValidation
             return [.. feedbackItems];
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entries"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateFindContentDimensionKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             if (info.ContentDimensionEntries is null || info.DimensionValues is null)
@@ -419,7 +469,7 @@ namespace PxUtils.Validation.ContentValidation
                     syntaxConf.Tokens.KeyWords.Units,
                 ];
 
-            string[] commonEntries =
+            string[] commonKeywords =
                 [
                     syntaxConf.Tokens.KeyWords.LastUpdated,
                     syntaxConf.Tokens.KeyWords.Precision
@@ -438,62 +488,47 @@ namespace PxUtils.Validation.ContentValidation
 
             if (contentDimensionNames.Length > 0)
             {
-                foreach (KeyValuePair<string, string> kvp in contentDimensionValueNames.Keys)
+                foreach (KeyValuePair<KeyValuePair<string, string>, string[]> kvp in contentDimensionValueNames)
                 {
-                    foreach (string keyword in languageSpecificKeywords)
-                    {
-                        ValidationFeedbackItem? issue = ContentValidationUtilityMethods.FindContentVariableKey(entries, keyword, kvp, defaultLanguage, info.Filename);
-                        if (issue is not null)
-                        {
-                            feedbackItems.Add((ValidationFeedbackItem)issue);
-                        }
-                    }
+                    string language = kvp.Key.Key;
+                    string dimensionName = kvp.Key.Value;
 
-                    if (kvp.Key == defaultLanguage)
+                    foreach (string dimensionValueName in kvp.Value)
                     {
-                        foreach(string keyword in commonEntries)
+                        foreach (string keyword in languageSpecificKeywords)
                         {
-                            ValidationFeedbackItem? issue = ContentValidationUtilityMethods.FindContentVariableKey(entries, keyword, kvp, defaultLanguage, info.Filename);
+                            ValidationFeedbackItem? issue = ContentValidationUtilityMethods.FindContentVariableKey(entries, keyword, language, dimensionName, dimensionValueName, defaultLanguage, info.Filename);
                             if (issue is not null)
                             {
                                 feedbackItems.Add((ValidationFeedbackItem)issue);
+                            }
+                        }
+
+                        if (language == defaultLanguage)
+                        {
+                            foreach (string keyword in commonKeywords)
+                            {
+                                ValidationFeedbackItem? issue = ContentValidationUtilityMethods.FindContentVariableKey(entries, keyword, language, dimensionName, dimensionValueName, defaultLanguage, info.Filename);
+                                if (issue is not null)
+                                {
+                                    feedbackItems.Add((ValidationFeedbackItem)issue);
+                                }
                             }
                         }
                     }
                 }
             }
 
-            foreach (string keyword in commonEntries)
-            {
-                IEnumerable<ValidationStructuredEntry> entriesWithLanguage = entries.Where(
-                    e => e.Key.Keyword.Equals(keyword) && e.Key.Language is not null);
-
-                foreach (ValidationStructuredEntry entry in entriesWithLanguage)
-                {
-                    KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                        entry.KeyStartLineIndex,
-                        0,
-                        entry.LineChangeIndexes);
-
-                    feedbackItems.Add(
-                        new ValidationFeedbackItem(
-                            entry,
-                            new ValidationFeedback(
-                                ValidationFeedbackLevel.Warning,
-                                ValidationFeedbackRule.UnrecommendedLanguageDefinitionFound,
-                                feedbackIndexes.Key,
-                                0,
-                                entry.Key.Language
-                                )
-                            )
-                        );
-                }
-            }
-
             return [.. feedbackItems];
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entries"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateFindDimensionRecommendedKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             if (info.StubDimensions is null && info.HeadingDimensions is null)
@@ -564,7 +599,13 @@ namespace PxUtils.Validation.ContentValidation
             return [.. feedbackItems];
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateUnexpectedSpecifiers(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             string[] noSpecifierAllowedKeywords =
@@ -607,7 +648,13 @@ namespace PxUtils.Validation.ContentValidation
             return null;
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateUnexpectedLanguageParams(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             string[] noLanguageParameterAllowedKeywords = [
@@ -645,7 +692,7 @@ namespace PxUtils.Validation.ContentValidation
                             ValidationFeedbackRule.IllegalLanguageDefinitionFound,
                             feedbackIndexes.Key,
                             0,
-                            $"{entry.Key.Keyword}: {entry.Key.Language}"))
+                            $"{entry.Key.Keyword}, {entry.Key.Language}, {entry.Key.FirstSpecifier}, {entry.Key.SecondSpecifier}"))
                         ];
                 }
                 else if (noLanguageParameterRecommendedKeywords.Contains(entry.Key.Keyword))
@@ -657,7 +704,7 @@ namespace PxUtils.Validation.ContentValidation
                             ValidationFeedbackRule.UnrecommendedLanguageDefinitionFound,
                             feedbackIndexes.Key,
                             0,
-                            $"{entry.Key.Keyword}: {entry.Key.Language}"))
+                            $"{entry.Key.Keyword}, {entry.Key.Language}, {entry.Key.FirstSpecifier}, {entry.Key.SecondSpecifier}"))
                         ];
                 }
             }
@@ -665,7 +712,13 @@ namespace PxUtils.Validation.ContentValidation
             return null;
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateLanguageParams(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             if (entry.Key.Language is null)
@@ -694,7 +747,13 @@ namespace PxUtils.Validation.ContentValidation
             return null;
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateSpecifiers(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             List<ValidationFeedbackItem> feedbackItems = [];
@@ -759,7 +818,13 @@ namespace PxUtils.Validation.ContentValidation
             return [.. feedbackItems];
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateValueTypes(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             string[] stringTypes =
@@ -806,7 +871,7 @@ namespace PxUtils.Validation.ContentValidation
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
-                    0,
+                    entry.ValueStartIndex,
                     entry.LineChangeIndexes);
 
                 return [new ValidationFeedbackItem(
@@ -815,7 +880,7 @@ namespace PxUtils.Validation.ContentValidation
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.UnmatchingValueType,
                         feedbackIndexes.Key,
-                        0,
+                        feedbackIndexes.Value,
                         $"{entry.Key.Keyword}: {entry.ValueType}"))
                     ];
             }
@@ -823,7 +888,13 @@ namespace PxUtils.Validation.ContentValidation
             return null;
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateValueContents(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             if (entry.Key.Keyword == syntaxConf.Tokens.KeyWords.Charset)
@@ -833,7 +904,7 @@ namespace PxUtils.Validation.ContentValidation
                 {
                     KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                         entry.KeyStartLineIndex,
-                        0,
+                        entry.ValueStartIndex,
                         entry.LineChangeIndexes);
 
                     return [new ValidationFeedbackItem(
@@ -842,7 +913,7 @@ namespace PxUtils.Validation.ContentValidation
                             ValidationFeedbackLevel.Error,
                             ValidationFeedbackRule.InvalidValueFound,
                             feedbackIndexes.Key,
-                            0,
+                            feedbackIndexes.Value,
                             $"{entry.Key.Keyword}: {entry.Value}"))
                         ];
                 }
@@ -852,7 +923,7 @@ namespace PxUtils.Validation.ContentValidation
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
-                    0,
+                    entry.ValueStartIndex,
                     entry.LineChangeIndexes);
 
                 return [new ValidationFeedbackItem(
@@ -861,7 +932,7 @@ namespace PxUtils.Validation.ContentValidation
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.InvalidValueFound,
                         feedbackIndexes.Key,
-                        0,
+                        feedbackIndexes.Value,
                         $"{entry.Key.Keyword}: {entry.Value}"))
                     ];
             }
@@ -881,9 +952,9 @@ namespace PxUtils.Validation.ContentValidation
                 if (!dimensionTypes.Contains(entry.Value))
                 {
                     KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    entry.KeyStartLineIndex,
-                    0,
-                    entry.LineChangeIndexes);
+                        entry.KeyStartLineIndex,
+                        entry.ValueStartIndex,
+                        entry.LineChangeIndexes);
 
                     return [new ValidationFeedbackItem(
                         entry,
@@ -891,7 +962,7 @@ namespace PxUtils.Validation.ContentValidation
                             ValidationFeedbackLevel.Error,
                             ValidationFeedbackRule.InvalidValueFound,
                             feedbackIndexes.Key,
-                            0,
+                            feedbackIndexes.Value,
                             $"{entry.Key.Keyword}: {entry.Value}"))
                         ];
                 }
@@ -904,9 +975,9 @@ namespace PxUtils.Validation.ContentValidation
                 (info.HeadingDimensions is not null && !Array.Exists(info.HeadingDimensions[lang], d => d == entry.Value)))
                 {
                     KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    entry.KeyStartLineIndex,
-                    0,
-                    entry.LineChangeIndexes);
+                        entry.KeyStartLineIndex,
+                        entry.ValueStartIndex,
+                        entry.LineChangeIndexes);
 
                     return [new ValidationFeedbackItem(
                         entry,
@@ -914,7 +985,7 @@ namespace PxUtils.Validation.ContentValidation
                             ValidationFeedbackLevel.Error,
                             ValidationFeedbackRule.InvalidValueFound,
                             feedbackIndexes.Key,
-                            0,
+                            feedbackIndexes.Value,
                             $"{entry.Key.Keyword}: {entry.Value}"))
                         ];
                 }
@@ -923,7 +994,13 @@ namespace PxUtils.Validation.ContentValidation
             return null;
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateValueAmounts(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             if (entry.Key.Keyword != syntaxConf.Tokens.KeyWords.VariableValueCodes ||
@@ -938,14 +1015,19 @@ namespace PxUtils.Validation.ContentValidation
             string lang = entry.Key.Language is not null ? entry.Key.Language : defaultLanguage;
             if (codes.Length != info.DimensionValues[new(lang, entry.Key.FirstSpecifier)].Length)
             {
+                KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
+                    entry.KeyStartLineIndex,
+                    entry.ValueStartIndex,
+                    entry.LineChangeIndexes);
+
                 return [
                     new ValidationFeedbackItem(
                         entry,
                         new ValidationFeedback(
                             ValidationFeedbackLevel.Error,
                             ValidationFeedbackRule.UnmatchingValueAmount,
-                            entry.KeyStartLineIndex,
-                            0,
+                            feedbackIndexes.Key,
+                            feedbackIndexes.Value,
                             $"{entry.Key.Keyword}: {entry.Value}"))
                     ];
             }
@@ -953,7 +1035,13 @@ namespace PxUtils.Validation.ContentValidation
             return null;
         }
 
-        // TODO: Summary
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public static ValidationFeedbackItem[]? ValidateValueUppercaseRecommendations(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             string[] recommendedUppercaseValueKeywords = [
@@ -969,9 +1057,9 @@ namespace PxUtils.Validation.ContentValidation
             string valueUppercase = entry.Value.ToUpper();
             if (entry.Value != valueUppercase)
             {
-                KeyValuePair<int, int> feebackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
+                KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
-                    0,
+                    entry.ValueStartIndex,
                     entry.LineChangeIndexes);
                 
                 return [new ValidationFeedbackItem(
@@ -979,8 +1067,8 @@ namespace PxUtils.Validation.ContentValidation
                     new ValidationFeedback(
                         ValidationFeedbackLevel.Warning,
                         ValidationFeedbackRule.LowerCaseValueFound,
-                        feebackIndexes.Key,
-                        0,
+                        feedbackIndexes.Key,
+                        entry.ValueStartIndex,
                         $"{entry.Key.Keyword}: {entry.Value}"))];
             }
             return null;
