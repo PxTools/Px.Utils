@@ -175,7 +175,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             };
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateFindStubOrHeading(
+            ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateFindStubAndHeading(
                 entries,
                 syntaxConf,
                 ref info
