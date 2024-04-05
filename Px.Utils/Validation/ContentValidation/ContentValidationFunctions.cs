@@ -449,7 +449,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if required entries are missing. Warnings are returned if entries are defined in an unrecommended way</returns>
         public static ValidationFeedbackItem[]? ValidateFindContentDimensionKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
-            List<ValidationFeedbackItem> feedbackItems = [];
+            List<ValidationFeedbackItem>? feedbackItems = [];
 
             string[] languageSpecificKeywords =
                 [
@@ -473,35 +473,12 @@ namespace PxUtils.Validation.ContentValidation
                 .Where(e => contentDimensionNames.Contains(e.Key.Value))
                 .ToDictionary(e => e.Key, e => e.Value);
 
-            string defaultLanguage = info.DefaultLanguage ?? string.Empty;
-
             foreach (KeyValuePair<KeyValuePair<string, string>, string[]> kvp in contentDimensionValueNames)
             {
-                string language = kvp.Key.Key;
-                string dimensionName = kvp.Key.Value;
-
                 foreach (string dimensionValueName in kvp.Value)
                 {
-                    foreach (string keyword in languageSpecificKeywords)
-                    {
-                        ValidationFeedbackItem? issue = ContentValidationUtilityMethods.FindContentVariableKey(entries, keyword, language, dimensionName, dimensionValueName, defaultLanguage, info.Filename);
-                        if (issue is not null)
-                        {
-                            feedbackItems.Add((ValidationFeedbackItem)issue);
-                        }
-                    }
-
-                    if (language == defaultLanguage)
-                    {
-                        foreach (string keyword in commonKeywords)
-                        {
-                            ValidationFeedbackItem? issue = ContentValidationUtilityMethods.FindContentVariableKey(entries, keyword, language, dimensionName, dimensionValueName, defaultLanguage, info.Filename);
-                            if (issue is not null)
-                            {
-                                feedbackItems.Add((ValidationFeedbackItem)issue);
-                            }
-                        }
-                    }
+                    List<ValidationFeedbackItem> items = ContentValidationUtilityMethods.ProcessContentDimensionValue(languageSpecificKeywords, commonKeywords, entries, info, kvp.Key, dimensionValueName);
+                    feedbackItems.AddRange(items);
                 }
             }
 
@@ -532,11 +509,9 @@ namespace PxUtils.Validation.ContentValidation
                 .GroupBy(kvp => kvp.Key)
                 .ToDictionary(g => g.Key, g => g.SelectMany(kvp => kvp.Value).ToArray());
 
-            string defaultLanguage = info.DefaultLanguage ?? string.Empty;
-
             foreach (KeyValuePair<string, string[]> languageDimensions in allDimensions)
             {
-                ValidationFeedbackItem? timeValFeedback = ContentValidationUtilityMethods.FindDimensionRecommendedKey(entries, syntaxConf.Tokens.KeyWords.TimeVal, languageDimensions.Key, defaultLanguage, info.Filename);
+                ValidationFeedbackItem? timeValFeedback = ContentValidationUtilityMethods.FindDimensionRecommendedKey(entries, syntaxConf.Tokens.KeyWords.TimeVal, languageDimensions.Key, info);
                 if (timeValFeedback is not null)
                 {
                     feedbackItems.Add((ValidationFeedbackItem)timeValFeedback);
@@ -544,23 +519,14 @@ namespace PxUtils.Validation.ContentValidation
 
                 foreach (string dimension in languageDimensions.Value)
                 {
-                    foreach (string keyword in dimensionRecommendedKeywords)
-                    {
-                        ValidationFeedbackItem? keywordFeedback = ContentValidationUtilityMethods.FindDimensionRecommendedKey(entries, keyword, languageDimensions.Key, defaultLanguage, info.Filename, dimension);
-                        if (keywordFeedback is not null)
-                        {
-                            feedbackItems.Add((ValidationFeedbackItem)keywordFeedback);
-                        }
-                    }
-
-                    if (languageDimensions.Key == defaultLanguage)
-                    {
-                        ValidationFeedbackItem? variableTypeFeedback = ContentValidationUtilityMethods.FindDimensionRecommendedKey(entries, syntaxConf.Tokens.KeyWords.DimensionType, languageDimensions.Key, defaultLanguage, info.Filename, dimension);
-                        if (variableTypeFeedback is not null)
-                        {
-                            feedbackItems.Add((ValidationFeedbackItem)variableTypeFeedback);
-                        }
-                    }
+                    List<ValidationFeedbackItem> dimensionFeedback = ContentValidationUtilityMethods.ProcessDimension(
+                        dimensionRecommendedKeywords,
+                        syntaxConf.Tokens.KeyWords.DimensionType,
+                        entries,
+                        languageDimensions.Key,
+                        info,
+                        dimension);
+                    feedbackItems.AddRange(dimensionFeedback);
                 }
             }
 
