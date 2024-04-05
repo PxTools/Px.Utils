@@ -223,7 +223,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"],
-                StubDimensions = new()
+                StubDimensionNames = new()
                 {
                     { "fi", ["bar", "bar-time"] },
                     { "en", ["bar-en", "bar-time-en"] }
@@ -254,12 +254,12 @@ namespace PxUtils.UnitTests.ContentValidationTests
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"],
-                ContentDimensionEntries = new()
+                ContentDimensionNames = new()
                 {
                     { "fi", "bar" },
                     { "en", "bar-en" }
                 },
-                DimensionValues = new()
+                DimensionValueNames = new()
                 {
                     { new KeyValuePair<string, string>( "fi", "bar" ), ["foo"] },
                     { new KeyValuePair<string, string>( "en", "bar-en" ), ["foo-en"] },
@@ -289,12 +289,12 @@ namespace PxUtils.UnitTests.ContentValidationTests
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"],
-                ContentDimensionEntries = new()
+                ContentDimensionNames = new()
                 {
                     { "fi", "bar" },
                     { "en", "bar-en" }
                 },
-                StubDimensions = new()
+                StubDimensionNames = new()
                 {
                     { "fi", ["bar", "bar-time"] },
                     { "en", ["bar-en", "bar-time-en"] }
@@ -390,12 +390,12 @@ namespace PxUtils.UnitTests.ContentValidationTests
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"],
-                StubDimensions = new()
+                StubDimensionNames = new()
                 {
                     { "fi", ["bar", "bar-time"] },
                     { "en", ["bar-en", "bar-time-en"] }
                 },
-                DimensionValues = new()
+                DimensionValueNames = new()
                 {
                     { new KeyValuePair<string, string>( "fi", "bar" ), ["foo"] },
                     { new KeyValuePair<string, string>( "fi", "bar-time" ), ["foo-time"] },
@@ -426,12 +426,12 @@ namespace PxUtils.UnitTests.ContentValidationTests
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"],
-                StubDimensions = new()
+                StubDimensionNames = new()
                 {
                     { "fi", ["bar", "bar-time"] },
                     { "en", ["bar-en", "bar-time-en"] }
                 },
-                DimensionValues = new()
+                DimensionValueNames = new()
                 {
                     { new KeyValuePair<string, string>( "fi", "bar" ), ["foo"] },
                     { new KeyValuePair<string, string>( "fi", "bar-time" ), ["foo-time"] },
@@ -508,12 +508,12 @@ namespace PxUtils.UnitTests.ContentValidationTests
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"],
-                StubDimensions = new()
+                StubDimensionNames = new()
                 {
                     { "fi", ["bar", "bar-time"] },
                     { "en", ["bar-en", "bar-time-en"] }
                 },
-                DimensionValues = new()
+                DimensionValueNames = new()
                 {
                     { new KeyValuePair<string, string>( "fi", "bar" ), ["foo"] },
                     { new KeyValuePair<string, string>( "fi", "bar-time" ), ["foo-time"] },
@@ -552,7 +552,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.LowerCaseValueFound, result[0].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.ValueIsNotInUpperCase, result[0].Feedback.Rule);
         }
     }
 }

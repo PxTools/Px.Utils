@@ -65,7 +65,7 @@
         IllegalSpecifierDefinitionFound = 36,
         UnrecommendedSpecifierDefinitionFound = 37,
         InvalidValueFound = 38,
-        LowerCaseValueFound = 39,
+        ValueIsNotInUpperCase = 39,
         UnmatchingValueType = 40,
         UnmatchingValueAmount = 41,
         MultipleInstancesOfUniqueKey = 42,

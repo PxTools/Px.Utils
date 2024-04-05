@@ -14,7 +14,9 @@ namespace PxUtils.Validation.ContentValidation
         public List<ContentValidationEntryFunctionDelegate> DefaultContentValidationEntryFunctions { get; }
         public List<ContentValidationSearchFunctionDelegate> DefaultContentValidationSearchFunctions { get; }
 
-        // TODO: Summmary
+        /// <summary>
+        /// Constructor for <see cref="ContentValidationFunctions"/> class that contains default content validation functions/>
+        /// </summary>
         public ContentValidationFunctions()
         {
             DefaultContentValidationEntryFunctions = [
@@ -47,7 +49,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
         /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
-        /// <returns>Null of no issues are found. <see cref="ValidationFeedbackItem"/> objects are returned if entry defining default language is not found or if more than one are found.</returns>
+        /// <returns>Null if no issues are found. <see cref="ValidationFeedbackItem"/> objects are returned if entry defining default language is not found or if more than one are found.</returns>
         public static ValidationFeedbackItem[]? ValidateFindDefaultLanguage(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             ValidationStructuredEntry[] langEntries = entries.Where(
@@ -93,12 +95,12 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Finds an entry that defines available languages in the Px file
         /// </summary>
-        /// <param name="entries"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns>Null if no issues are found. <see cref="ValidationFeedbackItem"/> object with a warning is returned if available languages entry is not found. Error is returned if multiple entries are found.</returns>
         public static ValidationFeedbackItem[]? ValidateFindAvailableLanguages(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             ValidationStructuredEntry[] availableLanguageEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.AvailableLanguages)).ToArray();
@@ -147,12 +149,12 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Validates that default language is defined in the available languages entry
         /// </summary>
-        /// <param name="entries"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns>Null of no issues are found. <see cref="ValidationFeedbackItem"/> object is returned if default language is not defined in the available languages entry</returns>
         public static ValidationFeedbackItem[]? ValidateDefaultLanguageDefinedInAvailableLanguages(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             if (info.AvailableLanguages is not null && !info.AvailableLanguages.Contains(info.DefaultLanguage))
@@ -187,14 +189,15 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Finds a content dimension and validates that it exists for all available languages
         /// </summary>
-        /// <param name="entries"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if content dimension entry is not found for any available language</returns>
         public static ValidationFeedbackItem[]? ValidateFindContentDimension(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
+            List<ValidationFeedbackItem> feedbackItems = [];
             ValidationStructuredEntry[] contentDimensionEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.ContentVariableIdentifier)).ToArray();
 
             string defaultLanguage = info.DefaultLanguage is not null ? info.DefaultLanguage : string.Empty;
@@ -204,7 +207,7 @@ namespace PxUtils.Validation.ContentValidation
                 ValidationStructuredEntry? contentDimension = Array.Find(contentDimensionEntries, c => c.Key.Language == language || (c.Key.Language is null && language == defaultLanguage));
                 if (contentDimension is null)
                 {
-                    return [
+                    feedbackItems.Add(
                         new ValidationFeedbackItem(
                         new ContentValidationObject(info.Filename, 0, []),
                         new ValidationFeedback(
@@ -214,27 +217,26 @@ namespace PxUtils.Validation.ContentValidation
                             0,
                             $"{syntaxConf.Tokens.KeyWords.ContentVariableIdentifier}, {language}"
                             )
-                        ),
-                    ];
+                        ));
                 }
             }
 
-            info.ContentDimensionEntries = contentDimensionEntries.ToDictionary(
+            info.ContentDimensionNames = contentDimensionEntries.ToDictionary(
                 e => e.Key.Language is not null ? 
                 e.Key.Language : 
                 defaultLanguage, 
                 e => e.Value);
             
-            return null;
+            return [.. feedbackItems];
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Validates that entries with required keys are found in the Px file metadata
         /// </summary>
-        /// <param name="entries"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if entries required keywords are not found</returns>
         public static ValidationFeedbackItem[]? ValidateFindRequiredCommonKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             List<ValidationFeedbackItem> feedbackItems = [];
@@ -268,12 +270,12 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Finds stub and heading dimensions in the Px file metadata and validates that they are defined for all available languages
         /// </summary>
-        /// <param name="entries"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if stub and heading dimension entries are not found for any available language</returns>
         public static ValidationFeedbackItem[]? ValidateFindStubOrHeading(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             ValidationStructuredEntry[] stubEntries = entries.Where(e => e.Key.Keyword.Equals(syntaxConf.Tokens.KeyWords.StubDimensions)).ToArray();
@@ -298,7 +300,7 @@ namespace PxUtils.Validation.ContentValidation
 
             if (stubEntries.Length > 0)
             {
-                info.StubDimensions = stubEntries.ToDictionary(
+                info.StubDimensionNames = stubEntries.ToDictionary(
                     e => e.Key.Language is not null ? 
                         e.Key.Language : 
                         defaultLanguage, 
@@ -306,22 +308,24 @@ namespace PxUtils.Validation.ContentValidation
             }
             if (headingEntries.Length > 0)
             {
-                info.HeadingDimensions = headingEntries.ToDictionary(
+                info.HeadingDimensionNames = headingEntries.ToDictionary(
                     e => e.Key.Language is not null ? 
                     e.Key.Language : 
                     defaultLanguage, 
                     e => e.Value.Split(syntaxConf.Symbols.Key.ListSeparator));
             }
 
+            List<ValidationFeedbackItem> feedbackItems = [];
+
             if (info.AvailableLanguages is not null)
             {
                 foreach (string language in info.AvailableLanguages)
                 {
-                    if ((info.StubDimensions is null || !info.StubDimensions.ContainsKey(language))
+                    if ((info.StubDimensionNames is null || !info.StubDimensionNames.ContainsKey(language))
                         &&
-                        (info.HeadingDimensions is null || !info.HeadingDimensions.ContainsKey(language)))
+                        (info.HeadingDimensionNames is null || !info.HeadingDimensionNames.ContainsKey(language)))
                     {
-                        return [
+                        feedbackItems.Add(
                             new ValidationFeedbackItem(
                                 new ContentValidationObject(info.Filename, 0, []),
                                 new ValidationFeedback(
@@ -332,21 +336,21 @@ namespace PxUtils.Validation.ContentValidation
                                     $"{language}"
                                     )
                                 )
-                            ];
+                            );
                     }
                 }
             }
 
-            return null;
+            return [.. feedbackItems];
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Finds recommended languages dependent or language independent keys in the Px file metadata
         /// </summary>
-        /// <param name="entries"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> objects with warning are returned if recommended keys are missing</returns>
         public static ValidationFeedbackItem[]? ValidateFindRecommendedKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             List<ValidationFeedbackItem> feedbackItems = [];
@@ -409,12 +413,12 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Finds and validates values for stub and heading dimensions in the Px file metadata
         /// </summary>
-        /// <param name="entries"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if values are missing for any dimension</returns>
         public static ValidationFeedbackItem[]? ValidateFindDimensionValues(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             List<ValidationFeedbackItem> feedbackItems = [];
@@ -423,41 +427,41 @@ namespace PxUtils.Validation.ContentValidation
 
             IEnumerable<KeyValuePair<KeyValuePair<string, string>, string[]>> dimensionValues = [];
             dimensionValues = dimensionValues.Concat(
-                ContentValidationUtilityMethods.FindVariableValues(
+                ContentValidationUtilityMethods.FindDimensionValues(
                     dimensionEntries,
                     syntaxConf,
-                    info.StubDimensions, 
+                    info.StubDimensionNames, 
                     ref feedbackItems, 
                     info.Filename)
                 );
             dimensionValues = dimensionValues.Concat(
-                ContentValidationUtilityMethods.FindVariableValues(
+                ContentValidationUtilityMethods.FindDimensionValues(
                     dimensionEntries,
                     syntaxConf, 
-                    info.HeadingDimensions, 
+                    info.HeadingDimensionNames, 
                     ref feedbackItems,
                     info.Filename)
                 );
 
-            info.DimensionValues = [];
+            info.DimensionValueNames = [];
             foreach (KeyValuePair<KeyValuePair<string, string>, string[]> item in dimensionValues)
             {
-                info.DimensionValues.Add(item.Key, item.Value);
+                info.DimensionValueNames.Add(item.Key, item.Value);
             }
 
             return [.. feedbackItems];
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Finds and validates that entries with required keys related to the content dimension and its values are found in the Px file metadata
         /// </summary>
-        /// <param name="entries"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if required entries are missing. Warnings are returned if entries are defined in an unrecommended way</returns>
         public static ValidationFeedbackItem[]? ValidateFindContentDimensionKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
-            if (info.ContentDimensionEntries is null || info.DimensionValues is null)
+            if (info.ContentDimensionNames is null || info.DimensionValueNames is null)
             {
                 return null;
             }
@@ -475,10 +479,10 @@ namespace PxUtils.Validation.ContentValidation
                     syntaxConf.Tokens.KeyWords.Precision
                 ];
 
-            string[] contentDimensionNames = [.. info.ContentDimensionEntries.Values];
+            string[] contentDimensionNames = [.. info.ContentDimensionNames.Values];
 
             Dictionary<KeyValuePair<string, string>, string[]> contentDimensionValueNames = [];
-            foreach(KeyValuePair<KeyValuePair<string, string>, string[]> item in info.DimensionValues.Where(
+            foreach(KeyValuePair<KeyValuePair<string, string>, string[]> item in info.DimensionValueNames.Where(
                 e => contentDimensionNames.Contains(e.Key.Value)))
             {
                 contentDimensionValueNames.Add(item.Key, item.Value);
@@ -523,15 +527,15 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Validates that recommended entries related to dimensions are found in the Px file metadata
         /// </summary>
-        /// <param name="entries"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> objects with warnings are returned if any dimensions are missing recommended entries related to them</returns>
         public static ValidationFeedbackItem[]? ValidateFindDimensionRecommendedKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
-            if (info.StubDimensions is null && info.HeadingDimensions is null)
+            if (info.StubDimensionNames is null && info.HeadingDimensionNames is null)
             {
                 return null;
             }
@@ -544,8 +548,8 @@ namespace PxUtils.Validation.ContentValidation
                     syntaxConf.Tokens.KeyWords.VariableValueCodes
                 ];
 
-            Dictionary<string, string[]> stubDimensions = info.StubDimensions is not null ? info.StubDimensions : [];
-            Dictionary<string, string[]> headingDimensions = info.HeadingDimensions is not null ? info.HeadingDimensions : [];
+            Dictionary<string, string[]> stubDimensions = info.StubDimensionNames is not null ? info.StubDimensionNames : [];
+            Dictionary<string, string[]> headingDimensions = info.HeadingDimensionNames is not null ? info.HeadingDimensionNames : [];
             Dictionary<string, string[]> allDimensions = [];
             
             foreach(KeyValuePair<string, string[]> item in stubDimensions)
@@ -600,12 +604,12 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// 
         /// </summary>
-        /// <param name="entry"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if </returns>
         public static ValidationFeedbackItem[]? ValidateUnexpectedSpecifiers(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             string[] noSpecifierAllowedKeywords =
@@ -649,12 +653,12 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Finds unexpected language parameters in the Px file metadata entry
         /// </summary>
-        /// <param name="entry"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if an illegal or unrecommended language parameter is detected in the entry</returns>
         public static ValidationFeedbackItem[]? ValidateUnexpectedLanguageParams(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             string[] noLanguageParameterAllowedKeywords = [
@@ -713,12 +717,12 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Validates that the language defined in the Px file metadata entry is defined in the available languages entry
         /// </summary>
-        /// <param name="entry"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> object is returned if an undefined language is found from the entry</returns>
         public static ValidationFeedbackItem[]? ValidateLanguageParams(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             if (entry.Key.Language is null)
@@ -748,17 +752,17 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Validates that specifiers are defined properly in the Px file metadata entry. Content dimension specifiers are allowed to be defined using only the first specifier at value level and are checked separately
         /// </summary>
-        /// <param name="entry"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> object is returned if the entry's specifier is defined in an unexpected way</returns>
         public static ValidationFeedbackItem[]? ValidateSpecifiers(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             List<ValidationFeedbackItem> feedbackItems = [];
             if ((entry.Key.FirstSpecifier is null && entry.Key.SecondSpecifier is null) || 
-                info.DimensionValues is null)
+                info.DimensionValueNames is null)
             {
                 return null;
             }
@@ -778,8 +782,8 @@ namespace PxUtils.Validation.ContentValidation
                 return null;
             }
 
-            if ((info.StubDimensions is null || !info.StubDimensions.Values.Any(v => v.Contains(entry.Key.FirstSpecifier))) &&
-                (info.HeadingDimensions is null || !info.HeadingDimensions.Values.Any(v => v.Contains(entry.Key.FirstSpecifier))))
+            if ((info.StubDimensionNames is null || !info.StubDimensionNames.Values.Any(v => v.Contains(entry.Key.FirstSpecifier))) &&
+                (info.HeadingDimensionNames is null || !info.HeadingDimensionNames.Values.Any(v => v.Contains(entry.Key.FirstSpecifier))))
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
@@ -797,7 +801,7 @@ namespace PxUtils.Validation.ContentValidation
                         );
             }
             else if (entry.Key.SecondSpecifier is not null && 
-                !info.DimensionValues.Values.Any(v => v.Contains(entry.Key.SecondSpecifier)))
+                !info.DimensionValueNames.Values.Any(v => v.Contains(entry.Key.SecondSpecifier)))
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
@@ -819,12 +823,12 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Validates that certain keywords are defined with the correct value types in the Px file metadata entry
         /// </summary>
-        /// <param name="entry"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> object is returned if an unexpected value type is detected</returns>
         public static ValidationFeedbackItem[]? ValidateValueTypes(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             string[] stringTypes =
@@ -889,12 +893,12 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Validates that entries with specific keywords have valid values in the Px file metadata entry
         /// </summary>
-        /// <param name="entry"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> object is returned if an unexpected value is detected</returns>
         public static ValidationFeedbackItem[]? ValidateValueContents(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             if (entry.Key.Keyword == syntaxConf.Tokens.KeyWords.Charset)
@@ -971,8 +975,8 @@ namespace PxUtils.Validation.ContentValidation
             {
                 string defaultLanguage = info.DefaultLanguage is not null ? info.DefaultLanguage : string.Empty;
                 string lang = entry.Key.Language is not null ? entry.Key.Language : defaultLanguage;
-                if (info.StubDimensions is not null && !Array.Exists(info.StubDimensions[lang], d => d == entry.Value) &&
-                (info.HeadingDimensions is not null && !Array.Exists(info.HeadingDimensions[lang], d => d == entry.Value)))
+                if (info.StubDimensionNames is not null && !Array.Exists(info.StubDimensionNames[lang], d => d == entry.Value) &&
+                (info.HeadingDimensionNames is not null && !Array.Exists(info.HeadingDimensionNames[lang], d => d == entry.Value)))
                 {
                     KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                         entry.KeyStartLineIndex,
@@ -995,16 +999,16 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Validates that entries with specific keywords have the correct amount of values in the Px file metadata entry
         /// </summary>
-        /// <param name="entry"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> object is returned if an unexpected amount of values is detected</returns>
         public static ValidationFeedbackItem[]? ValidateValueAmounts(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             if (entry.Key.Keyword != syntaxConf.Tokens.KeyWords.VariableValueCodes ||
-                info.DimensionValues is null ||
+                info.DimensionValueNames is null ||
                 entry.Key.FirstSpecifier is null)
             {
                 return null;
@@ -1013,7 +1017,7 @@ namespace PxUtils.Validation.ContentValidation
             string[] codes = entry.Value.Split(syntaxConf.Symbols.Value.ListSeparator);
             string defaultLanguage = info.DefaultLanguage is not null ? info.DefaultLanguage : string.Empty;
             string lang = entry.Key.Language is not null ? entry.Key.Language : defaultLanguage;
-            if (codes.Length != info.DimensionValues[new(lang, entry.Key.FirstSpecifier)].Length)
+            if (codes.Length != info.DimensionValueNames[new(lang, entry.Key.FirstSpecifier)].Length)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
@@ -1036,12 +1040,12 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Validates that entries with specific keywords have their values written in upper case
         /// </summary>
-        /// <param name="entry"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
+        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <returns><see cref="ValidationFeedbackItem"/> object with warning is returned if the found value is not written in upper case</returns>
         public static ValidationFeedbackItem[]? ValidateValueUppercaseRecommendations(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ref ContentValidationInfo info)
         {
             string[] recommendedUppercaseValueKeywords = [
@@ -1066,7 +1070,7 @@ namespace PxUtils.Validation.ContentValidation
                     entry,
                     new ValidationFeedback(
                         ValidationFeedbackLevel.Warning,
-                        ValidationFeedbackRule.LowerCaseValueFound,
+                        ValidationFeedbackRule.ValueIsNotInUpperCase,
                         feedbackIndexes.Key,
                         entry.ValueStartIndex,
                         $"{entry.Key.Keyword}: {entry.Value}"))];

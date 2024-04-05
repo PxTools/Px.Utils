@@ -195,15 +195,6 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 13,
                 Validation.ValueType.Number);
 
-        private static readonly ValidationStructuredEntry precisionBarFooEnEntry =
-            new(filename,
-                new ValidationStructuredEntryKey("PRECISION", "en", "bar", "foo"),
-                "0",
-                21,
-                [],
-                16,
-                Validation.ValueType.Number);
-
         private static readonly ValidationStructuredEntry variableTypeBarEntry =
             new(filename,
                 new ValidationStructuredEntryKey("VARIABLE-TYPE", null, "bar"),

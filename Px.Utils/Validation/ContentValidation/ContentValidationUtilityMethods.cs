@@ -1,29 +1,39 @@
-﻿using PxUtils.Models.Metadata.Dimensions;
-using PxUtils.PxFile;
+﻿using PxUtils.PxFile;
 using PxUtils.Validation.SyntaxValidation;
-using System.Collections.Generic;
 
 namespace PxUtils.Validation.ContentValidation
 {
+    /// <summary>
+    /// Contains a collection of utility methods used in content validation.
+    /// </summary>
     internal static class ContentValidationUtilityMethods
     {
-        internal static Dictionary<KeyValuePair<string, string>, string[]> FindVariableValues(
+        /// <summary>
+        /// Finds the values for given dimensions in the Px file
+        /// </summary>
+        /// <param name="entries">The structured entries of the Px file</param>
+        /// <param name="syntaxConf">The syntax configuration for the Px file</param>
+        /// <param name="dimensions">The dimensions to find values for</param>
+        /// <param name="feedbackItems">A list of feedback items to add to</param>
+        /// <param name="filename">The name of the Px file</param>
+        /// <returns>A dictionary containing the values for the dimensions</returns>
+        internal static Dictionary<KeyValuePair<string, string>, string[]> FindDimensionValues(
             ValidationStructuredEntry[] entries,
             PxFileSyntaxConf syntaxConf,
-            Dictionary<string, string[]>? variables,
+            Dictionary<string, string[]>? dimensions,
             ref List<ValidationFeedbackItem> feedbackItems,
             string filename)
         {
-            if (variables is null)
+            if (dimensions is null)
             {
                 return [];
             }
 
             Dictionary<KeyValuePair<string, string>, string[]> variableValues = [];
 
-            foreach (string language in variables.Keys)
+            foreach (string language in dimensions.Keys)
             {
-                foreach (string dimension in variables[language])
+                foreach (string dimension in dimensions[language])
                 {
                     ValidationStructuredEntry? valuesEntry = Array.Find(entries,
                         e => e.Key.FirstSpecifier is not null &&
@@ -59,6 +69,17 @@ namespace PxUtils.Validation.ContentValidation
             return variableValues;
         }
 
+        /// <summary>
+        /// Finds a specific content variable related entry in the structured entries of a Px file.
+        /// </summary>
+        /// <param name="entries">Structured entries of the Px file</param>
+        /// <param name="keyword">Keyword that the function searches for</param>
+        /// <param name="language">Language that the function searches the entry for</param>
+        /// <param name="dimensionName">Name of the content dimension</param>
+        /// <param name="dimensionValueName">Name of the content dimension value requiring the entry</param>
+        /// <param name="defaultLanguage">Default language of the Px file</param>
+        /// <param name="filename">Name of the Px file</param>
+        /// <returns>Returns a <see cref="ValidationFeedbackItem"/> object with an error if required entry is not found or with a warning if the entry specifiers are defined in an unexpected way</returns>
         internal static ValidationFeedbackItem? FindContentVariableKey(ValidationStructuredEntry[] entries, string keyword, string language, string dimensionName, string dimensionValueName, string defaultLanguage, string filename)
         {
             ValidationStructuredEntry? entry = Array.Find(entries,
@@ -104,6 +125,16 @@ namespace PxUtils.Validation.ContentValidation
             return null;
         }
 
+        /// <summary>
+        /// Finds a recommended dimension related entry in the structured entries of a Px file.
+        /// </summary>
+        /// <param name="entries">Structured entries of the Px file</param>
+        /// <param name="keyword">Keyword that the function searches for</param>
+        /// <param name="language">Language that the function searches the entry for</param>
+        /// <param name="defaultLanguage">Default language of the Px file</param>
+        /// <param name="filename">Name of the Px file</param>
+        /// <param name="dimensionName">Name of the dimension</param>
+        /// <returns>Returns a <see cref="ValidationFeedbackItem"/> object with a warning if the recommended entry is not found</returns>
         internal static ValidationFeedbackItem? FindDimensionRecommendedKey(ValidationStructuredEntry[] entries, string keyword, string language, string defaultLanguage, string filename, string? dimensionName = null)
         {
             ValidationStructuredEntry[] keywordEntries = entries.Where(e => e.Key.Keyword.Equals(keyword)).ToArray();
