@@ -12,6 +12,7 @@ namespace Px.Utils.TestingApp.Commands
         private int[] _readCols = [];
 
         private readonly string[] fileFlags = ["-f", "-file"];
+        private readonly string[] iterFlags = ["-i", "-iter"];
         private readonly string[] rowsFlags = ["-r", "-rows"];
         private readonly string[] colsFlags = ["-c", "-cols"];
 
@@ -174,8 +175,8 @@ namespace Px.Utils.TestingApp.Commands
 
         private void SetRunParameters(bool batchMode, List<string>? inputs)
         {
-            Dictionary<string, List<string>> parameters = GroupParameters(inputs ?? [], [.. fileFlags, .. rowsFlags, .. colsFlags]);
-            if(parameters.Keys.Count == 3)
+            Dictionary<string, List<string>> parameters = GroupParameters(inputs ?? [], [.. fileFlags, .. iterFlags, .. rowsFlags, .. colsFlags]);
+            if(parameters.Keys.Count == 4)
             {
                 foreach (string key in parameters.Keys)
                 {
@@ -183,17 +184,22 @@ namespace Px.Utils.TestingApp.Commands
                     {
                         _testFilePath = parameters[key][0];
                     }
-                    else if (rowsFlags.Contains(key) && !TryParseCoordinates(parameters[key], out _readRows))
+                    else if (iterFlags.Contains(key) && parameters[key].Count == 1 &&
+                        int.TryParse(parameters[key][0], out int iterations))
                     {
-                        throw new ArgumentException("Invalid rows parameter.");
+                        Iterations = iterations;
                     }
-                    else if (colsFlags.Contains(key) && !TryParseCoordinates(parameters[key], out _readCols))
+                    else if (rowsFlags.Contains(key) && TryParseCoordinates(parameters[key], out _readRows))
                     {
-                        throw new ArgumentException("Invalid cols parameter.");
+                        continue;
+                    }
+                    else if (colsFlags.Contains(key) && TryParseCoordinates(parameters[key], out _readCols))
+                    {
+                        continue;
                     }
                     else
                     {
-                        throw new ArgumentException("Invalid parameter.");
+                        throw new ArgumentException($"Invalid argument {key} {string.Join(' ', parameters[key])}");
                     }
                 }
             }
@@ -218,6 +224,16 @@ namespace Px.Utils.TestingApp.Commands
                 Console.WriteLine("File provided is not valid, please enter a path to a valid px file");
                 file = Console.ReadLine() ?? "";
             }
+
+            Console.WriteLine("Enter the number of iterations to run");
+            string iterations = Console.ReadLine() ?? "";
+            int value;
+            while (!int.TryParse(iterations, out value))
+            {
+                Console.WriteLine("Invalid number of iterations, please enter a valid integer");
+                iterations = Console.ReadLine() ?? "";
+            }
+            Iterations = value;
 
             Console.WriteLine("Enter the rows or row ranges to read, separated by spaces");
             string rows = Console.ReadLine() ?? "";

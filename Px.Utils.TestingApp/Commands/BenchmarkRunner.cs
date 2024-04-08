@@ -2,14 +2,22 @@
 {
     internal class BenchmarkRunner : Command
     {
-        Dictionary<string, Benchmark> _benchmarks = [];
+        private readonly Dictionary<string, Benchmark> _benchmarks = [];
 
         internal BenchmarkRunner()
         {
             _benchmarks.Add("dataread", new DataReadBenchmark());
         }
 
-        internal override string Help => string.Join(Environment.NewLine, _benchmarks.Select(b => $"{b.Key}:{Environment.NewLine}{b.Value.Help}{Environment.NewLine}"));
+        internal override string Help
+        {
+            get
+            {
+                Console.Clear();
+                string help = "Available benchmarks:" + Environment.NewLine;
+                return help + string.Join(Environment.NewLine, _benchmarks.Select(b => $"- {b.Key}: {b.Value.Description}{Environment.NewLine}"));
+            }
+        }
 
         internal override string Description => "Run a set of benchmarks.";
 

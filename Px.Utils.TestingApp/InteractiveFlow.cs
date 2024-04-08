@@ -23,5 +23,11 @@ namespace PxUtils.TestingApp
             }
             _commands[inputs[0]].Run(false, inputs.Skip(1).ToList());
         }
+
+        private void Help()
+        {
+            Console.WriteLine("Available commands:");
+            Console.WriteLine(string.Join(Environment.NewLine, _commands.Select(c => $"{c.Key}:{Environment.NewLine}{c.Value.Description}{Environment.NewLine}")));
+        }
     }
 }
