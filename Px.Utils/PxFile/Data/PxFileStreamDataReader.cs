@@ -62,6 +62,18 @@ namespace PxUtils.PxFile.Data
             }
         }
 
+        public async Task ReadUnsafeDoublesAsync(double[] buffer, int offset, int[] rows, int[] cols, double[] missingValueEncodings, CancellationToken cancellationToken)
+        {
+            await SetReaderPositionIfZeroAsync();
+            await Task.Factory.StartNew(() =>
+                ReadItemsFromStream(buffer, offset, rows, cols, Parser), cancellationToken);
+
+            double Parser(char[] parseBuffer, int len)
+            {
+                return DataValueParsers.FastParseUnsafeDoubleDangerous(parseBuffer, len, missingValueEncodings);
+            }
+        }
+
         public async Task ReadDoubleDataValuesAsync(DoubleDataValue[] buffer, int offset, int[] rows, int[] cols)
         {
             await SetReaderPositionIfZeroAsync();
@@ -69,11 +81,25 @@ namespace PxUtils.PxFile.Data
                 ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDoubleDataValue));
         }
 
+        public async Task ReadDoubleDataValuesAsync(DoubleDataValue[] buffer, int offset, int[] rows, int[] cols, CancellationToken cancellationToken)
+        {
+            await SetReaderPositionIfZeroAsync();
+            await Task.Factory.StartNew(() =>
+                ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDoubleDataValue), cancellationToken);
+        }
+
         public async Task ReadDecimalDataValuesAsync(DecimalDataValue[] buffer, int offset, int[] rows, int[] cols)
         {
             await SetReaderPositionIfZeroAsync();
             await Task.Factory.StartNew(() =>
                 ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDecimalDataValue));
+        }
+
+        public async Task ReadDecimalDataValuesAsync(DecimalDataValue[] buffer, int offset, int[] rows, int[] cols, CancellationToken cancellationToken)
+        {
+            await SetReaderPositionIfZeroAsync();
+            await Task.Factory.StartNew(() =>
+                ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDecimalDataValue), cancellationToken);
         }
 
         public void Dispose()
