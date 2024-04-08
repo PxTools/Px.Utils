@@ -2,7 +2,7 @@
 
 namespace PxUtils.PxFile.Data
 {
-    public sealed class PxFileStreamDataReader : IDisposable
+    public sealed class PxFileStreamDataReader : IPxFileStreamDataReader
     {
         private readonly Stream _stream;
         private readonly PxFileSyntaxConf _conf;
@@ -10,6 +10,9 @@ namespace PxUtils.PxFile.Data
 
         private const int INTERNAL_BUFFER_SIZE = 4096;
         private const char VALUE_SEPARATOR = ' ';
+
+        private int fileRow = 0;
+        private int fileCol = 0;
 
         public PxFileStreamDataReader(Stream stream, PxFileSyntaxConf? conf = null)
         {
@@ -113,9 +116,6 @@ namespace PxUtils.PxFile.Data
             byte[] internalBuffer = new byte[INTERNAL_BUFFER_SIZE];
             char[] valueBuffer = new char[30]; // separate buffer is needed because a value can be split between two reads
 
-            int fileRow = 0;
-            int fileCol = 0;
-
             int targetRowIndex = 0;
             int targetColIndex = 0;
 
@@ -147,6 +147,7 @@ namespace PxUtils.PxFile.Data
                                 if(targetRowIndex == rowsLength)
                                 {
                                     // All requested values have been read
+                                    _dataStart = _stream.Position - read + i;
                                     return;
                                 }
                             }

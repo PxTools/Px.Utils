@@ -5,11 +5,9 @@ namespace PxUtils.PxFile.Data
 {
     public static class StreamUtilities
     {
-        private readonly static char[] _whitespaces = ['\r', '\n', '\t', ' '];
-
         public static long FindKeywordPosition(Stream stream, string keyword, PxFileSyntaxConf conf, int bufferSize = 4096)
         {
-            char entrySeparator = conf.Symbols.SectionSeparator;
+            char entrySeparator = conf.Symbols.EntrySeparator;
 
             byte[] keywordBytes = Encoding.ASCII.GetBytes(keyword + conf.Symbols.KeywordSeparator);
             byte[] buffer = new byte[bufferSize];
@@ -31,7 +29,7 @@ namespace PxUtils.PxFile.Data
 
         public async static Task<long> FindKeywordPositionAsync(Stream stream, string keyword, PxFileSyntaxConf conf, int bufferSize = 4096)
         {
-            char entrySeparator = conf.Symbols.SectionSeparator;
+            char entrySeparator = conf.Symbols.EntrySeparator;
 
             byte[] keywordBytes = Encoding.ASCII.GetBytes(keyword + conf.Symbols.KeywordSeparator);
             byte[] buffer = new byte[bufferSize];
@@ -58,7 +56,7 @@ namespace PxUtils.PxFile.Data
 
             for (int i = 0; i < read; i++)
             {
-                if (searchMode && !_whitespaces.Contains((char)buffer[i]))
+                if (searchMode && !CharacterConstants.WhitespaceCharacters.Contains((char)buffer[i]))
                 {
                     if (buffer[i] == keywordBytes[keywordIndex])
                     {
