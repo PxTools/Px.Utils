@@ -225,6 +225,8 @@ namespace Px.Utils.TestingApp.Commands
                 file = Console.ReadLine() ?? "";
             }
 
+            _testFilePath = file;
+
             Console.WriteLine("Enter the number of iterations to run");
             string iterations = Console.ReadLine() ?? "";
             int value;
