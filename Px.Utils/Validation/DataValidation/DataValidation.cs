@@ -63,6 +63,17 @@ namespace PxUtils.Validation.DataValidation
             return feedbacks;
         }
 
+        /// <summary>
+        /// Validates the data in the specified stream asynchronously.
+        /// </summary>
+        /// <param name="stream">The stream containing the data to validate.</param>
+        /// <param name="rowLen">The expected length of each row in the data.</param>
+        /// <param name="numOfRows">The expected number of rows in the data.</param>
+        /// <param name="startRow">The starting row number.</param>
+        /// <param name="streamEncoding">The encoding of the stream. Can be null, in which case the default encoding is used.</param>
+        /// <param name="conf">The configuration for validating the data file syntax. Can be null, in which case the default configuration is used.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+        /// <returns>A collection of validation feedback for the data.</returns>
         public static async Task<IEnumerable<ValidationFeedback>> ValidateAsync(Stream stream, int rowLen,
             int numOfRows,
             int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null,
@@ -138,6 +149,14 @@ namespace PxUtils.Validation.DataValidation
         }
 
 
+        /// <summary>
+        /// Tokenizes a stream asynchronously.
+        /// </summary>
+        /// <param name="stream">The stream to tokenize.</param>
+        /// <param name="conf">The configuration for tokenization.</param>
+        /// <param name="streamEncoding">The encoding of the stream.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>An asynchronous enumerable of tokens.</returns>
         public static async IAsyncEnumerable<Token> TokenizeAsync(Stream stream, PxFileSyntaxConf conf,
             Encoding? streamEncoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
@@ -250,6 +269,9 @@ namespace PxUtils.Validation.DataValidation
         }
     }
 
+    /// <summary>
+    /// Represents the different types of tokens used in data validation.
+    /// </summary>
     public enum TokenType
     {
         EmptyToken,
@@ -262,6 +284,9 @@ namespace PxUtils.Validation.DataValidation
         EndOfStream
     }
 
+    /// <summary>
+    /// Represents a token of a specific type in data validation.
+    /// </summary>
     public readonly struct Token(TokenType type, string value, int lineNumber, int charPosition)
     {
         public TokenType Type { get; } = type;

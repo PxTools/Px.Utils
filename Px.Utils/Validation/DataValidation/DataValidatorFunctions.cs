@@ -8,6 +8,12 @@ namespace PxUtils.Validation.DataValidation;
 public class DataRowCountValidator(int numOfRows): IDataValidator
 {
     private int _currentRow;
+
+    /// <summary>
+    /// Validates the token based on the number of rows specified.
+    /// </summary>
+    /// <param name="token">The token to validate.</param>
+    /// <returns>A collection of validation feedbacks.</returns>
     public IEnumerable<ValidationFeedback> Validate(Token token)
     {
         if (token.Type == TokenType.LineSeparator)
@@ -29,7 +35,12 @@ public class DataRowCountValidator(int numOfRows): IDataValidator
 public class DataRowLengthValidator(int rowLen) : IDataValidator
 {
     private int _currentRowLen = 0;
-    
+
+    /// <summary>
+    /// Validates the given token for row length.
+    /// </summary>
+    /// <param name="token">The token to validate.</param>
+    /// <returns>An enumerable collection of ValidationFeedback objects.</returns>
     public IEnumerable<ValidationFeedback> Validate(Token token)
     {
         
@@ -59,6 +70,11 @@ public class DataStringValidator : IDataValidator
     private static readonly string[] ValidStringDataItems = new[]
         { "\".\"", "\"..\"", "\"...\"", "\"....\"", "\".....\"", "\"......\"", "\"-\"" };
 
+    /// <summary>
+    /// Validates a token as a string data item.
+    /// </summary>
+    /// <param name="token">The token to be validated.</param>
+    /// <returns>An enumerable collection of <see cref="ValidationFeedback"/> objects containing any validation feedback.</returns>
     public IEnumerable<ValidationFeedback> Validate(Token token)
     {
         if (token.Type != TokenType.StringDataItem) return Array.Empty<ValidationFeedback>();
@@ -76,6 +92,12 @@ public class DataStringValidator : IDataValidator
 public class DataNumberDataValidator : IDataValidator
 {
     private static readonly int MaxPositiveLength = decimal.MaxValue.ToString().Length;
+
+    /// <summary>
+    /// Validates a token to determine if it represents a valid number data item.
+    /// </summary>
+    /// <param name="token">The token to validate.</param>
+    /// <returns>An enumerable of <see cref="ValidationFeedback"/> objects indicating any validation errors.</returns>
     public IEnumerable<ValidationFeedback> Validate(Token token)
     {
         if( token.Type != TokenType.NumDataItem) return Array.Empty<ValidationFeedback>();
@@ -119,6 +141,11 @@ public class DataSeparatorValidator : IDataValidator
 {
     private char _separator = Sentinel;
 
+    /// <summary>
+    /// Validates a data token.
+    /// </summary>
+    /// <param name="token">The token to validate.</param>
+    /// <returns>A collection of validation feedback.</returns>
     public IEnumerable<ValidationFeedback> Validate(Token token)
     {
         if (token.Type != TokenType.DataItemSeparator) return Array.Empty<ValidationFeedback>();
@@ -151,7 +178,12 @@ public class DataStructureValidator : IDataValidator
         {TokenType.EndOfData, new[] {TokenType.NumDataItem, TokenType.StringDataItem}},
         {TokenType.EndOfStream, new[] {TokenType.LineSeparator}}
     };
-    
+
+    /// <summary>
+    /// Validates a token based on allowed previous tokens and returns validation feedback.
+    /// </summary>
+    /// <param name="token">The token to be validated.</param>
+    /// <returns>A collection of validation feedback.</returns>
     public IEnumerable<ValidationFeedback> Validate(Token token)
     {
         if (_allowedPreviousTokens[token.Type].Contains(_previousTokenType))
