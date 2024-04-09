@@ -10,19 +10,18 @@ public class DataRowCountValidator(int numOfRows): IDataValidator
     private int _currentRow;
     public IEnumerable<ValidationFeedback> Validate(Token token)
     {
-        switch (token.Type)
+        if (token.Type == TokenType.LineSeparator)
+            _currentRow++;
+        else if (token.Type == TokenType.EndOfStream && _currentRow != numOfRows)
         {
-            case TokenType.LineSeparator:
-                _currentRow++;
-                break;
-            case TokenType.EndOfStream:
-                if (_currentRow != numOfRows)
-                {
-                    return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error,
-                            ValidationFeedbackRule.DataValidationFeedbackInvalidRowCount, $"{numOfRows},{_currentRow}") };
-                }
-                break;
+            return new[]
+            {
+                new ValidationFeedback(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.DataValidationFeedbackInvalidRowCount, token.LineNumber,
+                    token.CharPosition, $"{numOfRows},{_currentRow}")
+            };
         }
+
         return Array.Empty<ValidationFeedback>();
     }
 }
@@ -45,7 +44,7 @@ public class DataRowLengthValidator(int rowLen) : IDataValidator
                 {
                     _currentRowLen = 0;
                     return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, 
-                        ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength, $"{rowLen},{itemNum}") };
+                        ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength, token.LineNumber, token.CharPosition,$"{rowLen},{itemNum}") };
                 }
                 _currentRowLen = 0;
                 break;
@@ -70,7 +69,7 @@ public class DataStringValidator : IDataValidator
         }
 
         return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, 
-            ValidationFeedbackRule.DataValidationFeedbackInvalidString, $"{token.Value}") };
+            ValidationFeedbackRule.DataValidationFeedbackInvalidString, token.LineNumber, token.CharPosition,$"{token.Value}") };
     }
 }
 
@@ -97,19 +96,19 @@ public class DataNumberDataValidator : IDataValidator
             }
             catch (Exception)
             {
-                return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, value) };
+                return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, token.LineNumber, token.CharPosition,value) };
             }
         } else if (dotPosition == 0 || dotPosition == length -1 || (dotPosition != -1 && value.IndexOf('.', dotPosition+1) != -1))
         {
-            return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, value) };
+            return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, token.LineNumber, token.CharPosition,value) };
         } else if ( minusPosition != -1 && (minusPosition != 0 || (value.IndexOf('-', minusPosition + 1 ) != -1))) {
-                return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, value) };
+                return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, token.LineNumber, token.CharPosition,value) };
         } else if (quotePosition != -1)
         {
-            return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, value) };
+            return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, token.LineNumber, token.CharPosition,value) };
         } else if (zeroPosition == 0 && dotPosition != 1 && length > 1 || minusPosition == 0 && zeroPosition == 1)
         {
-            return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, value) };
+            return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, token.LineNumber, token.CharPosition,value) };
         }
 
         return Array.Empty<ValidationFeedback>();
@@ -161,7 +160,7 @@ public class DataStructureValidator : IDataValidator
             return Array.Empty<ValidationFeedback>();
         }
         var feedback = new []{new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidStructure,
-            $"{_previousTokenType},{token.Type}")};
+            token.LineNumber, token.CharPosition, $"{_previousTokenType},{token.Type}")};
         _previousTokenType = token.Type;
         return feedback;
     }

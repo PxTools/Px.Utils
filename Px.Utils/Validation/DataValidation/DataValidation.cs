@@ -1,8 +1,7 @@
-﻿
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text;
 using PxUtils.PxFile;
-using PxUtils.Validation;
 
 namespace PxUtils.Validation.DataValidation
 {
@@ -11,14 +10,14 @@ namespace PxUtils.Validation.DataValidation
     /// </summary>
     public static class DataValidation
     {
-        private static readonly char[] ValidDataCharacters = ['1', '2', '3', '4', '5','6','7','8','9','0','-','.','"'];
+        private static readonly char[] ValidDataCharacters =
+            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '.', '"'];
 
         /// <summary>
         /// Validates the data in the stream according to the specified parameters and returns a collection of validation feedback items.
         /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword).
         /// </summary>
         /// <param name="stream">The stream containing the data to be validated.</param>
-        /// <param name="fileName">Name of the file of the stream (only used for reporting)</param>
         /// <param name="rowLen">The expected length of each row in the data.</param>
         /// <param name="numOfRows">The expected number of rows in the data.</param>
         /// <param name="startRow">The starting row number.</param>
@@ -27,12 +26,12 @@ namespace PxUtils.Validation.DataValidation
         /// <returns>
         /// A collection of ValidationFeedbackItem objects representing the feedback for the data validation.
         /// </returns>
-        public static IEnumerable<ValidationFeedbackItem> Validate(Stream stream, string fileName, int rowLen, int numOfRows,
+        public static IEnumerable<ValidationFeedback> Validate(Stream stream, int rowLen, int numOfRows,
             int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null)
         {
             conf ??= PxFileSyntaxConf.Default;
-            
-            var feedbackItems = new List<ValidationFeedbackItem>();
+
+            var feedbacks = new List<ValidationFeedback>();
             var tokens = Tokenize(stream, conf, streamEncoding);
 
             var validators = new List<IDataValidator>
@@ -44,32 +43,64 @@ namespace PxUtils.Validation.DataValidation
                 new DataRowCountValidator(numOfRows),
                 new DataStructureValidator()
             };
-            
+
             foreach (var token in tokens)
             {
                 if (token.Type == TokenType.InvalidDataChar)
                 {
-                    var validationEntry = new DataValidationEntry(fileName, startRow + token.LineNumber, token.CharPosition);
-                    feedbackItems.Add(new ValidationFeedbackItem(validationEntry, new ValidationFeedback(ValidationFeedbackLevel.Error, 
-                        ValidationFeedbackRule.DataValidationFeedbackInvalidChar, $"{token.Value}")));
+                    feedbacks.Add(new ValidationFeedback(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.DataValidationFeedbackInvalidChar, token.LineNumber, token.CharPosition,
+                        $"{token.Value}"));
                     continue;
                 }
-                var feedbacks = new List<ValidationFeedback>();
+
                 foreach (var validator in validators)
                 {
-                    feedbacks.AddRange(validator.Validate(token));                    
-                }
-                
-                if (feedbacks.Count > 0)
-                {
-                    var validationEntry = new DataValidationEntry(fileName, startRow + token.LineNumber, token.CharPosition);
-                    feedbackItems.AddRange(feedbacks.Select(feedback => new ValidationFeedbackItem(validationEntry, feedback)));
+                    feedbacks.AddRange(validator.Validate(token));
                 }
             }
 
-            return feedbackItems;
+            return feedbacks;
         }
 
+        public static async Task<IEnumerable<ValidationFeedback>> ValidateAsync(Stream stream, int rowLen,
+            int numOfRows,
+            int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null,
+            CancellationToken cancellationToken = default)
+        {
+            conf ??= PxFileSyntaxConf.Default;
+
+            var feedbacks = new List<ValidationFeedback>();
+            var tokens = TokenizeAsync(stream, conf, streamEncoding, cancellationToken);
+
+            var validators = new List<IDataValidator>
+            {
+                new DataSeparatorValidator(),
+                new DataNumberDataValidator(),
+                new DataStringValidator(),
+                new DataRowLengthValidator(rowLen),
+                new DataRowCountValidator(numOfRows),
+                new DataStructureValidator()
+            };
+
+            await foreach (var token in tokens)
+            {
+                if (token.Type == TokenType.InvalidDataChar)
+                {
+                    feedbacks.Add(new ValidationFeedback(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.DataValidationFeedbackInvalidChar, token.LineNumber, token.CharPosition,
+                        $"{token.Value}"));
+                    continue;
+                }
+
+                foreach (var validator in validators)
+                {
+                    feedbacks.AddRange(validator.Validate(token));
+                }
+            }
+
+            return feedbacks;
+        }
 
         /// <summary>
         /// Tokenizes the given stream according to the specified configuration and encoding.
@@ -89,50 +120,133 @@ namespace PxUtils.Validation.DataValidation
             while (!reader.EndOfStream)
             {
                 var currentCharacter = (char)reader.Read();
-                charPosition++;
                 var nextCharacter = reader.EndOfStream ? conf.Symbols.EndOfStream : reader.Peek();
 
-                if (currentCharacter is ' ' or '\t')
+                var token = GetToken(currentCharacter, nextCharacter, ref lineNumber, ref charPosition, out var skipNext,
+                    conf, ref valueBuilder);
+                if (skipNext)
                 {
-                    yield return new Token(TokenType.DataItemSeparator, currentCharacter.ToString(), lineNumber, charPosition);
+                    reader.Read();
                 }
-                else if (currentCharacter is '\n' or '\r')
+
+                if (token != null)
                 {
-                    var separator = currentCharacter.ToString();
-                    if(nextCharacter is '\n' or '\r')
-                    {
-                        separator += (char)nextCharacter;
-                        reader.Read();
-                    }
-                    yield return new Token(TokenType.LineSeparator, separator, lineNumber, charPosition);
-                    lineNumber++;
-                    charPosition = 0;
-                }
-                else if (currentCharacter == conf.Symbols.EntrySeparator)
-                {
-                    yield return new Token(TokenType.EndOfData, currentCharacter.ToString(), lineNumber, charPosition);
-                }
-                else if (ValidDataCharacters.Contains(currentCharacter))
-                {
-                    valueBuilder.Append(currentCharacter);                     
-                    if (nextCharacter is ' ' or '\t' || nextCharacter == conf.Symbols.EntrySeparator)
-                    {                    
-                        var tokentype = TokenType.NumDataItem;
-                        if (valueBuilder[0] == '\"')
-                        {
-                            tokentype = TokenType.StringDataItem;
-                        }
-                        yield return new Token(tokentype, valueBuilder.ToString(), lineNumber, charPosition - valueBuilder.Length + 1);
-                        valueBuilder.Clear();
-                    }
-                }
-                else
-                {
-                    yield return new Token(TokenType.InvalidDataChar, currentCharacter.ToString(), lineNumber, charPosition);
-                    valueBuilder.Clear();
+                    yield return (Token)token;
                 }
             }
             yield return new Token(TokenType.EndOfStream, valueBuilder.ToString(), lineNumber, charPosition);
+        }
+
+
+        public static async IAsyncEnumerable<Token> TokenizeAsync(Stream stream, PxFileSyntaxConf conf,
+            Encoding? streamEncoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            const int streamBufferSize = 1024;
+            var charPosition = 0;
+            var lineNumber = 1;
+            using StreamReader reader = new(stream, streamEncoding, false, streamBufferSize, true);
+            var valueBuilder = new StringBuilder();
+            var buffer = new char[streamBufferSize];
+            var readStartIndex = 0;
+
+            var charsRead = 0;
+            var ignoreNext = false;
+            Token? token;
+            do
+            {
+                charsRead = await reader.ReadAsync(buffer.AsMemory(readStartIndex), cancellationToken);
+
+                for (var currentPos = 0; currentPos < charsRead - 1 + readStartIndex; currentPos++)
+                {
+                    if (ignoreNext)
+                    {
+                        ignoreNext = false;
+                        continue;
+                    }
+                    var currentCharacter = buffer[currentPos];
+                    var nextCharacter = buffer[currentPos + 1];
+
+                    token = GetToken(currentCharacter, nextCharacter, ref lineNumber, ref charPosition,
+                        out var skipNext,
+                        conf, ref valueBuilder);
+                    ignoreNext = skipNext;
+                    if (token != null)
+                    {
+                        yield return (Token)token;
+                    }
+                }
+                buffer[0] = buffer[charsRead - 1 + readStartIndex];
+                readStartIndex = 1;
+
+            } while (charsRead > 0);
+
+            if (!ignoreNext)
+            {
+                token = GetToken(buffer[0], 0, ref lineNumber, ref charPosition, out _, conf, ref valueBuilder);
+
+                if (token != null)
+                {
+                    yield return (Token)token;
+                }
+            }
+
+            yield return new Token(TokenType.EndOfStream, valueBuilder.ToString(), lineNumber, charPosition);
+        }
+
+
+        private static Token? GetToken(char currentCharacter, int nextCharacter, ref int lineNumber,
+            ref int charPosition, out bool skipNext, PxFileSyntaxConf conf, ref StringBuilder valueBuilder)
+        {
+            skipNext = false;
+            charPosition++;
+            if (currentCharacter is ' ' or '\t')
+            {
+                return new Token(TokenType.DataItemSeparator, currentCharacter.ToString(), lineNumber,
+                    charPosition);
+            } 
+            if (currentCharacter is '\n' or '\r')
+            {
+                var separator = currentCharacter.ToString();
+                if (nextCharacter is '\n' or '\r')
+                {
+                    separator += (char)nextCharacter;
+                    skipNext = true;
+                }
+
+                var token = new Token(TokenType.LineSeparator, separator, lineNumber++, charPosition);
+                charPosition = 0;
+                return token;
+            }
+            if (currentCharacter == conf.Symbols.EntrySeparator)
+            {
+                return new Token(TokenType.EndOfData, currentCharacter.ToString(), lineNumber, charPosition);
+            }
+            if (ValidDataCharacters.Contains(currentCharacter))
+            {
+                valueBuilder.Append(currentCharacter);
+                if (nextCharacter is ' ' or '\t' || nextCharacter == conf.Symbols.EntrySeparator)
+                {
+                    var tokenType = TokenType.NumDataItem;
+                    if (valueBuilder[0] == '\"')
+                    {
+                        tokenType = TokenType.StringDataItem;
+                    }
+
+                    var token = new Token(tokenType, valueBuilder.ToString(), lineNumber,
+                        charPosition - valueBuilder.Length + 1);
+                    valueBuilder.Clear();
+                    return token;
+                }
+            }
+            else
+            {
+                var token = new Token(TokenType.InvalidDataChar, currentCharacter.ToString(), lineNumber,
+                    charPosition);
+                valueBuilder.Clear();
+                return token;
+            }
+            
+            return null;
         }
     }
 
@@ -147,6 +261,7 @@ namespace PxUtils.Validation.DataValidation
         EndOfData,
         EndOfStream
     }
+
     public readonly struct Token(TokenType type, string value, int lineNumber, int charPosition)
     {
         public TokenType Type { get; } = type;
@@ -166,9 +281,4 @@ namespace PxUtils.Validation.DataValidation
         internal IEnumerable<ValidationFeedback> Validate(Token token);
     }
 
-    public class DataValidationEntry(string file, int line, int character) : ValidationObject(line, character, file);
 }
-
-
-
-
