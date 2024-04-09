@@ -27,7 +27,7 @@ namespace PxUtils.PxFile.Data
             return -1;
         }
 
-        public async static Task<long> FindKeywordPositionAsync(Stream stream, string keyword, PxFileSyntaxConf conf, int bufferSize = 4096)
+        public async static Task<long> FindKeywordPositionAsync(Stream stream, string keyword, PxFileSyntaxConf conf, CancellationToken? cancellationToken = null, int bufferSize = 4096)
         {
             char entrySeparator = conf.Symbols.EntrySeparator;
 
@@ -40,7 +40,7 @@ namespace PxUtils.PxFile.Data
 
             do
             {
-                read = await stream.ReadAsync(buffer.AsMemory(0, bufferSize));
+                read = await stream.ReadAsync(buffer.AsMemory(0, bufferSize), cancellationToken ?? CancellationToken.None);
                 long indexInBuffer = FindInBuffer(read, buffer, keywordBytes, entrySeparator, ref searchMode, ref keywordIndex);
                 if(indexInBuffer >= 0) return stream.Position - read + indexInBuffer;
             }

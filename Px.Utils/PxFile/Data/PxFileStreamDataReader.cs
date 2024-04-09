@@ -64,9 +64,9 @@ namespace PxUtils.PxFile.Data
 
         public async Task ReadUnsafeDoublesAsync(double[] buffer, int offset, int[] rows, int[] cols, double[] missingValueEncodings, CancellationToken cancellationToken)
         {
-            await SetReaderPositionIfZeroAsync();
+            await SetReaderPositionIfZeroAsync(cancellationToken);
             await Task.Factory.StartNew(() =>
-                ReadItemsFromStream(buffer, offset, rows, cols, Parser), cancellationToken);
+                ReadItemsFromStream(buffer, offset, rows, cols, Parser, cancellationToken), cancellationToken);
 
             double Parser(char[] parseBuffer, int len)
             {
@@ -83,9 +83,9 @@ namespace PxUtils.PxFile.Data
 
         public async Task ReadDoubleDataValuesAsync(DoubleDataValue[] buffer, int offset, int[] rows, int[] cols, CancellationToken cancellationToken)
         {
-            await SetReaderPositionIfZeroAsync();
+            await SetReaderPositionIfZeroAsync(cancellationToken);
             await Task.Factory.StartNew(() =>
-                ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDoubleDataValue), cancellationToken);
+                ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDoubleDataValue, cancellationToken), cancellationToken);
         }
 
         public async Task ReadDecimalDataValuesAsync(DecimalDataValue[] buffer, int offset, int[] rows, int[] cols)
@@ -97,9 +97,9 @@ namespace PxUtils.PxFile.Data
 
         public async Task ReadDecimalDataValuesAsync(DecimalDataValue[] buffer, int offset, int[] rows, int[] cols, CancellationToken cancellationToken)
         {
-            await SetReaderPositionIfZeroAsync();
+            await SetReaderPositionIfZeroAsync(cancellationToken);
             await Task.Factory.StartNew(() =>
-                ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDecimalDataValue), cancellationToken);
+                ReadItemsFromStream(buffer, offset, rows, cols, DataValueParsers.ParseDecimalDataValue, cancellationToken), cancellationToken);
         }
 
         public void Dispose()
@@ -119,11 +119,11 @@ namespace PxUtils.PxFile.Data
             _dataStart = start + dataKeyword.Length + 1; // +1 to skip the '='
         }
 
-        private async Task SetReaderPositionIfZeroAsync()
+        private async Task SetReaderPositionIfZeroAsync(CancellationToken? cancellationToken = null)
         {
             if (_dataStart != 0) return;
             string dataKeyword = _conf.Tokens.KeyWords.Data;
-            long start = await StreamUtilities.FindKeywordPositionAsync(_stream, dataKeyword, _conf);
+            long start = await StreamUtilities.FindKeywordPositionAsync(_stream, dataKeyword, _conf, cancellationToken);
             if (start == -1)
             {
                 throw new ArgumentException($"Could not find data keyword '{dataKeyword}'");
@@ -131,7 +131,7 @@ namespace PxUtils.PxFile.Data
             _dataStart = start + dataKeyword.Length + 1; // +1 to skip the '='
         }
 
-        private void ReadItemsFromStream<T>(T[] buffer, int offset, int[] rows, int[] cols, Func<char[], int, T> readItem)
+        private void ReadItemsFromStream<T>(T[] buffer, int offset, int[] rows, int[] cols, Func<char[], int, T> readItem, CancellationToken? token = null)
         {
             _stream.Position = _dataStart;
             int startingIndex = offset;
@@ -150,6 +150,7 @@ namespace PxUtils.PxFile.Data
 
             do
             {
+                token?.ThrowIfCancellationRequested();
                 read = _stream.Read(internalBuffer, 0, INTERNAL_BUFFER_SIZE);
                 for(int i = 0; i < read; i++)
                 {
