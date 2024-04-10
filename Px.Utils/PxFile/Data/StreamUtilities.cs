@@ -3,8 +3,19 @@ using System.Text;
 
 namespace PxUtils.PxFile.Data
 {
+    /// <summary>
+    /// Utility class for working with px file <see cref="Stream"/> instances.
+    /// </summary>
     public static class StreamUtilities
     {
+        /// <summary>
+        /// Finds the position of the first occurrence of a specified keyword in a given stream.
+        /// </summary>
+        /// <param name="stream">The stream to search in.</param>
+        /// <param name="keyword">The keyword to search for.</param>
+        /// <param name="conf">A configuration object that contains symbols used in the px file syntax.</param>
+        /// <param name="bufferSize">The size of the buffer to use when reading from the stream. Defaults to 4096.</param>
+        /// <returns>The position of the keyword in the stream if found, otherwise -1.</returns>
         public static long FindKeywordPosition(Stream stream, string keyword, PxFileSyntaxConf conf, int bufferSize = 4096)
         {
             char entrySeparator = conf.Symbols.EntrySeparator;
@@ -27,6 +38,15 @@ namespace PxUtils.PxFile.Data
             return -1;
         }
 
+        /// <summary>
+        /// Asynchronously finds the position of the first occurrence of a specified keyword in a given stream.
+        /// </summary>
+        /// <param name="stream">The stream to search in.</param>
+        /// <param name="keyword">The keyword to search for.</param>
+        /// <param name="conf">A configuration object that contains symbols used in the px file syntax.</param>
+        /// <param name="cancellationToken">A token that can be used to cancel the operation. Defaults to None.</param>
+        /// <param name="bufferSize">The size of the buffer to use when reading from the stream. Defaults to 4096.</param>
+        /// <returns>The task result contains the position of the keyword in the stream if found, otherwise -1.</returns>
         public async static Task<long> FindKeywordPositionAsync(Stream stream, string keyword, PxFileSyntaxConf conf, CancellationToken? cancellationToken = null, int bufferSize = 4096)
         {
             char entrySeparator = conf.Symbols.EntrySeparator;

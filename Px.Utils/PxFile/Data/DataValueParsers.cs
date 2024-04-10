@@ -7,6 +7,14 @@ namespace PxUtils.PxFile.Data
 {
     public static class DataValueParsers
     {
+        /// <summary>
+        /// This method uses a fast, but potentially unsafe, parser to convert the characters into a <see cref="DoubleDataValue"/>.
+        /// It is important that the input has been validated before using this method since the method does not perform any validation.
+        /// Invalid input will result in undefined behavior.
+        /// </summary>
+        /// <param name="buffer">The characters to parse.</param>
+        /// <param name="len">The number of characters to parse.</param>
+        /// <returns>A <see cref="DoubleDataValue"/> instance representing the parsed value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DoubleDataValue FastParseDoubleDataValueDangerous(char[] buffer, int len)
         {
@@ -22,6 +30,14 @@ namespace PxUtils.PxFile.Data
             }
         }
 
+        /// <summary>
+        /// This method uses a fast, but potentially unsafe, parser to convert the characters into a <see cref="DecimalDataValue"/>.
+        /// It is important that the input has been validated before using this method since the method does not perform any validation.
+        /// Invalid input will result in undefined behavior.
+        /// </summary>
+        /// <param name="buffer">The characters to parse.</param>
+        /// <param name="len">The number of characters to parse.</param>
+        /// <returns>A <see cref="DecimalDataValue"/> instance representing the parsed value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DecimalDataValue FastParseDecimalDataValueDangerous(char[] buffer, int len)
         {
@@ -33,10 +49,29 @@ namespace PxUtils.PxFile.Data
             else
             {
                 decimal value = FastParseDecimalDangerous(buffer, len);
-                return new DecimalDataValue(value, DataValueType.Exists);
+                return new (value, DataValueType.Exists);
             }
         }
 
+        /// <summary>
+        /// This method uses a fast, but potentially unsafe, parser to convert the characters into a <see cref="double"/>.
+        /// If the value is missing, the method returns a value from the missingValueEncodings array.
+        /// Otherwise, the method interprets the characters as a number and returns that number.
+        /// This method does not perform any validation, so ensure the input is valid before use.
+        /// </summary>
+        /// <param name="buffer">The characters to parse.</param>
+        /// <param name="len">The number of characters to parse.</param>
+        /// <param name="missingValueEncodings">
+        /// Array of values to use for missing encodings:
+        /// [0] "-"
+        /// [1] "."
+        /// [2] ".."
+        /// [3] "..."
+        /// [4] "...."
+        /// [5] "....."
+        /// [6] "......"
+        /// </param>
+        /// <returns>A double value representing the parsed value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double FastParseUnsafeDoubleDangerous(char[] buffer, int len, double[] missingValueEncodings)
         {
@@ -51,6 +86,13 @@ namespace PxUtils.PxFile.Data
             }
         }
 
+        /// <summary>
+        /// Parses a set of characters into a <see cref="DoubleDataValue"/> instance.
+        /// </summary>
+        /// <param name="buffer">The characters to parse.</param>
+        /// <param name="len">The number of characters to parse.</param>
+        /// <returns>A <see cref="DoubleDataValue"/> instance representing the parsed value.</returns>
+        /// <exception cref="ArgumentException">Thrown if the input is not a valid number or a missing value code.</exception>"
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DoubleDataValue ParseDoubleDataValue(char[] buffer, int len)
         {
@@ -78,6 +120,13 @@ namespace PxUtils.PxFile.Data
             }
         }
 
+        /// <summary>
+        /// Parses a set of characters into a <see cref="DecimalDataValue"/> instance.
+        /// </summary>
+        /// <param name="buffer">The characters to parse.</param>
+        /// <param name="len">The number of characters to parse.</param>
+        /// <returns>A <see cref="DecimalDataValue"/> instance representing the parsed value.</returns>
+        /// <exception cref="ArgumentException">Thrown if the input is not a valid number or a missing value code.</exception>"
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DecimalDataValue ParseDecimalDataValue(char[] buffer, int len)
         {
@@ -105,6 +154,25 @@ namespace PxUtils.PxFile.Data
             }
         }
 
+        /// <summary>
+        /// Parses a set of characters into a <see cref="double"/> value.
+        /// If the value is missing, the method returns a value from the missingValueEncodings array.
+        /// Otherwise, the method interprets the characters as a number and returns that number.
+        /// </summary>
+        /// <param name="buffer">The characters to parse.</param>
+        /// <param name="len">The number of characters to parse.</param>
+        /// <param name="missingValueEncodings">
+        /// Array of values to use for missing encodings:
+        /// [0] "-"
+        /// [1] "."
+        /// [2] ".."
+        /// [3] "..."
+        /// [4] "...."
+        /// [5] "....."
+        /// [6] "......"
+        /// </param>
+        /// <returns>A <see cref="double"/> value representing the parsed value.</returns>
+        /// <exception cref="ArgumentException">Thrown if the input is not a valid number or a missing value code.</exception>"
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double ParseUnsafeDouble(char[] buffer, int len, double[] missingValueEncodings)
         {

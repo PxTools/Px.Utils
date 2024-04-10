@@ -1,5 +1,8 @@
 ﻿namespace PxUtils.Models.Data
 {
+    /// <summary>
+    /// Type of a singular data value in a px file.
+    /// </summary>
     public enum DataValueType : byte
     {
         Exists = 0,
