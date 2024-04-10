@@ -270,7 +270,7 @@ namespace Px.Utils.TestingApp.Commands
             List<int> builder = [];
             foreach (string part in input)
             {
-                if (Regex.IsMatch(part, rangePattern))
+                if (Regex.IsMatch(part, rangePattern, RegexOptions.None, TimeSpan.FromMilliseconds(100)))
                 {
                     string[] ints = part.Split("..");
                     if (int.TryParse(ints[0], out int start) && int.TryParse(ints[1], out int end))
