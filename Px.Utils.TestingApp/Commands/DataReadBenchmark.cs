@@ -17,15 +17,25 @@ namespace Px.Utils.TestingApp.Commands
         private readonly string[] colsFlags = ["-c", "-cols"];
 
         internal override string Help =>
-            "Reads the defined dataset from the target px file the given amount of times. " +
-            "The first parameter is the path to the file, the second parameter is the rows to read, " +
-            "the third parameter is the columns to read. " +
-            "The rows and columns are defined as a space-separated list of integers or ranges of integers separated by '..'.";
+        "Reads the defined dataset from the target px file the given amount of times." + Environment.NewLine +
+        "\t-f, -file: The path to the px file to read." + Environment.NewLine +
+        "\t-i, -iter: The number of iterations to run." + Environment.NewLine +
+        "\t-r, -rows: The rows to read from the dataset." + Environment.NewLine +
+        "\t-c, -cols: The columns to read from the dataset." + Environment.NewLine +
+        "The rows and columns are defined as a space-separated list of integers or ranges of integers separated by '..'.";
 
         internal override string Description => "Benchmarks the data reading capabilities of the PxFileStreamDataReader.";
 
         internal override void Run(bool batchMode, List<string>? inputs = null)
         {
+            if(inputs?.Count == 1 && inputs[0] == "help")
+            {
+                Console.Clear();
+                Console.WriteLine(Help);
+                Console.WriteLine();
+                inputs = [];
+            }
+
             SetRunParameters(batchMode, inputs);
 
             // synchronous read

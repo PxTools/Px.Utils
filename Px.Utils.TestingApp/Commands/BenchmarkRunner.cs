@@ -15,7 +15,7 @@
             {
                 Console.Clear();
                 string help = "Available benchmarks:" + Environment.NewLine;
-                return help + string.Join(Environment.NewLine, _benchmarks.Select(b => $"- {b.Key}: {b.Value.Description}{Environment.NewLine}"));
+                return help + string.Join(Environment.NewLine, _benchmarks.Select(b => $"\t{b.Key}: {b.Value.Description}{Environment.NewLine}"));
             }
         }
 
