@@ -420,25 +420,13 @@ namespace PxUtils.Validation.SyntaxValidation
             string[] splitIntervalSection = intervalSection.Sections[0].Split(syntaxConf.Symbols.Value.ListSeparator);
             string intervalToken = splitIntervalSection[0];
             string? timeRange = splitIntervalSection.Length == 2 ? splitIntervalSection[1] : null;
-            if (!IsIntervalTokenValid(intervalToken, syntaxConf))
+            if (!syntaxConf.Tokens.Time.TimeIntervalTokens.Contains(intervalToken))
             {
                 valueFormat = null;
                 return false;
             }
             string remainder = intervalSection.Remainder.Remove(0, syntaxConf.Tokens.Time.TimeIntervalIndicator.Length);
             return timeRange is not null ? TryGetTimeValueRangeFormat(timeRange, intervalToken, out valueFormat, syntaxConf) : TryGetTimeValueSeriesFormat(remainder, intervalToken, out valueFormat, syntaxConf);
-        }
-
-        private static bool IsIntervalTokenValid(string intervalToken, PxFileSyntaxConf syntaxConf)
-        {
-            if (syntaxConf.Tokens.Time.TimeIntervalTokens.Contains(intervalToken))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }   
         }
 
         private static bool TryGetTimeValueSeriesFormat(string input, string timeInterval, out ValueType? valueFormat, PxFileSyntaxConf syntaxConf)
