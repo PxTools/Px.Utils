@@ -490,18 +490,17 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static string GetPatternForTimeInterval(string timeInterval, PxFileSyntaxConf syntaxConf)
         {
-            Dictionary<string, string> patterns = new()
+            return timeInterval switch
             {
-                { syntaxConf.Tokens.Time.YearInterval, @"^\d{4}$" },
-                { syntaxConf.Tokens.Time.HalfYearInterval, @"^\d{4}[1-4]$" },
-                { syntaxConf.Tokens.Time.TrimesterInterval, @"^\d{4}[1-4]$" },
-                { syntaxConf.Tokens.Time.QuarterYearInterval, @"^\d{4}[1-4]$" },
-                { syntaxConf.Tokens.Time.MonthInterval, @"^\d{4}(0[1-9]|1[0-2])$" },
-                { syntaxConf.Tokens.Time.WeekInterval, @"^\d{4}(0[1-9]|[1-4][0-9]|5[0-2])$" },
-                { syntaxConf.Tokens.Time.DayInterval, @"^\d{4}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$" }
+                string interval when interval == syntaxConf.Tokens.Time.YearInterval => @"^\d{4}$",
+                string interval when interval == syntaxConf.Tokens.Time.HalfYearInterval => @"^\d{4}[1-4]$",
+                string interval when interval == syntaxConf.Tokens.Time.TrimesterInterval => @"^\d{4}[1-4]$",
+                string interval when interval == syntaxConf.Tokens.Time.QuarterYearInterval => @"^\d{4}[1-4]$",
+                string interval when interval == syntaxConf.Tokens.Time.MonthInterval => @"^\d{4}(0[1-9]|1[0-2])$",
+                string interval when interval == syntaxConf.Tokens.Time.WeekInterval => @"^\d{4}(0[1-9]|[1-4][0-9]|5[0-2])$",
+                string interval when interval == syntaxConf.Tokens.Time.DayInterval => @"^\d{4}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$",
+                _ => throw new ArgumentException("Invalid time interval", timeInterval)
             };
-
-            return patterns[timeInterval];
         }
 
         private static bool TryGetTimeValueRangeFormat(string input, string timeInterval, out ValueType? valueFormat, PxFileSyntaxConf syntaxConf)
