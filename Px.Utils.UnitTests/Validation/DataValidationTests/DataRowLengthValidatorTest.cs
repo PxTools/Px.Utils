@@ -1,56 +1,57 @@
 ﻿using PxUtils.Validation;
 using PxUtils.Validation.DataValidation;
 
-namespace Px.Utils.UnitTests.Validation.DataValidationTests;
-
-[TestClass]
-public class DataRowLengthValidatorTest
+namespace Px.Utils.UnitTests.Validation.DataValidationTests
 {
-    
-    [TestMethod]
-    public void RowLengthIsCorrect()
+    [TestClass]
+    public class DataRowLengthValidatorTest
     {
-        var validator = new DataRowLengthValidator(3);
-        var feedbacks = validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
-        Assert.IsFalse(feedbacks.Any());
-        feedbacks = validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
-        Assert.IsFalse(feedbacks.Any());
-        feedbacks = validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
-        Assert.IsFalse(feedbacks.Any());
-        feedbacks = validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
-        Assert.IsFalse(feedbacks.Any());
-    }
     
-    [TestMethod]
-    public void TooFewDataItems()
-    {
-        var validator = new DataRowLengthValidator(3);
-        validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
-        validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
-        var feedbacks = validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
+        [TestMethod]
+        public void RowLengthIsCorrect()
+        {
+            DataRowLengthValidator validator = new(3);
+            var feedbacks = validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
+            Assert.IsFalse(feedbacks.Any());
+            feedbacks = validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
+            Assert.IsFalse(feedbacks.Any());
+            feedbacks = validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
+            Assert.IsFalse(feedbacks.Any());
+            feedbacks = validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
+            Assert.IsFalse(feedbacks.Any());
+        }
+    
+        [TestMethod]
+        public void TooFewDataItems()
+        {
+            DataRowLengthValidator validator = new(3);
+            validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
+            validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
+            var feedbacks = validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
         
-        Assert.AreEqual(1, feedbacks.Count());
-        Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength, feedbacks.First().Rule);
-        Assert.AreEqual("3,2", feedbacks.First().AdditionalInfo);
-        Assert.AreEqual(ValidationFeedbackLevel.Error, feedbacks.First().Level);
+            Assert.AreEqual(1, feedbacks.Count());
+            Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength, feedbacks.First().Rule);
+            Assert.AreEqual("3,2", feedbacks.First().AdditionalInfo);
+            Assert.AreEqual(ValidationFeedbackLevel.Error, feedbacks.First().Level);
+
+        }
+
+        [TestMethod]
+        public void TooManyDataItems()
+        {
+            DataRowLengthValidator validator = new(3);
+            validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
+            validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
+            validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
+            validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
+            var feedbacks = validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
+
+            Assert.AreEqual(1, feedbacks.Count());
+            Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength, feedbacks.First().Rule);
+            Assert.AreEqual("3,4", feedbacks.First().AdditionalInfo);
+            Assert.AreEqual(ValidationFeedbackLevel.Error, feedbacks.First().Level);
+
+        }
 
     }
-
-    [TestMethod]
-    public void TooManyDataItems()
-    {
-        var validator = new DataRowLengthValidator(3);
-        validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
-        validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
-        validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
-        validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1, 1));
-        var feedbacks = validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
-
-        Assert.AreEqual(1, feedbacks.Count());
-        Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength, feedbacks.First().Rule);
-        Assert.AreEqual("3,4", feedbacks.First().AdditionalInfo);
-        Assert.AreEqual(ValidationFeedbackLevel.Error, feedbacks.First().Level);
-
-    }
-
 }

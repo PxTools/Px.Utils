@@ -31,18 +31,18 @@ namespace PxUtils.Validation.DataValidation
         {
             conf ??= PxFileSyntaxConf.Default;
 
-            var feedbacks = new List<ValidationFeedback>();
+            List<ValidationFeedback> feedbacks = [];
             var tokens = Tokenize(stream, conf, streamEncoding);
 
-            var validators = new List<IDataValidator>
-            {
+            List<IDataValidator> validators =
+            [
                 new DataSeparatorValidator(),
                 new DataNumberDataValidator(),
                 new DataStringValidator(),
                 new DataRowLengthValidator(rowLen),
                 new DataRowCountValidator(numOfRows),
                 new DataStructureValidator()
-            };
+            ];
 
             foreach (var token in tokens)
             {
@@ -81,18 +81,18 @@ namespace PxUtils.Validation.DataValidation
         {
             conf ??= PxFileSyntaxConf.Default;
 
-            var feedbacks = new List<ValidationFeedback>();
+            List<ValidationFeedback> feedbacks = [];
             var tokens = TokenizeAsync(stream, conf, streamEncoding, cancellationToken);
 
-            var validators = new List<IDataValidator>
-            {
+            List<IDataValidator> validators =
+            [
                 new DataSeparatorValidator(),
                 new DataNumberDataValidator(),
                 new DataStringValidator(),
                 new DataRowLengthValidator(rowLen),
                 new DataRowCountValidator(numOfRows),
                 new DataStructureValidator()
-            };
+            ];
 
             await foreach (var token in tokens)
             {
@@ -126,7 +126,7 @@ namespace PxUtils.Validation.DataValidation
             var charPosition = 0;
             var lineNumber = 1;
             using StreamReader reader = new(stream, streamEncoding, false, streamBufferSize, true);
-            var valueBuilder = new StringBuilder();
+            StringBuilder valueBuilder = new();
 
             while (!reader.EndOfStream)
             {
@@ -164,7 +164,7 @@ namespace PxUtils.Validation.DataValidation
             var charPosition = 0;
             var lineNumber = 1;
             using StreamReader reader = new(stream, streamEncoding, false, streamBufferSize, true);
-            var valueBuilder = new StringBuilder();
+            StringBuilder valueBuilder = new();
             var buffer = new char[streamBufferSize];
             var readStartIndex = 0;
 
@@ -232,7 +232,7 @@ namespace PxUtils.Validation.DataValidation
                     skipNext = true;
                 }
 
-                var token = new Token(TokenType.LineSeparator, separator, lineNumber++, charPosition);
+                Token token = new(TokenType.LineSeparator, separator, lineNumber++, charPosition);
                 charPosition = 0;
                 return token;
             }
@@ -251,7 +251,7 @@ namespace PxUtils.Validation.DataValidation
                         tokenType = TokenType.StringDataItem;
                     }
 
-                    var token = new Token(tokenType, valueBuilder.ToString(), lineNumber,
+                    Token token = new(tokenType, valueBuilder.ToString(), lineNumber,
                         charPosition - valueBuilder.Length + 1);
                     valueBuilder.Clear();
                     return token;
@@ -259,7 +259,7 @@ namespace PxUtils.Validation.DataValidation
             }
             else
             {
-                var token = new Token(TokenType.InvalidDataChar, currentCharacter.ToString(), lineNumber,
+                Token token = new(TokenType.InvalidDataChar, currentCharacter.ToString(), lineNumber,
                     charPosition);
                 valueBuilder.Clear();
                 return token;

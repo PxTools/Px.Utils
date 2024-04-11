@@ -193,6 +193,27 @@
 
                 public static BooleanTokens DefaultBooleanTokens => new();
             }
+            
+            public class DataValueTokens
+            {
+                private const string DATA_IS_MISSING = "\".\"";
+                private const string DATA_CATEGORY_NOT_APPLICABLE = "\"..\"";
+                private const string DATA_IS_CONFIDENTIAL = "\"...\"";
+                private const string DATA_IS_NOT_AVAILABLE = "\"....\"";
+                private const string DATA_HAS_NOT_BEEN_ASKED = "\".....\"";
+                private const string MISSING6 = "\"......\"";
+                private const string DATA_IS_NONE = "\"-\"";
+                
+                public string DataIsMissing { get; } = DATA_IS_MISSING;
+                public string DataCategoryNotApplicable { get; } = DATA_CATEGORY_NOT_APPLICABLE;
+                public string DataIsConfidential { get; } = DATA_IS_CONFIDENTIAL;
+                public string DataIsNotAvailable { get; } = DATA_IS_NOT_AVAILABLE;
+                public string DataHasNotBeenAsked { get; } = DATA_HAS_NOT_BEEN_ASKED;
+                public string Missing6 { get; } = MISSING6;
+                public string DataIsNone { get; } = DATA_IS_NONE;
+
+                public static DataValueTokens DefaultDataValueTokens=> new();
+            }
 
             public TimeValue Time { get; set; }
 
@@ -200,6 +221,8 @@
 
             public VariableTypeTokens VariableTypes { get; set; }
             public BooleanTokens Booleans { get; set; }
+            
+            public DataValueTokens DataValues { get; set; }
 
             private TokenCollection()
             {
@@ -207,6 +230,7 @@
                 KeyWords = KeyWordTokens.DefaultKeyWordTokens;
                 VariableTypes = VariableTypeTokens.DefaultVariableTypeTokens;
                 Booleans = BooleanTokens.DefaultBooleanTokens;
+                DataValues = DataValueTokens.DefaultDataValueTokens;
             }
 
             public static TokenCollection DefaultTokens => new();
