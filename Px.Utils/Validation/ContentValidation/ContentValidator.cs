@@ -54,19 +54,19 @@ namespace PxUtils.Validation.ContentValidation
             ContentValidationFunctions contentValidationFunctions = new();
 
             IEnumerable<ContentValidationEntryDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;
-            IEnumerable<ContentValidationSearchDelegate> contentValidationSearchFunctions = contentValidationFunctions.DefaultContentValidationSearchFunctions;
+            IEnumerable<ContentValidationFindKeywordDelegate> contentValidationFindKeywordFunctions = contentValidationFunctions.DefaultContentValidationFindKeywordFunctions;
 
             if (customContentValidationFunctions is not null)
             {
                 contentValidationEntryFunctions = contentValidationEntryFunctions.Concat(customContentValidationFunctions.CustomContentValidationEntryFunctions);
-                contentValidationSearchFunctions = contentValidationSearchFunctions.Concat(customContentValidationFunctions.CustomContentValidationSearchFunctions);
+                contentValidationFindKeywordFunctions = contentValidationFindKeywordFunctions.Concat(customContentValidationFunctions.CustomContentValidationFindKeywordFunctions);
             }
 
             List <ValidationFeedbackItem> feedbackItems = [];
 
-            foreach (ContentValidationSearchDelegate searchFunction in contentValidationSearchFunctions)
+            foreach (ContentValidationFindKeywordDelegate findingFunction in contentValidationFindKeywordFunctions)
             {
-                ValidationFeedbackItem[]? feedback = searchFunction(entries, syntaxConf, this);
+                ValidationFeedbackItem[]? feedback = findingFunction(entries, syntaxConf, this);
                 if (feedback is not null)
                 {
                     feedbackItems.AddRange(feedback);
@@ -105,20 +105,20 @@ namespace PxUtils.Validation.ContentValidation
             ContentValidationFunctions contentValidationFunctions = new();
 
             IEnumerable<ContentValidationEntryDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;
-            IEnumerable<ContentValidationSearchDelegate> contentValidationSearchFunctions = contentValidationFunctions.DefaultContentValidationSearchFunctions;
+            IEnumerable<ContentValidationFindKeywordDelegate> contentValidationFindKeywordFunctions = contentValidationFunctions.DefaultContentValidationFindKeywordFunctions;
 
             if (customContentValidationFunctions is not null)
             {
                 contentValidationEntryFunctions = [.. contentValidationEntryFunctions, .. customContentValidationFunctions.CustomContentValidationEntryFunctions];
-                contentValidationSearchFunctions = [.. contentValidationSearchFunctions, .. customContentValidationFunctions.CustomContentValidationSearchFunctions];
+                contentValidationFindKeywordFunctions = [.. contentValidationFindKeywordFunctions, .. customContentValidationFunctions.CustomContentValidationFindKeywordFunctions];
             }
 
             List<ValidationFeedbackItem> feedbackItems = [];
 
-            // Some search type content validation functions are dependent on the results of other search type content validation functions
-            foreach (var searchFunction in contentValidationSearchFunctions)
+            // Some "find keyword" type content validation functions are dependent on the results of other content validation functions
+            foreach (var findFunction in contentValidationFindKeywordFunctions)
             {
-                ValidationFeedbackItem[]? feedback = await Task.Run(() => searchFunction(entries, syntaxConf, this));
+                ValidationFeedbackItem[]? feedback = await Task.Run(() => findFunction(entries, syntaxConf, this));
                 if (feedback is not null)
                 {
                     feedbackItems.AddRange(feedback);

@@ -4,7 +4,7 @@ using PxUtils.Validation.SyntaxValidation;
 namespace PxUtils.Validation.ContentValidation
 {
     public delegate ValidationFeedbackItem[]? ContentValidationEntryDelegate(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ContentValidator validator);
-    public delegate ValidationFeedbackItem[]? ContentValidationSearchDelegate(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator); 
+    public delegate ValidationFeedbackItem[]? ContentValidationFindKeywordDelegate(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator); 
     
     /// <summary>
     /// Collection of functions for validating Px file metadata contents
@@ -12,7 +12,7 @@ namespace PxUtils.Validation.ContentValidation
     public class ContentValidationFunctions
     {
         public List<ContentValidationEntryDelegate> DefaultContentValidationEntryFunctions { get; }
-        public List<ContentValidationSearchDelegate> DefaultContentValidationSearchFunctions { get; }
+        public List<ContentValidationFindKeywordDelegate> DefaultContentValidationFindKeywordFunctions { get; }
 
         /// <summary>
         /// Constructor that contains default content validation functions
@@ -29,7 +29,7 @@ namespace PxUtils.Validation.ContentValidation
                 ValidateValueAmounts,
                 ValidateValueUppercaseRecommendations
             ];
-            DefaultContentValidationSearchFunctions = [
+            DefaultContentValidationFindKeywordFunctions = [
                 ValidateFindDefaultLanguage,
                 ValidateFindAvailableLanguages,
                 ValidateDefaultLanguageDefinedInAvailableLanguages,
