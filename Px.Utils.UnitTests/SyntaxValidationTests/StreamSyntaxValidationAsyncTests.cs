@@ -1,9 +1,8 @@
 ﻿using PxUtils.Validation.SyntaxValidation;
 using PxUtils.UnitTests.SyntaxValidationTests.Fixtures;
 using System.Text;
-using PxUtils.PxFile;
 using PxUtils.Validation;
-using PxUtils.PxFile.Meta;
+using PxUtils.PxFile.Metadata;
 
 namespace PxUtils.UnitTests.SyntaxValidationTests
 {
