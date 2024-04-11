@@ -207,23 +207,14 @@ namespace PxUtils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="input">The input string to clean</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
-        /// <param name="forceful">A boolean that can be set true if the cleaning should be done forcefully</param>
         /// <returns>Returns a string that is the input string cleaned from new line characters and quotation marks</returns>
-        internal static string CleanString(string input, PxFileSyntaxConf syntaxConf, bool forceful = false)
+        internal static string CleanString(string input, PxFileSyntaxConf syntaxConf)
         {
             char[] charactersToTrim = [
                 CharacterConstants.CARRIAGE_RETURN,
                 syntaxConf.Symbols.Linebreak,
                 syntaxConf.Symbols.Key.StringDelimeter
             ];
-
-            if (forceful)
-            {
-                input = input
-                    .Replace(CharacterConstants.CARRIAGE_RETURN.ToString(), "")
-                    .Replace(syntaxConf.Symbols.Linebreak.ToString(), "")
-                    .Replace(CharacterConstants.SPACE.ToString(), "");
-            }
 
             return input.Trim(charactersToTrim);
         }
@@ -461,12 +452,24 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static bool IsValidTimestampFormat(string input, string timeInterval, PxFileSyntaxConf syntaxConf)
         {
+            input = input
+                .Replace(CharacterConstants.CARRIAGE_RETURN.ToString(), "")
+                .Replace(syntaxConf.Symbols.Linebreak.ToString(), "")
+                .Replace(CharacterConstants.SPACE.ToString(), "");
+            
+            input = CleanString(input, syntaxConf);
+                
+
             // Timestamp should match with a regex pattern for the given time interval
-            input = CleanString(input, syntaxConf, true);
             Regex regex = GetRegexForTimeInterval(timeInterval, syntaxConf);
 
             try
             {
+                bool isMatch = regex.IsMatch(input);
+                if (!isMatch)
+                {
+                    int i = 0;
+                }
                 return regex.IsMatch(input);
             }
             catch (RegexMatchTimeoutException)
