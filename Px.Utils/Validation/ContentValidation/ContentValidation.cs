@@ -39,7 +39,7 @@ namespace PxUtils.Validation.ContentValidation
                 contentValidationSearchFunctions = contentValidationSearchFunctions.Concat(customContentValidationFunctions.CustomContentValidationSearchFunctions);
             }
 
-            foreach(ContentValidationSearchFunctionDelegate searchFunction in contentValidationSearchFunctions)
+            foreach (ContentValidationSearchFunctionDelegate searchFunction in contentValidationSearchFunctions)
             {
                 ValidationFeedbackItem[]? feedback = searchFunction(entries, syntaxConf, ref contentValidationInfo);
                 if (feedback is not null)
@@ -47,9 +47,9 @@ namespace PxUtils.Validation.ContentValidation
                     feedbackItems.AddRange(feedback);
                 }
             }
-            foreach(ContentValidationEntryFunctionDelegate entryFunction in contentValidationEntryFunctions)
+            foreach (ContentValidationEntryFunctionDelegate entryFunction in contentValidationEntryFunctions)
             {
-                foreach(ValidationStructuredEntry entry in entries)
+                foreach (ValidationStructuredEntry entry in entries)
                 {
                     ValidationFeedbackItem[]? feedback = entryFunction(entry, syntaxConf, ref contentValidationInfo);
                     if (feedback is not null)
@@ -84,22 +84,27 @@ namespace PxUtils.Validation.ContentValidation
             ContentValidationInfo contentValidationInfo = new(filename, encoding);
             ContentValidationFunctions contentValidationFunctions = new();
 
-            IEnumerable<ContentValidationEntryFunctionDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;
-            IEnumerable<ContentValidationSearchFunctionDelegate> contentValidationSearchFunctions = contentValidationFunctions.DefaultContentValidationSearchFunctions;
+            List<ContentValidationEntryFunctionDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;
+            List<ContentValidationSearchFunctionDelegate> finalContentValidationSearchFunctions = contentValidationFunctions.FinalAsyncSearchFunctionGroup;
 
             if (customContentValidationFunctions is not null)
             {
-                contentValidationEntryFunctions = contentValidationEntryFunctions.Concat(customContentValidationFunctions.CustomContentValidationEntryFunctions);
-                contentValidationSearchFunctions = contentValidationSearchFunctions.Concat(customContentValidationFunctions.CustomContentValidationSearchFunctions);
+                contentValidationEntryFunctions = [.. contentValidationEntryFunctions, .. customContentValidationFunctions.CustomContentValidationEntryFunctions];
+                finalContentValidationSearchFunctions = [.. finalContentValidationSearchFunctions, .. customContentValidationFunctions.CustomContentValidationSearchFunctions];
             }
 
-            IEnumerable<Task<ValidationFeedbackItem[]?>> searchTasks = contentValidationSearchFunctions.Select(searchFunction => Task.Run(() => searchFunction(entries, syntaxConf, ref contentValidationInfo)));
+            // Some search type content validation functions are dependent on the results of other search type content validation functions. Thus they are run in groups.
+            IEnumerable<Task<ValidationFeedbackItem[]?>> tasks = contentValidationFunctions.FirstAsyncSearchFunctionGroup
+                .Select(func => Task.Run(() => func(entries, syntaxConf, ref contentValidationInfo)));
+            await Task.WhenAll(tasks);
+            tasks = contentValidationFunctions.SecondAsyncSearchFunctionGroup
+                .Select(func => Task.Run(() => func(entries, syntaxConf, ref contentValidationInfo)));
+            await Task.WhenAll(tasks);
+            tasks = finalContentValidationSearchFunctions
+                .Select(func => Task.Run(() => func(entries, syntaxConf, ref contentValidationInfo)));
+            await Task.WhenAll(tasks);
 
-            await Task.WhenAll(searchTasks);
-
-            searchTasks.Select(task => task.Result).ToList().ForEach(feedback => 
-                feedbackItems.AddRange(feedback is not null ? feedback : []));
-
+            // Entry tasks can be run asynchronously without worrying about dependencies
             IEnumerable<Task<ValidationFeedbackItem[]?>> entryTasks = contentValidationEntryFunctions.SelectMany(entryFunction => entries.Select(entry => Task.Run(() => entryFunction(entry, syntaxConf, ref contentValidationInfo))));
 
             await Task.WhenAll(entryTasks);

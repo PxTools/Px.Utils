@@ -13,6 +13,9 @@ namespace PxUtils.Validation.ContentValidation
     {
         public List<ContentValidationEntryFunctionDelegate> DefaultContentValidationEntryFunctions { get; }
         public List<ContentValidationSearchFunctionDelegate> DefaultContentValidationSearchFunctions { get; }
+        public List<ContentValidationSearchFunctionDelegate> FirstAsyncSearchFunctionGroup { get; }
+        public List<ContentValidationSearchFunctionDelegate> SecondAsyncSearchFunctionGroup { get; }
+        public List<ContentValidationSearchFunctionDelegate> FinalAsyncSearchFunctionGroup { get; }
 
         /// <summary>
         /// Constructor for <see cref="ContentValidationFunctions"/> class that contains default content validation functions/>
@@ -37,6 +40,25 @@ namespace PxUtils.Validation.ContentValidation
                 ValidateFindRequiredCommonKeys,
                 ValidateFindStubAndHeading,
                 ValidateFindRecommendedKeys,
+                ValidateFindDimensionValues,
+                ValidateFindContentDimensionKeys,
+                ValidateFindDimensionRecommendedKeys
+            ];
+
+            FirstAsyncSearchFunctionGroup = [
+                ValidateFindDefaultLanguage,
+                ValidateFindAvailableLanguages,
+                ValidateFindRequiredCommonKeys
+            ];
+
+            SecondAsyncSearchFunctionGroup = [
+                ValidateDefaultLanguageDefinedInAvailableLanguages,
+                ValidateFindContentDimension,
+                ValidateFindStubAndHeading,
+                ValidateFindRecommendedKeys
+            ];
+
+            FinalAsyncSearchFunctionGroup = [
                 ValidateFindDimensionValues,
                 ValidateFindContentDimensionKeys,
                 ValidateFindDimensionRecommendedKeys

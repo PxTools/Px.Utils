@@ -75,11 +75,10 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Structured entries of the Px file</param>
         /// <param name="keyword">Keyword that the function searches for</param>
-        /// <param name="language">Language that the function searches the entry for</param>
-        /// <param name="dimensionName">Name of the content dimension</param>
+        /// <param name="languageAndDimensionPair">Contains language and dimension names</param>
         /// <param name="dimensionValueName">Name of the content dimension value requiring the entry</param>
-        /// <param name="defaultLanguage">Default language of the Px file</param>
-        /// <param name="filename">Name of the Px file</param>
+        /// <param name="info">Object that stores required information about the validation process</param>
+        /// <param name="recommended">Optional that indicates if the keyword entry is recommended and should yield a warning if not found</param>
         /// <returns>Returns a <see cref="ValidationFeedbackItem"/> object with an error if required entry is not found or with a warning if the entry specifiers are defined in an unexpected way</returns>
         internal static ValidationFeedbackItem? FindContentVariableKey(ValidationStructuredEntry[] entries, string keyword, KeyValuePair<string, string> languageAndDimensionPair, string dimensionValueName, ContentValidationInfo info, bool recommended = false)
         {
@@ -135,8 +134,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="entries">Structured entries of the Px file</param>
         /// <param name="keyword">Keyword that the function searches for</param>
         /// <param name="language">Language that the function searches the entry for</param>
-        /// <param name="defaultLanguage">Default language of the Px file</param>
-        /// <param name="filename">Name of the Px file</param>
+        /// <param name="info">Object that stores required information about the validation process</param>
         /// <param name="dimensionName">Name of the dimension</param>
         /// <returns>Returns a <see cref="ValidationFeedbackItem"/> object with a warning if the recommended entry is not found</returns>
         internal static ValidationFeedbackItem? FindDimensionRecommendedKey(ValidationStructuredEntry[] entries, string keyword, string language, ContentValidationInfo info, string? dimensionName = null)
