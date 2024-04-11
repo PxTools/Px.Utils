@@ -48,7 +48,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns>Null if no issues are found. <see cref="ValidationFeedbackItem"/> objects are returned if entry defining default language is not found or if more than one are found.</returns>
         public static ValidationFeedbackItem[]? ValidateFindDefaultLanguage(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -99,7 +99,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns>Null if no issues are found. <see cref="ValidationFeedbackItem"/> object with a warning is returned if available languages entry is not found. Error is returned if multiple entries are found.</returns>
         public static ValidationFeedbackItem[]? ValidateFindAvailableLanguages(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -153,7 +153,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns>Null of no issues are found. <see cref="ValidationFeedbackItem"/> object is returned if default language is not defined in the available languages entry</returns>
         public static ValidationFeedbackItem[]? ValidateDefaultLanguageDefinedInAvailableLanguages(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -193,7 +193,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if content dimension entry is not found for any available language</returns>
         public static ValidationFeedbackItem[]? ValidateFindContentDimension(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -233,7 +233,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if entries required keywords are not found</returns>
         public static ValidationFeedbackItem[]? ValidateFindRequiredCommonKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -272,7 +272,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if stub and heading dimension entries are not found for any available language</returns>
         public static ValidationFeedbackItem[]? ValidateFindStubAndHeading(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -337,7 +337,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> objects with warning are returned if recommended keys are missing</returns>
         public static ValidationFeedbackItem[]? ValidateFindRecommendedKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -405,7 +405,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if values are missing for any dimension</returns>
         public static ValidationFeedbackItem[]? ValidateFindDimensionValues(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -445,7 +445,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if required entries are missing. Warnings are returned if entries are defined in an unrecommended way</returns>
         public static ValidationFeedbackItem[]? ValidateFindContentDimensionKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -494,7 +494,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> objects with warnings are returned if any dimensions are missing recommended entries related to them</returns>
         public static ValidationFeedbackItem[]? ValidateFindDimensionRecommendedKeys(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -542,7 +542,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if </returns>
         public static ValidationFeedbackItem[]? ValidateUnexpectedSpecifiers(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -591,7 +591,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if an illegal or unrecommended language parameter is detected in the entry</returns>
         public static ValidationFeedbackItem[]? ValidateUnexpectedLanguageParams(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -655,7 +655,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> object is returned if an undefined language is found from the entry</returns>
         public static ValidationFeedbackItem[]? ValidateLanguageParams(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -690,7 +690,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> object is returned if the entry's specifier is defined in an unexpected way</returns>
         public static ValidationFeedbackItem[]? ValidateSpecifiers(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -761,7 +761,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> object is returned if an unexpected value type is detected</returns>
         public static ValidationFeedbackItem[]? ValidateValueTypes(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -831,7 +831,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> object is returned if an unexpected value is detected</returns>
         public static ValidationFeedbackItem[]? ValidateValueContents(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -899,7 +899,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> object is returned if an unexpected amount of values is detected</returns>
         public static ValidationFeedbackItem[]? ValidateValueAmounts(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
@@ -940,7 +940,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens that define the Px file syntax</param>
-        /// <param name="info"><see cref="ContentValidationInfo"/> object that stores information that is gathered during the validation process</param>
+        /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns><see cref="ValidationFeedbackItem"/> object with warning is returned if the found value is not written in upper case</returns>
         public static ValidationFeedbackItem[]? ValidateValueUppercaseRecommendations(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ContentValidator validator)
         {
