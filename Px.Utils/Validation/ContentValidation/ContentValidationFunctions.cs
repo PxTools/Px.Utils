@@ -851,7 +851,7 @@ namespace PxUtils.Validation.ContentValidation
                 (listOfStringTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.ListOfStrings) ||
                 (dateTimeTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.DateTime) ||
                 (numberTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.Number) ||
-                (timeval.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.Timeval))
+                (timeval.Contains(entry.Key.Keyword) && (entry.ValueType != ValueType.TimeValRange && entry.ValueType != ValueType.TimeValSeries)))
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,

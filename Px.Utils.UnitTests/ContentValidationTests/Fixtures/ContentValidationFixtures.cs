@@ -211,7 +211,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 23,
                 [],
                 17,
-                Validation.ValueType.Timeval);
+                Validation.ValueType.TimeValSeries);
 
         private static readonly ValidationStructuredEntry timeValEnEntry =
             new(filename,
@@ -220,7 +220,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 24,
                 [],
                 17,
-                Validation.ValueType.Timeval);
+                Validation.ValueType.TimeValSeries);
 
         private static readonly ValidationStructuredEntry valuesBarTimeEntry =
             new(filename,
