@@ -174,7 +174,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="input">The input string to check</param>
         /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <returns>Returns a <see cref="ValueType"/> object that represents the type of the value in the input string. If the type cannot be determined, null is returned.</returns>
-        public static ValueType? GetValueTypeFromString(string input, PxFileSyntaxConf syntaxConf)
+        internal static ValueType? GetValueTypeFromString(string input, PxFileSyntaxConf syntaxConf)
         {
             if (GetTimeValueFormat(input, out ValueType? valueFormat, syntaxConf))
             {
