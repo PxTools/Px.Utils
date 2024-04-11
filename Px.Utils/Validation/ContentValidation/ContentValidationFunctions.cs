@@ -62,30 +62,34 @@ namespace PxUtils.Validation.ContentValidation
                     0, 
                     entries[0].LineChangeIndexes);
 
-                return [
-                    new ValidationFeedbackItem(
-                    entries[0],
-                    new ValidationFeedback(
+                ValidationFeedback feedback = new (
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.MultipleInstancesOfUniqueKey,
                         feedbackIndexes.Key,
                         0,
                         $"{syntaxConf.Tokens.KeyWords.DefaultLanguage}: " + string.Join(", ", entries.Select(e => e.Value).ToArray())
-                        )
+                        );
+
+                return [
+                    new ValidationFeedbackItem(
+                    entries[0],
+                    feedback
                     ),
                 ];
             }
             else if (langEntries.Length == 0)
             {
-                return [
-                    new ValidationFeedbackItem(
-                    new ContentValidationObject(validator.Filename, 0, []),
-                    new ValidationFeedback(
+                ValidationFeedback feedback = new (
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.MissingDefaultLanguage,
                         0,
                         0
-                        )
+                        );
+
+                return [
+                    new ValidationFeedbackItem(
+                    new ContentValidationObject(validator.Filename, 0, []),
+                    feedback
                     ),
                 ];
             }
@@ -112,16 +116,18 @@ namespace PxUtils.Validation.ContentValidation
                     0,
                     entries[0].LineChangeIndexes);
 
-                return [
-                    new ValidationFeedbackItem(
-                    entries[0],
-                    new ValidationFeedback(
+                ValidationFeedback feedback = new (
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.MultipleInstancesOfUniqueKey,
                         feedbackIndexes.Key,
                         0,
                         $"{syntaxConf.Tokens.KeyWords.AvailableLanguages}: " + string.Join(", ", entries.Select(e => e.Value).ToArray())
-                        )
+                        );
+
+                return [
+                    new ValidationFeedbackItem(
+                    entries[0],
+                    feedback
                     )
                ];
             }
@@ -133,16 +139,18 @@ namespace PxUtils.Validation.ContentValidation
             }
             else
             {
-                return [
-                    new ValidationFeedbackItem(
-                    new ContentValidationObject(validator.Filename, 0, []),
-                    new ValidationFeedback(
+                ValidationFeedback feedback = new (
                         ValidationFeedbackLevel.Warning,
                         ValidationFeedbackRule.RecommendedKeyMissing,
                         0,
                         0,
                         syntaxConf.Tokens.KeyWords.AvailableLanguages
-                        )
+                        );
+
+                return [
+                    new ValidationFeedbackItem(
+                    new ContentValidationObject(validator.Filename, 0, []),
+                    feedback
                     )
                ];
             }
@@ -171,16 +179,18 @@ namespace PxUtils.Validation.ContentValidation
                     0,
                     defaultLanguageEntry.LineChangeIndexes);
 
-                return [
-                    new ValidationFeedbackItem(
-                    defaultLanguageEntry,
-                    new ValidationFeedback(
+                ValidationFeedback feedback = new (
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.UndefinedLanguageFound,
                         feedbackIndexes.Key,
                         0,
                         validator.DefaultLanguage
-                        )
+                        );
+
+                return [
+                    new ValidationFeedbackItem(
+                    defaultLanguageEntry,
+                    feedback
                     )
                 ];
             }
@@ -207,16 +217,18 @@ namespace PxUtils.Validation.ContentValidation
                 ValidationStructuredEntry? contentDimension = Array.Find(contentDimensionEntries, c => c.Key.Language == language || (c.Key.Language is null && language == defaultLanguage));
                 if (contentDimension is null)
                 {
-                    feedbackItems.Add(
-                        new ValidationFeedbackItem(
-                        new ContentValidationObject(validator.Filename, 0, []),
-                        new ValidationFeedback(
+                    ValidationFeedback feedback = new (
                             ValidationFeedbackLevel.Warning,
                             ValidationFeedbackRule.RecommendedKeyMissing,
                             0,
                             0,
                             $"{syntaxConf.Tokens.KeyWords.ContentVariableIdentifier}, {language}"
-                            )
+                            );
+
+                    feedbackItems.Add(
+                        new ValidationFeedbackItem(
+                        new ContentValidationObject(validator.Filename, 0, []),
+                        feedback
                         ));
                 }
             }
@@ -249,16 +261,18 @@ namespace PxUtils.Validation.ContentValidation
             {
                 if (!Array.Exists(entries, e => e.Key.Keyword.Equals(keyword)))
                 {
-                    feedbackItems.Add(
-                        new ValidationFeedbackItem(
-                            new ContentValidationObject(validator.Filename, 0, []),
-                            new ValidationFeedback(
+                    ValidationFeedback feedback = new (
                                 ValidationFeedbackLevel.Error,
                                 ValidationFeedbackRule.RequiredKeyMissing,
                                 0,
                                 0,
                                 keyword
-                                )
+                                );
+
+                    feedbackItems.Add(
+                        new ValidationFeedbackItem(
+                            new ContentValidationObject(validator.Filename, 0, []),
+                            feedback
                             )
                     );
                 }
@@ -281,15 +295,17 @@ namespace PxUtils.Validation.ContentValidation
 
             if (stubEntries.Length == 0 && headingEntries.Length == 0)
             {
-                return [
-                    new(
-                    new ContentValidationObject(validator.Filename, 0, []),
-                    new ValidationFeedback(
+                ValidationFeedback feedback = new (
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.MissingStubAndHeading,
                         0,
                         0
-                        )
+                        );
+
+                return [
+                    new(
+                    new ContentValidationObject(validator.Filename, 0, []),
+                    feedback
                     )
                 ];
             }
@@ -314,16 +330,18 @@ namespace PxUtils.Validation.ContentValidation
                     &&
                     (validator.HeadingDimensionNames is null || !validator.HeadingDimensionNames.ContainsKey(language)))
                 {
-                    feedbackItems.Add(
-                        new ValidationFeedbackItem(
-                            new ContentValidationObject(validator.Filename, 0, []),
-                            new ValidationFeedback(
+                    ValidationFeedback feedback = new ValidationFeedback(
                                 ValidationFeedbackLevel.Error,
                                 ValidationFeedbackRule.MissingStubAndHeading,
                                 0,
                                 0,
                                 $"{language}"
-                                )
+                                );
+
+                    feedbackItems.Add(
+                        new ValidationFeedbackItem(
+                            new ContentValidationObject(validator.Filename, 0, []),
+                            feedback
                             )
                         );
                 }
@@ -356,16 +374,18 @@ namespace PxUtils.Validation.ContentValidation
             {
                 if (!Array.Exists(entries, e => e.Key.Keyword.Equals(keyword)))
                 {
-                    feedbackItems.Add(
-                        new ValidationFeedbackItem(
-                            new ContentValidationObject(validator.Filename, 0, []),
-                            new ValidationFeedback(
+                    ValidationFeedback feedback = new (
                                 ValidationFeedbackLevel.Warning,
                                 ValidationFeedbackRule.RecommendedKeyMissing,
                                 0,
                                 0,
                                 keyword
-                                )
+                                );
+
+                    feedbackItems.Add(
+                        new ValidationFeedbackItem(
+                            new ContentValidationObject(validator.Filename, 0, []),
+                            feedback
                             )
                         );
                 }
@@ -381,16 +401,18 @@ namespace PxUtils.Validation.ContentValidation
                     if (!Array.Exists(entries, e => e.Key.Keyword.Equals(keyword) && 
                     (e.Key.Language == language || (language == defaultLanguage && e.Key.Language is null))))
                     {
-                        feedbackItems.Add(
-                            new ValidationFeedbackItem(
-                                new ContentValidationObject(validator.Filename, 0, []),
-                                new ValidationFeedback(
+                        ValidationFeedback feedback = new (
                                     ValidationFeedbackLevel.Warning,
                                     ValidationFeedbackRule.RecommendedKeyMissing,
                                     0,
                                     0,
                                     $"{language}, {keyword}"
-                                    )
+                                    );
+
+                        feedbackItems.Add(
+                            new ValidationFeedbackItem(
+                                new ContentValidationObject(validator.Filename, 0, []),
+                                feedback
                                 )
                             );
                     }
@@ -571,16 +593,20 @@ namespace PxUtils.Validation.ContentValidation
                     0,
                     entry.LineChangeIndexes);
 
-                return [new ValidationFeedbackItem(
-                    entry,
-                    new ValidationFeedback(
+                ValidationFeedback feedback = new (
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.IllegalSpecifierDefinitionFound,
                         feedbackIndexes.Key,
                         0,
                         $"{entry.Key.Keyword}: {entry.Key.FirstSpecifier}, {entry.Key.SecondSpecifier}"
-                        )
-                    )];
+                        );
+
+                return [
+                    new ValidationFeedbackItem(
+                        entry,
+                        feedback
+                    )
+                ];
             }
 
             return null;
@@ -623,27 +649,35 @@ namespace PxUtils.Validation.ContentValidation
 
                 if (noLanguageParameterAllowedKeywords.Contains(entry.Key.Keyword))
                 {
-                    return [new ValidationFeedbackItem(
-                        entry,
-                        new ValidationFeedback(
+                    ValidationFeedback feedback = new (
                             ValidationFeedbackLevel.Error,
                             ValidationFeedbackRule.IllegalLanguageDefinitionFound,
                             feedbackIndexes.Key,
                             0,
-                            $"{entry.Key.Keyword}, {entry.Key.Language}, {entry.Key.FirstSpecifier}, {entry.Key.SecondSpecifier}"))
-                        ];
+                            $"{entry.Key.Keyword}, {entry.Key.Language}, {entry.Key.FirstSpecifier}, {entry.Key.SecondSpecifier}");
+
+                    return [
+                        new ValidationFeedbackItem(
+                            entry,
+                            feedback
+                        )
+                    ];
                 }
                 else if (noLanguageParameterRecommendedKeywords.Contains(entry.Key.Keyword))
                 {
-                    return [new ValidationFeedbackItem(
-                        entry,
-                        new ValidationFeedback(
+                    ValidationFeedback feedback = new (
                             ValidationFeedbackLevel.Warning,
                             ValidationFeedbackRule.UnrecommendedLanguageDefinitionFound,
                             feedbackIndexes.Key,
                             0,
-                            $"{entry.Key.Keyword}, {entry.Key.Language}, {entry.Key.FirstSpecifier}, {entry.Key.SecondSpecifier}"))
-                        ];
+                            $"{entry.Key.Keyword}, {entry.Key.Language}, {entry.Key.FirstSpecifier}, {entry.Key.SecondSpecifier}");
+
+                    return [
+                        new ValidationFeedbackItem(
+                            entry,
+                            feedback
+                        )
+                    ];
                 }
             }
 
@@ -671,15 +705,19 @@ namespace PxUtils.Validation.ContentValidation
                     0,
                     entry.LineChangeIndexes);
 
-                return [new ValidationFeedbackItem(
-                    entry,
-                    new ValidationFeedback(
+                ValidationFeedback feedback = new (
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.UndefinedLanguageFound,
                         feedbackIndexes.Key,
                         0,
-                        entry.Key.Language))
-                    ];
+                        entry.Key.Language);
+
+                return [
+                    new ValidationFeedbackItem(
+                        entry,
+                        feedback
+                    )
+                ];
             }
 
             return null;
@@ -723,16 +761,20 @@ namespace PxUtils.Validation.ContentValidation
                     entry.KeyStartLineIndex,
                     0,
                     entry.LineChangeIndexes);
-                    
-                    feedbackItems.Add(new ValidationFeedbackItem(
-                        entry,
-                        new ValidationFeedback(
+
+                ValidationFeedback feedback = new (
                             ValidationFeedbackLevel.Error,
                             ValidationFeedbackRule.IllegalSpecifierDefinitionFound,
                             feedbackIndexes.Key,
                             0,
-                            entry.Key.FirstSpecifier))
-                        );
+                            entry.Key.FirstSpecifier);
+
+                feedbackItems.Add(
+                    new ValidationFeedbackItem(
+                        entry,
+                        feedback
+                    )
+                );
             }
             else if (entry.Key.SecondSpecifier is not null && 
                 !validator.DimensionValueNames.Values.Any(v => v.Contains(entry.Key.SecondSpecifier)))
@@ -742,15 +784,19 @@ namespace PxUtils.Validation.ContentValidation
                     0,
                     entry.LineChangeIndexes);
 
-                feedbackItems.Add(new ValidationFeedbackItem(
-                    entry,
-                    new ValidationFeedback(
+                ValidationFeedback feedback = new (
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.IllegalSpecifierDefinitionFound,
                         feedbackIndexes.Key,
                         0,
-                        entry.Key.SecondSpecifier))
-                    );
+                        entry.Key.SecondSpecifier);
+
+                feedbackItems.Add(
+                    new ValidationFeedbackItem(
+                        entry,
+                        feedback
+                    )
+                );
             }
 
             return [.. feedbackItems];
@@ -812,15 +858,19 @@ namespace PxUtils.Validation.ContentValidation
                     entry.ValueStartIndex,
                     entry.LineChangeIndexes);
 
-                return [new ValidationFeedbackItem(
-                    entry,
-                    new ValidationFeedback(
+                ValidationFeedback feedback = new (
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.UnmatchingValueType,
                         feedbackIndexes.Key,
                         feedbackIndexes.Value,
-                        $"{entry.Key.Keyword}: {entry.ValueType}"))
-                    ];
+                        $"{entry.Key.Keyword}: {entry.ValueType}");
+
+                return [
+                    new ValidationFeedbackItem(
+                        entry,
+                        feedback
+                    )
+                ];
             }
 
             return null;
@@ -857,15 +907,19 @@ namespace PxUtils.Validation.ContentValidation
                     entry.ValueStartIndex,
                     entry.LineChangeIndexes);
 
-                return [new ValidationFeedbackItem(
-                    entry,
-                    new ValidationFeedback(
+                ValidationFeedback feedback = new(
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.InvalidValueFound,
                         feedbackIndexes.Key,
                         feedbackIndexes.Value,
-                        $"{entry.Key.Keyword}: {entry.Value}"))
-                    ];
+                        $"{entry.Key.Keyword}: {entry.Value}");
+
+                return [
+                    new ValidationFeedbackItem(
+                        entry,
+                        feedback
+                        )
+                ];
             }
             else if (entry.Key.Keyword == syntaxConf.Tokens.KeyWords.ContentVariableIdentifier)
             {
@@ -879,15 +933,19 @@ namespace PxUtils.Validation.ContentValidation
                         entry.ValueStartIndex,
                         entry.LineChangeIndexes);
 
-                    return [new ValidationFeedbackItem(
-                        entry,
-                        new ValidationFeedback(
-                            ValidationFeedbackLevel.Error,
-                            ValidationFeedbackRule.InvalidValueFound,
-                            feedbackIndexes.Key,
-                            feedbackIndexes.Value,
-                            $"{entry.Key.Keyword}: {entry.Value}"))
-                        ];
+                    ValidationFeedback feedback = new (
+                                ValidationFeedbackLevel.Error,
+                                ValidationFeedbackRule.InvalidValueFound,
+                                feedbackIndexes.Key,
+                                feedbackIndexes.Value,
+                                $"{entry.Key.Keyword}: {entry.Value}");
+
+                    return [
+                        new ValidationFeedbackItem(
+                            entry,
+                            feedback
+                        )
+                    ];
                 }
             }
 
@@ -920,16 +978,19 @@ namespace PxUtils.Validation.ContentValidation
                     entry.ValueStartIndex,
                     entry.LineChangeIndexes);
 
-                return [
-                    new ValidationFeedbackItem(
-                        entry,
-                        new ValidationFeedback(
+                ValidationFeedback feedback = new (
                             ValidationFeedbackLevel.Error,
                             ValidationFeedbackRule.UnmatchingValueAmount,
                             feedbackIndexes.Key,
                             feedbackIndexes.Value,
-                            $"{entry.Key.Keyword}: {entry.Value}"))
-                    ];
+                            $"{entry.Key.Keyword}: {entry.Value}");
+
+                return [
+                    new ValidationFeedbackItem(
+                        entry,
+                        feedback
+                    )
+                ];
             }
 
             return null;
@@ -961,15 +1022,20 @@ namespace PxUtils.Validation.ContentValidation
                     entry.KeyStartLineIndex,
                     entry.ValueStartIndex,
                     entry.LineChangeIndexes);
-                
-                return [new ValidationFeedbackItem(
-                    entry,
-                    new ValidationFeedback(
+
+                ValidationFeedback feedback = new (
                         ValidationFeedbackLevel.Warning,
                         ValidationFeedbackRule.ValueIsNotInUpperCase,
                         feedbackIndexes.Key,
                         entry.ValueStartIndex,
-                        $"{entry.Key.Keyword}: {entry.Value}"))];
+                        $"{entry.Key.Keyword}: {entry.Value}");
+
+                return [
+                    new ValidationFeedbackItem(
+                        entry,
+                        feedback
+                    )
+                ];
             }
             return null;
         }

@@ -54,15 +54,17 @@ namespace PxUtils.Validation.ContentValidation
                     }
                     else
                     {
-                        feedbackItems.Add(new ValidationFeedbackItem(
-                            new ContentValidationObject(filename, 0, []),
-                            new ValidationFeedback(
+                        ValidationFeedback feedback = new (
                                 ValidationFeedbackLevel.Error,
                                 ValidationFeedbackRule.VariableValuesMissing,
                                 0,
                                 0,
                                 $"{dimension}, {language}"
-                                )
+                                );
+
+                        feedbackItems.Add(new ValidationFeedbackItem(
+                            new ContentValidationObject(filename, 0, []),
+                            feedback
                             ));
                     }
                 }
@@ -92,17 +94,18 @@ namespace PxUtils.Validation.ContentValidation
                             (e.Key.SecondSpecifier == dimensionValueName || e.Key.SecondSpecifier == null));
 
             if (entry is null)
-            { 
-                return
-                    new ValidationFeedbackItem(
-                        new ContentValidationObject(validator.Filename, 0, []),
-                        new ValidationFeedback(
+            {
+                ValidationFeedback feedback = new (
                             recommended ? ValidationFeedbackLevel.Warning : ValidationFeedbackLevel.Error,
                             recommended ? ValidationFeedbackRule.RecommendedKeyMissing : ValidationFeedbackRule.RequiredKeyMissing,
                             0,
                             0,
                             $"{keyword}, {language}, {dimensionName}, {dimensionValueName}"
-                            )
+                            );
+                return
+                    new ValidationFeedbackItem(
+                        new ContentValidationObject(validator.Filename, 0, []),
+                        feedback
                         );
             }
             else if (entry.Key.FirstSpecifier is null || entry.Key.SecondSpecifier is null)
@@ -112,16 +115,18 @@ namespace PxUtils.Validation.ContentValidation
                     0,
                     entry.LineChangeIndexes);
 
-                return 
-                    new ValidationFeedbackItem(
-                        entry,
-                        new ValidationFeedback(
+                ValidationFeedback feedback = new ValidationFeedback(
                             ValidationFeedbackLevel.Warning,
                             ValidationFeedbackRule.UnrecommendedSpecifierDefinitionFound,
                             feedbackIndexes.Key,
                             0,
                             $"{keyword}, {language}, {dimensionName}, {dimensionValueName}"
-                            )
+                            );
+
+                return 
+                    new ValidationFeedbackItem(
+                        entry,
+                        feedback
                         );
             }
 
@@ -146,14 +151,16 @@ namespace PxUtils.Validation.ContentValidation
 
             if (entry is null)
             {
-                return new ValidationFeedbackItem(
-                        new ContentValidationObject(validator.Filename, 0, []),
-                        new ValidationFeedback(
+                ValidationFeedback feedback = new (
                             ValidationFeedbackLevel.Warning,
                             ValidationFeedbackRule.RecommendedKeyMissing,
                             0,
                             0,
-                            $"{language}, {keyword}, {dimensionName}")
+                            $"{language}, {keyword}, {dimensionName}");
+
+                return new ValidationFeedbackItem(
+                        new ContentValidationObject(validator.Filename, 0, []),
+                        feedback
                         );
             }
 
