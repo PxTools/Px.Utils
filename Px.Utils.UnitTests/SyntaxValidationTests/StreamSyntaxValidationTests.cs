@@ -17,16 +17,19 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         private MethodInfo? entryValidationMethod;
         private MethodInfo? kvpValidationMethod;
         private MethodInfo? structuredValidationMethod;
+        private MethodInfo? getValueTypeFromStringMethod;
 
         [TestInitialize]
         public void Initialize()
         {
             entryValidationMethod = typeof(SyntaxValidation)
-                    .GetMethod("ValidateEntries", BindingFlags.NonPublic | BindingFlags.Static);
+                .GetMethod("ValidateEntries", BindingFlags.NonPublic | BindingFlags.Static);
             kvpValidationMethod = typeof(SyntaxValidation)
-                    .GetMethod("ValidateKeyValuePairs", BindingFlags.NonPublic | BindingFlags.Static);
+                .GetMethod("ValidateKeyValuePairs", BindingFlags.NonPublic | BindingFlags.Static);
             structuredValidationMethod = typeof(SyntaxValidation)
-                    .GetMethod("ValidateStructs", BindingFlags.NonPublic | BindingFlags.Static);
+                .GetMethod("ValidateStructs", BindingFlags.NonPublic | BindingFlags.Static);
+            getValueTypeFromStringMethod = typeof(SyntaxValidationUtilityMethods)
+                .GetMethod("GetValueTypeFromString", BindingFlags.NonPublic | BindingFlags.Static);
         }
 
         [TestMethod]
@@ -376,6 +379,110 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(ValidationFeedbackRule.KeywordExcessivelyLong, feedback[0].Feedback.Rule);
+        }
+
+        [TestMethod]
+        [DataRow("TLIST(A1),\"2000\",\"2001\",\"2003\"", Validation.ValueType.TimeValSeries)]
+        [DataRow("TLIST(H1),\"20001\", \"20002\", \"20011\", \"20012\"", Validation.ValueType.TimeValSeries)] // Has spaces between values
+        [DataRow("TLIST(T1),\"20001\",\"20002\",\"20003\"", Validation.ValueType.TimeValSeries)]
+        [DataRow("TLIST(Q1),\"20001\",\"20002\",\"20003\",\"20004\"", Validation.ValueType.TimeValSeries)]
+        [DataRow("TLIST(M1),\"200001\",\"200002\",\n\"200003\"", Validation.ValueType.TimeValSeries)] // Has newline between values
+        [DataRow("TLIST(W1),\"200050\",\"200051\",\"200052\"", Validation.ValueType.TimeValSeries)]
+        [DataRow("TLIST(D1),\"20001010\",\"20001011\",\"20001012\"", Validation.ValueType.TimeValSeries)]
+        [DataRow("TLIST(A1, \"2000-2003\")", Validation.ValueType.TimeValRange)]
+        [DataRow("TLIST(H1, \"20001-20012\")", Validation.ValueType.TimeValRange)]
+        [DataRow("TLIST(T1, \"20001-20003\")", Validation.ValueType.TimeValRange)]
+        [DataRow("TLIST(Q1, \"20001-20004\")", Validation.ValueType.TimeValRange)]
+        [DataRow("TLIST(M1, \"200001-200003\")", Validation.ValueType.TimeValRange)]
+        [DataRow("TLIST(W1, \"200050-200052\")", Validation.ValueType.TimeValRange)]
+        [DataRow("TLIST(D1, \"20001010-20001012\")", Validation.ValueType.TimeValRange)]
+        public void Correctly_Defined_Range_And_Series_TimeValues_Return_Correct_ValueType(string timeval, Validation.ValueType type)
+        {
+            // Arrange
+            List<ValidationKeyValuePair> keyValuePairs = [ new("foo", new KeyValuePair<string, string>("foo-key", timeval), 0, [], 0) ];
+            List<KeyValuePairValidationFunctionDelegate> functions = [SyntaxValidationFunctions.InvalidValueFormat];
+
+            // Act
+            feedback = kvpValidationMethod?.Invoke(null, new object[] { keyValuePairs, functions, syntaxConf }) as List<ValidationFeedbackItem> ?? [];
+            Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, new object[] { keyValuePairs[0].KeyValuePair.Value, PxFileSyntaxConf.Default }) as Validation.ValueType?;
+
+            // Assert
+            Assert.AreEqual(0, feedback.Count);
+            Assert.AreEqual(type, valueType);
+        }
+
+        [TestMethod]
+        [DataRow("TLIST(A1),2000,2001,2003", null)]
+        [DataRow("\"TLIST(H1)\",\"20001\", \"20002\", \"20011\", \"20012\"", Validation.ValueType.ListOfStrings)]
+        [DataRow("TLIST(T1)=\"20001\",\"20002\",\"20003\"", null)]
+        [DataRow("TLIST(Q1):\"20001\",\"20002\",\"20003\",\"20004\"", null)]
+        [DataRow("TLIST(M1),\"20001\",\"20002\",\"20003\"", null)]
+        [DataRow("TLIST(W1),\"2000-50\",\"2000-51\",\"2000-52\"", null)]
+        [DataRow("TLIST(D1),\"2000/1010\",\"2000/1011\",\"2000/1012\"", null)]
+        [DataRow("TLIST(A1, 2000-2003)", null)]
+        [DataRow("TLIST(H1, \"20001,20012\")", null)]
+        [DataRow("TLIST(T1, \"20001/20003\"", null)]
+        [DataRow("TLIST(Q1, \"2001-2004\")", null)]
+        [DataRow("TLIST(M1, \"2000/01-2000/03\")", null)]
+        [DataRow("TLIST(W1, \"2000.50-2000.52\")", null)]
+        [DataRow("TLIST(D1, \"10/10/2000-10/11/2000\")", null)]
+        public void Incorrectly_Defined_Range_And_Series_TimeValues_Return_With_Errors(string timeval, Validation.ValueType? type)
+        {
+            // Arrange
+            List<ValidationKeyValuePair> keyValuePairs = [new("foo", new KeyValuePair<string, string>("foo-key", timeval), 0, [], 0)];
+            List<KeyValuePairValidationFunctionDelegate> functions = [SyntaxValidationFunctions.InvalidValueFormat];
+
+            // Act
+            feedback = kvpValidationMethod?.Invoke(null, new object[] { keyValuePairs, functions, syntaxConf }) as List<ValidationFeedbackItem> ?? [];
+            Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, new object[] { keyValuePairs[0].KeyValuePair.Value, PxFileSyntaxConf.Default }) as Validation.ValueType?;
+
+            // Assert
+            if (type is null)
+            {
+                Assert.AreEqual(1, feedback.Count);
+                Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, feedback[0].Feedback.Rule);
+            }
+            Assert.AreEqual(type, valueType);
+        }
+
+        [TestMethod]
+        public void ValidatePxFileSyntax_CalledWith_UTF8_N_WITH_TIMEVALS_Returns_With_Valid_Result()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_TIMEVALS);
+            using Stream stream = new MemoryStream(data);
+            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+
+            // Assert
+            Assert.IsNotNull(encoding, "Encoding should not be null");
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename);
+            Assert.AreEqual(0, result.FeedbackItems.Count);
+        }
+
+        [TestMethod]
+        public void ValidatePxFileSyntax_CalledWith_UTF8_N_WITH_BAD_TIMEVALS_Returns_Errors()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_BAD_TIMEVALS);
+            using Stream stream = new MemoryStream(data);
+            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+
+            // Assert
+            Assert.IsNotNull(encoding, "Encoding should not be null");
+
+            // Act
+            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename);
+            Assert.AreEqual(2, result.FeedbackItems.Count);
+            Assert.AreEqual(9, result.FeedbackItems[0].Feedback.Line);
+            Assert.AreEqual(16, result.FeedbackItems[0].Feedback.Character);
+            Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, result.FeedbackItems[0].Feedback.Rule);
+            Assert.AreEqual(10, result.FeedbackItems[1].Feedback.Line);
+            Assert.AreEqual(16, result.FeedbackItems[1].Feedback.Character);
+            Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, result.FeedbackItems[1].Feedback.Rule);
         }
     }
 }
