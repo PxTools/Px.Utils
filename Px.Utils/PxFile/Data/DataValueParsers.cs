@@ -18,6 +18,8 @@ namespace PxUtils.PxFile.Data
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DoubleDataValue FastParseDoubleDataValueDangerous(char[] buffer, int len)
         {
+            // All special/missing values are encoded as strings in the format "..." or "-".
+            // The length of the string (number of dots) is used to determine the type of missing value.
             if (buffer[0] == '"')
             {
                 if (buffer[1] == '-') return new DoubleDataValue(0, DataValueType.Nill);
@@ -41,6 +43,8 @@ namespace PxUtils.PxFile.Data
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DecimalDataValue FastParseDecimalDataValueDangerous(char[] buffer, int len)
         {
+            // All special/missing values are encoded as strings in the format "..." or "-".
+            // The length of the string (number of dots) is used to determine the type of missing value.
             if (buffer[0] == '"')
             {
                 if (buffer[1] == '-') return new DecimalDataValue(0, DataValueType.Nill);
