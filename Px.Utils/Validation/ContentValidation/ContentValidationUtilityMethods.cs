@@ -77,17 +77,17 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="keyword">Keyword that the function searches for</param>
         /// <param name="languageAndDimensionPair">Contains language and dimension names</param>
         /// <param name="dimensionValueName">Name of the content dimension value requiring the entry</param>
-        /// <param name="info">Object that stores required information about the validation process</param>
+        /// <param name="validator">Object that stores required information about the validation process</param>
         /// <param name="recommended">Optional that indicates if the keyword entry is recommended and should yield a warning if not found</param>
         /// <returns>Returns a <see cref="ValidationFeedbackItem"/> object with an error if required entry is not found or with a warning if the entry specifiers are defined in an unexpected way</returns>
-        internal static ValidationFeedbackItem? FindContentVariableKey(ValidationStructuredEntry[] entries, string keyword, KeyValuePair<string, string> languageAndDimensionPair, string dimensionValueName, ContentValidationInfo info, bool recommended = false)
+        internal static ValidationFeedbackItem? FindContentVariableKey(ValidationStructuredEntry[] entries, string keyword, KeyValuePair<string, string> languageAndDimensionPair, string dimensionValueName, ContentValidator validator, bool recommended = false)
         {
             string language = languageAndDimensionPair.Key;
             string dimensionName = languageAndDimensionPair.Value;
 
             ValidationStructuredEntry? entry = Array.Find(entries,
                             e => e.Key.Keyword.Equals(keyword) &&
-                            (e.Key.Language == language || (language == info.DefaultLanguage && e.Key.Language is null)) &&
+                            (e.Key.Language == language || (language == validator.DefaultLanguage && e.Key.Language is null)) &&
                             (e.Key.FirstSpecifier == dimensionName || e.Key.FirstSpecifier == dimensionValueName) &&
                             (e.Key.SecondSpecifier == dimensionValueName || e.Key.SecondSpecifier == null));
 
@@ -95,7 +95,7 @@ namespace PxUtils.Validation.ContentValidation
             { 
                 return
                     new ValidationFeedbackItem(
-                        new ContentValidationObject(info.Filename, 0, []),
+                        new ContentValidationObject(validator.Filename, 0, []),
                         new ValidationFeedback(
                             recommended ? ValidationFeedbackLevel.Warning : ValidationFeedbackLevel.Error,
                             recommended ? ValidationFeedbackRule.RecommendedKeyMissing : ValidationFeedbackRule.RequiredKeyMissing,
@@ -134,20 +134,20 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="entries">Structured entries of the Px file</param>
         /// <param name="keyword">Keyword that the function searches for</param>
         /// <param name="language">Language that the function searches the entry for</param>
-        /// <param name="info">Object that stores required information about the validation process</param>
+        /// <param name="validator">Object that stores required information about the validation process</param>
         /// <param name="dimensionName">Name of the dimension</param>
         /// <returns>Returns a <see cref="ValidationFeedbackItem"/> object with a warning if the recommended entry is not found</returns>
-        internal static ValidationFeedbackItem? FindDimensionRecommendedKey(ValidationStructuredEntry[] entries, string keyword, string language, ContentValidationInfo info, string? dimensionName = null)
+        internal static ValidationFeedbackItem? FindDimensionRecommendedKey(ValidationStructuredEntry[] entries, string keyword, string language, ContentValidator validator, string? dimensionName = null)
         {
             ValidationStructuredEntry[] keywordEntries = entries.Where(e => e.Key.Keyword.Equals(keyword)).ToArray();
             ValidationStructuredEntry? entry = Array.Find(keywordEntries,
-                e => ((language == info.DefaultLanguage && e.Key.Language is null) || language == e.Key.Language) &&
+                e => ((language == validator.DefaultLanguage && e.Key.Language is null) || language == e.Key.Language) &&
                 (e.Key.FirstSpecifier == dimensionName || dimensionName is null));
 
             if (entry is null)
             {
                 return new ValidationFeedbackItem(
-                        new ContentValidationObject(info.Filename, 0, []),
+                        new ContentValidationObject(validator.Filename, 0, []),
                         new ValidationFeedback(
                             ValidationFeedbackLevel.Warning,
                             ValidationFeedbackRule.RecommendedKeyMissing,
@@ -166,7 +166,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="languageSpecificKeywords">Keywords to search for that are language specific</param>
         /// <param name="commonKeywords">Language agnostic keywords</param>
         /// <param name="entries">Structured entries of Px file metadata to be searched from</param>
-        /// <param name="info">Object that provides information of the ongoing content validation process</param>
+        /// <param name="validator">Object that provides information of the ongoing content validation process</param>
         /// <param name="languageAndDimensionPair">KeyValuePair that contains the processed language as key and the dimension name as value</param>
         /// <param name="valueName">Name of the content dimension value to look entries for</param>
         /// <returns>Returns a list of <see cref="ValidationFeedbackItem"/> objects if required entries are not found</returns>
@@ -175,25 +175,25 @@ namespace PxUtils.Validation.ContentValidation
             string[] commonKeywords,
             string[] recommendedKeywords,
             ValidationStructuredEntry[] entries,
-            ContentValidationInfo info,
+            ContentValidator validator,
             KeyValuePair<string, string> languageAndDimensionPair,
             string valueName)
         {
             List<ValidationFeedbackItem> feedbackItems = [];
             foreach (string keyword in languageSpecificKeywords)
             {
-                ValidationFeedbackItem? issue = FindContentVariableKey(entries, keyword, languageAndDimensionPair, valueName, info);
+                ValidationFeedbackItem? issue = FindContentVariableKey(entries, keyword, languageAndDimensionPair, valueName, validator);
                 if (issue is not null)
                 {
                     feedbackItems.Add((ValidationFeedbackItem)issue);
                 }
             }
 
-            if (languageAndDimensionPair.Key == info.DefaultLanguage)
+            if (languageAndDimensionPair.Key == validator.DefaultLanguage)
             {
                 foreach (string keyword in commonKeywords)
                 {
-                    ValidationFeedbackItem? issue = FindContentVariableKey(entries, keyword, languageAndDimensionPair, valueName, info);
+                    ValidationFeedbackItem? issue = FindContentVariableKey(entries, keyword, languageAndDimensionPair, valueName, validator);
                     if (issue is not null)
                     {
                         feedbackItems.Add((ValidationFeedbackItem)issue);
@@ -201,7 +201,7 @@ namespace PxUtils.Validation.ContentValidation
                 }
                 foreach (string keyword in recommendedKeywords)
                 {
-                    ValidationFeedbackItem? issue = FindContentVariableKey(entries, keyword, languageAndDimensionPair, valueName, info, true);
+                    ValidationFeedbackItem? issue = FindContentVariableKey(entries, keyword, languageAndDimensionPair, valueName, validator, true);
                     if (issue is not null)
                     {
                         feedbackItems.Add((ValidationFeedbackItem)issue);
@@ -219,7 +219,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="dimensionTypeKeyword">DimensionType keyword, which is language agnostic</param>
         /// <param name="entries">Structured metadata entries to search through</param>
         /// <param name="language">Language assigned to the currently processed dimension</param>
-        /// <param name="info">Object that provides information of the ongoing content validation process</param>
+        /// <param name="validator">Object that provides information of the ongoing content validation process</param>
         /// <param name="dimensionName">Name of the dimension currently being processed</param>
         /// <returns></returns>
         internal static List<ValidationFeedbackItem> ProcessDimension(
@@ -227,23 +227,22 @@ namespace PxUtils.Validation.ContentValidation
             string dimensionTypeKeyword,
             ValidationStructuredEntry[] entries, 
             string language,
-            ContentValidationInfo 
-            info, 
+            ContentValidator validator,
             string dimensionName)
         {
             List<ValidationFeedbackItem> feedbackItems = [];
             foreach (string keyword in keywords)
             {
-                ValidationFeedbackItem? keywordFeedback = FindDimensionRecommendedKey(entries, keyword, language, info, dimensionName);
+                ValidationFeedbackItem? keywordFeedback = FindDimensionRecommendedKey(entries, keyword, language, validator, dimensionName);
                 if (keywordFeedback is not null)
                 {
                     feedbackItems.Add((ValidationFeedbackItem)keywordFeedback);
                 }
             }
 
-            if (language == info.DefaultLanguage)
+            if (language == validator.DefaultLanguage)
             {
-                ValidationFeedbackItem? variableTypeFeedback = FindDimensionRecommendedKey(entries, dimensionTypeKeyword, language, info, dimensionName);
+                ValidationFeedbackItem? variableTypeFeedback = FindDimensionRecommendedKey(entries, dimensionTypeKeyword, language, validator, dimensionName);
                 if (variableTypeFeedback is not null)
                 {
                     feedbackItems.Add((ValidationFeedbackItem)variableTypeFeedback);

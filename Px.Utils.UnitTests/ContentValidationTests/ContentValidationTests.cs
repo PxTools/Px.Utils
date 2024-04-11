@@ -12,7 +12,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
     {
         private readonly string filename = "foo";
         private readonly PxFileSyntaxConf syntaxConf = PxFileSyntaxConf.Default;
-        private List<ValidationFeedbackItem> feedback = [];
+        private ValidationFeedbackItem[] feedback = [];
         private readonly Encoding encoding = Encoding.UTF8;
 
         [TestMethod]
@@ -20,18 +20,16 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.MINIMAL_STRUCTURED_ENTRY_ARRAY;
+            ContentValidator validator = new(filename, encoding);
 
             // Act
-            ContentValidation.ValidatePxFileContent(
-                filename,
+            feedback = validator.ValidatePxFileContent(
                 entries,
-                syntaxConf,
-                ref feedback,
-                encoding
+                syntaxConf
                 );
 
             // Assert
-            Assert.AreEqual(0, feedback.Count);
+            Assert.AreEqual(0, feedback.Length);
         }
 
         [TestMethod]
@@ -39,18 +37,16 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.MINIMAL_STRUCTURED_ENTRY_ARRAY;
+            ContentValidator validator = new(filename, encoding);
 
             // Act
-            ValidationFeedbackItem[] result = await ContentValidation.ValidatePxFileContentAsync(
-                filename,
+            feedback = await validator.ValidatePxFileContentAsync(
                 entries,
-                syntaxConf,
-                feedback,
-                encoding
+                syntaxConf
                 );
 
             // Assert
-            Assert.AreEqual(0, result.Length);
+            Assert.AreEqual(0, feedback.Length);
         }
 
         [TestMethod]
@@ -58,13 +54,13 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.EMPTY_STRUCTURED_ENTRY_ARRAY;
-            ContentValidationInfo info = new(filename, encoding);
+            ContentValidator validator = new(filename, encoding);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateFindDefaultLanguage(
                 entries,
                 syntaxConf,
-                ref info
+                validator
                 );
                 
             // Assert
@@ -78,13 +74,13 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.EMPTY_STRUCTURED_ENTRY_ARRAY;
-            ContentValidationInfo info = new(filename, encoding);
+            ContentValidator validator = new(filename, encoding);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateFindAvailableLanguages(
                 entries,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -98,7 +94,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_DEFAULT_LANGUAGE;
-            ContentValidationInfo info = new(filename, encoding)
+            ContentValidator validator = new(filename, encoding)
             {
                 DefaultLanguage = "foo",
                 AvailableLanguages = ["fi", "en"]
@@ -108,7 +104,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateDefaultLanguageDefinedInAvailableLanguages(
                 entries,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -122,7 +118,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_MISSING_CONTVARIABLE;
-            ContentValidationInfo info = new(filename, encoding)
+            ContentValidator validator = new(filename, encoding)
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"]
@@ -132,7 +128,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateFindContentDimension(
                 entries,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -146,13 +142,13 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.EMPTY_STRUCTURED_ENTRY_ARRAY;
-            ContentValidationInfo info = new(filename, encoding);
+            ContentValidator validator = new(filename, encoding);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateFindRequiredCommonKeys(
                 entries,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -168,7 +164,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_STUB;
-            ContentValidationInfo info = new(filename, encoding)
+            ContentValidator validator = new(filename, encoding)
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"]
@@ -178,7 +174,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateFindStubAndHeading(
                 entries,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -193,7 +189,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
 
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_DESCRIPTION;
-            ContentValidationInfo info = new(filename, encoding)
+            ContentValidator validator = new(filename, encoding)
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"]
@@ -204,7 +200,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateFindRecommendedKeys(
                 entries,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -219,7 +215,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_DIMENSIONVALUES;
-            ContentValidationInfo info = new(filename, encoding)
+            ContentValidator validator = new(filename, encoding)
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"],
@@ -234,7 +230,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateFindDimensionValues(
                 entries,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -250,7 +246,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_INVALID_CONTENT_VALUE_KEY_ENTRIES;
-            ContentValidationInfo info = new(filename, encoding)
+            ContentValidator validator = new(filename, encoding)
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"],
@@ -270,7 +266,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateFindContentDimensionKeys(
                 entries,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -285,7 +281,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_INCOMPLETE_VARIABLE_RECOMMENDED_KEYS;
-            ContentValidationInfo info = new(filename, encoding)
+            ContentValidator validator = new(filename, encoding)
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"],
@@ -305,7 +301,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateFindDimensionRecommendedKeys(
                 entries,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -322,13 +318,13 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithIllegalSpecifiers;
-            ContentValidationInfo info = new(filename, encoding);
+            ContentValidator validator = new(filename, encoding);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateUnexpectedSpecifiers(
                 entry,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -342,13 +338,13 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithIllegalLanguageParameter;
-            ContentValidationInfo info = new(filename, encoding);
+            ContentValidator validator = new(filename, encoding);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateUnexpectedLanguageParams(
                 entry,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -362,7 +358,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithUndefinedLanguage;
-            ContentValidationInfo info = new(filename, encoding)
+            ContentValidator validator = new(filename, encoding)
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"]
@@ -372,7 +368,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateLanguageParams(
                 entry,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -386,7 +382,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithUndefinedFirstSpecifier;
-            ContentValidationInfo info = new(filename, encoding)
+            ContentValidator validator = new(filename, encoding)
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"],
@@ -408,7 +404,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateSpecifiers(
                 entry,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -422,7 +418,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithUndefinedSecondSpecifier;
-            ContentValidationInfo info = new(filename, encoding)
+            ContentValidator validator = new(filename, encoding)
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"],
@@ -444,7 +440,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateSpecifiers(
                 entry,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -458,7 +454,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_INVALID_VALUE_TYPES;
-            ContentValidationInfo info = new(filename, encoding);
+            ContentValidator validator = new(filename, encoding);
 
             // Act
             foreach (ValidationStructuredEntry entry in entries)
@@ -466,7 +462,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
                 ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateValueTypes(
                     entry,
                     syntaxConf,
-                    ref info
+                    validator
                     );
 
                 // Assert
@@ -481,7 +477,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_WRONG_VALUES;
-            ContentValidationInfo info = new(filename, encoding);
+            ContentValidator validator = new(filename, encoding);
 
             // Act
             foreach (ValidationStructuredEntry entry in entries)
@@ -489,7 +485,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
                 ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateValueContents(
                     entry,
                     syntaxConf,
-                    ref info
+                    validator
                     );
 
                 // Assert
@@ -504,7 +500,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithUnmatchingAmountOfElements;
-            ContentValidationInfo info = new(filename, encoding)
+            ContentValidator validator = new(filename, encoding)
             {
                 DefaultLanguage = "fi",
                 AvailableLanguages = ["fi", "en"],
@@ -526,7 +522,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateValueAmounts(
                 entry,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert
@@ -540,13 +536,13 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithLowerCaseValue;
-            ContentValidationInfo info = new(filename, encoding);
+            ContentValidator validator = new(filename, encoding);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidationFunctions.ValidateValueUppercaseRecommendations(
                 entry,
                 syntaxConf,
-                ref info
+                validator
                 );
 
             // Assert

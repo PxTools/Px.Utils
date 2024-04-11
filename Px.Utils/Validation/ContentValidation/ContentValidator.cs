@@ -1,33 +1,50 @@
 ﻿using PxUtils.PxFile;
 using PxUtils.Validation.SyntaxValidation;
+using System.Collections.Generic;
 using System.Text;
 
 namespace PxUtils.Validation.ContentValidation
 {
     /// <summary>
-    /// Methods for validating the content of Px file metadata
+    /// Provides methods for validating the content of Px file metadata
+    /// <param name="filename">Name of the Px file</param>
+    /// <param name="encoding"> Encoding of the Px file</param>
     /// </summary>
-    public static class ContentValidation
+    public class ContentValidator(string filename, Encoding encoding)
     {
+        public string Filename { get; } = filename;
+        public Encoding Encoding { get; } = encoding;
+        public string? DefaultLanguage { get; set; }
+        public string[]? AvailableLanguages { get; set; }
+        /// <summary>
+        /// Dictionary that define content dimension names for available languages. Key represents the language, while the value is the dimension name.
+        /// </summary>
+        public Dictionary<string, string>? ContentDimensionNames { get; set; }
+        /// <summary>
+        /// Dictionary that define stub dimension names for available languages. Key represents the language, while the value is the dimension name.
+        /// </summary>
+        public Dictionary<string, string[]>? StubDimensionNames { get; set; }
+        /// <summary>
+        /// Dictionary that define heading dimension names for available languages. Key represents the language, while the value is the dimension name.
+        /// </summary>
+        public Dictionary<string, string[]>? HeadingDimensionNames { get; set; }
+        /// <summary>
+        /// Dictionary of key value pairs that define names for dimension values. Key is a key value pair of language and dimension name, while the value is an array of dimension value names.
+        /// </summary>
+        public Dictionary<KeyValuePair<string, string>, string[]>? DimensionValueNames { get; set; }
+
         /// <summary>
         /// Blocking function for validating contents of a Px file metadata
         /// </summary>
-        /// <param name="filename">Name of the file being validated</param>
         /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that defines keywords and symbols for Px file syntax</param>
-        /// <param name="feedbackItems">List of <see cref="ValidationFeedbackItem"/> objects. Any issues found during the validation process will be added to this list</param>
-        /// <param name="encoding">Encoding format of the Px file</param>
         /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
-        public static void ValidatePxFileContent(
-            string filename,
+        public ValidationFeedbackItem[] ValidatePxFileContent(
             ValidationStructuredEntry[] entries,
             PxFileSyntaxConf syntaxConf,
-            ref List<ValidationFeedbackItem> feedbackItems,
-            Encoding encoding,
             CustomContentValidationFunctions? customContentValidationFunctions = null
             )
         {
-            ContentValidationInfo contentValidationInfo = new(filename, encoding);
             ContentValidationFunctions contentValidationFunctions = new();
 
             IEnumerable<ContentValidationEntryFunctionDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;
@@ -39,9 +56,11 @@ namespace PxUtils.Validation.ContentValidation
                 contentValidationSearchFunctions = contentValidationSearchFunctions.Concat(customContentValidationFunctions.CustomContentValidationSearchFunctions);
             }
 
+            List <ValidationFeedbackItem> feedbackItems = [];
+
             foreach (ContentValidationSearchFunctionDelegate searchFunction in contentValidationSearchFunctions)
             {
-                ValidationFeedbackItem[]? feedback = searchFunction(entries, syntaxConf, ref contentValidationInfo);
+                ValidationFeedbackItem[]? feedback = searchFunction(entries, syntaxConf, this);
                 if (feedback is not null)
                 {
                     feedbackItems.AddRange(feedback);
@@ -51,61 +70,59 @@ namespace PxUtils.Validation.ContentValidation
             {
                 foreach (ValidationStructuredEntry entry in entries)
                 {
-                    ValidationFeedbackItem[]? feedback = entryFunction(entry, syntaxConf, ref contentValidationInfo);
+                    ValidationFeedbackItem[]? feedback = entryFunction(entry, syntaxConf, this);
                     if (feedback is not null)
                     {
                         feedbackItems.AddRange(feedback);
                     }
                 }
             }
+
+            return [.. feedbackItems];
         }
 
         /// <summary>
         /// Asynchronous function for validating contents of a Px file metadata
         /// </summary>
-        /// <param name="filename">Name of the file being validated</param>
         /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that defines keywords and symbols for Px file syntax</param>
-        /// <param name="feedbackItems">List of <see cref="ValidationFeedbackItem"/> objects. Any issues found during the validation process will be added to this list</param>
-        /// <param name="encoding">Encoding format of the Px file</param>
         /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
         /// <param name="cancellationToken">Cancellation token for cancelling the validation process</param>
         /// <returns>Array of <see cref="ValidationFeedbackItem"/> objects. Any issues found during validation will be listed here</returns>
-        public static async Task<ValidationFeedbackItem[]> ValidatePxFileContentAsync(
-            string filename,
+        public async Task<ValidationFeedbackItem[]> ValidatePxFileContentAsync(
             ValidationStructuredEntry[] entries,
             PxFileSyntaxConf syntaxConf,
-            List<ValidationFeedbackItem> feedbackItems,
-            Encoding encoding,
             CustomContentValidationFunctions? customContentValidationFunctions = null,
             CancellationToken cancellationToken = default
             )
         {
-            ContentValidationInfo contentValidationInfo = new(filename, encoding);
             ContentValidationFunctions contentValidationFunctions = new();
 
-            List<ContentValidationEntryFunctionDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;
-            List<ContentValidationSearchFunctionDelegate> finalContentValidationSearchFunctions = contentValidationFunctions.FinalAsyncSearchFunctionGroup;
+            IEnumerable<ContentValidationEntryFunctionDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;
+            IEnumerable<ContentValidationSearchFunctionDelegate> contentValidationSearchFunctions = contentValidationFunctions.DefaultContentValidationSearchFunctions;
 
             if (customContentValidationFunctions is not null)
             {
                 contentValidationEntryFunctions = [.. contentValidationEntryFunctions, .. customContentValidationFunctions.CustomContentValidationEntryFunctions];
-                finalContentValidationSearchFunctions = [.. finalContentValidationSearchFunctions, .. customContentValidationFunctions.CustomContentValidationSearchFunctions];
+                contentValidationSearchFunctions = [.. contentValidationSearchFunctions, .. customContentValidationFunctions.CustomContentValidationSearchFunctions];
             }
 
-            // Some search type content validation functions are dependent on the results of other search type content validation functions. Thus they are run in groups.
-            IEnumerable<Task<ValidationFeedbackItem[]?>> tasks = contentValidationFunctions.FirstAsyncSearchFunctionGroup
-                .Select(func => Task.Run(() => func(entries, syntaxConf, ref contentValidationInfo)));
-            await Task.WhenAll(tasks);
-            tasks = contentValidationFunctions.SecondAsyncSearchFunctionGroup
-                .Select(func => Task.Run(() => func(entries, syntaxConf, ref contentValidationInfo)));
-            await Task.WhenAll(tasks);
-            tasks = finalContentValidationSearchFunctions
-                .Select(func => Task.Run(() => func(entries, syntaxConf, ref contentValidationInfo)));
-            await Task.WhenAll(tasks);
+            List<ValidationFeedbackItem> feedbackItems = [];
+
+            // Some search type content validation functions are dependent on the results of other search type content validation functions
+            foreach (var searchFunction in contentValidationSearchFunctions)
+            {
+                ValidationFeedbackItem[]? feedback = await Task.Run(() => searchFunction(entries, syntaxConf, this));
+                if (feedback is not null)
+                {
+                    feedbackItems.AddRange(feedback);
+                }
+            }
 
             // Entry tasks can be run asynchronously without worrying about dependencies
-            IEnumerable<Task<ValidationFeedbackItem[]?>> entryTasks = contentValidationEntryFunctions.SelectMany(entryFunction => entries.Select(entry => Task.Run(() => entryFunction(entry, syntaxConf, ref contentValidationInfo))));
+            IEnumerable<Task<ValidationFeedbackItem[]?>> entryTasks = contentValidationEntryFunctions
+                .SelectMany(entryFunction => entries
+                    .Select(entry => Task.Run(() => entryFunction(entry, syntaxConf, this))));
 
             await Task.WhenAll(entryTasks);
 
