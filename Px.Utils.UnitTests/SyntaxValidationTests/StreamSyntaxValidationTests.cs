@@ -398,7 +398,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         [DataRow("TLIST(M1, \"200001-200003\")", Validation.ValueType.TimeValRange)]
         [DataRow("TLIST(W1, \"200050-200052\")", Validation.ValueType.TimeValRange)]
         [DataRow("TLIST(D1, \"20001010-20001012\")", Validation.ValueType.TimeValRange)]
-        public void ValidateObjects_CalledWith_KEYVALUEPAIRS_WITH_TIMEVALS_Returns_With_Valid_Result(string timeval, Validation.ValueType type)
+        public void Correctly_Defined_Range_And_Series_TimeValues_Return_Correct_ValueType(string timeval, Validation.ValueType type)
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = [ new("foo", new KeyValuePair<string, string>("foo-key", timeval), 0, [], 0) ];
@@ -428,7 +428,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         [DataRow("TLIST(M1, \"2000/01-2000/03\")", null)]
         [DataRow("TLIST(W1, \"2000.50-2000.52\")", null)]
         [DataRow("TLIST(D1, \"10/10/2000-10/11/2000\")", null)]
-        public void ValidateObjects_CalledWith_KEYVALUEPAIRS_WITH_BAD_TIMEVALS_Returns_With_Errors(string timeval, Validation.ValueType? type)
+        public void Incorrectly_Defined_Range_And_Series_TimeValues_Return_With_Errors(string timeval, Validation.ValueType? type)
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = [new("foo", new KeyValuePair<string, string>("foo-key", timeval), 0, [], 0)];
