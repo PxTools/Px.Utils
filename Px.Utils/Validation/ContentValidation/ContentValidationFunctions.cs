@@ -330,7 +330,7 @@ namespace PxUtils.Validation.ContentValidation
                     &&
                     (validator.HeadingDimensionNames is null || !validator.HeadingDimensionNames.ContainsKey(language)))
                 {
-                    ValidationFeedback feedback = new ValidationFeedback(
+                    ValidationFeedback feedback = new (
                                 ValidationFeedbackLevel.Error,
                                 ValidationFeedbackRule.MissingStubAndHeading,
                                 0,
