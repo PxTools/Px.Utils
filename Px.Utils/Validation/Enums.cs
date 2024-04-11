@@ -18,8 +18,9 @@
         ListOfStrings,
         Number,
         Boolean,
-        Timeval,
-        DateTime
+        DateTime,
+        TimeValRange,
+        TimeValSeries
     }
 
     /// <summary>

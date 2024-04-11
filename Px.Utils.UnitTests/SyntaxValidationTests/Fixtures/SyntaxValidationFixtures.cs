@@ -45,6 +45,32 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
             "\"id\", \"ornare\";\n" +
             "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
 
+        internal static string UTF8_N_WITH_TIMEVALS =>
+            "CHARSET=\"ANSI\";" +
+            "\nAXIS-VERSION=\"2013\";" +
+            "\nCODEPAGE=\"utf-8\";" +
+            "\nLANGUAGES=\"aa\",\"åå\",\"öö\";\n" +
+            "NEXT-UPDATE=\"20240131 08:00\";" +
+            "\nSUBJECT-AREA=\"test\";" +
+            "\nSUBJECT-AREA[fi]=\"test\";" +
+            "\nCOPYRIGHT=YES;\n" +
+            "TIMEVAL(\"foo\")=TLIST(A1),\"2000\",\"2001\",\"2003\";\n" +
+            "TIMEVAL(\"bar\")=TLIST(H1, \"20001-20202\");\n" +
+            "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
+
+        internal static string UTF8_N_WITH_BAD_TIMEVALS =>
+            "CHARSET=\"ANSI\";" +
+            "\nAXIS-VERSION=\"2013\";" +
+            "\nCODEPAGE=\"utf-8\";" +
+            "\nLANGUAGES=\"aa\",\"åå\",\"öö\";\n" +
+            "NEXT-UPDATE=\"20240131 08:00\";" +
+            "\nSUBJECT-AREA=\"test\";" +
+            "\nSUBJECT-AREA[fi]=\"test\";" +
+            "\nCOPYRIGHT=YES;\n" +
+            "TIMEVAL(\"foo\")=TLIST(A1),2000,2001,2003;\n" +
+            "TIMEVAL(\"bar\")=TLIST(H1 20001-20202);\n" +
+            "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
+
         internal static List<ValidationKeyValuePair> KEYVALUEPAIR_WITH_MULTIPLE_LANGUAGE_PARAMETERS => [
             new("foo", new KeyValuePair<string, string>("FOO[fi][en](\"first_specifier\", \"second_specifier\")", "YES\n"), 0, [], 0)
                 ];
