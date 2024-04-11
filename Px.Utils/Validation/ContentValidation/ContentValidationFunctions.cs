@@ -456,9 +456,13 @@ namespace PxUtils.Validation.ContentValidation
                     syntaxConf.Tokens.KeyWords.Units,
                 ];
 
-            string[] commonKeywords =
+            string[] requiredKeywords =
                 [
                     syntaxConf.Tokens.KeyWords.LastUpdated,
+                ];
+
+            string[] recommendedKeywords =
+                [
                     syntaxConf.Tokens.KeyWords.Precision
                 ];
 
@@ -477,7 +481,7 @@ namespace PxUtils.Validation.ContentValidation
             {
                 foreach (string dimensionValueName in kvp.Value)
                 {
-                    List<ValidationFeedbackItem> items = ContentValidationUtilityMethods.ProcessContentDimensionValue(languageSpecificKeywords, commonKeywords, entries, info, kvp.Key, dimensionValueName);
+                    List<ValidationFeedbackItem> items = ContentValidationUtilityMethods.ProcessContentDimensionValue(languageSpecificKeywords, requiredKeywords, recommendedKeywords, entries, info, kvp.Key, dimensionValueName);
                     feedbackItems.AddRange(items);
                 }
             }

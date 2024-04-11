@@ -81,7 +81,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="defaultLanguage">Default language of the Px file</param>
         /// <param name="filename">Name of the Px file</param>
         /// <returns>Returns a <see cref="ValidationFeedbackItem"/> object with an error if required entry is not found or with a warning if the entry specifiers are defined in an unexpected way</returns>
-        internal static ValidationFeedbackItem? FindContentVariableKey(ValidationStructuredEntry[] entries, string keyword, KeyValuePair<string, string> languageAndDimensionPair, string dimensionValueName, ContentValidationInfo info)
+        internal static ValidationFeedbackItem? FindContentVariableKey(ValidationStructuredEntry[] entries, string keyword, KeyValuePair<string, string> languageAndDimensionPair, string dimensionValueName, ContentValidationInfo info, bool recommended = false)
         {
             string language = languageAndDimensionPair.Key;
             string dimensionName = languageAndDimensionPair.Value;
@@ -93,13 +93,13 @@ namespace PxUtils.Validation.ContentValidation
                             (e.Key.SecondSpecifier == dimensionValueName || e.Key.SecondSpecifier == null));
 
             if (entry is null)
-            {
+            { 
                 return
                     new ValidationFeedbackItem(
                         new ContentValidationObject(info.Filename, 0, []),
                         new ValidationFeedback(
-                            ValidationFeedbackLevel.Error,
-                            ValidationFeedbackRule.RequiredKeyMissing,
+                            recommended ? ValidationFeedbackLevel.Warning : ValidationFeedbackLevel.Error,
+                            recommended ? ValidationFeedbackRule.RecommendedKeyMissing : ValidationFeedbackRule.RequiredKeyMissing,
                             0,
                             0,
                             $"{keyword}, {language}, {dimensionName}, {dimensionValueName}"
@@ -175,6 +175,7 @@ namespace PxUtils.Validation.ContentValidation
         internal static List<ValidationFeedbackItem> ProcessContentDimensionValue(
             string[] languageSpecificKeywords,
             string[] commonKeywords,
+            string[] recommendedKeywords,
             ValidationStructuredEntry[] entries,
             ContentValidationInfo info,
             KeyValuePair<string, string> languageAndDimensionPair,
@@ -195,6 +196,14 @@ namespace PxUtils.Validation.ContentValidation
                 foreach (string keyword in commonKeywords)
                 {
                     ValidationFeedbackItem? issue = FindContentVariableKey(entries, keyword, languageAndDimensionPair, valueName, info);
+                    if (issue is not null)
+                    {
+                        feedbackItems.Add((ValidationFeedbackItem)issue);
+                    }
+                }
+                foreach (string keyword in recommendedKeywords)
+                {
+                    ValidationFeedbackItem? issue = FindContentVariableKey(entries, keyword, languageAndDimensionPair, valueName, info, true);
                     if (issue is not null)
                     {
                         feedbackItems.Add((ValidationFeedbackItem)issue);
