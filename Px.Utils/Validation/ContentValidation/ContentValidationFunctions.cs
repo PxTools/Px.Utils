@@ -3,19 +3,19 @@ using PxUtils.Validation.SyntaxValidation;
 
 namespace PxUtils.Validation.ContentValidation
 {
-    public delegate ValidationFeedbackItem[]? ContentValidationEntryFunctionDelegate(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ContentValidator validator);
-    public delegate ValidationFeedbackItem[]? ContentValidationSearchFunctionDelegate(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator); 
+    public delegate ValidationFeedbackItem[]? ContentValidationEntryDelegate(ValidationStructuredEntry entry, PxFileSyntaxConf syntaxConf, ContentValidator validator);
+    public delegate ValidationFeedbackItem[]? ContentValidationSearchDelegate(ValidationStructuredEntry[] entries, PxFileSyntaxConf syntaxConf, ContentValidator validator); 
     
     /// <summary>
     /// Collection of functions for validating Px file metadata contents
     /// </summary>
     public class ContentValidationFunctions
     {
-        public List<ContentValidationEntryFunctionDelegate> DefaultContentValidationEntryFunctions { get; }
-        public List<ContentValidationSearchFunctionDelegate> DefaultContentValidationSearchFunctions { get; }
+        public List<ContentValidationEntryDelegate> DefaultContentValidationEntryFunctions { get; }
+        public List<ContentValidationSearchDelegate> DefaultContentValidationSearchFunctions { get; }
 
         /// <summary>
-        /// Constructor for <see cref="ContentValidationFunctions"/> class that contains default content validation functions/>
+        /// Constructor that contains default content validation functions
         /// </summary>
         public ContentValidationFunctions()
         {

@@ -14,7 +14,13 @@ namespace PxUtils.Validation.ContentValidation
     {
         public string Filename { get; } = filename;
         public Encoding Encoding { get; } = encoding;
+        /// <summary>
+        /// Default language of the Px file defined with LANGUAGE keyword by default
+        /// </summary>
         public string? DefaultLanguage { get; set; }
+        /// <summary>
+        /// Array of supported languages in the Px file. Defined with LANGUAGES keyword by default
+        /// </summary>
         public string[]? AvailableLanguages { get; set; }
         /// <summary>
         /// Dictionary that define content dimension names for available languages. Key represents the language, while the value is the dimension name.
@@ -34,7 +40,7 @@ namespace PxUtils.Validation.ContentValidation
         public Dictionary<KeyValuePair<string, string>, string[]>? DimensionValueNames { get; set; }
 
         /// <summary>
-        /// Blocking function for validating contents of a Px file metadata
+        /// Validates contents of Px file metadata. Metadata syntax must be valid for this method to work properly.
         /// </summary>
         /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that defines keywords and symbols for Px file syntax</param>
@@ -47,8 +53,8 @@ namespace PxUtils.Validation.ContentValidation
         {
             ContentValidationFunctions contentValidationFunctions = new();
 
-            IEnumerable<ContentValidationEntryFunctionDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;
-            IEnumerable<ContentValidationSearchFunctionDelegate> contentValidationSearchFunctions = contentValidationFunctions.DefaultContentValidationSearchFunctions;
+            IEnumerable<ContentValidationEntryDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;
+            IEnumerable<ContentValidationSearchDelegate> contentValidationSearchFunctions = contentValidationFunctions.DefaultContentValidationSearchFunctions;
 
             if (customContentValidationFunctions is not null)
             {
@@ -58,7 +64,7 @@ namespace PxUtils.Validation.ContentValidation
 
             List <ValidationFeedbackItem> feedbackItems = [];
 
-            foreach (ContentValidationSearchFunctionDelegate searchFunction in contentValidationSearchFunctions)
+            foreach (ContentValidationSearchDelegate searchFunction in contentValidationSearchFunctions)
             {
                 ValidationFeedbackItem[]? feedback = searchFunction(entries, syntaxConf, this);
                 if (feedback is not null)
@@ -66,7 +72,7 @@ namespace PxUtils.Validation.ContentValidation
                     feedbackItems.AddRange(feedback);
                 }
             }
-            foreach (ContentValidationEntryFunctionDelegate entryFunction in contentValidationEntryFunctions)
+            foreach (ContentValidationEntryDelegate entryFunction in contentValidationEntryFunctions)
             {
                 foreach (ValidationStructuredEntry entry in entries)
                 {
@@ -82,7 +88,7 @@ namespace PxUtils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// Asynchronous function for validating contents of a Px file metadata
+        /// Validates contents of Px file metadata asynchronously. Metadata syntax must be valid for this method to work properly.
         /// </summary>
         /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that defines keywords and symbols for Px file syntax</param>
@@ -98,8 +104,8 @@ namespace PxUtils.Validation.ContentValidation
         {
             ContentValidationFunctions contentValidationFunctions = new();
 
-            IEnumerable<ContentValidationEntryFunctionDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;
-            IEnumerable<ContentValidationSearchFunctionDelegate> contentValidationSearchFunctions = contentValidationFunctions.DefaultContentValidationSearchFunctions;
+            IEnumerable<ContentValidationEntryDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;
+            IEnumerable<ContentValidationSearchDelegate> contentValidationSearchFunctions = contentValidationFunctions.DefaultContentValidationSearchFunctions;
 
             if (customContentValidationFunctions is not null)
             {
