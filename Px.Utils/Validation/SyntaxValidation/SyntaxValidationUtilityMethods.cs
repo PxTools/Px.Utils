@@ -392,13 +392,14 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static bool TryGetTimeValueFormat(string input, out ValueType? valueFormat, PxFileSyntaxConf syntaxConf)
         {
+            string timeIntervalIndicator = syntaxConf.Tokens.Time.TimeIntervalIndicator;
+
             // Value has to start with the time interval indicator (TLIST by default)
-            if (!input.StartsWith(syntaxConf.Tokens.Time.TimeIntervalIndicator))
+            if (!input.StartsWith(timeIntervalIndicator))
             {
                 valueFormat = null;
                 return false;
             }
-
 
             ExtractSectionResult intervalSection = ExtractSectionFromString(input, syntaxConf.Symbols.Value.TimeSeriesIntervalStart, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Value.TimeSeriesIntervalEnd);
             // There can only be one time interval specifier section
@@ -416,13 +417,14 @@ namespace PxUtils.Validation.SyntaxValidation
                 valueFormat = null;
                 return false;
             }
-            string remainder = intervalSection.Remainder.Remove(0, syntaxConf.Tokens.Time.TimeIntervalIndicator.Length);
+            string remainder = intervalSection.Remainder.Remove(0, timeIntervalIndicator.Length);
             return timeRange is not null ? TryGetTimeValueRangeFormat(timeRange, intervalToken, out valueFormat, syntaxConf) : TryGetTimeValueSeriesFormat(remainder, intervalToken, out valueFormat, syntaxConf);
         }
 
         private static bool TryGetTimeValueSeriesFormat(string input, string timeInterval, out ValueType? valueFormat, PxFileSyntaxConf syntaxConf)
         {
-            if (input.Length == 0 || input[0] != syntaxConf.Symbols.Value.ListSeparator)
+            char listSeparator = syntaxConf.Symbols.Value.ListSeparator;
+            if (input.Length == 0 || input[0] != listSeparator)
             {
                 valueFormat = null;
                 return false;
@@ -430,14 +432,14 @@ namespace PxUtils.Validation.SyntaxValidation
 
             // Remove preceding list separator from input
             input = input.Remove(0, 1);
-            if (!IsStringListFormat(input, syntaxConf.Symbols.Value.ListSeparator, syntaxConf.Symbols.Value.StringDelimeter))
+            if (!IsStringListFormat(input, listSeparator, syntaxConf.Symbols.Value.StringDelimeter))
             {
                 valueFormat = null;
                 return false;
             }
 
             // Time value series should be a list of time values
-            string[] timeValSeries = input.Split(syntaxConf.Symbols.Value.ListSeparator);
+            string[] timeValSeries = input.Split(listSeparator);
             if (Array.TrueForAll(timeValSeries, x => IsValidTimestampFormat(x, timeInterval, syntaxConf)))
             {
                 valueFormat = ValueType.TimeValSeries;
@@ -465,11 +467,6 @@ namespace PxUtils.Validation.SyntaxValidation
 
             try
             {
-                bool isMatch = regex.IsMatch(input);
-                if (!isMatch)
-                {
-                    int i = 0;
-                }
                 return regex.IsMatch(input);
             }
             catch (RegexMatchTimeoutException)
