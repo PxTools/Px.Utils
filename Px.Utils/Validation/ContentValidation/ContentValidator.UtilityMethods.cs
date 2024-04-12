@@ -17,7 +17,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="feedbackItems">A list of feedback items to add to</param>
         /// <param name="filename">The name of the Px file</param>
         /// <returns>A dictionary containing the values for the dimensions</returns>
-        internal static Dictionary<KeyValuePair<string, string>, string[]> FindDimensionValues(
+        private static Dictionary<KeyValuePair<string, string>, string[]> FindDimensionValues(
             ValidationStructuredEntry[] entries,
             PxFileSyntaxConf syntaxConf,
             Dictionary<string, string[]>? dimensions,
@@ -81,7 +81,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="validator">Object that stores required information about the validation process</param>
         /// <param name="recommended">Optional that indicates if the keyword entry is recommended and should yield a warning if not found</param>
         /// <returns>Returns a <see cref="ValidationFeedbackItem"/> object with an error if required entry is not found or with a warning if the entry specifiers are defined in an unexpected way</returns>
-        internal static ValidationFeedbackItem? FindContentVariableKey(ValidationStructuredEntry[] entries, string keyword, KeyValuePair<string, string> languageAndDimensionPair, string dimensionValueName, ContentValidator validator, bool recommended = false)
+        private static ValidationFeedbackItem? FindContentVariableKey(ValidationStructuredEntry[] entries, string keyword, KeyValuePair<string, string> languageAndDimensionPair, string dimensionValueName, ContentValidator validator, bool recommended = false)
         {
             string language = languageAndDimensionPair.Key;
             string dimensionName = languageAndDimensionPair.Value;
@@ -141,7 +141,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="validator">Object that stores required information about the validation process</param>
         /// <param name="dimensionName">Name of the dimension</param>
         /// <returns>Returns a <see cref="ValidationFeedbackItem"/> object with a warning if the recommended entry is not found</returns>
-        internal static ValidationFeedbackItem? FindDimensionRecommendedKey(ValidationStructuredEntry[] entries, string keyword, string language, ContentValidator validator, string? dimensionName = null)
+        private static ValidationFeedbackItem? FindDimensionRecommendedKey(ValidationStructuredEntry[] entries, string keyword, string language, ContentValidator validator, string? dimensionName = null)
         {
             ValidationStructuredEntry[] keywordEntries = entries.Where(e => e.Key.Keyword.Equals(keyword)).ToArray();
             ValidationStructuredEntry? entry = Array.Find(keywordEntries,
@@ -176,7 +176,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="languageAndDimensionPair">KeyValuePair that contains the processed language as key and the dimension name as value</param>
         /// <param name="valueName">Name of the content dimension value to look entries for</param>
         /// <returns>Returns a list of <see cref="ValidationFeedbackItem"/> objects if required entries are not found</returns>
-        internal static List<ValidationFeedbackItem> ProcessContentDimensionValue(
+        private static List<ValidationFeedbackItem> ProcessContentDimensionValue(
             string[] languageSpecificKeywords,
             string[] commonKeywords,
             string[] recommendedKeywords,
@@ -228,7 +228,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="validator">Object that provides information of the ongoing content validation process</param>
         /// <param name="dimensionName">Name of the dimension currently being processed</param>
         /// <returns></returns>
-        internal static List<ValidationFeedbackItem> ProcessDimension(
+        private static List<ValidationFeedbackItem> ProcessDimension(
             string[] keywords,
             string dimensionTypeKeyword,
             ValidationStructuredEntry[] entries, 
