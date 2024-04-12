@@ -41,7 +41,15 @@ namespace Px.Utils.TestingApp.Commands
         internal Action[] BenchmarkFunctions { get; set; } = [];
         internal Func<Task>[] BenchmarkFunctionsAsync { get; set; } = [];
 
+        internal string TestFilePath { get; set; } = "";
         internal int Iterations { get; set; } = 10;
+        internal bool BatchMode { get; }
+        internal List<string>? Inputs { get; set; } = [];
+        
+        private static readonly string[] fileFlags = ["-f", "-file"];
+        private static readonly string[] iterFlags = ["-i", "-iter"];
+
+        protected List<string[]> ParameterFlags { get; } = [fileFlags, iterFlags];
 
         internal List<BenchmarkResult> Results { get; } = [];
         internal int processesCompleted = 0;
@@ -65,15 +73,16 @@ namespace Px.Utils.TestingApp.Commands
 
         internal override void Run(bool batchMode, List<string>? inputs = null)
         {
+            Inputs = inputs;
             if (inputs?.Count == 1 && inputs[0] == "help")
             {
                 Console.Clear();
                 Console.WriteLine(Help);
                 Console.WriteLine();
-                inputs = [];
+                Inputs = [];
             }
 
-            SetRunParameters(batchMode, inputs);
+            SetRunParameters();
 
             Results.Clear();
             processesCompleted = 0;
@@ -85,7 +94,66 @@ namespace Px.Utils.TestingApp.Commands
             RunBenchmarksAsync(BenchmarkFunctionsAsync).Wait();
         }
 
-        protected abstract void SetRunParameters(bool batchMode, List<string>? inputs);
+        protected virtual void SetRunParameters()
+        {
+            Dictionary<string, List<string>> parameters = GroupParameters(Inputs ?? [], ParameterFlags.SelectMany(x => x).ToList());
+            if (parameters.Keys.Count == ParameterFlags.Count)
+            {
+                foreach (string key in parameters.Keys)
+                {
+                    if (fileFlags.Contains(key) && parameters[key].Count == 1)
+                    {
+                        TestFilePath = parameters[key][0];
+                    }
+                    else if (iterFlags.Contains(key) && parameters[key].Count == 1 &&
+                        int.TryParse(parameters[key][0], out int iterations))
+                    {
+                        Iterations = iterations;
+                    }
+                    else if (ParameterFlags.Any(flag => flag.Contains(key)))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Invalid argument {key} {string.Join(' ', parameters[key])}");
+                    }
+                }
+            }
+            else if (BatchMode)
+            {
+                throw new ArgumentException("Invalid number of parameters.");
+            }
+            else
+            {
+                StartInteractiveMode();
+            }
+        }
+
+        protected virtual void StartInteractiveMode()
+        {
+            Console.WriteLine("Enter the path to the PX file to benchmark");
+            string file = Console.ReadLine() ?? "";
+
+            while (!Path.Exists(file) || !Path.GetFileName(file).EndsWith(".px"))
+            {
+                Console.WriteLine("File provided is not valid, please enter a path to a valid px file");
+                file = Console.ReadLine() ?? "";
+            }
+
+            TestFilePath = file;
+
+            Console.WriteLine("Enter the number of iterations to run");
+            string iterations = Console.ReadLine() ?? "";
+            int value;
+            while (!int.TryParse(iterations, out value))
+            {
+                Console.WriteLine("Invalid number of iterations, please enter a valid integer");
+                iterations = Console.ReadLine() ?? "";
+            }
+
+            Iterations = value;
+        }
 
         protected void RunBenchmarks(Action[] functions)
         {

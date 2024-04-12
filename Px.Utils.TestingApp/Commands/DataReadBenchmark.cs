@@ -6,12 +6,9 @@ namespace Px.Utils.TestingApp.Commands
 {
     internal class DataReadBenchmark : Benchmark
     {
-        private string _testFilePath = "";
         private int[] _readRows = [];
         private int[] _readCols = [];
 
-        private readonly string[] fileFlags = ["-f", "-file"];
-        private readonly string[] iterFlags = ["-i", "-iter"];
         private readonly string[] rowsFlags = ["-r", "-rows"];
         private readonly string[] colsFlags = ["-c", "-cols"];
 
@@ -29,13 +26,14 @@ namespace Px.Utils.TestingApp.Commands
         {
             BenchmarkFunctions = [RunReadDoubleDataValuesBenchmarks, RunReadDecimalDataValuesBenchmarks, RunReadUnsafeDoubleBenchmarks];
             BenchmarkFunctionsAsync = [RunReadDoubleDataValuesAsyncBenchmarks, RunReadDecimalDataValuesAsyncBenchmarks, RunReadUnsafeDoubleAsyncBenchmarks];
+            ParameterFlags.AddRange([rowsFlags, colsFlags]);
         }
 
         private void RunReadDoubleDataValuesBenchmarks()
         {
             DoubleDataValue[] buffer = new DoubleDataValue[_readRows.Length * _readCols.Length];
            
-            using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
+            using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
             
             reader.ReadDoubleDataValues(buffer, 0, _readRows, _readCols);
@@ -45,7 +43,7 @@ namespace Px.Utils.TestingApp.Commands
         {
             DecimalDataValue[] buffer = new DecimalDataValue[_readRows.Length * _readCols.Length];
             
-            using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
+            using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
             
             reader.ReadDecimalDataValues(buffer, 0, _readRows, _readCols);
@@ -56,7 +54,7 @@ namespace Px.Utils.TestingApp.Commands
             double[] buffer = new double[_readRows.Length * _readCols.Length];
             double[] missingValueEncodings = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
 
-            using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
+            using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
 
             reader.ReadUnsafeDoubles(buffer, 0, _readRows, _readCols, missingValueEncodings);
@@ -66,7 +64,7 @@ namespace Px.Utils.TestingApp.Commands
         {
             DoubleDataValue[] buffer = new DoubleDataValue[_readRows.Length * _readCols.Length];
 
-            using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
+            using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
 
             await reader.ReadDoubleDataValuesAsync(buffer, 0, _readRows, _readCols);
@@ -76,7 +74,7 @@ namespace Px.Utils.TestingApp.Commands
         {
             DecimalDataValue[] buffer = new DecimalDataValue[_readRows.Length * _readCols.Length];
 
-            using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
+            using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
 
             await reader.ReadDecimalDataValuesAsync(buffer, 0, _readRows, _readCols);
@@ -87,33 +85,30 @@ namespace Px.Utils.TestingApp.Commands
             double[] buffer = new double[_readRows.Length * _readCols.Length];
             double[] missingValueEncodings = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
 
-            using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
+            using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
 
             await reader.ReadUnsafeDoublesAsync(buffer, 0, _readRows, _readCols, missingValueEncodings);
         }
 
-        protected override void SetRunParameters(bool batchMode, List<string>? inputs)
+        protected override void SetRunParameters()
         {
-            Dictionary<string, List<string>> parameters = GroupParameters(inputs ?? [], [.. fileFlags, .. iterFlags, .. rowsFlags, .. colsFlags]);
-            if(parameters.Keys.Count == 4)
+            base.SetRunParameters();
+
+            Dictionary<string, List<string>> parameters = GroupParameters(Inputs ?? [], ParameterFlags.SelectMany(x => x).ToList());
+            if (parameters.Keys.Count == 4)
             {
                 foreach (string key in parameters.Keys)
                 {
-                    if (fileFlags.Contains(key) && parameters[key].Count == 1)
-                    {
-                        _testFilePath = parameters[key][0];
-                    }
-                    else if (iterFlags.Contains(key) && parameters[key].Count == 1 &&
-                        int.TryParse(parameters[key][0], out int iterations))
-                    {
-                        Iterations = iterations;
-                    }
-                    else if (rowsFlags.Contains(key) && TryParseCoordinates(parameters[key], out _readRows))
+                    if (rowsFlags.Contains(key) && TryParseCoordinates(parameters[key], out _readRows))
                     {
                         continue;
                     }
                     else if (colsFlags.Contains(key) && TryParseCoordinates(parameters[key], out _readCols))
+                    {
+                        continue;
+                    }
+                    else if (ParameterFlags.Any(flag => flag.Contains(key)))
                     {
                         continue;
                     }
@@ -123,39 +118,11 @@ namespace Px.Utils.TestingApp.Commands
                     }
                 }
             }
-            else if( batchMode)
-            {
-                throw new ArgumentException("Invalid number of parameters.");
-            }
-            else
-            {
-                StartInteractiveMode();
-            }
-            
         }
 
-        private void StartInteractiveMode()
+        protected override void StartInteractiveMode()
         {
-            Console.WriteLine("Enter the path to the PX file to benchmark");
-            string file = Console.ReadLine() ?? "";
-
-            while (!Path.Exists(file) || !Path.GetFileName(file).EndsWith(".px"))
-            {
-                Console.WriteLine("File provided is not valid, please enter a path to a valid px file");
-                file = Console.ReadLine() ?? "";
-            }
-
-            _testFilePath = file;
-
-            Console.WriteLine("Enter the number of iterations to run");
-            string iterations = Console.ReadLine() ?? "";
-            int value;
-            while (!int.TryParse(iterations, out value))
-            {
-                Console.WriteLine("Invalid number of iterations, please enter a valid integer");
-                iterations = Console.ReadLine() ?? "";
-            }
-            Iterations = value;
+            base.StartInteractiveMode();
 
             Console.WriteLine("Enter the rows or row ranges to read, separated by spaces");
             string rows = Console.ReadLine() ?? "";
