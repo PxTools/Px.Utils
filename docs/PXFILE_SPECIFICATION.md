@@ -226,7 +226,7 @@ More spesific encoding information. The value must be a string that matches the 
 ##### UNITS*
 - The value must be a string.
 - Must be defined for each value of the dimension defined with the CONTVARIABLE keyword.
-- Can be defined for the whole matrix without spesifiers.
+- Can be defined for the whole matrix without spesifiers if CONTVARIABLE is not defined.
 - Recommended to be defined for the content dimension value with two specifiers.
 - Can be defined for the content dimension values with the value name as only the first specifier, but this is not recommended.
 - Language dependant.
@@ -279,7 +279,7 @@ More spesific encoding information. The value must be a string that matches the 
 #### VARIABLE-TYPE
 - The value must be a string.
 - Recommended that the variable type is defined for each variable defined by the STUB or HEADING.
-- Has a set of allowed values: ```Content```, ```Time```, ```Geographical```, ```Ordinal```, ```Nominal```, ```Other```, ```Unknown```.
+- Has a set of allowed values: ```Content```, ```Time```, ```Geographical```, ```Ordinal```, ```Nominal```, ```Other```, ```Classificatory```., ```Unknown```.
 - Can be defined for each language, but this is not recommended.
 
 #### TIMEVAL

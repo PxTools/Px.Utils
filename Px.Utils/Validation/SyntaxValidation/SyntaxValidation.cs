@@ -185,8 +185,10 @@ namespace PxUtils.Validation.SyntaxValidation
         {
             return keyValuePairs.Select(entry =>
             {
+                ValueType? valueType = SyntaxValidationUtilityMethods.GetValueTypeFromString(entry.KeyValuePair.Value, syntaxConf);
                 ValidationStructuredEntryKey key = ParseStructuredValidationEntryKey(entry.KeyValuePair.Key, syntaxConf);
-                return new ValidationStructuredEntry(entry.File, key, entry.KeyValuePair.Value, entry.KeyStartLineIndex, entry.LineChangeIndexes, entry.ValueStartIndex);
+                string value = SyntaxValidationUtilityMethods.CleanValue(entry.KeyValuePair.Value, syntaxConf, valueType);
+                return new ValidationStructuredEntry(entry.File, key, value, entry.KeyStartLineIndex, entry.LineChangeIndexes, entry.ValueStartIndex, valueType);
             }).ToList();
         }
 
@@ -306,7 +308,7 @@ namespace PxUtils.Validation.SyntaxValidation
         private static ValidationStructuredEntryKey ParseStructuredValidationEntryKey(string input, PxFileSyntaxConf syntaxConf)
         {
             ExtractSectionResult languageResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(input, syntaxConf.Symbols.Key.LangParamStart, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.LangParamEnd);
-            string? language = languageResult.Sections.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(languageResult.Sections[0], syntaxConf) : null;
+            string? language = languageResult.Sections.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(languageResult.Sections[0], syntaxConf).Trim(syntaxConf.Symbols.Key.StringDelimeter) : null;
             ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageResult.Remainder, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.SpecifierParamEnd);
             string[] specifiers = specifierResult.Sections.Length > 0
                 ? SyntaxValidationUtilityMethods.ExtractSectionFromString(
@@ -315,8 +317,8 @@ namespace PxUtils.Validation.SyntaxValidation
                     syntaxConf.Symbols.Key.StringDelimeter)
                 .Sections 
                 : [];
-            string? firstSpecifier = specifiers.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(specifiers[0], syntaxConf) : null;
-            string? secondSpecifier = specifiers.Length > 1 ? SyntaxValidationUtilityMethods.CleanString(specifiers[1], syntaxConf) : null;
+            string? firstSpecifier = specifiers.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(specifiers[0], syntaxConf).Trim(syntaxConf.Symbols.Key.StringDelimeter) : null;
+            string? secondSpecifier = specifiers.Length > 1 ? SyntaxValidationUtilityMethods.CleanString(specifiers[1], syntaxConf).Trim(syntaxConf.Symbols.Key.StringDelimeter) : null;
             string keyword = SyntaxValidationUtilityMethods.CleanString(specifierResult.Remainder, syntaxConf);
 
             return new(keyword, language, firstSpecifier, secondSpecifier);

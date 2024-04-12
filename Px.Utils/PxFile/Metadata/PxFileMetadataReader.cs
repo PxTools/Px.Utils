@@ -214,7 +214,7 @@ namespace PxUtils.PxFile.Metadata
         /// </summary>
         /// <param name="stream">The stream from which to determine the encoding.</param>
         /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
-        /// <returns>The determined Encoding of the stream.</returns>
+        /// <returns>The determined encoding of the stream.</returns>
         public static Encoding GetEncoding(Stream stream, PxFileSyntaxConf? symbolsConf = null)
         {
             symbolsConf ??= PxFileSyntaxConf.Default;
@@ -242,7 +242,7 @@ namespace PxUtils.PxFile.Metadata
         /// <param name="stream">The stream from which to determine the encoding.</param>
         /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
-        /// <returns>A Task that represents the asynchronous operation. The Task result contains the determined Encoding of the stream.</returns>
+        /// <returns>A Task that represents the asynchronous operation. The Task result contains the determined encoding of the stream.</returns>
         public static async Task<Encoding> GetEncodingAsync(Stream stream, PxFileSyntaxConf? symbolsConf = null, CancellationToken cancellationToken = default)
         {
             symbolsConf ??= PxFileSyntaxConf.Default;

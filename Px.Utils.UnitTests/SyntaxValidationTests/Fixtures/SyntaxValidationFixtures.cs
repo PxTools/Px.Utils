@@ -1,5 +1,5 @@
-﻿using PxUtils.PxFile;
-using PxUtils.Validation.SyntaxValidation;
+﻿using PxUtils.Validation.SyntaxValidation;
+using PxUtils.Validation;
 
 namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
 {
@@ -152,28 +152,28 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
         private readonly static ValidationStructuredEntryKey slashInKeyword = new("B/AR");
         private readonly static ValidationStructuredEntryKey colonInKeyword = new("B:AZ");
         internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_INVALID_KEYWORDS => [
-            new("foo", numberInKeyword, "foo", 0, [], 0),
-            new("foo", slashInKeyword, "bar", 0, [], 0),
-            new("foo", colonInKeyword, "baz", 0, [], 0)
+            new("foo", numberInKeyword, "foo", 0, [], 0, Validation.ValueType.String),
+            new("foo", slashInKeyword, "bar", 0, [], 0, Validation.ValueType.String),
+            new("foo", colonInKeyword, "baz", 0, [], 0, Validation.ValueType.String)
         ];
 
         private readonly static ValidationStructuredEntryKey fi = new("FOO", "fi");
         private readonly static ValidationStructuredEntryKey fin = new("BAR", "fin");
         private readonly static ValidationStructuredEntryKey fiFi = new("BAZ", "fi-FI");
         internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_VALID_LANGUAGES => [
-            new("foo", fi, "foo", 0, [], 0),
-            new("foo", fin, "bar", 0, [], 0),
-            new("foo", fiFi, "baz", 0, [], 0)
+            new("foo", fi, "foo", 0, [], 0, Validation.ValueType.String),
+            new("foo", fin, "bar", 0, [], 0, Validation.ValueType.String),
+            new("foo", fiFi, "baz", 0, [], 0, Validation.ValueType.String)
         ];
 
         private readonly static ValidationStructuredEntryKey fien = new("FOO", "fi en");
         internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_INVALID_LANGUAGES => [
-            new("foo", fien, "foo", 0, [], 0)
+            new("foo", fien, "foo", 0, [], 0, Validation.ValueType.String)
         ];
 
         private readonly static ValidationStructuredEntryKey illegalSpecifier = new("FOO", "fi", "first\"specifier");
         internal static List<ValidationStructuredEntry> STRUCTIRED_ENTRIES_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS => [
-            new("foo", illegalSpecifier, "foo", 0, [], 0)
+            new("foo", illegalSpecifier, "foo", 0, [], 0, Validation.ValueType.String)
         ];
 
         internal static List<ValidationEntry> ENTRY_WITHOUT_VALUE => [
@@ -183,20 +183,20 @@ namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
         private readonly static ValidationStructuredEntryKey finnish = new("FOO", "finnish");
         private readonly static ValidationStructuredEntryKey engl = new("BAR", "engl");
         internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_INCOMPLIANT_LANGUAGES => [
-            new("foo", finnish, "foo", 0, [], 0),
-            new("foo", engl, "foo", 0, [], 0)
+            new("foo", finnish, "foo", 0, [], 0, Validation.ValueType.String),
+            new("foo", engl, "foo", 0, [], 0, Validation.ValueType.String)
         ];
 
         private readonly static ValidationStructuredEntryKey longKeyword = new("THISISALONGKEYWORDWHICHISNOTRECOMMENDED");
         internal static List<ValidationStructuredEntry> STRUCTS_WITH_LONG_KEYWORD => [
-            new("foo", longKeyword, "foo", 0, [], 0)
+            new("foo", longKeyword, "foo", 0, [], 0, Validation.ValueType.String)
         ];
 
         private readonly static ValidationStructuredEntryKey pascalCaseKeyword = new("PascalCase");
         private readonly static ValidationStructuredEntryKey screamingSnakeCaseKeyword = new("SCREAMING_SNAKE");
         internal static List<ValidationStructuredEntry> STRUCTURED_ENTRIES_WITH_UNRECOMMENDED_KEYWORD_NAMING => [
-            new("foo", pascalCaseKeyword, "foo", 0, [], 0),
-            new("foo", screamingSnakeCaseKeyword, "foo", 0, [], 0)
+            new("foo", pascalCaseKeyword, "foo", 0, [], 0, Validation.ValueType.String),
+            new("foo", screamingSnakeCaseKeyword, "foo", 0, [], 0, Validation.ValueType.String)
         ];
     }
 }
