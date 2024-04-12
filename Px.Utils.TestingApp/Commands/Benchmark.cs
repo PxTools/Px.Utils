@@ -1,4 +1,8 @@
-﻿namespace Px.Utils.TestingApp.Commands
+﻿using System;
+using System.Diagnostics;
+using System.Reflection;
+
+namespace Px.Utils.TestingApp.Commands
 {
     internal abstract class Benchmark : Command
     {
@@ -34,10 +38,13 @@
                 IterationTimesMs = iterationTimesMs;
             }
         }
+        internal Action[] BenchmarkFunctions { get; set; } = [];
+        internal Func<Task>[] BenchmarkFunctionsAsync { get; set; } = [];
 
         internal int Iterations { get; set; } = 10;
 
         internal List<BenchmarkResult> Results { get; } = [];
+        internal int processesCompleted = 0;
 
         internal void PrintResults()
         {
@@ -53,6 +60,92 @@
             foreach (BenchmarkResult result in Results)
             {
                 Console.WriteLine(format, result.Name, result.MinTimeMs, result.MaxTimeMs, result.MeanTimeMs, result.MedianTimeMs, result.StandardDeviation);
+            }
+        }
+
+        internal override void Run(bool batchMode, List<string>? inputs = null)
+        {
+            if (inputs?.Count == 1 && inputs[0] == "help")
+            {
+                Console.Clear();
+                Console.WriteLine(Help);
+                Console.WriteLine();
+                inputs = [];
+            }
+
+            SetRunParameters(batchMode, inputs);
+
+            Results.Clear();
+            processesCompleted = 0;
+
+            // synchronous validation
+            RunBenchmarks(BenchmarkFunctions);
+
+            // async validation
+            RunBenchmarksAsync(BenchmarkFunctionsAsync).Wait();
+        }
+
+        protected abstract void SetRunParameters(bool batchMode, List<string>? inputs);
+
+        protected void RunBenchmarks(Action[] functions)
+        {
+            foreach (Action function in functions)
+            {
+                string name = function.GetMethodInfo().Name;
+                Stopwatch stopwatch = new();
+                List<double> iterationTimes = [];
+
+                for (int i = 0; i < Iterations; i++)
+                {
+                    stopwatch.Start();
+                    function();
+                    stopwatch.Stop();
+                    iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Reset();
+                    UpdateProgressText();
+                }
+
+                Results.Add(new BenchmarkResult(name, iterationTimes));
+            }
+        }
+
+        protected async Task RunBenchmarksAsync(Func<Task>[] tasks)
+        {
+            foreach (Func<Task> task in tasks)
+            {
+                string name = task.GetMethodInfo().Name;
+
+                Stopwatch stopwatch = new();
+                List<double> iterationTimes = [];
+
+                for (int i = 0; i < Iterations; i++)
+                {
+                    stopwatch.Start();
+                    await task();
+                    stopwatch.Stop();
+                    iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Reset();
+                    UpdateProgressText();
+                }
+                Results.Add(new BenchmarkResult(name, iterationTimes));
+            }
+        }
+
+        private void UpdateProgressText()
+        {
+            int totalProcesses = Iterations * (BenchmarkFunctions.Length + BenchmarkFunctionsAsync.Length);
+            processesCompleted++;
+            if (processesCompleted > 1)
+            {
+                Console.CursorLeft = 0;
+                Console.Write(new string(' ', Console.WindowWidth)); // Clear the entire line
+                Console.CursorLeft = 0;
+            }
+            float progress = (float)processesCompleted / (totalProcesses);
+            Console.Write($"Progress: {Math.Round(progress * 100f)}% - {processesCompleted} operations completed out of total {totalProcesses}");
+            if (processesCompleted == totalProcesses)
+            {
+                Console.WriteLine();
             }
         }
     }

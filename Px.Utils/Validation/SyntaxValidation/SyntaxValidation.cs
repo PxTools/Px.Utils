@@ -209,7 +209,10 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 for (int i = 0; i < buffer.Length; i++)
                 {
-                    if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString)) break;
+                    if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
+                    {
+                        return entries;
+                    }
                     UpdateLineAndCharacter(buffer[i], syntaxConf, ref characterIndex, ref lineChangeIndexes, ref isProcessingString);
                     if (!isProcessingString && buffer[i] == syntaxConf.Symbols.EntrySeparator)
                     {
@@ -257,7 +260,10 @@ namespace PxUtils.Validation.SyntaxValidation
                 read = await reader.ReadAsync(buffer.AsMemory(), cancellationToken);
                 for (int i = 0; i < read; i++)
                 {
-                    if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString)) break;
+                    if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
+                    {
+                        return entries;
+                    }
                     UpdateLineAndCharacter(buffer[i], syntaxConf, ref characterIndex, ref lineChangeIndexes, ref isProcessingString);
                     if (!isProcessingString && buffer[i] == syntaxConf.Symbols.EntrySeparator)
                     {

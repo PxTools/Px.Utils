@@ -1,6 +1,5 @@
 ﻿using PxUtils.Models.Data.DataValue;
 using PxUtils.PxFile.Data;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Px.Utils.TestingApp.Commands
@@ -26,164 +25,75 @@ namespace Px.Utils.TestingApp.Commands
 
         internal override string Description => "Benchmarks the data reading capabilities of the PxFileStreamDataReader.";
 
-        internal override void Run(bool batchMode, List<string>? inputs = null)
+        internal DataReadBenchmark()
         {
-            if(inputs?.Count == 1 && inputs[0] == "help")
-            {
-                Console.Clear();
-                Console.WriteLine(Help);
-                Console.WriteLine();
-                inputs = [];
-            }
-
-            SetRunParameters(batchMode, inputs);
-
-            // synchronous read
-            RunReadDoubleDataValuesBenchmarks();
-            RunReadDecimalDataValuesBenchmarks();
-            RunReadUnsafeDoubleBenchmarks();
-
-            // async read
-            RunReadDoubleDataValuesAsyncBenchmarks().Wait();
-            RunReadDecimalDataValuesAsyncBenchmarks().Wait();
-            RunReadUnsafeDoubleAsyncBenchmarks().Wait();
+            BenchmarkFunctions = [RunReadDoubleDataValuesBenchmarks, RunReadDecimalDataValuesBenchmarks, RunReadUnsafeDoubleBenchmarks];
+            BenchmarkFunctionsAsync = [RunReadDoubleDataValuesAsyncBenchmarks, RunReadDecimalDataValuesAsyncBenchmarks, RunReadUnsafeDoubleAsyncBenchmarks];
         }
 
         private void RunReadDoubleDataValuesBenchmarks()
         {
-            Stopwatch stopwatch = new();
-            List<double> iterationTimes = [];
             DoubleDataValue[] buffer = new DoubleDataValue[_readRows.Length * _readCols.Length];
-
-            for (int i = 0; i < Iterations; i++)
-            {
-                stopwatch.Start();
-
-                using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
-                using PxFileStreamDataReader reader = new(stream);
-
-                reader.ReadDoubleDataValues(buffer, 0, _readRows, _readCols);
-                stopwatch.Stop();
-                iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
-                stopwatch.Reset();
-            }
-
-            Results.Add(new BenchmarkResult("ReadDoubleDataValues", iterationTimes));
+           
+            using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
+            using PxFileStreamDataReader reader = new(stream);
+            
+            reader.ReadDoubleDataValues(buffer, 0, _readRows, _readCols);
         }
 
         private void RunReadDecimalDataValuesBenchmarks()
         {
-            Stopwatch stopwatch = new();
-            List<double> iterationTimes = [];
             DecimalDataValue[] buffer = new DecimalDataValue[_readRows.Length * _readCols.Length];
-
-            for (int i = 0; i < Iterations; i++)
-            {
-                stopwatch.Start();
-
-                using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
-                using PxFileStreamDataReader reader = new(stream);
-
-                reader.ReadDecimalDataValues(buffer, 0, _readRows, _readCols);
-                stopwatch.Stop();
-                iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
-                stopwatch.Reset();
-            }
-
-            Results.Add(new BenchmarkResult("ReadDecimalDataValues", iterationTimes));
+            
+            using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
+            using PxFileStreamDataReader reader = new(stream);
+            
+            reader.ReadDecimalDataValues(buffer, 0, _readRows, _readCols);
         }
 
         private void RunReadUnsafeDoubleBenchmarks()
         {
-            Stopwatch stopwatch = new();
-            List<double> iterationTimes = [];
             double[] buffer = new double[_readRows.Length * _readCols.Length];
             double[] missingValueEncodings = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
 
-            for (int i = 0; i < Iterations; i++)
-            {
-                stopwatch.Start();
+            using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
+            using PxFileStreamDataReader reader = new(stream);
 
-                using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
-                using PxFileStreamDataReader reader = new(stream);
-
-                reader.ReadUnsafeDoubles(buffer, 0, _readRows, _readCols, missingValueEncodings);
-                stopwatch.Stop();
-                iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
-                stopwatch.Reset();
-            }
-
-            Results.Add(new BenchmarkResult("ReadUnsafeDoubleValues", iterationTimes));
+            reader.ReadUnsafeDoubles(buffer, 0, _readRows, _readCols, missingValueEncodings);
         }
 
         private async Task RunReadDoubleDataValuesAsyncBenchmarks()
         {
-            Stopwatch stopwatch = new();
-            List<double> iterationTimes = [];
             DoubleDataValue[] buffer = new DoubleDataValue[_readRows.Length * _readCols.Length];
 
-            for (int i = 0; i < Iterations; i++)
-            {
-                stopwatch.Start();
+            using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
+            using PxFileStreamDataReader reader = new(stream);
 
-                using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
-                using PxFileStreamDataReader reader = new(stream);
-
-                await reader.ReadDoubleDataValuesAsync(buffer, 0, _readRows, _readCols);
-                stopwatch.Stop();
-                iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
-                stopwatch.Reset();
-            }
-
-            Results.Add(new BenchmarkResult("ReadDoubleDataValuesAsync", iterationTimes));
+            await reader.ReadDoubleDataValuesAsync(buffer, 0, _readRows, _readCols);
         }
 
         private async Task RunReadDecimalDataValuesAsyncBenchmarks()
         {
-            Stopwatch stopwatch = new();
-            List<double> iterationTimes = [];
             DecimalDataValue[] buffer = new DecimalDataValue[_readRows.Length * _readCols.Length];
 
-            for (int i = 0; i < Iterations; i++)
-            {
-                stopwatch.Start();
+            using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
+            using PxFileStreamDataReader reader = new(stream);
 
-                using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
-                using PxFileStreamDataReader reader = new(stream);
-
-                await reader.ReadDecimalDataValuesAsync(buffer, 0, _readRows, _readCols);
-                stopwatch.Stop();
-                iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
-                stopwatch.Reset();
-            }
-
-            Results.Add(new BenchmarkResult("ReadDecimalDataValuesAsync", iterationTimes));
+            await reader.ReadDecimalDataValuesAsync(buffer, 0, _readRows, _readCols);
         }
 
         private async Task RunReadUnsafeDoubleAsyncBenchmarks()
         {
-            Stopwatch stopwatch = new();
-            List<double> iterationTimes = [];
             double[] buffer = new double[_readRows.Length * _readCols.Length];
             double[] missingValueEncodings = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
 
-            for (int i = 0; i < Iterations; i++)
-            {
-                stopwatch.Start();
+            using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
+            using PxFileStreamDataReader reader = new(stream);
 
-                using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
-                using PxFileStreamDataReader reader = new(stream);
-
-                await reader.ReadUnsafeDoublesAsync(buffer, 0, _readRows, _readCols, missingValueEncodings);
-                stopwatch.Stop();
-                iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
-                stopwatch.Reset();
-            }
-
-            Results.Add(new BenchmarkResult("ReadUnsafeDoubleValuesAsync", iterationTimes));
+            await reader.ReadUnsafeDoublesAsync(buffer, 0, _readRows, _readCols, missingValueEncodings);
         }
 
-        private void SetRunParameters(bool batchMode, List<string>? inputs)
+        protected override void SetRunParameters(bool batchMode, List<string>? inputs)
         {
             Dictionary<string, List<string>> parameters = GroupParameters(inputs ?? [], [.. fileFlags, .. iterFlags, .. rowsFlags, .. colsFlags]);
             if(parameters.Keys.Count == 4)
