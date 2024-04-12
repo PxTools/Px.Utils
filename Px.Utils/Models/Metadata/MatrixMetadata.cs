@@ -1,4 +1,5 @@
-﻿using PxUtils.Models.Metadata.Dimensions;
+﻿using Px.Utils.Models.Metadata;
+using PxUtils.Models.Metadata.Dimensions;
 
 namespace PxUtils.Models.Metadata
 {
@@ -36,6 +37,17 @@ namespace PxUtils.Models.Metadata
         IReadOnlyList<IReadOnlyDimension> IReadOnlyMatrixMetadata.Dimensions => Dimensions;
 
         IReadOnlyDictionary<string, Property> IReadOnlyMatrixMetadata.AdditionalProperties => AdditionalProperties;
+
+        public IReadOnlyMatrixMetadata GetTransform(Map map)
+        {
+            List<IDimension> newDimensions = map.DimensionMaps.Select(map =>
+            {
+                if(Dimensions.Find(dimension => dimension.Code == map.Code) is IDimension dimension) return dimension.GetTransform(map);
+                else throw new ArgumentException($"Dimension with code {map.Code} not found in metadata");
+
+            }).ToList();
+            return new MatrixMetadata(DefaultLanguage, AvailableLanguages, newDimensions, AdditionalProperties);
+        }
 
         #endregion
     }

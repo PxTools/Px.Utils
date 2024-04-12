@@ -1,5 +1,6 @@
 ﻿using PxUtils.Models.Metadata.Enums;
 using PxUtils.Language;
+using Px.Utils.Models.Metadata;
 
 namespace PxUtils.Models.Metadata.Dimensions
 {
@@ -65,6 +66,19 @@ namespace PxUtils.Models.Metadata.Dimensions
         IReadOnlyList<IReadOnlyDimensionValue> IReadOnlyDimension.Values => Values;
 
         IReadOnlyDimensionValue? IReadOnlyDimension.DefaultValue => DefaultValue;
+
+        public IDimension GetTransform(Map.DimensionMap map)
+        {
+            List<DimensionValue> newValues = map.ValueCodes.Select(code =>
+            {
+                if (Values.First(value => value.Code == code) is DimensionValue value) return value;
+                else throw new ArgumentException($"Value with code {code} not found in dimension");
+            }).ToList();
+
+            return new TimeDimension(Code, Name, AdditionalProperties, newValues, DefaultValue, Interval);
+        }
+
+        IReadOnlyDimension IReadOnlyDimension.GetTransform(Map.DimensionMap map) => GetTransform(map);
 
         #endregion
     }
