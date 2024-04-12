@@ -1,5 +1,4 @@
-﻿using PxUtils.Models.Metadata.Dimensions;
-using PxUtils.PxFile;
+﻿using PxUtils.PxFile;
 using PxUtils.Validation.SyntaxValidation;
 
 namespace PxUtils.Validation.ContentValidation
@@ -7,7 +6,7 @@ namespace PxUtils.Validation.ContentValidation
     /// <summary>
     /// Contains a collection of utility methods used in content validation.
     /// </summary>
-    internal static class ContentValidationUtilityMethods
+    public partial class ContentValidator
     {
         /// <summary>
         /// Finds the values for given dimensions in the Px file
@@ -115,7 +114,7 @@ namespace PxUtils.Validation.ContentValidation
                     0,
                     entry.LineChangeIndexes);
 
-                ValidationFeedback feedback = new ValidationFeedback(
+                ValidationFeedback feedback = new (
                             ValidationFeedbackLevel.Warning,
                             ValidationFeedbackRule.UnrecommendedSpecifierDefinitionFound,
                             feedbackIndexes.Key,

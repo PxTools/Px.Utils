@@ -9,39 +9,31 @@ namespace PxUtils.Validation.ContentValidation
     /// <summary>
     /// Collection of functions for validating Px file metadata contents
     /// </summary>
-    public class ContentValidationFunctions
+    public partial class ContentValidator
     {
-        public List<ContentValidationEntryDelegate> DefaultContentValidationEntryFunctions { get; }
-        public List<ContentValidationFindKeywordDelegate> DefaultContentValidationFindKeywordFunctions { get; }
+        public List<ContentValidationEntryDelegate> DefaultContentValidationEntryFunctions { get; } = [
+            ValidateUnexpectedSpecifiers,
+            ValidateUnexpectedLanguageParams,
+            ValidateLanguageParams,
+            ValidateSpecifiers,
+            ValidateValueTypes,
+            ValidateValueContents,
+            ValidateValueAmounts,
+            ValidateValueUppercaseRecommendations
+        ];
 
-        /// <summary>
-        /// Constructor that contains default content validation functions
-        /// </summary>
-        public ContentValidationFunctions()
-        {
-            DefaultContentValidationEntryFunctions = [
-                ValidateUnexpectedSpecifiers,
-                ValidateUnexpectedLanguageParams,
-                ValidateLanguageParams,
-                ValidateSpecifiers,
-                ValidateValueTypes,
-                ValidateValueContents,
-                ValidateValueAmounts,
-                ValidateValueUppercaseRecommendations
-            ];
-            DefaultContentValidationFindKeywordFunctions = [
-                ValidateFindDefaultLanguage,
-                ValidateFindAvailableLanguages,
-                ValidateDefaultLanguageDefinedInAvailableLanguages,
-                ValidateFindContentDimension,
-                ValidateFindRequiredCommonKeys,
-                ValidateFindStubAndHeading,
-                ValidateFindRecommendedKeys,
-                ValidateFindDimensionValues,
-                ValidateFindContentDimensionKeys,
-                ValidateFindDimensionRecommendedKeys
-            ];
-        }
+        public List<ContentValidationFindKeywordDelegate> DefaultContentValidationFindKeywordFunctions { get; } = [
+            ValidateFindDefaultLanguage,
+            ValidateFindAvailableLanguages,
+            ValidateDefaultLanguageDefinedInAvailableLanguages,
+            ValidateFindContentDimension,
+            ValidateFindRequiredCommonKeys,
+            ValidateFindStubAndHeading,
+            ValidateFindRecommendedKeys,
+            ValidateFindDimensionValues,
+            ValidateFindContentDimensionKeys,
+            ValidateFindDimensionRecommendedKeys
+        ];
 
         /// <summary>
         /// Validates that default language is defined properly in the Px file metadata
@@ -437,7 +429,7 @@ namespace PxUtils.Validation.ContentValidation
 
             IEnumerable<KeyValuePair<KeyValuePair<string, string>, string[]>> dimensionValues = [];
             dimensionValues = dimensionValues.Concat(
-                ContentValidationUtilityMethods.FindDimensionValues(
+                FindDimensionValues(
                     dimensionEntries,
                     syntaxConf,
                     validator.StubDimensionNames, 
@@ -445,7 +437,7 @@ namespace PxUtils.Validation.ContentValidation
                     validator.Filename)
                 );
             dimensionValues = dimensionValues.Concat(
-                ContentValidationUtilityMethods.FindDimensionValues(
+                FindDimensionValues(
                     dimensionEntries,
                     syntaxConf, 
                     validator.HeadingDimensionNames, 
@@ -503,7 +495,7 @@ namespace PxUtils.Validation.ContentValidation
             {
                 foreach (string dimensionValueName in kvp.Value)
                 {
-                    List<ValidationFeedbackItem> items = ContentValidationUtilityMethods.ProcessContentDimensionValue(languageSpecificKeywords, requiredKeywords, recommendedKeywords, entries, validator, kvp.Key, dimensionValueName);
+                    List<ValidationFeedbackItem> items = ProcessContentDimensionValue(languageSpecificKeywords, requiredKeywords, recommendedKeywords, entries, validator, kvp.Key, dimensionValueName);
                     feedbackItems.AddRange(items);
                 }
             }
@@ -528,7 +520,7 @@ namespace PxUtils.Validation.ContentValidation
                     syntaxConf.Tokens.KeyWords.VariableValueCodes
                 ];
 
-            Dictionary<string, string[]> stubDimensions =  validator.StubDimensionNames ?? [];
+            Dictionary<string, string[]> stubDimensions = validator.StubDimensionNames ?? [];
             Dictionary<string, string[]> headingDimensions =  validator.HeadingDimensionNames ?? [];
             Dictionary<string, string[]> allDimensions = stubDimensions
                 .Concat(headingDimensions)
@@ -537,7 +529,7 @@ namespace PxUtils.Validation.ContentValidation
 
             foreach (KeyValuePair<string, string[]> languageDimensions in allDimensions)
             {
-                ValidationFeedbackItem? timeValFeedback = ContentValidationUtilityMethods.FindDimensionRecommendedKey(entries, syntaxConf.Tokens.KeyWords.TimeVal, languageDimensions.Key, validator);
+                ValidationFeedbackItem? timeValFeedback = FindDimensionRecommendedKey(entries, syntaxConf.Tokens.KeyWords.TimeVal, languageDimensions.Key, validator);
                 if (timeValFeedback is not null)
                 {
                     feedbackItems.Add((ValidationFeedbackItem)timeValFeedback);
@@ -545,7 +537,7 @@ namespace PxUtils.Validation.ContentValidation
 
                 foreach (string dimension in languageDimensions.Value)
                 {
-                    List<ValidationFeedbackItem> dimensionFeedback = ContentValidationUtilityMethods.ProcessDimension(
+                    List<ValidationFeedbackItem> dimensionFeedback = ProcessDimension(
                         dimensionRecommendedKeywords,
                         syntaxConf.Tokens.KeyWords.DimensionType,
                         entries,

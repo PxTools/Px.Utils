@@ -10,34 +10,34 @@ namespace PxUtils.Validation.ContentValidation
     /// <param name="filename">Name of the Px file</param>
     /// <param name="encoding"> Encoding of the Px file</param>
     /// </summary>
-    public class ContentValidator(string filename, Encoding encoding)
+    public partial class ContentValidator(string filename, Encoding encoding)
     {
-        public string Filename { get; } = filename;
-        public Encoding Encoding { get; } = encoding;
+        private string Filename { get; } = filename;
+        private Encoding Encoding { get; } = encoding;
         /// <summary>
         /// Default language of the Px file defined with LANGUAGE keyword by default
         /// </summary>
-        public string? DefaultLanguage { get; set; }
+        private string? DefaultLanguage { get; set; }
         /// <summary>
         /// Array of supported languages in the Px file. Defined with LANGUAGES keyword by default
         /// </summary>
-        public string[]? AvailableLanguages { get; set; }
+        private string[]? AvailableLanguages { get; set; }
         /// <summary>
         /// Dictionary that define content dimension names for available languages. Key represents the language, while the value is the dimension name.
         /// </summary>
-        public Dictionary<string, string>? ContentDimensionNames { get; set; }
+        private Dictionary<string, string>? ContentDimensionNames { get; set; }
         /// <summary>
         /// Dictionary that define stub dimension names for available languages. Key represents the language, while the value is the dimension name.
         /// </summary>
-        public Dictionary<string, string[]>? StubDimensionNames { get; set; }
+        private Dictionary<string, string[]>? StubDimensionNames { get; set; }
         /// <summary>
         /// Dictionary that define heading dimension names for available languages. Key represents the language, while the value is the dimension name.
         /// </summary>
-        public Dictionary<string, string[]>? HeadingDimensionNames { get; set; }
+        private Dictionary<string, string[]>? HeadingDimensionNames { get; set; }
         /// <summary>
         /// Dictionary of key value pairs that define names for dimension values. Key is a key value pair of language and dimension name, while the value is an array of dimension value names.
         /// </summary>
-        public Dictionary<KeyValuePair<string, string>, string[]>? DimensionValueNames { get; set; }
+        private Dictionary<KeyValuePair<string, string>, string[]>? DimensionValueNames { get; set; }
 
         /// <summary>
         /// Validates contents of Px file metadata. Metadata syntax must be valid for this method to work properly.
@@ -51,10 +51,9 @@ namespace PxUtils.Validation.ContentValidation
             CustomContentValidationFunctions? customContentValidationFunctions = null
             )
         {
-            ContentValidationFunctions contentValidationFunctions = new();
 
-            IEnumerable<ContentValidationEntryDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;
-            IEnumerable<ContentValidationFindKeywordDelegate> contentValidationFindKeywordFunctions = contentValidationFunctions.DefaultContentValidationFindKeywordFunctions;
+            IEnumerable<ContentValidationEntryDelegate> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
+            IEnumerable<ContentValidationFindKeywordDelegate> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
 
             if (customContentValidationFunctions is not null)
             {
@@ -102,10 +101,8 @@ namespace PxUtils.Validation.ContentValidation
             CancellationToken cancellationToken = default
             )
         {
-            ContentValidationFunctions contentValidationFunctions = new();
-
-            IEnumerable<ContentValidationEntryDelegate> contentValidationEntryFunctions = contentValidationFunctions.DefaultContentValidationEntryFunctions;
-            IEnumerable<ContentValidationFindKeywordDelegate> contentValidationFindKeywordFunctions = contentValidationFunctions.DefaultContentValidationFindKeywordFunctions;
+            IEnumerable<ContentValidationEntryDelegate> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
+            IEnumerable<ContentValidationFindKeywordDelegate> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
 
             if (customContentValidationFunctions is not null)
             {
