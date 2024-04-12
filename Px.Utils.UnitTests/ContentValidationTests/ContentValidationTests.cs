@@ -15,8 +15,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         private static readonly PxFileSyntaxConf syntaxConf = PxFileSyntaxConf.Default;
         private ValidationFeedbackItem[] feedback = [];
         private static readonly Encoding encoding = Encoding.UTF8;
-        // TODO: readonly?
-        private ContentValidator validator = new(filename, encoding);
+        private readonly ContentValidator validator = new(filename, encoding);
         private static readonly string defaultLanguage = "fi";
         private static readonly string[] availableLanguages = ["fi", "en"];
         private static readonly Dictionary<string, string> contentDimensionNames = new ()

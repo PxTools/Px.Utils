@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace PxUtils.PxFile.Meta
+namespace PxUtils.PxFile.Metadata
 {
     /// <summary>
     /// Provides methods to read metadata and get the encoding from a stream of a Px file.
@@ -50,7 +50,7 @@ namespace PxUtils.PxFile.Meta
                     if (buffer[i] == stringDelimeter) readingValueString = !readingValueString;
                     if (!readingValueString)
                     {
-                        if ((keyWordMode && buffer[i] == sectionSeparator) || (!keyWordMode && buffer[i] == keywordSeperator))
+                        if (keyWordMode && buffer[i] == sectionSeparator || !keyWordMode && buffer[i] == keywordSeperator)
                         {
                             throw new InvalidPxFileMetadataException($"Unexpected character '{buffer[i]}' found at position {i}.");
                         }
@@ -133,7 +133,7 @@ namespace PxUtils.PxFile.Meta
                     if (parsingBuffer[i] == stringDelimeter) readingValueString = !readingValueString;
                     if (!readingValueString)
                     {
-                        if ((keyWordMode && parsingBuffer[i] == sectionSeparator) || (!keyWordMode && parsingBuffer[i] == keywordSeperator))
+                        if (keyWordMode && parsingBuffer[i] == sectionSeparator || !keyWordMode && parsingBuffer[i] == keywordSeperator)
                         {
                             throw new InvalidPxFileMetadataException($"Unexpected character '{parsingBuffer[i]}' found at position {i}.");
                         }
@@ -198,7 +198,7 @@ namespace PxUtils.PxFile.Meta
             CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> metaDict = [];
-            ConfiguredCancelableAsyncEnumerable<KeyValuePair<string, string>> metaEnumerable = 
+            ConfiguredCancelableAsyncEnumerable<KeyValuePair<string, string>> metaEnumerable =
                 ReadMetadataAsync(stream, encoding, symbolsConf, readBufferSize, cancellationToken)
                 .WithCancellation(cancellationToken);
 

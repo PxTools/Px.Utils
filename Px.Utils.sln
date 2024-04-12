@@ -19,7 +19,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\CI.yml = .github\workflows\CI.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Px.Utils.UnitTests", "Px.Utils.UnitTests\Px.Utils.UnitTests.csproj", "{D72C6067-56A5-4302-838B-41E6CA725C4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Px.Utils.UnitTests", "Px.Utils.UnitTests\Px.Utils.UnitTests.csproj", "{D72C6067-56A5-4302-838B-41E6CA725C4F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D94934AF-6B41-4C66-818A-C4C33230E9DD} = {D94934AF-6B41-4C66-818A-C4C33230E9DD}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Px.Utils.TestingApp", "Px.Utils.TestingApp\Px.Utils.TestingApp.csproj", "{0C0227EC-68EE-425D-892B-F570EC18E792}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D94934AF-6B41-4C66-818A-C4C33230E9DD} = {D94934AF-6B41-4C66-818A-C4C33230E9DD}
 	EndProjectSection
@@ -38,6 +43,10 @@ Global
 		{D72C6067-56A5-4302-838B-41E6CA725C4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D72C6067-56A5-4302-838B-41E6CA725C4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D72C6067-56A5-4302-838B-41E6CA725C4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C0227EC-68EE-425D-892B-F570EC18E792}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C0227EC-68EE-425D-892B-F570EC18E792}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C0227EC-68EE-425D-892B-F570EC18E792}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C0227EC-68EE-425D-892B-F570EC18E792}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
