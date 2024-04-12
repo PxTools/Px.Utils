@@ -6,7 +6,7 @@ namespace PxUtils.Validation.ContentValidation
     /// <summary>
     /// Contains a collection of utility methods used in content validation.
     /// </summary>
-    public partial class ContentValidator
+    public sealed partial class ContentValidator
     {
         /// <summary>
         /// Finds the values for given dimensions in the Px file

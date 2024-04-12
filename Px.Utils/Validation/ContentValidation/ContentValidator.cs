@@ -11,7 +11,7 @@ namespace PxUtils.Validation.ContentValidation
     /// <param name="_encoding"> _encoding of the Px file</param>
     /// <param name="_syntaxConf">Object that stores syntax specific symbols and tokens for the Px file</param>
     /// </summary>
-    public partial class ContentValidator(string _filename, Encoding _encoding, PxFileSyntaxConf? _syntaxConf = null)
+    public sealed partial class ContentValidator(string _filename, Encoding _encoding, PxFileSyntaxConf? _syntaxConf = null)
     {
         private readonly string filename = _filename;
         private readonly Encoding encoding = _encoding;
@@ -50,7 +50,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
         /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that defines keywords and symbols for Px file syntax</param>
         /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
-        public ValidationFeedbackItem[] ValidatePxFileContent(
+        public ValidationFeedbackItem[] Validate(
             ValidationStructuredEntry[] entries,
             PxFileSyntaxConf syntaxConf,
             CustomContentValidationFunctions? customContentValidationFunctions = null
@@ -88,6 +88,8 @@ namespace PxUtils.Validation.ContentValidation
                 }
             }
 
+            ResetFields();
+
             return [.. feedbackItems];
         }
 
@@ -99,7 +101,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
         /// <param name="cancellationToken">Cancellation token for cancelling the validation process</param>
         /// <returns>Array of <see cref="ValidationFeedbackItem"/> objects. Any issues found during validation will be listed here</returns>
-        public async Task<ValidationFeedbackItem[]> ValidatePxFileContentAsync(
+        public async Task<ValidationFeedbackItem[]> ValidateAsync(
             ValidationStructuredEntry[] entries,
             PxFileSyntaxConf syntaxConf,
             CustomContentValidationFunctions? customContentValidationFunctions = null,
@@ -137,7 +139,19 @@ namespace PxUtils.Validation.ContentValidation
             entryTasks.Select(task => task.Result).ToList().ForEach(feedback =>
                 feedbackItems.AddRange(feedback is not null ? feedback : []));
 
+            ResetFields();
+
             return [.. feedbackItems];
+        }
+
+        private void ResetFields()
+        {
+            defaultLanguage = null;
+            availableLanguages = null;
+            contentDimensionNames = null;
+            stubDimensionNames = null;
+            headingDimensionNames = null;
+            dimensionValueNames = null;
         }
     }
 }

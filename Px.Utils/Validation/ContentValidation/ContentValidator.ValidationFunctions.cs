@@ -9,7 +9,7 @@ namespace PxUtils.Validation.ContentValidation
     /// <summary>
     /// Collection of functions for validating Px file metadata contents
     /// </summary>
-    public partial class ContentValidator
+    public sealed partial class ContentValidator
     {
         public List<ContentValidationEntryDelegate> DefaultContentValidationEntryFunctions { get; } = [
             ValidateUnexpectedSpecifiers,

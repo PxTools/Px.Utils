@@ -43,7 +43,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             ValidationStructuredEntry[] entries = ContentValidationFixtures.MINIMAL_STRUCTURED_ENTRY_ARRAY;
 
             // Act
-            feedback = validator.ValidatePxFileContent(
+            feedback = validator.Validate(
                 entries,
                 syntaxConf
                 );
@@ -59,7 +59,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             ValidationStructuredEntry[] entries = ContentValidationFixtures.MINIMAL_STRUCTURED_ENTRY_ARRAY;
 
             // Act
-            feedback = await validator.ValidatePxFileContentAsync(
+            feedback = await validator.ValidateAsync(
                 entries,
                 syntaxConf
                 );
