@@ -84,8 +84,7 @@ namespace Px.Utils.TestingApp.Commands
 
             SetRunParameters();
 
-            Results.Clear();
-            processesCompleted = 0;
+            BenchmarkSetup();
 
             // synchronous validation
             RunBenchmarks(BenchmarkFunctions);
@@ -153,6 +152,12 @@ namespace Px.Utils.TestingApp.Commands
             }
 
             Iterations = value;
+        }
+
+        protected virtual void BenchmarkSetup()
+        {
+            Results.Clear();
+            processesCompleted = 0;
         }
 
         protected void RunBenchmarks(Action[] functions)
