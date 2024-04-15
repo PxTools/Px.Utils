@@ -209,12 +209,21 @@ namespace Px.Utils.TestingApp.Commands
             processesCompleted++;
             if (processesCompleted > 1)
             {
-                Console.CursorLeft = 0;
-                Console.Write(new string(' ', Console.WindowWidth)); // Clear the entire line
-                Console.CursorLeft = 0;
+                Console.SetCursorPosition(0, Console.CursorTop - 1);
+                Console.Write(new string(' ', Console.WindowWidth * 2)); // Clear the line
+                Console.SetCursorPosition(0, Console.CursorTop - 1);
             }
-            float progress = (float)processesCompleted / (totalProcesses);
+            float progress = (float)processesCompleted / totalProcesses;
+
+            // Progress bar
+            int progressBarLength = 100;
+            int progressBlocks = (int)(progress * progressBarLength);
+            Console.Write(new string('█', progressBlocks));
+            Console.Write(new string('░', progressBarLength - progressBlocks));
+            Console.WriteLine();
+
             Console.Write($"Progress: {Math.Round(progress * 100f)}% - {processesCompleted} operations completed out of total {totalProcesses}");
+
             if (processesCompleted == totalProcesses)
             {
                 Console.WriteLine();
