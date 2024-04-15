@@ -19,8 +19,8 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         [DataRow("79228162514264337593543950335")]
         public void AllowedNumberValues(string allowedValue)
         {
-            DataNumberDataValidator validator = new();
-            var feedbacks = validator.Validate(new Token(TokenType.NumDataItem, allowedValue, 1, 1));
+            DataNumberValidator validator = new();
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.NumDataItem, allowedValue, 1, 1));
             Assert.IsFalse(feedbacks.Any());
         }
     
@@ -39,9 +39,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         [DataRow("79228162514264337593543950336")]
         public void NotAllowedNumberValue(string value)
         {
-            DataNumberDataValidator validator = new();
+            DataNumberValidator validator = new();
 
-            var feedbacks = validator.Validate(new Token(TokenType.NumDataItem, value, 1, 1));
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.NumDataItem, value, 1, 1));
         
             Assert.AreEqual(1, feedbacks.Count());
             Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, feedbacks.First().Rule);

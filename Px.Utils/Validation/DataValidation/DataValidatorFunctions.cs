@@ -51,7 +51,7 @@ namespace PxUtils.Validation.DataValidation
                     _currentRowLen++;
                     break;
                 case TokenType.LineSeparator:
-                    var itemNum = _currentRowLen;
+                    int itemNum = _currentRowLen;
                     if (_currentRowLen != rowLen)
                     {
                         _currentRowLen = 0;
@@ -98,7 +98,7 @@ namespace PxUtils.Validation.DataValidation
         }
     }
 
-    public class DataNumberDataValidator : IDataValidator
+    public class DataNumberValidator : IDataValidator
     {
         private static readonly int MaxPositiveLength = decimal.MaxValue.ToString().Length;
 
@@ -111,13 +111,13 @@ namespace PxUtils.Validation.DataValidation
         {
             if( token.Type != TokenType.NumDataItem) return Array.Empty<ValidationFeedback>();
 
-            var value = token.Value;
+            string value = token.Value;
 
-            var length = value.Length;
-            var dotPosition = value.IndexOf('.');
-            var minusPosition = value.IndexOf('-');
-            var zeroPosition = value.IndexOf('0');
-            var quotePosition = value.IndexOf('"');
+            int length = value.Length;
+            int dotPosition = value.IndexOf('.');
+            int minusPosition = value.IndexOf('-');
+            int zeroPosition = value.IndexOf('0');
+            int quotePosition = value.IndexOf('"');
 
             if (length >= MaxPositiveLength - 1)
             {
@@ -200,8 +200,11 @@ namespace PxUtils.Validation.DataValidation
                 _previousTokenType = token.Type;
                 return Array.Empty<ValidationFeedback>();
             }
-            var feedback = new []{new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidStructure,
-                token.LineNumber, token.CharPosition, $"{_previousTokenType},{token.Type}")};
+            ValidationFeedback[] feedback =
+            [
+                new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidStructure,
+                token.LineNumber, token.CharPosition, $"{_previousTokenType},{token.Type}")
+            ];
             _previousTokenType = token.Type;
             return feedback;
         }

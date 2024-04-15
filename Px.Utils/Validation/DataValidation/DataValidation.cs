@@ -32,19 +32,19 @@ namespace PxUtils.Validation.DataValidation
             conf ??= PxFileSyntaxConf.Default;
 
             List<ValidationFeedback> feedbacks = [];
-            var tokens = Tokenize(stream, conf, streamEncoding);
+            IEnumerable<Token> tokens = Tokenize(stream, conf, streamEncoding);
 
             List<IDataValidator> validators =
             [
                 new DataSeparatorValidator(),
-                new DataNumberDataValidator(),
+                new DataNumberValidator(),
                 new DataStringValidator(),
                 new DataRowLengthValidator(rowLen),
                 new DataRowCountValidator(numOfRows),
                 new DataStructureValidator()
             ];
 
-            foreach (var token in tokens)
+            foreach (Token token in tokens)
             {
                 if (token.Type == TokenType.InvalidDataChar)
                 {
@@ -54,7 +54,7 @@ namespace PxUtils.Validation.DataValidation
                     continue;
                 }
 
-                foreach (var validator in validators)
+                foreach (IDataValidator validator in validators)
                 {
                     feedbacks.AddRange(validator.Validate(token));
                 }
@@ -82,19 +82,19 @@ namespace PxUtils.Validation.DataValidation
             conf ??= PxFileSyntaxConf.Default;
 
             List<ValidationFeedback> feedbacks = [];
-            var tokens = TokenizeAsync(stream, conf, streamEncoding, cancellationToken);
+            IAsyncEnumerable<Token> tokens = TokenizeAsync(stream, conf, streamEncoding, cancellationToken);
 
             List<IDataValidator> validators =
             [
                 new DataSeparatorValidator(),
-                new DataNumberDataValidator(),
+                new DataNumberValidator(),
                 new DataStringValidator(),
                 new DataRowLengthValidator(rowLen),
                 new DataRowCountValidator(numOfRows),
                 new DataStructureValidator()
             ];
 
-            await foreach (var token in tokens)
+            await foreach (Token token in tokens)
             {
                 if (token.Type == TokenType.InvalidDataChar)
                 {
@@ -104,7 +104,7 @@ namespace PxUtils.Validation.DataValidation
                     continue;
                 }
 
-                foreach (var validator in validators)
+                foreach (IDataValidator validator in validators)
                 {
                     feedbacks.AddRange(validator.Validate(token));
                 }
@@ -123,17 +123,17 @@ namespace PxUtils.Validation.DataValidation
         public static IEnumerable<Token> Tokenize(Stream stream, PxFileSyntaxConf conf, Encoding? streamEncoding)
         {
             const int streamBufferSize = 1024;
-            var charPosition = 0;
-            var lineNumber = 1;
+            int charPosition = 0;
+            int lineNumber = 1;
             using StreamReader reader = new(stream, streamEncoding, false, streamBufferSize, true);
             StringBuilder valueBuilder = new();
 
             while (!reader.EndOfStream)
             {
-                var currentCharacter = (char)reader.Read();
-                var nextCharacter = reader.EndOfStream ? conf.Symbols.EndOfStream : reader.Peek();
+                char currentCharacter = (char)reader.Read();
+                int nextCharacter = reader.EndOfStream ? conf.Symbols.EndOfStream : reader.Peek();
 
-                var token = GetToken(currentCharacter, nextCharacter, ref lineNumber, ref charPosition, out var skipNext,
+                Token? token = GetToken(currentCharacter, nextCharacter, ref lineNumber, ref charPosition, out bool skipNext,
                     conf, ref valueBuilder);
                 if (skipNext)
                 {
@@ -161,32 +161,32 @@ namespace PxUtils.Validation.DataValidation
             Encoding? streamEncoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             const int streamBufferSize = 1024;
-            var charPosition = 0;
-            var lineNumber = 1;
+            int charPosition = 0;
+            int lineNumber = 1;
             using StreamReader reader = new(stream, streamEncoding, false, streamBufferSize, true);
             StringBuilder valueBuilder = new();
-            var buffer = new char[streamBufferSize];
-            var readStartIndex = 0;
+            char[] buffer = new char[streamBufferSize];
+            int readStartIndex = 0;
 
-            var charsRead = 0;
-            var ignoreNext = false;
+            int charsRead = 0;
+            bool ignoreNext = false;
             Token? token;
             do
             {
                 charsRead = await reader.ReadAsync(buffer.AsMemory(readStartIndex), cancellationToken);
 
-                for (var currentPos = 0; currentPos < charsRead - 1 + readStartIndex; currentPos++)
+                for (int currentPos = 0; currentPos < charsRead - 1 + readStartIndex; currentPos++)
                 {
                     if (ignoreNext)
                     {
                         ignoreNext = false;
                         continue;
                     }
-                    var currentCharacter = buffer[currentPos];
-                    var nextCharacter = buffer[currentPos + 1];
+                    char currentCharacter = buffer[currentPos];
+                    char nextCharacter = buffer[currentPos + 1];
 
                     token = GetToken(currentCharacter, nextCharacter, ref lineNumber, ref charPosition,
-                        out var skipNext,
+                        out bool skipNext,
                         conf, ref valueBuilder);
                     ignoreNext = skipNext;
                     if (token != null)
@@ -225,7 +225,7 @@ namespace PxUtils.Validation.DataValidation
             } 
             if (currentCharacter is '\n' or '\r')
             {
-                var separator = currentCharacter.ToString();
+                string separator = currentCharacter.ToString();
                 if (nextCharacter is '\n' or '\r')
                 {
                     separator += (char)nextCharacter;
@@ -245,7 +245,7 @@ namespace PxUtils.Validation.DataValidation
                 valueBuilder.Append(currentCharacter);
                 if (nextCharacter is ' ' or '\t' || nextCharacter == conf.Symbols.EntrySeparator)
                 {
-                    var tokenType = TokenType.NumDataItem;
+                    TokenType tokenType = TokenType.NumDataItem;
                     if (valueBuilder[0] == '\"')
                     {
                         tokenType = TokenType.StringDataItem;

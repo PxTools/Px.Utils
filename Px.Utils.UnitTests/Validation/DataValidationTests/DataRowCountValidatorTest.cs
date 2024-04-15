@@ -11,7 +11,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         public void RowCountIsCorrect()
         {
             DataRowCountValidator validator = new(3);
-            var feedbacks = validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
             Assert.IsFalse(feedbacks.Any());
             feedbacks = validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
             Assert.IsFalse(feedbacks.Any());
@@ -27,7 +27,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             DataRowCountValidator validator = new(3);
             validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
             validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
-            var feedbacks = validator.Validate(new Token(TokenType.EndOfStream, " ", 1, 1));
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.EndOfStream, " ", 1, 1));
         
             Assert.AreEqual(1, feedbacks.Count());
             Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidRowCount, feedbacks.First().Rule);
@@ -44,7 +44,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
             validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
             validator.Validate(new Token(TokenType.LineSeparator, " ", 1, 1));
-            var feedbacks = validator.Validate(new Token(TokenType.EndOfStream, " ", 1, 1));
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.EndOfStream, " ", 1, 1));
 
             Assert.AreEqual(1, feedbacks.Count());
             Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidRowCount, feedbacks.First().Rule);

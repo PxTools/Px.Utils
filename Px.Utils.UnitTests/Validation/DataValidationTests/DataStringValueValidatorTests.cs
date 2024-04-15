@@ -18,7 +18,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         public void AllowedStrings(string allowedValue)
         {
             DataStringValidator validator = new();
-            var feedbacks = validator.Validate(new Token(TokenType.StringDataItem, allowedValue, 1, 1));
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.StringDataItem, allowedValue, 1, 1));
             Assert.IsFalse(feedbacks.Any());
         }
     
@@ -27,7 +27,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             DataStringValidator validator = new();
 
-            var feedbacks = validator.Validate(new Token(TokenType.StringDataItem, "X", 1, 1));
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.StringDataItem, "X", 1, 1));
         
             Assert.AreEqual(1, feedbacks.Count());
             Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidString, feedbacks.First().Rule);

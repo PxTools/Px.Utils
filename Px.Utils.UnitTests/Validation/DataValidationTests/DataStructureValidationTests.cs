@@ -26,7 +26,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             List<ValidationFeedback> feedbacks = [];
             DataStructureValidator validator = new();
-            foreach (var tokenType in tokenSequence)
+            foreach (TokenType tokenType in tokenSequence)
             {
                 feedbacks.AddRange(validator.Validate(new Token(tokenType, " ", 1, 1)));
             }
@@ -48,7 +48,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             List<ValidationFeedback> feedbacks = [];
             DataStructureValidator validator = new();
-            foreach (var tokenType in tokenSequence)
+            foreach (TokenType tokenType in tokenSequence)
             {
                 feedbacks.AddRange(validator.Validate(new Token(tokenType, " ", 1, 1)));
             }
@@ -56,7 +56,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             Assert.AreEqual(1, feedbacks.Count);
             Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidStructure, feedbacks[0].Rule);
             Assert.AreEqual(ValidationFeedbackLevel.Error, feedbacks[0].Level);
-            var expectedTokens = new List<TokenType> { tokenSequence.Length>1?tokenSequence[^2]:TokenType.EmptyToken, tokenSequence[^1] };
+            List<TokenType> expectedTokens = new List<TokenType> { tokenSequence.Length>1?tokenSequence[^2]:TokenType.EmptyToken, tokenSequence[^1] };
             Assert.AreEqual(string.Join(",", expectedTokens), feedbacks[0].AdditionalInfo);
         }
 

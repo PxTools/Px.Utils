@@ -11,7 +11,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         public void FirstSeparatorIsUsedAsReference()
         {
             DataSeparatorValidator validator = new();
-            var feedbacks = validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1 ,1));
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1 ,1));
 
             Assert.IsFalse(feedbacks.Any());
         
@@ -23,9 +23,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             DataSeparatorValidator validator = new();
             validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1 ,1));
 
-            var feedbacks = validator.Validate(new Token(TokenType.DataItemSeparator, "\t", 1 ,1));
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.DataItemSeparator, "\t", 1 ,1));
 
-            var validationFeedbacks = feedbacks as ValidationFeedback[] ?? feedbacks.ToArray();
+            ValidationFeedback[] validationFeedbacks = feedbacks as ValidationFeedback[] ?? feedbacks.ToArray();
             Assert.AreEqual(1, validationFeedbacks.Length);
             Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInconsistentSeparator, validationFeedbacks[0].Rule);
             Assert.AreEqual(ValidationFeedbackLevel.Warning, validationFeedbacks[0].Level);
@@ -39,7 +39,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             DataSeparatorValidator validator = new();
             validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1 ,1));
 
-            var feedbacks = validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1 ,1));
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.DataItemSeparator, " ", 1 ,1));
 
             Assert.IsFalse(feedbacks.Any());
         }
