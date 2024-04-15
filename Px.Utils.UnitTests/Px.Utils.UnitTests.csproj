@@ -20,11 +20,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Px.Utils\Px.Utils.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Validation\Fixtures\statfin_tyonv_pxt_12ts.px">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
+  
 </Project>
