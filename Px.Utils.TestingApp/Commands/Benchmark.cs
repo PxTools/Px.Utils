@@ -52,7 +52,7 @@ namespace Px.Utils.TestingApp.Commands
         protected List<string[]> ParameterFlags { get; } = [fileFlags, iterFlags];
 
         internal List<BenchmarkResult> Results { get; } = [];
-        internal int processesCompleted = 0;
+        private int processesCompleted = 0;
 
         internal void PrintResults()
         {
@@ -83,7 +83,6 @@ namespace Px.Utils.TestingApp.Commands
             }
 
             SetRunParameters();
-
             BenchmarkSetup();
 
             // synchronous validation
@@ -109,7 +108,7 @@ namespace Px.Utils.TestingApp.Commands
                     {
                         Iterations = iterations;
                     }
-                    else if (ParameterFlags.Any(flag => flag.Contains(key)))
+                    else if (Array.Exists(ParameterFlags.ToArray(), flag => flag.Contains(key)))
                     {
                         continue;
                     }

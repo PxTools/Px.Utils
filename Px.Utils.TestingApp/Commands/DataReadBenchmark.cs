@@ -108,7 +108,7 @@ namespace Px.Utils.TestingApp.Commands
                     {
                         continue;
                     }
-                    else if (ParameterFlags.Any(flag => flag.Contains(key)))
+                    else if (Array.Exists(ParameterFlags.ToArray(), flags => flags.Contains(key)))
                     {
                         continue;
                     }
