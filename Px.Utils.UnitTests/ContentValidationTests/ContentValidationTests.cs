@@ -12,7 +12,6 @@ namespace PxUtils.UnitTests.ContentValidationTests
     public class ContentValidationTests
     {
         private static readonly string filename = "foo";
-        private static readonly PxFileSyntaxConf syntaxConf = PxFileSyntaxConf.Default;
         private ValidationFeedbackItem[] feedback = [];
         private static readonly Encoding encoding = Encoding.UTF8;
         private readonly ContentValidator validator = new(filename, encoding);
@@ -44,8 +43,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
 
             // Act
             feedback = validator.Validate(
-                entries,
-                syntaxConf
+                entries
                 );
 
             // Assert
@@ -60,8 +58,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
 
             // Act
             feedback = await validator.ValidateAsync(
-                entries,
-                syntaxConf
+                entries
                 );
 
             // Assert
