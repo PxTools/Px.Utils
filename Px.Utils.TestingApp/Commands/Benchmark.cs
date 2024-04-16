@@ -1,11 +1,16 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Reflection;
 
-namespace Px.Utils.TestingApp.Commands
+﻿namespace Px.Utils.TestingApp.Commands
 {
+    /// <summary>
+    /// Base class for benchmarking commands. Contains methods for running benchmarks synchronously and asynchronously and printing the results.
+    /// </summary>
     internal abstract class Benchmark : Command
     {
+        /// <summary>
+        /// Represents one result of a benchmark run. Contains iteration times and metrics such as min, max, mean, median and standard deviation calculated from the iteration times.
+        /// </summary>
         internal class BenchmarkResult
         {
             internal readonly string Name;
@@ -38,17 +43,39 @@ namespace Px.Utils.TestingApp.Commands
                 IterationTimesMs = iterationTimesMs;
             }
         }
+
+        /// <summary>
+        /// Synchronous benchmark functions to benchmark.
+        /// </summary>
         internal Action[] BenchmarkFunctions { get; set; } = [];
+        /// <summary>
+        /// Asynchronous benchmarks to benchmark.
+        /// </summary>
         internal Func<Task>[] BenchmarkFunctionsAsync { get; set; } = [];
 
+        /// <summary>
+        /// Path to the PX file subject to benchmark.
+        /// </summary>
         internal string TestFilePath { get; set; } = "";
+        /// <summary>
+        /// How many times to run each benchmark.
+        /// </summary>
         internal int Iterations { get; set; } = 10;
+        /// <summary>
+        /// Whether the user provided all benchmark parameters in one go.
+        /// </summary>
         internal bool BatchMode { get; }
+        /// <summary>
+        /// List of inputs provided by the user.
+        /// </summary>
         internal List<string>? Inputs { get; set; } = [];
         
         private static readonly string[] fileFlags = ["-f", "-file"];
         private static readonly string[] iterFlags = ["-i", "-iter"];
 
+        /// <summary>
+        /// List of flags that can be used to provide parameters to the benchmark command.
+        /// </summary>
         protected List<string[]> ParameterFlags { get; } = [fileFlags, iterFlags];
 
         internal List<BenchmarkResult> Results { get; } = [];
@@ -153,6 +180,9 @@ namespace Px.Utils.TestingApp.Commands
             Iterations = value;
         }
 
+        /// <summary>
+        /// Setup method for the benchmark. Called before running the benchmarks. Marked as virtual to allow for custom setup in derived classes.
+        /// </summary>
         protected virtual void BenchmarkSetup()
         {
             Results.Clear();
@@ -174,7 +204,7 @@ namespace Px.Utils.TestingApp.Commands
                     stopwatch.Stop();
                     iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Reset();
-                    UpdateProgressText();
+                    UpdateProgress();
                 }
 
                 Results.Add(new BenchmarkResult(name, iterationTimes));
@@ -197,13 +227,13 @@ namespace Px.Utils.TestingApp.Commands
                     stopwatch.Stop();
                     iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Reset();
-                    UpdateProgressText();
+                    UpdateProgress();
                 }
                 Results.Add(new BenchmarkResult(name, iterationTimes));
             }
         }
 
-        private void UpdateProgressText()
+        private void UpdateProgress()
         {
             int totalProcesses = Iterations * (BenchmarkFunctions.Length + BenchmarkFunctionsAsync.Length);
             processesCompleted++;
