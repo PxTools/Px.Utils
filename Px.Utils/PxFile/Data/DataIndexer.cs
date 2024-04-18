@@ -7,7 +7,14 @@ namespace Px.Utils.PxFile.Data
 {
     public sealed class DataIndexer
     {
+        /// <summary>
+        /// Current index.
+        /// </summary>
         public long CurrentIndex { get; private set; }
+
+        /// <summary>
+        /// The number of items that can be indexed.
+        /// </summary>
         public int DataLength { get; private set; }
 
         private readonly int[][] _coordinates;
@@ -16,19 +23,24 @@ namespace Px.Utils.PxFile.Data
         private readonly int _lastCoordinateIndex;
         private readonly int[] _ReverseCumulativeProducts;
 
-        public DataIndexer(IReadOnlyMatrixMetadata meta, MatrixMap map)
+        /// <summary>
+        /// Builds an indexer based on a complete metadata of the original set and a target map.
+        /// </summary>
+        /// <param name="completeTableMeta">Metadata covering the whole starting set on which the indexing is based on.</param>
+        /// <param name="targetMap">Produces the indexes of the items decribed by this map.</param>
+        public DataIndexer(IReadOnlyMatrixMetadata completeTableMeta, MatrixMap targetMap)
         {
-            int[] dimensionSizes = meta.Dimensions.Select(d => d.Values.Count).ToArray();
-            _coordinates = new int[map.DimensionMaps.Count][];
-            for (int dimIndex = 0; dimIndex < map.DimensionMaps.Count; dimIndex++)
+            int[] dimensionSizes = completeTableMeta.Dimensions.Select(d => d.Values.Count).ToArray();
+            _coordinates = new int[targetMap.DimensionMaps.Count][];
+            for (int dimIndex = 0; dimIndex < targetMap.DimensionMaps.Count; dimIndex++)
             {
-                IReadOnlyDimension dimension = meta.Dimensions.First(d => d.Code == map.DimensionMaps[dimIndex].Code);
-                _coordinates[dimIndex] = new int[map.DimensionMaps[dimIndex].ValueCodes.Count];
-                for (int mapIndex = 0; mapIndex < map.DimensionMaps[dimIndex].ValueCodes.Count; mapIndex++)
+                IReadOnlyDimension dimension = completeTableMeta.Dimensions.First(d => d.Code == targetMap.DimensionMaps[dimIndex].Code);
+                _coordinates[dimIndex] = new int[targetMap.DimensionMaps[dimIndex].ValueCodes.Count];
+                for (int mapIndex = 0; mapIndex < targetMap.DimensionMaps[dimIndex].ValueCodes.Count; mapIndex++)
                 {
                     for (int valIndex = 0; valIndex < dimension.Values.Count; valIndex++)
                     {
-                        if (dimension.Values[valIndex].Code == map.DimensionMaps[dimIndex].ValueCodes[mapIndex])
+                        if (dimension.Values[valIndex].Code == targetMap.DimensionMaps[dimIndex].ValueCodes[mapIndex])
                         {
                             _coordinates[dimIndex][mapIndex] = valIndex;
                         }
@@ -36,14 +48,24 @@ namespace Px.Utils.PxFile.Data
                 }
             }
 
-            DataLength = map.DimensionMaps.Select(dm => dm.ValueCodes.Count).Aggregate(1, (a, b) => a * b);
-            _indices = new int[meta.Dimensions.Count];
-            _lastIndices = map.DimensionMaps.Select(d => d.ValueCodes.Count - 1).ToArray();
+            DataLength = targetMap.DimensionMaps.Select(dm => dm.ValueCodes.Count).Aggregate(1, (a, b) => a * b);
+            _indices = new int[completeTableMeta.Dimensions.Count];
+            _lastIndices = targetMap.DimensionMaps.Select(d => d.ValueCodes.Count - 1).ToArray();
             _lastCoordinateIndex = _coordinates.Length - 1;
             _ReverseCumulativeProducts = GenerateRCP(dimensionSizes);
             SetCurrentIndex();
         }
 
+        /// <summary>
+        /// Builds an indexer based on a set of coordinates and the sizes of the dimensions in the original set.
+        /// </summary>
+        /// <param name="coordinates">
+        /// Produces the indexes of the items in these coordinates.
+        /// Each sublist in the list represents a dimension and the values in the sublist are the indexes of the values in the original set.
+        /// </param>
+        /// <param name="dimensionSizes">
+        /// Sizes of the dimensions in the original set.
+        /// </param>
         public DataIndexer(int[][] coordinates, int[] dimensionSizes)
         {
             _coordinates = [.. coordinates];
@@ -55,6 +77,10 @@ namespace Px.Utils.PxFile.Data
             SetCurrentIndex();
         }
 
+        /// <summary>
+        /// Moves the indexer to the next item in the target map if possible.
+        /// </summary>
+        /// <returns>True if the indexer was moved to the next item, false if the indexer is at the last item.</returns>
         public bool Next()
         {
             for (int i = _lastCoordinateIndex; i >= 0; i--)
