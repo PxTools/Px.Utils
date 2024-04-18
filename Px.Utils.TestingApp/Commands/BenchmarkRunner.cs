@@ -7,6 +7,8 @@
         internal BenchmarkRunner()
         {
             _benchmarks.Add("dataread", new DataReadBenchmark());
+            _benchmarks.Add("metadataSyntaxValidation", new MetadataSyntaxValidationBenchmark());
+            _benchmarks.Add("metadataContentValidation", new MetadataContentValidationBenchmark());
         }
 
         internal override string Help

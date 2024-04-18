@@ -48,11 +48,9 @@ namespace PxUtils.Validation.ContentValidation
         /// Validates contents of Px file metadata. Metadata syntax must be valid for this method to work properly.
         /// </summary>
         /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
-        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that defines keywords and symbols for Px file syntax</param>
         /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
         public ValidationFeedbackItem[] Validate(
             ValidationStructuredEntry[] entries,
-            PxFileSyntaxConf syntaxConf,
             CustomContentValidationFunctions? customContentValidationFunctions = null
             )
         {
@@ -97,13 +95,11 @@ namespace PxUtils.Validation.ContentValidation
         /// Validates contents of Px file metadata asynchronously. Metadata syntax must be valid for this method to work properly.
         /// </summary>
         /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
-        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that defines keywords and symbols for Px file syntax</param>
         /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
         /// <param name="cancellationToken">Cancellation token for cancelling the validation process</param>
         /// <returns>Array of <see cref="ValidationFeedbackItem"/> objects. Any issues found during validation will be listed here</returns>
         public async Task<ValidationFeedbackItem[]> ValidateAsync(
             ValidationStructuredEntry[] entries,
-            PxFileSyntaxConf syntaxConf,
             CustomContentValidationFunctions? customContentValidationFunctions = null,
             CancellationToken cancellationToken = default
             )
