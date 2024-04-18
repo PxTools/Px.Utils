@@ -114,6 +114,7 @@
                 private const string GEOGRAPHICAL = "Geographical";
                 private const string OTHER = "Other";
                 private const string UNKNOWN = "Unknown";
+                private const string CLASSIFICATORY = "Classificatory";
 
                 public string Content { get; set; } = CONTENT;
                 public string Time { get; set; } = TIME;
@@ -122,6 +123,7 @@
                 public string Geographical { get; set; } = GEOGRAPHICAL;
                 public string Other { get; set; } = OTHER;
                 public string Unknown { get; set; } = UNKNOWN;
+                public string Classificatory { get; set; } = CLASSIFICATORY;
 
                 private VariableTypeTokens() { }
 
@@ -147,6 +149,11 @@
                 private const string DIMENSION_TYPE = "VARIABLE-TYPE";
                 private const string STUB_DIMENSIONS = "STUB";
                 private const string HEADING_DIMENSIONS = "HEADING";
+                private const string CHARSET = "CHARSET";
+                private const string TABLEID = "TABLEID";
+                private const string DESCRIPTION = "DESCRIPTION";
+                private const string CONTACT = "CONTACT";
+                private const string VALUE_NOTE = "VALUENOTE";
 
                 public string Data { get; set; } = DATA;
                 public string CodePage { get; set; } = CODEPAGE;
@@ -165,6 +172,11 @@
                 public string DimensionType { get; set; } = DIMENSION_TYPE;
                 public string StubDimensions { get; set; } = STUB_DIMENSIONS;
                 public string HeadingDimensions { get; set; } = HEADING_DIMENSIONS;
+                public string Charset { get; set; } = CHARSET;
+                public string TableId { get; set; } = TABLEID;
+                public string Description { get; set; } = DESCRIPTION;
+                public string Contact { get; set; } = CONTACT;
+                public string ValueNote { get; set; } = VALUE_NOTE;
 
                 private KeyWordTokens() { }
 
