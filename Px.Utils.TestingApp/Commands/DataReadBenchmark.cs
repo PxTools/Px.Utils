@@ -1,4 +1,5 @@
-﻿using PxUtils.Models.Data.DataValue;
+﻿using Px.Utils.PxFile.Data;
+using PxUtils.Models.Data.DataValue;
 using PxUtils.PxFile.Data;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -15,6 +16,17 @@ namespace Px.Utils.TestingApp.Commands
         private readonly string[] iterFlags = ["-i", "-iter"];
         private readonly string[] rowsFlags = ["-r", "-rows"];
         private readonly string[] colsFlags = ["-c", "-cols"];
+
+        private readonly int[][] coordinates = [
+                Enumerable.Range(330, 83).ToArray(),
+                [1,2],
+                [9, 10, 11],
+                [0, 2],
+                Enumerable.Range(110, 100).ToArray(),
+                Enumerable.Range(1, 10).ToArray()
+                ];
+
+        private DataIndexer Indexer => new(coordinates, [414, 3, 12, 3, 215, 13]);
 
         internal override string Help =>
         "Reads the defined dataset from the target px file the given amount of times." + Environment.NewLine +
@@ -62,7 +74,7 @@ namespace Px.Utils.TestingApp.Commands
                 using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
                 using PxFileStreamDataReader reader = new(stream);
 
-                reader.ReadDoubleDataValues(buffer, 0, _readRows, _readCols);
+                reader.ReadDoubleDataValues(buffer, 0, Indexer);
                 stopwatch.Stop();
                 iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Reset();
@@ -84,7 +96,7 @@ namespace Px.Utils.TestingApp.Commands
                 using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
                 using PxFileStreamDataReader reader = new(stream);
 
-                reader.ReadDecimalDataValues(buffer, 0, _readRows, _readCols);
+                reader.ReadDecimalDataValues(buffer, 0, Indexer);
                 stopwatch.Stop();
                 iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Reset();
@@ -107,7 +119,7 @@ namespace Px.Utils.TestingApp.Commands
                 using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
                 using PxFileStreamDataReader reader = new(stream);
 
-                reader.ReadUnsafeDoubles(buffer, 0, _readRows, _readCols, missingValueEncodings);
+                reader.ReadUnsafeDoubles(buffer, 0, Indexer, missingValueEncodings);
                 stopwatch.Stop();
                 iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Reset();
@@ -129,7 +141,7 @@ namespace Px.Utils.TestingApp.Commands
                 using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
                 using PxFileStreamDataReader reader = new(stream);
 
-                await reader.ReadDoubleDataValuesAsync(buffer, 0, _readRows, _readCols);
+                await reader.ReadDoubleDataValuesAsync(buffer, 0, Indexer);
                 stopwatch.Stop();
                 iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Reset();
@@ -151,7 +163,7 @@ namespace Px.Utils.TestingApp.Commands
                 using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
                 using PxFileStreamDataReader reader = new(stream);
 
-                await reader.ReadDecimalDataValuesAsync(buffer, 0, _readRows, _readCols);
+                await reader.ReadDecimalDataValuesAsync(buffer, 0, Indexer);
                 stopwatch.Stop();
                 iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Reset();
@@ -174,7 +186,7 @@ namespace Px.Utils.TestingApp.Commands
                 using Stream stream = new FileStream(_testFilePath, FileMode.Open, FileAccess.Read);
                 using PxFileStreamDataReader reader = new(stream);
 
-                await reader.ReadUnsafeDoublesAsync(buffer, 0, _readRows, _readCols, missingValueEncodings);
+                await reader.ReadUnsafeDoublesAsync(buffer, 0, Indexer, missingValueEncodings);
                 stopwatch.Stop();
                 iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Reset();

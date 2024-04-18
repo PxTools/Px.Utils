@@ -301,7 +301,7 @@ namespace ModelBuilderTests
         {
             IDimension? building_type_dim = Actual_3Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
             Assert.IsNotNull(building_type_dim);
-            DimensionValue? defaultValue = building_type_dim.DefaultValue;
+            IReadOnlyDimensionValue? defaultValue = building_type_dim.DefaultValue;
             Assert.IsNotNull(defaultValue);
             Assert.AreEqual("0", defaultValue.Code);
             MultilanguageString expected = new([new("fi", "Talotyypit yhteensä"), new("sv", "Hustyp totalt"), new("en", "Building types total")]);
@@ -313,7 +313,7 @@ namespace ModelBuilderTests
         {
             IDimension? building_type_dim = Actual_1Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
             Assert.IsNotNull(building_type_dim);
-            DimensionValue? defaultValue = building_type_dim.DefaultValue;
+            IReadOnlyDimensionValue? defaultValue = building_type_dim.DefaultValue;
             Assert.IsNotNull(defaultValue);
             Assert.AreEqual("0", defaultValue.Code);
             MultilanguageString expected = new("fi", "Talotyypit yhteensä");
