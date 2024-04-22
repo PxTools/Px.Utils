@@ -7,10 +7,10 @@
         internal BenchmarkRunner()
         {
             _benchmarks.Add("dataread", new DataReadBenchmark());
-            _benchmarks.Add("metadataReader", new MetadataReaderBenchmark());
-            _benchmarks.Add("metadataBuilder", new MetadataBuilderBenchmark());
-            _benchmarks.Add("metadataSyntaxValidation", new MetadataSyntaxValidationBenchmark());
-            _benchmarks.Add("metadataContentValidation", new MetadataContentValidationBenchmark());
+            _benchmarks.Add("metadata-reader", new MetadataReaderBenchmark());
+            _benchmarks.Add("metadata-builder", new MetadataBuilderBenchmark());
+            _benchmarks.Add("metadata-syntaxvalidation", new MetadataSyntaxValidationBenchmark());
+            _benchmarks.Add("metadata-contentvalidation", new MetadataContentValidationBenchmark());
         }
 
         internal override string Help
