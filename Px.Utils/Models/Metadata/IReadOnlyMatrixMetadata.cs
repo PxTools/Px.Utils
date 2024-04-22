@@ -6,7 +6,7 @@ namespace PxUtils.Models.Metadata
     /// <summary>
     /// Readonly metadata interface for a matrix object in a strucured format.
     /// </summary>
-    public interface IReadOnlyMatrixMetadata
+    public interface IReadOnlyMatrixMetadata : IMatrixMap
     {
         /// <summary>
         /// The default language of the matrix
@@ -34,6 +34,6 @@ namespace PxUtils.Models.Metadata
         /// </summary>
         /// <param name="map">The resulting new metadata object will this structure</param>
         /// <returns>New metadata object with the transform applied</returns>
-        public IReadOnlyMatrixMetadata GetTransform(Map map);
+        public IReadOnlyMatrixMetadata GetTransform(MatrixMap map);
     }
 }

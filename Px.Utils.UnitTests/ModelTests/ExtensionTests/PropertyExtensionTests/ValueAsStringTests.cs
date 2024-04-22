@@ -8,7 +8,7 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
     public class ValueAsStringTests
     {
         [TestMethod]
-        public void ValueToString_ValidValue_ReturnsString()
+        public void ValueAsString_ValidValue_ReturnsString()
         {
             // Arrange
             string input = "\"aa\"";
@@ -25,7 +25,7 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToString_ValidValueWithWhitespace_ReturnsString()
+        public void ValueAsString_ValidValueWithWhitespace_ReturnsString()
         {
             // Arrange
             string input = "\" a a \"";
@@ -42,7 +42,7 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToString_ValidValueWithTrimmableWhitespace_ReturnsString()
+        public void ValueAsString_ValidValueWithTrimmableWhitespace_ReturnsString()
         {
             // Arrange
             string input = " \"a a\" ";
@@ -59,7 +59,24 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringListt_MissingListSeparator_ThrowsArgumentException()
+        public void ValueAsString_MultilineString_ReturnsString()
+        {
+            // Arrange
+            string input = "\"foo\" \n\"bar\"";
+            Property property = new("key", input);
+
+            char stringDelimeter = '"';
+            string expected = "foobar";
+
+            // Act
+            string result = property.ValueAsString(stringDelimeter);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void ValueToStringList_MissingListSeparator_ThrowsArgumentException()
         {
             // Arrange
             string a_list_string = "\"a_0\", \"a_1\", \"a_2\"";

@@ -7,13 +7,8 @@ namespace PxUtils.Models.Metadata.Dimensions
     /// <summary>
     /// Readonly interface for a dimension object in a structured format.
     /// </summary>
-    public interface IReadOnlyDimension
+    public interface IReadOnlyDimension : IDimensionMap
     {
-        /// <summary>
-        /// Unique code among the dimensions of the matrix.
-        /// </summary>
-        string Code { get; }
-
         /// <summary>
         /// The type of the dimension.
         /// </summary>
@@ -44,6 +39,6 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// </summary>
         /// <param name="map">Change the order of values or filter out some values</param>
         /// <returns>New dimension object with the transform applied</returns>
-        IReadOnlyDimension GetTransform(Map.DimensionMap map);
+        IReadOnlyDimension GetTransform(DimensionMap map);
     }
 }

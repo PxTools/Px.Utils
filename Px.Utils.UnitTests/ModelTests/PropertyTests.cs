@@ -22,8 +22,8 @@ namespace ModelTests
             Assert.AreEqual(keyWord, property.KeyWord);
             Assert.IsTrue(property.CanGetStringValue);
             Assert.IsTrue(property.CanGetMultilanguageValue);
-            Assert.AreEqual(text, property.GetString());
-            Assert.AreEqual(multilanguageString, property.GetMultiLanguageString());
+            Assert.AreEqual(text, property.GetRawValueString());
+            Assert.AreEqual(multilanguageString, property.GetRawValueMultiLanguageString());
         }
 
         [TestMethod]
@@ -43,7 +43,7 @@ namespace ModelTests
             Assert.AreEqual(keyWord, property.KeyWord);
             Assert.IsFalse(property.CanGetStringValue);
             Assert.IsTrue(property.CanGetMultilanguageValue);
-            Assert.AreEqual(multilanguageString, property.GetMultiLanguageString());
+            Assert.AreEqual(multilanguageString, property.GetRawValueMultiLanguageString());
         }
 
         [TestMethod]
@@ -63,7 +63,7 @@ namespace ModelTests
             Assert.AreEqual(keyWord, property.KeyWord);
             Assert.IsTrue(property.CanGetStringValue);
             Assert.IsTrue(property.CanGetMultilanguageValue);
-            Assert.AreEqual(multilanguageString, property.GetMultiLanguageString());
+            Assert.AreEqual(multilanguageString, property.GetRawValueMultiLanguageString());
         }
 
         [TestMethod]
@@ -93,7 +93,7 @@ namespace ModelTests
             Property property = new(keyWord, multilanguageString);
 
             // Act
-            bool result = property.TryGetString(out string? value);
+            bool result = property.TryGetRawValueString(out string? value);
 
             // Assert
             Assert.IsTrue(result);
@@ -112,7 +112,7 @@ namespace ModelTests
             Property property = new(keyWord, multilanguageString);
 
             // Act
-            bool result = property.TryGetString(out string? value);
+            bool result = property.TryGetRawValueString(out string? value);
 
             // Assert
             Assert.IsFalse(result);
@@ -131,7 +131,7 @@ namespace ModelTests
             Property property = new(keyWord, multilanguageString);
 
             // Act
-            bool result = property.TryGetString(out string? value);
+            bool result = property.TryGetRawValueString(out string? value);
 
             // Assert
             Assert.IsTrue(result);
@@ -147,7 +147,7 @@ namespace ModelTests
             Property property = new(keyWord, value);
 
             // Act and assert
-            Assert.AreEqual(value, property.GetString());
+            Assert.AreEqual(value, property.GetRawValueString());
         }
 
         [TestMethod]
@@ -161,7 +161,7 @@ namespace ModelTests
             Property property = new(keyWord, multilanguageString);
 
             // Act and assert
-            Assert.AreEqual(text, property.GetString());
+            Assert.AreEqual(text, property.GetRawValueString());
         }
 
         [TestMethod]
@@ -176,7 +176,7 @@ namespace ModelTests
             Property property = new(keyWord, multilanguageString);
 
             // Act and assert
-            Assert.ThrowsException<InvalidOperationException>(() => property.GetString());
+            Assert.ThrowsException<InvalidOperationException>(() => property.GetRawValueString());
         }
 
         [TestMethod]
@@ -190,7 +190,7 @@ namespace ModelTests
             Property property = new(keyWord, multilanguageString);
 
             // Act
-            bool result = property.TryGetMultilanguageString(out MultilanguageString? value);
+            bool result = property.TryGetRawValueMultilanguageString(out MultilanguageString? value);
 
             // Assert
             Assert.IsTrue(result);
@@ -209,7 +209,7 @@ namespace ModelTests
             Property property = new(keyWord, multilanguageString);
 
             // Act
-            bool result = property.TryGetMultilanguageString(out MultilanguageString? value);
+            bool result = property.TryGetRawValueMultilanguageString(out MultilanguageString? value);
 
             // Assert
             Assert.IsTrue(result);
@@ -229,7 +229,7 @@ namespace ModelTests
             Property property = new(keyWord, multilanguageString);
 
             // Act
-            bool result = property.TryGetMultilanguageString(out MultilanguageString? value);
+            bool result = property.TryGetRawValueMultilanguageString(out MultilanguageString? value);
 
             // Assert
             Assert.IsTrue(result);
@@ -245,7 +245,7 @@ namespace ModelTests
             Property property = new(keyWord, value);
 
             // Act
-            bool result = property.TryGetMultilanguageString(out MultilanguageString? mls);
+            bool result = property.TryGetRawValueMultilanguageString(out MultilanguageString? mls);
 
             // Assert
             Assert.IsFalse(result);
@@ -263,7 +263,7 @@ namespace ModelTests
             Property property = new(keyWord, multilanguageString);
 
             // Act and assert
-            Assert.AreEqual(multilanguageString, property.GetMultiLanguageString());
+            Assert.AreEqual(multilanguageString, property.GetRawValueMultiLanguageString());
         }
 
         [TestMethod]
@@ -278,7 +278,7 @@ namespace ModelTests
             Property property = new(keyWord, multilanguageString);
 
             // Act and assert
-            Assert.AreEqual(multilanguageString, property.GetMultiLanguageString());
+            Assert.AreEqual(multilanguageString, property.GetRawValueMultiLanguageString());
         }
 
         [TestMethod]
@@ -290,7 +290,7 @@ namespace ModelTests
             Property property = new(keyWord, text);
 
             // Act and assert
-            Assert.ThrowsException<InvalidOperationException>(() => property.GetMultiLanguageString());
+            Assert.ThrowsException<InvalidOperationException>(() => property.GetRawValueMultiLanguageString());
         }
     }
 }

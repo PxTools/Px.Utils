@@ -65,9 +65,11 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         IReadOnlyList<IReadOnlyDimensionValue> IReadOnlyDimension.Values => Values;
 
+        IReadOnlyList<string> IDimensionMap.ValueCodes => _valueCodes;
+
         IReadOnlyDimensionValue? IReadOnlyDimension.DefaultValue => DefaultValue;
 
-        public IDimension GetTransform(Map.DimensionMap map)
+        public IDimension GetTransform(DimensionMap map)
         {
             List<DimensionValue> newValues = map.ValueCodes.Select(code =>
             {
@@ -78,8 +80,10 @@ namespace PxUtils.Models.Metadata.Dimensions
             return new TimeDimension(Code, Name, AdditionalProperties, newValues, DefaultValue, Interval);
         }
 
-        IReadOnlyDimension IReadOnlyDimension.GetTransform(Map.DimensionMap map) => GetTransform(map);
+        IReadOnlyDimension IReadOnlyDimension.GetTransform(DimensionMap map) => GetTransform(map);
 
         #endregion
+
+        private readonly List<string> _valueCodes = values.Select(value => value.Code).ToList();
     }
 }

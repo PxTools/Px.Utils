@@ -68,7 +68,9 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         IReadOnlyDimensionValue? IReadOnlyDimension.DefaultValue => DefaultValue;
 
-        public IDimension GetTransform(Map.DimensionMap map)
+        IReadOnlyList<string> IDimensionMap.ValueCodes => _valueCodes;
+
+        public IDimension GetTransform(DimensionMap map)
         {
             List<ContentDimensionValue> newValues = map.ValueCodes.Select(code =>
             {
@@ -79,8 +81,10 @@ namespace PxUtils.Models.Metadata.Dimensions
             return new ContentDimension(Code, Name, AdditionalProperties, newValues, DefaultValue);
         }
 
-        IReadOnlyDimension IReadOnlyDimension.GetTransform(Map.DimensionMap map) => GetTransform(map);
+        IReadOnlyDimension IReadOnlyDimension.GetTransform(DimensionMap map) => GetTransform(map);
 
         #endregion
+
+        private readonly IReadOnlyList<string> _valueCodes = values.Select(value => value.Code).ToList();
     }
 }

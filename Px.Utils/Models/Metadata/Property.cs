@@ -56,22 +56,24 @@ namespace PxUtils.Models.Metadata
         }
 
         /// <summary>
-        /// Retrieves the value of the property as a single string.
+        /// Retrieves the raw value of the property as a single string.
+        /// This method does not perform any trimming or other modifications to the value.
         /// </summary>
         /// <returns>The value of the property as a single string.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the property value cannot be represented as a single string.</exception>
-        public string GetString()
+        public string GetRawValueString()
         {
             if (!CanGetStringValue) throw new InvalidOperationException("Property value can not be represented as a single string");
             else return Entries.UniformValue();
         }
 
         /// <summary>
-        /// Attempts to retrieve the value of the property as a single string.
+        /// Attempts to retrieve the raw value of the property as a single string.
+        /// This method does not perform any trimming or other modifications to the value.
         /// </summary>
         /// <param name="value">When this method returns, contains the value of the property as a single string, if the conversion succeeded, or null if the conversion failed.</param>
         /// <returns>true if the property value can be represented as a single string; otherwise, false.</returns>
-        public bool TryGetString(out string? value)
+        public bool TryGetRawValueString(out string? value)
         {
             if (!CanGetStringValue)
             {
@@ -86,23 +88,25 @@ namespace PxUtils.Models.Metadata
         }
 
         /// <summary>
-        /// Retrieves the value of the property as a multilanguage string.
+        /// Retrieves the raw value of the property as a multilanguage string.
+        /// This method does not perform any trimming or other modifications to the value.
         /// </summary>
         /// <returns>A <see cref="MultilanguageString"/> object that represents the value of the property.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the property value cannot be represented as a multilanguage string.</exception>
-        public MultilanguageString GetMultiLanguageString()
+        public MultilanguageString GetRawValueMultiLanguageString()
         {
             if (!CanGetMultilanguageValue) throw new InvalidOperationException("Value can not be represented as a multilanguage string");
             else return new(Entries);
         }
 
         /// <summary>
-        /// Attempts to retrieve the value of the property as a multilanguage string.
+        /// Attempts to retrieve the raw value of the property as a multilanguage string.
+        /// This method does not perform any trimming or other modifications to the value.
         /// </summary>
         /// <param name="value">When this method returns, contains a <see cref="MultilanguageString"/>
         /// object that represents the value of the property, if the conversion succeeded, or null if the conversion failed.</param>
         /// <returns>true if the property value can be represented as a multilanguage string; otherwise, false.</returns>
-        public bool TryGetMultilanguageString(out MultilanguageString? value)
+        public bool TryGetRawValueMultilanguageString(out MultilanguageString? value)
         {
             if(!CanGetMultilanguageValue)
             {
@@ -114,18 +118,6 @@ namespace PxUtils.Models.Metadata
                 value = new(Entries);
                 return true;
             }
-        }
-
-        /// <summary>
-        /// Retrieves the value of the property as a multilanguage string. If the property value cannot be represented as a multilanguage string,
-        /// it creates a new multilanguage string with the provided backup language and the unique value of the property.
-        /// </summary>
-        /// <param name="backupLang">The backup language to use when creating a new multilanguage string.</param>
-        /// <returns>A <see cref="MultilanguageString"/> object that represents the value of the property.</returns>
-        public MultilanguageString ForceToMultilanguageString(string backupLang)
-        {
-            if(CanGetMultilanguageValue) return new(Entries);
-            else return new(backupLang, Entries.UniformValue());
         }
     }
 }

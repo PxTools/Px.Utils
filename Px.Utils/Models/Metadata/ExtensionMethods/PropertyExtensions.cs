@@ -1,4 +1,5 @@
 ﻿using PxUtils.Language;
+using System.Globalization;
 
 namespace PxUtils.Models.Metadata.ExtensionMethods
 {
@@ -18,7 +19,7 @@ namespace PxUtils.Models.Metadata.ExtensionMethods
         {
             if (input.CanGetMultilanguageValue)
             {
-                MultilanguageString values = input.GetMultiLanguageString();
+                MultilanguageString values = input.GetRawValueMultiLanguageString();
                 Dictionary<string, List<string>> langToListDict = [];
 
                 // Build dictionary of language to list of strings
@@ -34,7 +35,7 @@ namespace PxUtils.Models.Metadata.ExtensionMethods
             }
             else
             {
-                List<string> list = ParseStringList(input.GetString(), listSeparator, stringDelimeter);
+                List<string> list = ParseStringList(input.GetRawValueString(), listSeparator, stringDelimeter);
                 List<MultilanguageString> result = [];
                 foreach (string s in list) result.Add(new MultilanguageString(backupLang, s));
                 return result;
@@ -49,15 +50,34 @@ namespace PxUtils.Models.Metadata.ExtensionMethods
         /// <param name="stringDelimeter">The character used to delimit strings in the list.</param>
         /// <returns>A list of strings parsed from the input <see cref="Property"/>.</returns>
         /// <exception cref="ArgumentException">Thrown when the value of the <see cref="Property"/> cannot be presented as a list of strings.</exception>
-        public static List<string> ValueAsListOfStrings(this Property input, char listSeparator, char stringDelimeter)
+        public static List<string> ValueAsListOfStrings(this Property input, char listSeparator, char stringDelimeter, string? forceLanguage = null)
         {
             if(input.CanGetStringValue)
             {
-                return ParseStringList(input.GetString(), listSeparator, stringDelimeter);
+                return ParseStringList(input.GetRawValueString(), listSeparator, stringDelimeter);
+            }
+
+            MultilanguageString multilangValue = input.GetRawValueMultiLanguageString();
+
+            if (forceLanguage is not null && multilangValue.Languages.Contains(forceLanguage))
+            {
+                return ParseStringList(multilangValue[forceLanguage], listSeparator, stringDelimeter);
             }
             else
             {
                 throw new ArgumentException($"The value of the property {input.KeyWord} can not ne presented as a list of strings");
+            }
+        }
+
+        public static MultilanguageString ValueAsMultilanguageString(this Property input, char stringDelimeter, string backupLang)
+        {
+            if (input.CanGetMultilanguageValue)
+            {
+                return input.GetRawValueMultiLanguageString().CopyAndEditAll(s => CleanString(s, stringDelimeter));
+            }
+            else
+            {
+                return new MultilanguageString(backupLang, input.ValueAsString(stringDelimeter));
             }
         }
 
@@ -72,13 +92,36 @@ namespace PxUtils.Models.Metadata.ExtensionMethods
         {
             if(input.CanGetStringValue)
             {
-                return input.GetString().Trim().Trim(stringDelimeter);
+                return CleanString(input.GetRawValueString(), stringDelimeter);
             }
             else
             {
                 throw new ArgumentException($"The value of the property {input.KeyWord} can not be presented as a string");
             }  
         }
+
+
+        /// <summary>
+        /// Extension method that returns the value of a <see cref="Property"/> object as a <see cref="DateTime"/> object, using the provided string delimiter and format string.
+        /// </summary>
+        /// <param name="input">Input property</param>
+        /// <param name="stringDelimeter">The datetimes are surrounded by this character in the px file</param>
+        /// <param name="formatString">The format string to use when parsing the datetime</param></param>
+        /// <returns>A <see cref="DateTime"/> object parsed from the input <see cref="Property"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown when the value of the <see cref="Property"/> cannot be presented as a <see cref="DateTime"/>.</exception>
+        public static DateTime ValueAsDateTime(this Property input, char stringDelimeter, string formatString)
+        {
+            if (input.CanGetStringValue)
+            {
+                return DateTime.ParseExact(input.ValueAsString(stringDelimeter), formatString, CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                throw new ArgumentException($"The value of the property {input.KeyWord} can not be presented as a DateTime");
+            }
+        }
+
+        #region Private methods
 
         /// <summary>
         /// Parses a string into a list of strings, using the provided list separator and string delimiter.
@@ -127,5 +170,26 @@ namespace PxUtils.Models.Metadata.ExtensionMethods
 
             return list;
         }
+
+        private static string CleanString(string input, char stringDelimeter)
+        {
+            char[] output = new char[input.Length];
+            int outputIndex = 0;
+            bool inString = false;
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (input[i] == stringDelimeter)
+                {
+                    inString = !inString;
+                }
+                else if (inString)
+                {
+                    output[outputIndex++] = input[i];
+                }
+            }
+            return new(output, 0, outputIndex);
+        }
+
+        #endregion
     }
 }

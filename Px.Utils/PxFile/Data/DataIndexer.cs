@@ -24,23 +24,23 @@ namespace Px.Utils.PxFile.Data
         private readonly int[] _ReverseCumulativeProducts;
 
         /// <summary>
-        /// Builds an indexer based on a complete metadata of the original set and a target map.
+        /// Builds an indexer based on a complete metadata map of the original set and a target map.
         /// </summary>
-        /// <param name="completeTableMeta">Metadata covering the whole starting set on which the indexing is based on.</param>
+        /// <param name="completeMetaMap">Metadata map covering the whole starting set on which the indexing is based on.</param>
         /// <param name="targetMap">Produces the indexes of the items decribed by this map.</param>
-        public DataIndexer(IReadOnlyMatrixMetadata completeTableMeta, MatrixMap targetMap)
+        public DataIndexer(IMatrixMap completeMetaMap, IMatrixMap targetMap)
         {
-            int[] dimensionSizes = completeTableMeta.Dimensions.Select(d => d.Values.Count).ToArray();
+            int[] dimensionSizes = completeMetaMap.DimensionMaps.Select(d => d.ValueCodes.Count).ToArray();
             _coordinates = new int[targetMap.DimensionMaps.Count][];
             for (int dimIndex = 0; dimIndex < targetMap.DimensionMaps.Count; dimIndex++)
             {
-                IReadOnlyDimension dimension = completeTableMeta.Dimensions.First(d => d.Code == targetMap.DimensionMaps[dimIndex].Code);
+                IDimensionMap dimension = completeMetaMap.DimensionMaps.First(d => d.Code == targetMap.DimensionMaps[dimIndex].Code);
                 _coordinates[dimIndex] = new int[targetMap.DimensionMaps[dimIndex].ValueCodes.Count];
                 for (int mapIndex = 0; mapIndex < targetMap.DimensionMaps[dimIndex].ValueCodes.Count; mapIndex++)
                 {
-                    for (int valIndex = 0; valIndex < dimension.Values.Count; valIndex++)
+                    for (int valIndex = 0; valIndex < dimension.ValueCodes.Count; valIndex++)
                     {
-                        if (dimension.Values[valIndex].Code == targetMap.DimensionMaps[dimIndex].ValueCodes[mapIndex])
+                        if (dimension.ValueCodes[valIndex] == targetMap.DimensionMaps[dimIndex].ValueCodes[mapIndex])
                         {
                             _coordinates[dimIndex][mapIndex] = valIndex;
                         }
@@ -49,7 +49,7 @@ namespace Px.Utils.PxFile.Data
             }
 
             DataLength = targetMap.DimensionMaps.Select(dm => dm.ValueCodes.Count).Aggregate(1, (a, b) => a * b);
-            _indices = new int[completeTableMeta.Dimensions.Count];
+            _indices = new int[completeMetaMap.DimensionMaps.Count];
             _lastIndices = targetMap.DimensionMaps.Select(d => d.ValueCodes.Count - 1).ToArray();
             _lastCoordinateIndex = _coordinates.Length - 1;
             _ReverseCumulativeProducts = GenerateRCP(dimensionSizes);

@@ -38,7 +38,9 @@ namespace PxUtils.Models.Metadata
 
         IReadOnlyDictionary<string, Property> IReadOnlyMatrixMetadata.AdditionalProperties => AdditionalProperties;
 
-        public IReadOnlyMatrixMetadata GetTransform(Map map)
+        IReadOnlyList<IDimensionMap> IMatrixMap.DimensionMaps => Dimensions;
+
+        public IReadOnlyMatrixMetadata GetTransform(MatrixMap map)
         {
             List<IDimension> newDimensions = map.DimensionMaps.Select(map =>
             {

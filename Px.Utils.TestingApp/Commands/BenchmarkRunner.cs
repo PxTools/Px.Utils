@@ -7,6 +7,8 @@
         internal BenchmarkRunner()
         {
             _benchmarks.Add("dataread", new DataReadBenchmark());
+            _benchmarks.Add("metadataReader", new MetadataReaderBenchmark());
+            _benchmarks.Add("metadataBuilder", new MetadataBuilderBenchmark());
             _benchmarks.Add("metadataSyntaxValidation", new MetadataSyntaxValidationBenchmark());
             _benchmarks.Add("metadataContentValidation", new MetadataContentValidationBenchmark());
         }
