@@ -20,9 +20,9 @@ namespace Px.Utils.TestingApp.Commands
             _metaEntries = [];
         }
 
-        protected override void BenchmarkSetup()
+        protected override void OneTimeBenchmarkSetup()
         {
-            base.BenchmarkSetup();
+            base.OneTimeBenchmarkSetup();
             FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
             Encoding encoding = PxFileMetadataReader.GetEncoding(fileStream);
             fileStream.Seek(0, SeekOrigin.Begin);

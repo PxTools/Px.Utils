@@ -22,9 +22,9 @@ namespace Px.Utils.TestingApp.Commands
             BenchmarkFunctionsAsync = [SyntaxValidationAsyncBenchmark];
         }
 
-        protected override void BenchmarkSetup()
+        protected override void OneTimeBenchmarkSetup()
         {
-            base.BenchmarkSetup();
+            base.OneTimeBenchmarkSetup();
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             encoding = PxFileMetadataReader.GetEncoding(stream);

@@ -1,6 +1,4 @@
 ﻿using Px.Utils.Models.Metadata;
-using PxUtils.Models.Metadata;
-using PxUtils.Models.Metadata.Dimensions;
 using System.Runtime.CompilerServices;
 
 namespace Px.Utils.PxFile.Data

@@ -118,7 +118,7 @@ namespace Px.Utils.TestingApp.Commands
             }
 
             SetRunParameters();
-            BenchmarkSetup();
+            OneTimeBenchmarkSetup();
 
             // synchronous validation
             RunBenchmarks(BenchmarkFunctions);
@@ -191,7 +191,7 @@ namespace Px.Utils.TestingApp.Commands
         /// <summary>
         /// Setup method for the benchmark. Called before running the benchmarks. Marked as virtual to allow for custom setup in derived classes.
         /// </summary>
-        protected virtual void BenchmarkSetup()
+        protected virtual void OneTimeBenchmarkSetup()
         {
             Results.Clear();
             processesCompleted = 0;
