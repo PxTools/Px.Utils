@@ -97,7 +97,8 @@ namespace Px.Utils.TestingApp.Commands
             {
                 if(result.Error)
                 {
-                    Console.WriteLine(format, result.Name, "Error", "Error", "Error", "Error", "Error");
+                    string errorFormatString = "| {0,-" + longestNameLength + "} | {1,12} " + new string(' ', 60) + "|";
+                    Console.WriteLine(errorFormatString, result.Name, "Error");
                 }
                 else
                 {
@@ -205,6 +206,8 @@ namespace Px.Utils.TestingApp.Commands
                 Stopwatch stopwatch = new();
                 List<double> iterationTimes = [];
 
+                bool error = false;
+
                 for (int i = 0; i < Iterations; i++)
                 {
                     stopwatch.Start();
@@ -214,9 +217,9 @@ namespace Px.Utils.TestingApp.Commands
                     }
                     catch
                     {
-                        Results.Add(new BenchmarkResult(name, []));
-                        UpdateProgress(Iterations - i);
-                        return;
+                        error = true;
+                        UpdateProgress();
+                        continue;
                     }
                     stopwatch.Stop();
                     iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
@@ -224,7 +227,8 @@ namespace Px.Utils.TestingApp.Commands
                     UpdateProgress();
                 }
 
-                Results.Add(new BenchmarkResult(name, iterationTimes));
+                if (error) Results.Add(new BenchmarkResult(name, []));
+                else Results.Add(new BenchmarkResult(name, iterationTimes));
             }
         }
 
