@@ -464,6 +464,16 @@ namespace PxUtils.UnitTests.ContentValidationTests
             Assert.AreEqual(ValidationFeedbackRule.ValueIsNotInUpperCase, result[0].Feedback.Rule);
         }
 
+        [TestMethod]
+        public void CodeCoverageTestMethod_Returns_4950()
+        {
+            // Act
+            int result = ContentValidator.CodeCoverageTestMethod();
+
+            // Assert
+            Assert.AreEqual(4950, result);
+        }
+
         private void SetValidatorFIeld(string fieldName, object value)
         {
             var propertyInfo = validator.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);

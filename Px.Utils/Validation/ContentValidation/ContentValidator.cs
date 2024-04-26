@@ -88,6 +88,8 @@ namespace PxUtils.Validation.ContentValidation
 
             ResetFields();
 
+            int testValue = CodeCoverageTestCalculations();
+
             return [.. feedbackItems];
         }
 
@@ -148,6 +150,29 @@ namespace PxUtils.Validation.ContentValidation
             stubDimensionNames = null;
             headingDimensionNames = null;
             dimensionValueNames = null;
+        }
+
+        private static int CodeCoverageTestCalculations()
+        {
+            // Do some useless calculations here to see if the code coverage test works
+            int testValue = 0;
+            for (int i = 0; i < 100; i++)
+            {
+                testValue += i;
+            }
+            return testValue;
+        }
+
+        public static int CodeCoverageTestMethod()
+        {
+            // Do some useless calculation here too to see if the code coverage test works
+            int testValue = 0;
+            for (int i = 0; i < 100; i++)
+            {
+                testValue += i;
+            }
+            // Return value should be 4950
+            return testValue;
         }
     }
 }
