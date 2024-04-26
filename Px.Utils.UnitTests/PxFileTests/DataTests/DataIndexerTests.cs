@@ -36,7 +36,7 @@ namespace PxFileTests.DataTests
             long[] expected = [2, 3, 4];
             int i = 0;
 
-            Assert.AreEqual(5, generator.DataLength);
+            Assert.AreEqual(3, generator.DataLength);
 
             do
             {
@@ -80,6 +80,46 @@ namespace PxFileTests.DataTests
             {
                 Assert.AreEqual(expected[i++], generator.CurrentIndex);
             } 
+            while (generator.Next());
+        }
+
+        [TestMethod]
+        public void ThreeDimensions_3_2_5_ReorderingTest()
+        {
+            var coordinates = new int[][]
+            {
+                [ 2, 1 ],
+                [ 0, 1 ],
+                [ 2, 3, 4 ]
+            };
+            DataIndexer generator = new(coordinates, [3, 2, 5]);
+            long[] expected = [22, 23, 24, 27, 28, 29, 12, 13, 14, 17, 18, 19];
+            int i = 0;
+
+            do
+            {
+                Assert.AreEqual(expected[i++], generator.CurrentIndex);
+            }
+            while (generator.Next());
+        }
+
+        [TestMethod]
+        public void ThreeDimensions_3_2_5_MultidimensionalReorderingTest()
+        {
+            var coordinates = new int[][]
+            {
+                [ 2, 1 ],
+                [ 0, 1 ],
+                [ 4, 3, 2 ]
+            };
+            DataIndexer generator = new(coordinates, [3, 2, 5]);
+            long[] expected = [24, 23, 22, 29, 28, 27, 14, 13, 12, 19, 18, 17];
+            int i = 0;
+
+            do
+            {
+                Assert.AreEqual(expected[i++], generator.CurrentIndex);
+            }
             while (generator.Next());
         }
     }
