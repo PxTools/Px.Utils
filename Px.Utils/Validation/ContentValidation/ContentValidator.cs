@@ -149,17 +149,5 @@ namespace PxUtils.Validation.ContentValidation
             headingDimensionNames = null;
             dimensionValueNames = null;
         }
-
-        public static int CodeCoverageTestMethod()
-        {
-            // Do some useless calculation here too to see if the code coverage test works
-            int testValue = 0;
-            for (int i = 0; i < 100; i++)
-            {
-                testValue += i;
-            }
-            // Return value should be 4950
-            return testValue;
-        }
     }
 }
