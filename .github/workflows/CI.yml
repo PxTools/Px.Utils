@@ -22,7 +22,9 @@ jobs:
 
       - name: Install dependencies
         run: dotnet restore
-             dotnet tool install --global dotnet-coverage
+
+      - name: Install dotnet-coverage
+        run: dotnet tool install --g dotnet-coverage
 
       - name: Begin SonarScanner
         run: dotnet sonarscanner begin /k:PxTools_Px.Utils
