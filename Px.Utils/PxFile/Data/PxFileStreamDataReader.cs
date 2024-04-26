@@ -12,9 +12,8 @@ namespace PxUtils.PxFile.Data
         private readonly Stream _stream;
         private readonly PxFileSyntaxConf _conf;
         private long readIndex = 0;
-
-        private const int INTERNAL_BUFFER_SIZE = 4096;
-        private const char VALUE_SEPARATOR = ' ';
+        private readonly int _readBufferSize;
+        private readonly char _valueSeparator = ' ';
 
         #region Constructors
 
@@ -23,9 +22,10 @@ namespace PxUtils.PxFile.Data
         /// </summary>
         /// <param name="stream">Px file stream</param>
         /// <param name="conf">Px file syntax configuration</param>
-        public PxFileStreamDataReader(Stream stream, PxFileSyntaxConf? conf = null)
+        public PxFileStreamDataReader(Stream stream, PxFileSyntaxConf? conf = null, int readBufferSize = 4096)
         {
             _stream = stream;
+            _readBufferSize = readBufferSize;
             _conf = conf ?? PxFileSyntaxConf.Default;
         }
 
@@ -35,10 +35,11 @@ namespace PxUtils.PxFile.Data
         /// <param name="stream">Px file stream</param>
         /// <param name="dataStart">Position of the first data point in the file</param>
         /// <param name="conf">Px file syntax configuration</param>
-        public PxFileStreamDataReader(Stream stream, long dataStart, PxFileSyntaxConf? conf = null)
+        public PxFileStreamDataReader(Stream stream, long dataStart, PxFileSyntaxConf? conf = null, int readBufferSize = 4096)
         {
             _stream = stream;
             _stream.Position = dataStart;
+            _readBufferSize = readBufferSize;
             _conf = conf ?? PxFileSyntaxConf.Default;
         }
 
@@ -273,7 +274,7 @@ namespace PxUtils.PxFile.Data
         {
             int startingIndex = offset;
 
-            byte[] internalBuffer = new byte[INTERNAL_BUFFER_SIZE];
+            byte[] internalBuffer = new byte[_readBufferSize];
             char[] valueBuffer = new char[30]; // separate buffer is needed because a value can be split between two reads
             int valueBufferIndex = 0;
 
@@ -282,7 +283,7 @@ namespace PxUtils.PxFile.Data
             do
             {
                 token?.ThrowIfCancellationRequested();
-                read = _stream.Read(internalBuffer, 0, INTERNAL_BUFFER_SIZE);
+                read = _stream.Read(internalBuffer, 0, _readBufferSize);
                 for (int i = 0; i < read; i++) // Hot loop, mind the performance!
                 {
                     char c = (char)internalBuffer[i];
@@ -290,7 +291,7 @@ namespace PxUtils.PxFile.Data
                     {
                         valueBuffer[valueBufferIndex++] = c;
                     }
-                    else if (c == VALUE_SEPARATOR)
+                    else if (c == _valueSeparator)
                     {
                         if(readIndex++ == indexer.CurrentIndex)
                         {
@@ -309,7 +310,7 @@ namespace PxUtils.PxFile.Data
             while (read > 0);
 
             // Read the last value that may contain a section separator
-            if (valueBuffer[valueBufferIndex - 1] == 0x3b) valueBufferIndex--; // Remove the section separator
+            if (valueBuffer[valueBufferIndex - 1] == _conf.Symbols.EntrySeparator) valueBufferIndex--; // Remove the section separator
             buffer[offset++] = readItem(valueBuffer, valueBufferIndex);
 
             if (offset < startingIndex + indexer.DataLength - 1)

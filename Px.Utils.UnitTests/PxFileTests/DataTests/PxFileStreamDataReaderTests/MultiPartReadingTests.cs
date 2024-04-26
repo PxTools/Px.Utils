@@ -47,6 +47,43 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
+        public void ReadAddDoubleDataValues_OneRowAtTimeWithSmallBuffer_ReturnsCorrectDoubleDataValues()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
+            using Stream stream = new MemoryStream(data);
+            using PxFileStreamDataReader reader = new(stream, null, 8); // Buffer size of 8
+            DoubleDataValue[] targetBuffer = new DoubleDataValue[10];
+
+            // Act and Assert
+            int[] testDimLengths_2_5_2 = [2, 5, 2];
+
+            int[][] testCoordinates0 =
+            [
+                [0],
+                [0, 1, 2, 3, 4],
+                [0, 1]
+            ];
+            DataIndexer indexer0 = new(testCoordinates0, testDimLengths_2_5_2);
+
+            double[] expected0 = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
+            reader.ReadDoubleDataValues(targetBuffer, 0, indexer0);
+            CollectionAssert.AreEqual(expected0, targetBuffer.Select(v => v.UnsafeValue).ToArray());
+
+            int[][] testCoordinates1 =
+            [
+                [1],
+                [0, 1, 2, 3, 4],
+                [0, 1]
+            ];
+            DataIndexer indexer1 = new(testCoordinates1, testDimLengths_2_5_2);
+
+            double[] expected1 = [10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0];
+            reader.ReadDoubleDataValues(targetBuffer, 0, indexer1);
+            CollectionAssert.AreEqual(expected1, targetBuffer.Select(v => v.UnsafeValue).ToArray());
+        }
+
+        [TestMethod]
         public void ReadAddDoubleDataValues_HalfRowAtTime_ReturnsCorrectDoubleDataValues()
         {
             // Arrange

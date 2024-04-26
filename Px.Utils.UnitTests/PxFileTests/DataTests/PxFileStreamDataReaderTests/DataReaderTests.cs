@@ -46,6 +46,39 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
+        public void ReadDoubleDataValues_ValidIntegersWithSmallBuffer_ReturnsCorrectDoubleDataValues()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
+            using Stream stream = new MemoryStream(data);
+            using PxFileStreamDataReader reader = new(stream, null, 16); // Small buffer
+            DoubleDataValue[] targetBuffer = new DoubleDataValue[21];
+            double canary = 123.456;
+            targetBuffer[^1] = new DoubleDataValue(canary, DataValueType.Exists);
+
+            // Act
+            int[] testDimLengths_2_2_5 = [2, 2, 5];
+            int[][] testCoordinates =
+            [
+                [0, 1],
+                [0, 1],
+                [0, 1, 2, 3, 4]
+            ];
+            DataIndexer indexer = new(testCoordinates, testDimLengths_2_2_5);
+            reader.ReadDoubleDataValues(targetBuffer, 0, indexer);
+
+            // Assert
+            double[] expexted =
+            [
+                0.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 7.00, 8.00, 9.00,
+                10.00, 11.00, 12.00, 13.00, 14.00, 15.00, 16.00, 17.00, 18.00, 19.00, canary
+            ];
+            // The canary in the expected checks against overwrites
+
+            CollectionAssert.AreEqual(expexted, targetBuffer.Select(v => v.UnsafeValue).ToArray());
+        }
+
+        [TestMethod]
         public void ReadDoubleDataValues_ValidIntegersAndMissing_ReturnsCorrectDoubleDataValues()
         {
             // Arrange
