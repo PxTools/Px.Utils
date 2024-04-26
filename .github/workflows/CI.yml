@@ -10,70 +10,47 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
         dotnet-version: [ '7.x', '8.x' ]
+        configuration: [ 'Debug' ]
     runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Setup dotnet ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
 
-
-
       - name: Install dependencies
         run: dotnet restore
-
-      - name: Install dotnet-coverage
-        run: dotnet tool install -g dotnet-coverage
-
-      - name: Build
-        run: dotnet build --verbosity normal --no-restore --configuration Release
-
-      - name: Unit tests
-        run: dotnet test --verbosity normal
-
-      - name: Run coverage test
-        run: dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage
-          path: coverage.xml
-
-  analyze:
-    runs-on: windows-latest
-    needs: build
-    steps:       
+      
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
             distribution: 'zulu'
             java-version: '21'
+
+      - name: Install dotnet-coverage
+        run: dotnet tool install -g dotnet-coverage
       
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-        
-      - name: Download coverage report
-        uses: actions/download-artifact@v3
-        with:
-          name: coverage
-          path: coverage.xml
-          
       - name: Install SonarCloud scanner
         run: dotnet tool install -g dotnet-sonarscanner
 
       - name: Begin SonarScanner
         run: dotnet sonarscanner begin /k:PxTools_Px.Utils
+            /o:pxtools
             /d:sonar.host.url=https://sonarcloud.io
             /d:sonar.token=${{ secrets.SONAR_TOKEN }}
             /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
-            /o:pxtools
-      
-      - name: Build and analyze
-        run: dotnet build --verbosity normal --no-incremental --configuration Debug
+            /d:sonar.verbose=true
+
+      - name: Build
+        run: dotnet build --verbosity normal --no-restore --configuration ${{ matrix.configuration }}
+
+      - name: Run coverage test
+        run: dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
         
       - name: End SonarScanner
         run: dotnet sonarscanner end /d:sonar.token=${{ secrets.SONAR_TOKEN }}
