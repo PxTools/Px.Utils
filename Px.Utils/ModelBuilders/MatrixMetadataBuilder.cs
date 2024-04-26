@@ -68,7 +68,7 @@ namespace PxUtils.ModelBuilders
                     else return BuildDimension(entries, langs, name);
                 });
 
-            MatrixMetadata meta = new (langs.DefaultLanguage, langs.AvailableLanguages, dimensions.ToList(), []);
+            MatrixMetadata meta = new(langs.DefaultLanguage, langs.AvailableLanguages, dimensions.ToList(), []);
             AddAdditionalPropertiesToMatrixMetadata(meta, entries, langs);
             return meta;
         }
@@ -81,9 +81,7 @@ namespace PxUtils.ModelBuilders
             string contentKey = _pxFileSyntaxConf.Tokens.KeyWords.ContentVariableIdentifier;
             if(TryGetAndRemoveProperty(entries, contentKey, langs, out Property? contVarNameProp))
             {
-                MultilanguageString name = contVarNameProp
-                    .ForceToMultilanguageString(langs.DefaultLanguage)
-                    .CopyAndEditAll(s => s.Trim(_stringDelimeter));
+                MultilanguageString name = contVarNameProp.ValueAsMultilanguageString(_stringDelimeter, langs.DefaultLanguage);
                 return BuildContentDimension(entries, langs, name);
             }
 
@@ -103,13 +101,13 @@ namespace PxUtils.ModelBuilders
                 string code = GetDimensionCode(entries, langs, dimensionNameToTest);
                 DimensionValue[] values = GetDimensionValues(entries, langs, dimensionNameToTest);
                 DimensionValue? maybeDefault = GetDefaultValue(entries, langs, dimensionNameToTest, values);
-                TimeDimensionInterval interval = ValueParserUtilities.ParseTimeIntervalFromTimeVal(timeVal.GetString(), _pxFileSyntaxConf);
+                TimeDimensionInterval interval = ValueParserUtilities.ParseTimeIntervalFromTimeVal(timeVal.GetRawValueString(), _pxFileSyntaxConf);
                 Dictionary<string, Property> additionalProperties = new() { { timeVal.KeyWord, timeVal } };
                 timeDimension = new TimeDimension(code, dimensionNameToTest, additionalProperties, [.. values], maybeDefault, interval);
                 return true;
             }
             else if (TryGetProperty(entries, dimensionTypeKey, langs, out Property? dimType, dimensionNameToTest) &&
-                ValueParserUtilities.StringToDimensionType(dimType.GetString()) == DimensionType.Time)
+                ValueParserUtilities.StringToDimensionType(dimType.ValueAsString(_stringDelimeter)) == DimensionType.Time)
             {
                 List<MetadataEntryKey> keys = BuildKeys(entries, dimensionTypeKey, langs, dimensionNameToTest);
                 keys.ForEach(k => entries.Remove(k));
@@ -139,7 +137,7 @@ namespace PxUtils.ModelBuilders
         {
             string dimensionTypeKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionType;
             DimensionType type = TryGetAndRemoveProperty(entries, dimensionTypeKey, langs, out Property? dimTypeContent, dimensionName)
-                ? ValueParserUtilities.StringToDimensionType(dimTypeContent.GetString(), _pxFileSyntaxConf)
+                ? ValueParserUtilities.StringToDimensionType(dimTypeContent.GetRawValueString(), _pxFileSyntaxConf)
                 : DimensionType.Unknown;
 
             if(type is DimensionType.Other or DimensionType.Unknown)
@@ -160,7 +158,7 @@ namespace PxUtils.ModelBuilders
             string defaultValueKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionDefaultValue;
             if (TryGetAndRemoveProperty(entries, defaultValueKey, langs, out Property? defaultValueProperty))
             {
-                MultilanguageString defaultValueName = defaultValueProperty.ForceToMultilanguageString(langs.DefaultLanguage);
+                MultilanguageString defaultValueName = defaultValueProperty.ValueAsMultilanguageString(_stringDelimeter, langs.DefaultLanguage);
                 ContentDimensionValue? defaultValue = values.Find(v => v.Name.Equals(defaultValueName));
 
                 if (defaultValue is null)
@@ -242,7 +240,7 @@ namespace PxUtils.ModelBuilders
 
                 string valueCodesKey = _pxFileSyntaxConf.Tokens.KeyWords.VariableValueCodes;
                 List<string> codes = TryGetAndRemoveProperty(entries, valueCodesKey, langs, out Property? codeSet, dimensionName)
-                    ? codeSet.ValueAsListOfStrings(_listSeparator, _stringDelimeter)
+                    ? codeSet.ValueAsListOfStrings(_listSeparator, _stringDelimeter, langs.DefaultLanguage)
                     : new(GetDefaultCodes(valueNamesList));
 
                 int numOfCodes = codes.Count;
@@ -329,7 +327,7 @@ namespace PxUtils.ModelBuilders
             string unitKey = _pxFileSyntaxConf.Tokens.KeyWords.Units;
             if (TryGetAndRemoveProperty(entries, unitKey, langs, out Property? unit, dimName, valName) || // Both identifiers
                 TryGetAndRemoveProperty(entries, unitKey, langs, out unit, valName) // Only value identifier
-                ) return unit.ForceToMultilanguageString(langs.DefaultLanguage);
+                ) return unit.ValueAsMultilanguageString(_stringDelimeter, langs.DefaultLanguage);
 
             throw new ArgumentException("Unit information not found");
         }
@@ -341,7 +339,7 @@ namespace PxUtils.ModelBuilders
                 TryGetAndRemoveProperty(entries, lastUpdatedKey, langs, out lastUpdated, valName)) // Only value identifier
             {
                 string formatString = _pxFileSyntaxConf.Tokens.Time.DateTimeFormatString;
-                return DateTime.ParseExact(lastUpdated.GetString(), formatString, CultureInfo.InvariantCulture);
+                return lastUpdated.ValueAsDateTime(_stringDelimeter, formatString);
             }
 
             throw new ArgumentException("Last update information not found");
@@ -353,7 +351,7 @@ namespace PxUtils.ModelBuilders
             if (TryGetAndRemoveProperty(entries, precisionKey, langs, out Property? precision, dimName, valName) || // Both identifiers
                TryGetAndRemoveProperty(entries, precisionKey, langs, out precision, valName)) // Only value identifier
             {
-                return int.Parse(precision.GetString());
+                return int.Parse(precision.GetRawValueString());
             }
 
             return 0; // Default value
@@ -364,14 +362,14 @@ namespace PxUtils.ModelBuilders
             string defaultValueKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionDefaultValue;
             if (TryGetAndRemoveProperty(entries, defaultValueKey, langs, out Property? defaultValueName, dimensionName))
             {
-                MultilanguageString name = defaultValueName.ForceToMultilanguageString(langs.DefaultLanguage);
+                MultilanguageString name = defaultValueName.ValueAsMultilanguageString(_stringDelimeter, langs.DefaultLanguage);
                 if (Array.Find(values, v => v.Name.Equals(name)) is Dim dimensionValue)
                 {
                     return dimensionValue;
                 }
                 else
                 {
-                    string defaultName = defaultValueName.GetMultiLanguageString()[langs.DefaultLanguage];
+                    string defaultName = defaultValueName.ValueAsMultilanguageString(_stringDelimeter, langs.DefaultLanguage)[langs.DefaultLanguage];
                     string eMsg = $"Default value is defined for the variable but it does not contain a value with name {defaultName}";
                     throw new ArgumentException(eMsg);
                 }
@@ -395,6 +393,8 @@ namespace PxUtils.ModelBuilders
             {
                 throw new ArgumentException($"Default language not found in metadata");
             }
+
+            defaultLang = defaultLang.Trim().Trim(_stringDelimeter);
 
             MetadataEntryKey availableLangsKey = new(_pxFileSyntaxConf.Tokens.KeyWords.AvailableLanguages);
             List<string> availableLangs = [defaultLang];

@@ -1,11 +1,12 @@
-﻿using PxUtils.Models.Metadata.Dimensions;
+﻿using Px.Utils.Models.Metadata;
+using PxUtils.Models.Metadata.Dimensions;
 
 namespace PxUtils.Models.Metadata
 {
     /// <summary>
     /// Readonly metadata interface for a matrix object in a strucured format.
     /// </summary>
-    public interface IReadOnlyMatrixMetadata
+    public interface IReadOnlyMatrixMetadata : IMatrixMap
     {
         /// <summary>
         /// The default language of the matrix
@@ -26,5 +27,13 @@ namespace PxUtils.Models.Metadata
         /// Additional properties of the matrix object, does not include properties of the dimensions or their values.
         /// </summary>
         public IReadOnlyDictionary<string, Property> AdditionalProperties { get; }
+
+        /// <summary>
+        /// Returns a new metadata object with the specified transform map applied.
+        /// Map can be used to change the order of dimensions and their values or to filter out some values.
+        /// </summary>
+        /// <param name="map">The resulting new metadata object will this structure</param>
+        /// <returns>New metadata object with the transform applied</returns>
+        public IReadOnlyMatrixMetadata GetTransform(MatrixMap map);
     }
 }

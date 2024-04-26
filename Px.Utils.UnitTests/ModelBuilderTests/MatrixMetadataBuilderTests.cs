@@ -4,6 +4,7 @@ using PxUtils.ModelBuilders;
 using PxUtils.Models.Metadata;
 using PxUtils.Models.Metadata.Dimensions;
 using PxUtils.Models.Metadata.Enums;
+using PxUtils.Models.Metadata.ExtensionMethods;
 using System.Globalization;
 
 namespace ModelBuilderTests
@@ -30,49 +31,47 @@ namespace ModelBuilderTests
         }
 
         [DataTestMethod]
-        [DataRow("ANSI", "CHARSET")]
-        [DataRow("2013", "AXIS-VERSION")]
-        [DataRow("iso-8859-15", "CODEPAGE")]
-        [DataRow("20200121 09:00", "CREATION-DATE")]
-        [DataRow("20240131 08:00", "NEXT-UPDATE")]
+        [DataRow("\"ANSI\"", "CHARSET")]
+        [DataRow("\"2013\"", "AXIS-VERSION")]
+        [DataRow("\"iso-8859-15\"", "CODEPAGE")]
+        [DataRow("\"20200121 09:00\"", "CREATION-DATE")]
+        [DataRow("\"20240131 08:00\"", "NEXT-UPDATE")]
         [DataRow("YES", "OFFICIAL-STATISTICS")]
         public void MultiLangTableLevelAdditionalNotTranslatedParametersTest(string expected, string keyWord)
         {
-            Assert.AreEqual(expected, Actual_3Lang.AdditionalProperties[keyWord].GetString());
+            Assert.AreEqual(expected, Actual_3Lang.AdditionalProperties[keyWord].GetRawValueString());
         }
 
         [DataTestMethod]
-        [DataRow("ANSI", "CHARSET")]
-        [DataRow("2013", "AXIS-VERSION")]
-        [DataRow("iso-8859-15", "CODEPAGE")]
-        [DataRow("20200121 09:00", "CREATION-DATE")]
-        [DataRow("20240131 08:00", "NEXT-UPDATE")]
+        [DataRow("\"ANSI\"", "CHARSET")]
+        [DataRow("\"2013\"", "AXIS-VERSION")]
+        [DataRow("\"iso-8859-15\"", "CODEPAGE")]
+        [DataRow("\"20200121 09:00\"", "CREATION-DATE")]
+        [DataRow("\"20240131 08:00\"", "NEXT-UPDATE")]
         [DataRow("YES", "OFFICIAL-STATISTICS")]
         public void SingleLangTableLevelAdditionalNotTranslatedParametersTest(string expected, string keyWord)
         {
-            Assert.AreEqual(expected, Actual_1Lang.AdditionalProperties[keyWord].GetString());
+            Assert.AreEqual(expected, Actual_1Lang.AdditionalProperties[keyWord].GetRawValueString());
         }
 
         [DataTestMethod]
-        [DataRow("abcd", "abcd", "abcd", "SUBJECT-AREA")]
-        [DataRow("test_description_fi", "test_description_sv", "test_description_en", "DESCRIPTION")]
-        [DataRow("test_note_fi", "test_note_sv", "test_note_en", "NOTE")]
+        [DataRow("\"abcd\"", "\"abcd\"", "\"abcd\"", "SUBJECT-AREA")]
+        [DataRow("\"test_description_fi\"", "\"test_description_sv\"", "\"test_description_en\"", "DESCRIPTION")]
+        [DataRow("\"test_note_fi\"", "\"test_note_sv\"", "\"test_note_en\"", "NOTE")]
         public void MultiLangTableLevelAdditionalTranslatedParametersTest(string fi, string sv, string en, string keyWord)
         {
             MultilanguageString expected = new([new("fi", fi), new("sv", sv), new("en", en)]);
-            Assert.AreEqual(expected, Actual_3Lang.AdditionalProperties[keyWord].GetMultiLanguageString());
+            Assert.AreEqual(expected, Actual_3Lang.AdditionalProperties[keyWord].GetRawValueMultiLanguageString());
         }
 
         [DataTestMethod]
-        [DataRow("abcd", "SUBJECT-AREA")]
-        [DataRow("test_description_fi", "DESCRIPTION")]
-        [DataRow("test_note_fi", "NOTE")]
-        public void SingleLangTableLevelAdditionalTranslatedParametersTest(string fi, string keyWord)
+        [DataRow("\"abcd\"", "SUBJECT-AREA")]
+        [DataRow("\"test_description_fi\"", "DESCRIPTION")]
+        [DataRow("\"test_note_fi\"", "NOTE")]
+        public void SingleLangTableLevelAdditionalTranslatedParametersTest(string input, string keyWord)
         {
-            string lang = "fi";
-            MultilanguageString expected = new(lang, fi);
-            MultilanguageString actual = Actual_1Lang.AdditionalProperties[keyWord].ForceToMultilanguageString(lang);
-            Assert.AreEqual(expected, actual);
+            string actual = Actual_1Lang.AdditionalProperties[keyWord].GetRawValueString();
+            Assert.AreEqual(input, actual);
         }
 
         [TestMethod]
@@ -301,7 +300,7 @@ namespace ModelBuilderTests
         {
             IDimension? building_type_dim = Actual_3Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
             Assert.IsNotNull(building_type_dim);
-            DimensionValue? defaultValue = building_type_dim.DefaultValue;
+            IReadOnlyDimensionValue? defaultValue = building_type_dim.DefaultValue;
             Assert.IsNotNull(defaultValue);
             Assert.AreEqual("0", defaultValue.Code);
             MultilanguageString expected = new([new("fi", "Talotyypit yhteensä"), new("sv", "Hustyp totalt"), new("en", "Building types total")]);
@@ -313,7 +312,7 @@ namespace ModelBuilderTests
         {
             IDimension? building_type_dim = Actual_1Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
             Assert.IsNotNull(building_type_dim);
-            DimensionValue? defaultValue = building_type_dim.DefaultValue;
+            IReadOnlyDimensionValue? defaultValue = building_type_dim.DefaultValue;
             Assert.IsNotNull(defaultValue);
             Assert.AreEqual("0", defaultValue.Code);
             MultilanguageString expected = new("fi", "Talotyypit yhteensä");

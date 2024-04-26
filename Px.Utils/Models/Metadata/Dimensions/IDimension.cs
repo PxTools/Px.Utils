@@ -1,4 +1,5 @@
-﻿using PxUtils.Language;
+﻿using Px.Utils.Models.Metadata;
+using PxUtils.Language;
 
 namespace PxUtils.Models.Metadata.Dimensions
 {
@@ -23,5 +24,12 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// The default value of the dimension, this property is optional.
         /// </summary>
         new DimensionValue? DefaultValue { get; set; }
+
+        /// <summary>
+        /// Returns a new dimension object where the order of values is changed or some values are filtered out according to the map.
+        /// </summary>
+        /// <param name="map">Change the order of values or filter out some values</param>
+        /// <returns>New dimension object with the transform applied</returns>
+        new IDimension GetTransform(DimensionMap map);
     }
 }

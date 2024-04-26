@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-﻿namespace Px.Utils.TestingApp.Commands
+namespace Px.Utils.TestingApp.Commands
 {
     /// <summary>
     /// Base class for benchmarking commands. Contains methods for running benchmarks synchronously and asynchronously and printing the results.
@@ -41,17 +41,9 @@ using System.Reflection;
             {
                 Name = name;
                 IterationTimesMs = iterationTimesMs;
+                Error = iterationTimesMs.Count == 0;
             }
         }
-
-        /// <summary>
-        /// Synchronous benchmark functions to benchmark.
-        /// </summary>
-        internal Action[] BenchmarkFunctions { get; set; } = [];
-        /// <summary>
-        /// Asynchronous benchmarks to benchmark.
-        /// </summary>
-        internal Func<Task>[] BenchmarkFunctionsAsync { get; set; } = [];
 
         /// <summary>
         /// Path to the PX file subject to benchmark.
@@ -69,7 +61,16 @@ using System.Reflection;
         /// List of inputs provided by the user.
         /// </summary>
         internal List<string>? Inputs { get; set; } = [];
-        
+
+        /// <summary>
+        /// Synchronous benchmark functions to benchmark.
+        /// </summary>
+        protected Action[] BenchmarkFunctions { get; set; } = [];
+        /// <summary>
+        /// Asynchronous benchmarks to benchmark.
+        /// </summary>
+        protected Func<Task>[] BenchmarkFunctionsAsync { get; set; } = [];
+
         private static readonly string[] fileFlags = ["-f", "-file"];
         private static readonly string[] iterFlags = ["-i", "-iter"];
 
@@ -94,7 +95,15 @@ using System.Reflection;
             Console.WriteLine(new string('-', longestNameLength + 79));
             foreach (BenchmarkResult result in Results)
             {
-                Console.WriteLine(format, result.Name, result.MinTimeMs, result.MaxTimeMs, result.MeanTimeMs, result.MedianTimeMs, result.StandardDeviation);
+                if(result.Error)
+                {
+                    string errorFormatString = "| {0,-" + longestNameLength + "} | {1,12} " + new string(' ', 60) + "|";
+                    Console.WriteLine(errorFormatString, result.Name, "Error");
+                }
+                else
+                {
+                    Console.WriteLine(format, result.Name, result.MinTimeMs, result.MaxTimeMs, result.MeanTimeMs, result.MedianTimeMs, result.StandardDeviation);
+                }
             }
         }
 
@@ -110,7 +119,7 @@ using System.Reflection;
             }
 
             SetRunParameters();
-            BenchmarkSetup();
+            OneTimeBenchmarkSetup();
 
             // synchronous validation
             RunBenchmarks(BenchmarkFunctions);
@@ -183,7 +192,7 @@ using System.Reflection;
         /// <summary>
         /// Setup method for the benchmark. Called before running the benchmarks. Marked as virtual to allow for custom setup in derived classes.
         /// </summary>
-        protected virtual void BenchmarkSetup()
+        protected virtual void OneTimeBenchmarkSetup()
         {
             Results.Clear();
             processesCompleted = 0;
@@ -197,17 +206,29 @@ using System.Reflection;
                 Stopwatch stopwatch = new();
                 List<double> iterationTimes = [];
 
+                bool error = false;
+
                 for (int i = 0; i < Iterations; i++)
                 {
                     stopwatch.Start();
-                    function();
+                    try
+                    {
+                        function();
+                    }
+                    catch
+                    {
+                        error = true;
+                        UpdateProgress();
+                        continue;
+                    }
                     stopwatch.Stop();
                     iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Reset();
                     UpdateProgress();
                 }
 
-                Results.Add(new BenchmarkResult(name, iterationTimes));
+                if (error) Results.Add(new BenchmarkResult(name, []));
+                else Results.Add(new BenchmarkResult(name, iterationTimes));
             }
         }
 
@@ -223,8 +244,18 @@ using System.Reflection;
                 for (int i = 0; i < Iterations; i++)
                 {
                     stopwatch.Start();
-                    await task();
-                    stopwatch.Stop();
+                    try
+                    {
+                        await task();
+                    }
+                    catch
+                    {
+                        Results.Add(new BenchmarkResult(name, []));
+                        UpdateProgress(Iterations - i);
+                        stopwatch.Stop();
+                        stopwatch.Reset();
+                        return;
+                    }
                     iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Reset();
                     UpdateProgress();
@@ -233,10 +264,10 @@ using System.Reflection;
             }
         }
 
-        private void UpdateProgress()
+        private void UpdateProgress(int increment = 1)
         {
             int totalProcesses = Iterations * (BenchmarkFunctions.Length + BenchmarkFunctionsAsync.Length);
-            processesCompleted++;
+            processesCompleted += increment;
             if (processesCompleted > 1)
             {
                 Console.SetCursorPosition(0, Console.CursorTop - 1);
