@@ -39,6 +39,6 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// </summary>
         /// <param name="map">Change the order of values or filter out some values</param>
         /// <returns>New dimension object with the transform applied</returns>
-        IReadOnlyDimension GetTransform(DimensionMap map);
+        IDimension GetTransform(IDimensionMap map);
     }
 }

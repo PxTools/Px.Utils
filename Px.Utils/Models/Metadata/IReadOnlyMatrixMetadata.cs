@@ -34,6 +34,6 @@ namespace PxUtils.Models.Metadata
         /// </summary>
         /// <param name="map">The resulting new metadata object will this structure</param>
         /// <returns>New metadata object with the transform applied</returns>
-        public IReadOnlyMatrixMetadata GetTransform(MatrixMap map);
+        public MatrixMetadata GetTransform(IMatrixMap map);
     }
 }
