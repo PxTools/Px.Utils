@@ -25,7 +25,24 @@ jobs:
 
       - name: Install dependencies
         run: dotnet restore
-      
+
+      - name: Build
+        run: dotnet build --verbosity normal --no-restore --configuration ${{ matrix.configuration }}
+   
+  sonar:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -45,9 +62,6 @@ jobs:
             /d:sonar.token=${{ secrets.SONAR_TOKEN }}
             /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
             /d:sonar.coverage.exclusions=Px.Utils.TestingApp/**
-
-      - name: Build
-        run: dotnet build --verbosity normal --no-restore --configuration ${{ matrix.configuration }}
 
       - name: Run coverage test
         run: dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
