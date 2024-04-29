@@ -69,7 +69,7 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         IReadOnlyDimensionValue? IReadOnlyDimension.DefaultValue => DefaultValue;
 
-        public IDimension GetTransform(DimensionMap map)
+        public IDimension GetTransform(IDimensionMap map)
         {
             List<DimensionValue> newValues = map.ValueCodes.Select(code =>
             {
@@ -79,8 +79,6 @@ namespace PxUtils.Models.Metadata.Dimensions
 
             return new TimeDimension(Code, Name, AdditionalProperties, newValues, DefaultValue, Interval);
         }
-
-        IReadOnlyDimension IReadOnlyDimension.GetTransform(DimensionMap map) => GetTransform(map);
 
         #endregion
 

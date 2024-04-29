@@ -40,7 +40,7 @@ namespace PxUtils.Models.Metadata
 
         IReadOnlyList<IDimensionMap> IMatrixMap.DimensionMaps => Dimensions;
 
-        public IReadOnlyMatrixMetadata GetTransform(MatrixMap map)
+        public MatrixMetadata GetTransform(IMatrixMap map)
         {
             List<IDimension> newDimensions = map.DimensionMaps.Select(map =>
             {

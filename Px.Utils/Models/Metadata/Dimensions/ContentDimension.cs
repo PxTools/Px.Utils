@@ -70,7 +70,7 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         IReadOnlyList<string> IDimensionMap.ValueCodes => _valueCodes;
 
-        public IDimension GetTransform(DimensionMap map)
+        public IDimension GetTransform(IDimensionMap map)
         {
             List<ContentDimensionValue> newValues = map.ValueCodes.Select(code =>
             {
@@ -80,8 +80,6 @@ namespace PxUtils.Models.Metadata.Dimensions
 
             return new ContentDimension(Code, Name, AdditionalProperties, newValues, DefaultValue);
         }
-
-        IReadOnlyDimension IReadOnlyDimension.GetTransform(DimensionMap map) => GetTransform(map);
 
         #endregion
 
