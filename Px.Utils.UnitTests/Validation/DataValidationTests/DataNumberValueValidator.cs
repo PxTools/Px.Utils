@@ -1,5 +1,6 @@
 ﻿using PxUtils.Validation;
 using PxUtils.Validation.DataValidation;
+using System.Text;
 
 namespace Px.Utils.UnitTests.Validation.DataValidationTests
 {
@@ -20,7 +21,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         public void AllowedNumberValues(string allowedValue)
         {
             DataNumberValidator validator = new();
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.NumDataItem, allowedValue, 1, 1));
+            Encoding encoding = Encoding.UTF8;
+            List<byte> value = [.. encoding.GetBytes(allowedValue)];
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(value, EntryType.DataItem, encoding, 0, 0);
             Assert.IsFalse(feedbacks.Any());
         }
     
@@ -37,15 +40,18 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         [DataRow("-1-2")]
         [DataRow("-79228162514264337593543950336")]
         [DataRow("79228162514264337593543950336")]
-        public void NotAllowedNumberValue(string value)
+        public void NotAllowedNumberValue(string notAllowedValue)
         {
             DataNumberValidator validator = new();
 
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.NumDataItem, value, 1, 1));
+            Encoding encoding = Encoding.UTF8;
+            List<byte> value = [.. encoding.GetBytes(notAllowedValue)];
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(value, EntryType.DataItem, encoding, 0, 0);
+
         
             Assert.AreEqual(1, feedbacks.Count());
             Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, feedbacks.First().Rule);
-            Assert.AreEqual(value, feedbacks.First().AdditionalInfo);
+            Assert.AreEqual(notAllowedValue, feedbacks.First().AdditionalInfo);
             Assert.AreEqual(ValidationFeedbackLevel.Error, feedbacks.First().Level);
         }
 

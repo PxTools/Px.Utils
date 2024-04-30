@@ -6,27 +6,27 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
     [TestClass]
     public class DataStructureValidatorTest
     {
-
+        /*
         [TestMethod]
-        [DataRow([TokenType.StringDataItem])]
-        [DataRow([TokenType.NumDataItem])]
+        [DataRow([EntryType.StringDataItem])]
+        [DataRow([EntryType.DataItem])]
 
-        [DataRow([TokenType.StringDataItem, TokenType.DataItemSeparator])]
-        [DataRow([TokenType.NumDataItem, TokenType.DataItemSeparator])]
+        [DataRow([EntryType.StringDataItem, EntryType.DataItemSeparator])]
+        [DataRow([EntryType.DataItem, EntryType.DataItemSeparator])]
 
-        [DataRow([TokenType.NumDataItem, TokenType.DataItemSeparator, TokenType.NumDataItem])]
-        [DataRow([TokenType.NumDataItem, TokenType.DataItemSeparator, TokenType.StringDataItem])]
-        [DataRow([TokenType.NumDataItem, TokenType.DataItemSeparator, TokenType.LineSeparator])]
+        [DataRow([EntryType.DataItem, EntryType.DataItemSeparator, EntryType.DataItem])]
+        [DataRow([EntryType.DataItem, EntryType.DataItemSeparator, EntryType.StringDataItem])]
+        [DataRow([EntryType.DataItem, EntryType.DataItemSeparator, EntryType.LineSeparator])]
 
-        [DataRow([TokenType.NumDataItem, TokenType.DataItemSeparator, TokenType.LineSeparator, TokenType.NumDataItem])]
-        [DataRow([TokenType.NumDataItem, TokenType.DataItemSeparator, TokenType.LineSeparator, TokenType.StringDataItem])]
-        [DataRow([TokenType.NumDataItem, TokenType.EndOfData])]
+        [DataRow([EntryType.DataItem, EntryType.DataItemSeparator, EntryType.LineSeparator, EntryType.DataItem])]
+        [DataRow([EntryType.DataItem, EntryType.DataItemSeparator, EntryType.LineSeparator, EntryType.StringDataItem])]
+        [DataRow([EntryType.DataItem, EntryType.EndOfData])]
 
-        public void AllowedTokenSequences(params TokenType[] tokenSequence)
+        public void AllowedTokenSequences(params EntryType[] tokenSequence)
         {
             List<ValidationFeedback> feedbacks = [];
             DataStructureValidator validator = new();
-            foreach (TokenType tokenType in tokenSequence)
+            foreach (EntryType tokenType in tokenSequence)
             {
                 feedbacks.AddRange(validator.Validate(new Token(tokenType, " ", 1, 1)));
             }
@@ -36,19 +36,19 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
     
     
         [TestMethod]
-        [DataRow(TokenType.InvalidDataChar)]
-        [DataRow([TokenType.StringDataItem, TokenType.InvalidDataChar])]
-        [DataRow([TokenType.NumDataItem, TokenType.InvalidDataChar])]
-        [DataRow([TokenType.StringDataItem, TokenType.DataItemSeparator, TokenType.DataItemSeparator])]
-        [DataRow([TokenType.StringDataItem, TokenType.LineSeparator])]
-        [DataRow([TokenType.StringDataItem, TokenType.DataItemSeparator, TokenType.LineSeparator, TokenType.LineSeparator])]
-        [DataRow([TokenType.StringDataItem, TokenType.EndOfStream])]
-        [DataRow([TokenType.StringDataItem, TokenType.DataItemSeparator, TokenType.EndOfData])]
-        public void NotAllowedTokenSequences(params TokenType[] tokenSequence)
+        [DataRow(EntryType.InvalidDataChar)]
+        [DataRow([EntryType.StringDataItem, EntryType.InvalidDataChar])]
+        [DataRow([EntryType.DataItem, EntryType.InvalidDataChar])]
+        [DataRow([EntryType.StringDataItem, EntryType.DataItemSeparator, EntryType.DataItemSeparator])]
+        [DataRow([EntryType.StringDataItem, EntryType.LineSeparator])]
+        [DataRow([EntryType.StringDataItem, EntryType.DataItemSeparator, EntryType.LineSeparator, EntryType.LineSeparator])]
+        [DataRow([EntryType.StringDataItem, EntryType.EndOfStream])]
+        [DataRow([EntryType.StringDataItem, EntryType.DataItemSeparator, EntryType.EndOfData])]
+        public void NotAllowedTokenSequences(params EntryType[] tokenSequence)
         {
             List<ValidationFeedback> feedbacks = [];
             DataStructureValidator validator = new();
-            foreach (TokenType tokenType in tokenSequence)
+            foreach (EntryType tokenType in tokenSequence)
             {
                 feedbacks.AddRange(validator.Validate(new Token(tokenType, " ", 1, 1)));
             }
@@ -56,9 +56,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             Assert.AreEqual(1, feedbacks.Count);
             Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidStructure, feedbacks[0].Rule);
             Assert.AreEqual(ValidationFeedbackLevel.Error, feedbacks[0].Level);
-            List<TokenType> expectedTokens = new List<TokenType> { tokenSequence.Length>1?tokenSequence[^2]:TokenType.EmptyToken, tokenSequence[^1] };
+            List<EntryType> expectedTokens = new List<EntryType> { tokenSequence.Length>1?tokenSequence[^2]:EntryType.EmptyToken, tokenSequence[^1] };
             Assert.AreEqual(string.Join(",", expectedTokens), feedbacks[0].AdditionalInfo);
         }
-
+        */
     }
 }

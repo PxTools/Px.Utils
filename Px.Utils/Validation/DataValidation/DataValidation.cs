@@ -12,7 +12,11 @@ namespace PxUtils.Validation.DataValidation
     {
         private const int StreamBufferSize = 4096;
 
-        private static readonly string[] delimiters = [" ", "t"];
+        private readonly static List<IDataValidator> commonValidators = [];
+        private readonly static List<IDataValidator> dataNumValidators = [];
+        private readonly static List<IDataValidator> dataStringValidators = [];
+        private readonly static List<IDataValidator> dataSeparatorValidators = [];
+
         /// <summary>
         /// Validates the data in the stream according to the specified parameters and returns a collection of validation feedback items.
         /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
@@ -29,37 +33,30 @@ namespace PxUtils.Validation.DataValidation
         public static IEnumerable<ValidationFeedback> Validate(Stream stream, int rowLen, int numOfRows,
             int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null)
         {
-            conf ??= PxFileSyntaxConf.Default;
-
-            List<ValidationFeedback> feedbacks = [];
-            IEnumerable<Token> tokens = Tokenize(stream, conf, streamEncoding);
-
-            List<IDataValidator> validators =
-            [
-                new DataSeparatorValidator(),
-                new DataNumberValidator(),
-                new DataStringValidator(),
-                new DataRowLengthValidator(rowLen),
-                new DataRowCountValidator(numOfRows),
-                new DataStructureValidator()
-            ];
-
-            foreach (Token token in tokens)
+            if (streamEncoding is null)
             {
-                if (token.Type == TokenType.InvalidDataChar)
-                {
-                    feedbacks.Add(new ValidationFeedback(ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.DataValidationFeedbackInvalidChar, token.LineNumber, token.CharPosition,
-                        $"{token.Value}"));
-                    continue;
-                }
-
-                foreach (IDataValidator validator in validators)
-                {
-                    feedbacks.AddRange(validator.Validate(token));
-                }
+                return [new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.NoEncoding, 0, 0) ];
             }
 
+            conf ??= PxFileSyntaxConf.Default;
+            commonValidators.Add(new DataStructureValidator());
+            dataNumValidators.AddRange(commonValidators);
+            dataNumValidators.Add(new DataNumberValidator());
+            dataStringValidators.AddRange(commonValidators);
+            dataStringValidators.Add(new DataStringValidator());
+            dataSeparatorValidators.AddRange(commonValidators);
+            dataSeparatorValidators.Add(new DataSeparatorValidator());
+
+            // TODO: Remove console logs
+            Console.WriteLine($"Starting with parameters: {rowLen} {numOfRows} {startRow} {streamEncoding} {conf}");
+            List<ValidationFeedback> feedbacks = ValidateDataStream(stream, conf, streamEncoding, numOfRows, rowLen);
+
+            // TODO: Remove console logs
+            Console.WriteLine($"Feedbacks: {feedbacks.Count}");
+            foreach (ValidationFeedback feedback in feedbacks)
+            {
+                Console.WriteLine($"{feedback.Rule} - {feedback.AdditionalInfo} - {feedback.Line}/{feedback.Character}");
+            }
             return feedbacks;
         }
 
@@ -83,33 +80,6 @@ namespace PxUtils.Validation.DataValidation
             conf ??= PxFileSyntaxConf.Default;
 
             List<ValidationFeedback> feedbacks = [];
-            IAsyncEnumerable<Token> tokens = TokenizeAsync(stream, conf, streamEncoding, cancellationToken);
-
-            List<IDataValidator> validators =
-            [
-                new DataSeparatorValidator(),
-                new DataNumberValidator(),
-                new DataStringValidator(),
-                new DataRowLengthValidator(rowLen),
-                new DataRowCountValidator(numOfRows),
-                new DataStructureValidator()
-            ];
-
-            await foreach (Token token in tokens)
-            {
-                if (token.Type == TokenType.InvalidDataChar)
-                {
-                    feedbacks.Add(new ValidationFeedback(ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.DataValidationFeedbackInvalidChar, token.LineNumber, token.CharPosition,
-                        $"{token.Value}"));
-                    continue;
-                }
-
-                foreach (IDataValidator validator in validators)
-                {
-                    feedbacks.AddRange(validator.Validate(token));
-                }
-            }
 
             return feedbacks;
         }
@@ -125,7 +95,7 @@ namespace PxUtils.Validation.DataValidation
         /// <returns>
         /// An <see cref="IAsyncEnumerable{T}"/> of <see cref="Token"/> representing the tokens in the data.
         /// </returns>
-        public static async IAsyncEnumerable<Token> TokenizeAsync(Stream stream, PxFileSyntaxConf conf,
+        public static async Task TokenizeAsync(Stream stream, PxFileSyntaxConf conf,
             Encoding? streamEncoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             int charPosition = 0;
@@ -136,7 +106,6 @@ namespace PxUtils.Validation.DataValidation
             int readStartIndex = 0;
             int leftOver = 0;
             int charsRead = 0;
-            Token? token;
             do
             {
                 charsRead = await reader.ReadAsync(buffer.AsMemory(readStartIndex), cancellationToken);
@@ -144,13 +113,13 @@ namespace PxUtils.Validation.DataValidation
 
                 for (int currentPos = 0; currentPos < currentBufferSize - 1; )
                 {
-                    token = GetToken(ref buffer, ref currentPos, ref tokenStartIndex, 
+                    /*token = GetToken(ref buffer, ref currentPos, ref tokenStartIndex, 
                         currentBufferSize -1 , ref lineNumber, ref charPosition,
                         out leftOver, conf);
                     if (token != null)
                     {
                         yield return (Token)token;
-                    }
+                    }*/
                 }
 
                 if (leftOver != 0)
@@ -169,7 +138,6 @@ namespace PxUtils.Validation.DataValidation
                 }
             } while (charsRead > 0);
 
-            yield return new Token(TokenType.EndOfStream, "", lineNumber, charPosition);
         }
 
 
@@ -181,202 +149,103 @@ namespace PxUtils.Validation.DataValidation
         /// <param name="conf">The syntax configuration for the PX file.</param>
         /// <param name="streamEncoding">The encoding of the stream. Set to null if the default encoding should be used.</param>
         /// <returns>A collection of Token objects representing the tokens in the data stream.</returns>
-        public static IEnumerable<Token> Tokenize(Stream stream, PxFileSyntaxConf conf, Encoding? streamEncoding)
+        public static List<ValidationFeedback> ValidateDataStream(Stream stream, PxFileSyntaxConf conf, Encoding streamEncoding, int expectedRows, int expectedRowLength)
         {
+            EntryType currentEntryType = EntryType.Unknown;
+            List<byte> currentEntry = new(StreamBufferSize);
+            List<ValidationFeedback> feedbacks = new(StreamBufferSize);
             int charPosition = 0;
             int lineNumber = 1;
-            int tokenStartIndex = 0;
-            using StreamReader reader = new(stream, streamEncoding, false, StreamBufferSize, true);
-            char[] buffer = new char[StreamBufferSize];
-            int readStartIndex = 0;
-            int leftOver = 0;
-            int charsRead = 0;
-            Token? token;
-            do
+            byte[] buffer = new byte[StreamBufferSize];
+            int bytesRead;
+            long currentRowLength = 0;
+            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
             {
-                charsRead = reader.Read(buffer.AsSpan(readStartIndex));
-                
-                int currentBufferSize = charsRead + readStartIndex;
-
-                for (int currentPos = 0; currentPos < currentBufferSize - 1; )
+                for (int i = 0; i < bytesRead; i++)
                 {
-                    token = GetToken(ref buffer, ref currentPos, ref tokenStartIndex, 
-                        currentBufferSize -1 , ref lineNumber, ref charPosition,
-                        out leftOver, conf);
-                    if (token != null)
+                    byte currentByte = buffer[i];
+                    EntryType currentType = currentByte switch
                     {
-                        yield return (Token)token;
-                    }
-                }
-
-                if (leftOver != 0)
-                {
-                    readStartIndex = 0;
-                    for (int i = tokenStartIndex; i < currentBufferSize; i++)
+                        >= 0x22 => EntryType.DataItem,
+                        0x20 or 0x09 => EntryType.DataItemSeparator,
+                        0x0A or 0x0D => EntryType.LineSeparator,
+                        _ => EntryType.Unknown
+                    };
+                    if (currentType != currentEntryType)
                     {
-                        buffer[i - tokenStartIndex] = buffer[i];
-                        readStartIndex++;
-                    }
-                }
-                else
-                {
-                    buffer[0] = buffer[currentBufferSize - 1];
-                    readStartIndex = 1;
-                }
-            } while (charsRead > 0);
+                        if (currentEntryType == EntryType.Unknown && 
+                            (lineNumber > 1 || charPosition > 0))
+                        {
+                            feedbacks.Add(
+                                new(ValidationFeedbackLevel.Error,
+                                ValidationFeedbackRule.DataValidationFeedbackInvalidChar,
+                                lineNumber,
+                                charPosition));
+                        }
+                        else
+                        {
+                            List<IDataValidator> validators = currentEntryType switch
+                            {
+                                EntryType.DataItemSeparator => dataSeparatorValidators,
+                                EntryType.DataItem => currentEntry[0] is 0x22 ? dataStringValidators : dataNumValidators,
+                                _ => commonValidators
+                            };
 
-            yield return new Token(TokenType.EndOfStream, "", lineNumber, charPosition);
-        }
+                            foreach (IDataValidator validator in validators)
+                            {
+                                feedbacks.AddRange(validator.Validate(currentEntry, currentEntryType, streamEncoding, lineNumber, charPosition));
+                            }
 
-
-        private static Token? GetToken(ref char[] buffer, ref int currentPos, ref int tokenStartIndex, int bufLen, 
-            ref int lineNumber, ref int charPosition, out int leftOver, PxFileSyntaxConf conf)
-        {
-            leftOver = 0;
-            charPosition++;
-            tokenStartIndex = currentPos;
-            char currentCharacter = buffer[currentPos];
-            if (currentCharacter is ' ')
-            {
-                currentPos++;
-                return new Token(TokenType.DataItemSeparator, delimiters[0], lineNumber,
-                    charPosition);
-            } 
-            if (currentCharacter is '\t')
-            {
-                currentPos++;
-                return new Token(TokenType.DataItemSeparator, delimiters[1], lineNumber,
-                    charPosition);
-            } 
-            if (currentCharacter is '\n' or '\r')
-            {
-                int nextCharacter = buffer[currentPos + 1];
-
-                string separator = currentCharacter.ToString();
-                if (nextCharacter is '\n' or '\r')
-                {
-                    separator += (char)nextCharacter;
-                    currentPos++;
-                    leftOver = currentPos;
-                    tokenStartIndex = currentPos +1 ;
-                }
-
-                currentPos++;
-                Token token = new(TokenType.LineSeparator, separator, lineNumber++, charPosition);
-                charPosition = 0;
-                return token;
-            }
-            if (currentCharacter == conf.Symbols.EntrySeparator)
-            {
-                currentPos++;
-                return new Token(TokenType.EndOfData, currentCharacter.ToString(), lineNumber, charPosition);
-            }
-            if (IsValidDataValueCharacter(currentCharacter))
-            {
-                tokenStartIndex = currentPos;
-
-                while (currentPos < bufLen  && IsValidDataValueCharacter(buffer[currentPos + 1]))
-                {
-                    currentPos++; 
-                }
-
-                if (currentPos == bufLen  )
-                {
-                    leftOver = tokenStartIndex;
-                    charPosition--;
-                    return null;
-                }
-                char nextCharacter = buffer[currentPos + 1];               
-                if (nextCharacter is ' ' or '\t' || nextCharacter == conf.Symbols.EntrySeparator)
-                {
-                    TokenType tokenType = TokenType.NumDataItem;
-                    if (buffer[tokenStartIndex] == '\"')
-                    {
-                        tokenType = TokenType.StringDataItem;
+                            if (currentType != EntryType.DataItemSeparator)
+                            {
+                                if (currentType == EntryType.DataItem)
+                                {
+                                    currentRowLength++;
+                                }
+                                else if (currentType == EntryType.LineSeparator)
+                                {
+                                    if (currentRowLength != expectedRowLength)
+                                    {
+                                        feedbacks.Add(new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength, lineNumber, charPosition));
+                                    }
+                                    lineNumber++;
+                                    currentRowLength = 0;
+                                    charPosition = 0;
+                                }
+                            }
+                        }
+                        
+                        currentEntryType = currentType;
+                        currentEntry.Clear();
                     }
 
-                    Token token = new(tokenType, StringFrom(buffer, tokenStartIndex, currentPos), lineNumber,
-                        charPosition);
-                    charPosition += (currentPos - tokenStartIndex );
-                    currentPos++;
-                    tokenStartIndex = currentPos;
-                    return token;
-                }
-                else
-                {
-                    Token token = new(TokenType.InvalidDataChar, currentCharacter.ToString(), lineNumber,
-                        charPosition);
-                    tokenStartIndex = currentPos;
-                    currentPos++;
-                    return token;
-                    
+                    currentEntry.Add(currentByte);
+                    charPosition++;
                 }
             }
-            else
+
+            if (expectedRows != lineNumber - 1)
             {
-                Token token = new(TokenType.InvalidDataChar, currentCharacter.ToString(), lineNumber,
-                    charPosition);
-                tokenStartIndex = currentPos;
-                currentPos++;
-                return token;
+                feedbacks.Add(new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidRowCount, lineNumber, charPosition));
             }
-            
-        }
 
-        private static string StringFrom(char[] buffer, int startIndex, int currentPosition)
-        {
-            int length = currentPosition - startIndex + 1;
-            var context = new { Buf=buffer, Start = startIndex, Length=length};
-            return string.Create(length, context, (chars, context) =>
-            {
-                Span<char> sp = context.Buf.AsSpan(context.Start, context.Length);
-                sp.CopyTo(chars);
-            });
+            return feedbacks;
         }
-
-        private static bool IsValidDataValueCharacter(char currentCharacter)
-        {
-            //  allowed characters '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '.', '"'
-            return currentCharacter is >= '0' and <= '9' or '-' or '.' or '"';
-        }
-        
     }
 
     /// <summary>
     /// Represents the different types of tokens used in data validation.
     /// </summary>
-    public enum TokenType
+    public enum EntryType
     {
-        EmptyToken,
-        InvalidDataChar,
-        NumDataItem,
-        StringDataItem,
+        DataItem,
         DataItemSeparator,
         LineSeparator,
-        EndOfData,
-        EndOfStream
-    }
-
-    /// <summary>
-    /// Represents a token of a specific type in data validation.
-    /// </summary>
-    public readonly struct Token(TokenType type, string value, int lineNumber, int charPosition)
-    {
-        public TokenType Type { get; } = type;
-        public string Value { get; } = value;
-        public int LineNumber { get; } = lineNumber;
-        public int CharPosition { get; } = charPosition;
-
-        [ExcludeFromCodeCoverage]
-        public override string ToString()
-        {
-            return $"token: {Type}, value: {Value}, line: {LineNumber}, pos: {CharPosition}";
-        }
+        Unknown
     }
 
     internal interface IDataValidator
     {
-        internal IEnumerable<ValidationFeedback> Validate(Token token);
+        internal IEnumerable<ValidationFeedback> Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos);
     }
-
 }

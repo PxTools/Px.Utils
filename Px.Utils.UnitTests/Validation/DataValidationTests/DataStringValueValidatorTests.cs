@@ -1,5 +1,6 @@
 ﻿using PxUtils.Validation;
 using PxUtils.Validation.DataValidation;
+using System.Text;
 
 namespace Px.Utils.UnitTests.Validation.DataValidationTests
 {
@@ -18,7 +19,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         public void AllowedStrings(string allowedValue)
         {
             DataStringValidator validator = new();
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.StringDataItem, allowedValue, 1, 1));
+            Encoding encoding = Encoding.UTF8;
+            List<byte> value = [.. encoding.GetBytes(allowedValue)];
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(value, EntryType.StringDataItem, encoding, 0, 0);
             Assert.IsFalse(feedbacks.Any());
         }
     
@@ -27,8 +30,11 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             DataStringValidator validator = new();
 
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(TokenType.StringDataItem, "X", 1, 1));
-        
+            Encoding encoding = Encoding.UTF8;
+            List<byte> value = [.. encoding.GetBytes("X")];
+
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(value, EntryType.StringDataItem, encoding, 0, 0);
+
             Assert.AreEqual(1, feedbacks.Count());
             Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidString, feedbacks.First().Rule);
             Assert.AreEqual("X", feedbacks.First().AdditionalInfo);

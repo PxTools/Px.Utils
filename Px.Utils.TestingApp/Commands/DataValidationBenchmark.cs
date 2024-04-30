@@ -1,7 +1,8 @@
 ﻿using PxUtils.PxFile;
 using PxUtils.PxFile.Data;
 using PxUtils.Validation.DataValidation;
-using PxUtils.Validation;
+using PxUtils.PxFile.Metadata;
+using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
@@ -25,17 +26,21 @@ namespace Px.Utils.TestingApp.Commands
         private long start = 0;
         private const string dataKeyword = "DATA";
 
+        private Encoding encoding;
+
         internal DataValidationBenchmark()
         {
-            BenchmarkFunctions = [ValidateDataBenchmarks, ValidateDataTokenBenchmarks];
-            BenchmarkFunctionsAsync = [ValidateDataAsyncBenchmarks, ValidateDataTokenAsyncBenchmarks];
+            BenchmarkFunctions = [ValidateDataBenchmarks];
+            // BenchmarkFunctionsAsync = [ValidateDataAsyncBenchmarks, ValidateDataTokenAsyncBenchmarks];
             ParameterFlags.Add(expectedRowsFlags);
             ParameterFlags.Add(expectedColsFlags);
+            encoding = Encoding.UTF8;
         }
 
         protected override void OneTimeBenchmarkSetup()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
+            encoding = PxFileMetadataReader.GetEncoding(stream);
             start = StreamUtilities.FindKeywordPosition(stream, dataKeyword, PxFileSyntaxConf.Default);
             if (start == -1)
             {
@@ -47,10 +52,10 @@ namespace Px.Utils.TestingApp.Commands
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             stream.Position = start + dataKeyword.Length + 1 + 2; // +1 to skip the '='
-            DataValidation.Validate(stream, expectedCols, expectedRows, 0, null);
+            DataValidation.Validate(stream, expectedCols, expectedRows, 0, encoding);
         }
         
-        private async Task ValidateDataTokenAsyncBenchmarks()
+       /* private async Task ValidateDataTokenAsyncBenchmarks()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             
@@ -63,21 +68,7 @@ namespace Px.Utils.TestingApp.Commands
             {
                 j++;
             }
-        }
-        private void ValidateDataTokenBenchmarks()
-        {
-            using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            stream.Position = start + dataKeyword.Length + 1 + 2; // +1 to skip the '='
-
-
-            IEnumerable<Token> tokens = DataValidation.Tokenize(stream, PxFileSyntaxConf.Default,null);
-                
-            int j = 0;
-            foreach (Token token in tokens)
-            {
-                j++;
-            }
-        }
+        }*/
         
         private async Task ValidateDataAsyncBenchmarks()
         {
@@ -94,10 +85,10 @@ namespace Px.Utils.TestingApp.Commands
             Dictionary<string, List<string>> parameters = GroupParameters(Inputs ?? [], ParameterFlags.SelectMany(x => x).ToList());
             foreach (string key in parameters.Keys)
             {
-                if ((expectedColsFlags.Contains(key) && !int.TryParse(parameters[key][0], out expectedCols)) && 
+                if ((expectedColsFlags.Contains(key) && !int.TryParse(parameters[key][0], out expectedCols)) &&
                     (expectedRowsFlags.Contains(key) && !int.TryParse(parameters[key][0], out expectedRows)))
                 {
-                    throw new ArgumentException($"Invalid argument {key} {string.Join(' ', parameters[key])}");
+                        throw new ArgumentException($"Invalid argument {key} {string.Join(' ', parameters[key])}");
                 }
             }
         }

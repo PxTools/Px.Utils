@@ -10,41 +10,6 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
     [TestClass]
     public class DataValidationTest
     {
-
-        [TestMethod]
-        public void Tokenize()
-        {
-            using MemoryStream stream = new(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_VALID_DATA));
-            stream.Seek(6,0);
-        
-            IEnumerable<Token> tokens = DataValidation.Tokenize(stream, PxFileSyntaxConf.Default, Encoding.UTF8);
-
-            int i = 0;
-            foreach (Token token in tokens)
-            {
-                Logger.LogMessage($"token: {token.Type}, value: {token.Value}, line: {token.LineNumber}, pos: {token.CharPosition}");
-                Assert.AreEqual(DataStreamContents.EXPECTED_SIMPLE_VALID_DATA_TOKENS[i++], token);
-            }
-            Assert.AreEqual(DataStreamContents.EXPECTED_SIMPLE_VALID_DATA_TOKENS.Length, i);
-        }
-
-        
-        [TestMethod]
-        public async Task TokenizeAsync()
-        {
-            await using MemoryStream stream = new(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_VALID_DATA));
-            stream.Seek(6,0);
-        
-            IAsyncEnumerable<Token> tokens = DataValidation.TokenizeAsync(stream, PxFileSyntaxConf.Default, Encoding.UTF8);
-
-            int i = 0;
-            await foreach (Token token in tokens)
-            {
-                Logger.LogMessage($"token: {token.Type}, value: {token.Value}, line: {token.LineNumber}, pos: {token.CharPosition}");
-                Assert.AreEqual(DataStreamContents.EXPECTED_SIMPLE_VALID_DATA_TOKENS[i++], token);
-            }
-        }
-    
         [TestMethod]
         public void TestValidateWithoutErrors()
         {
@@ -80,6 +45,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             Assert.AreEqual(0, validationFeedbacks.Count());
 
         }
+
         [TestMethod]
         public void TestValidateWithErrors()
         {
