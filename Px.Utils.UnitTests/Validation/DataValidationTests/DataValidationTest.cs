@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
-using Microsoft.Win32.SafeHandles;
 using Px.Utils.UnitTests.Validation.Fixtures;
 using PxUtils.PxFile;
 using PxUtils.Validation;
@@ -26,8 +25,10 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                 Logger.LogMessage($"token: {token.Type}, value: {token.Value}, line: {token.LineNumber}, pos: {token.CharPosition}");
                 Assert.AreEqual(DataStreamContents.EXPECTED_SIMPLE_VALID_DATA_TOKENS[i++], token);
             }
+            Assert.AreEqual(DataStreamContents.EXPECTED_SIMPLE_VALID_DATA_TOKENS.Length, i);
         }
 
+        
         [TestMethod]
         public async Task TokenizeAsync()
         {
@@ -53,13 +54,13 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             IEnumerable<ValidationFeedback> validationFeedbacks =
                 DataValidation.Validate(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
 
-
-            Assert.AreEqual(0, validationFeedbacks.Count());
             foreach (ValidationFeedback validationFeedback in validationFeedbacks)
             {
                 Logger.LogMessage($"Line {validationFeedback.Line}, Char {validationFeedback.Character}: " 
                                   + $"{validationFeedback.Rule} {validationFeedback.AdditionalInfo}");
             }
+            Assert.AreEqual(0, validationFeedbacks.Count());
+
         }
 
         [TestMethod]
@@ -89,12 +90,12 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                 DataValidation.Validate(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
 
 
-            Assert.AreEqual(10, validationFeedbacks.Count());
             foreach (ValidationFeedback validationFeedback in validationFeedbacks)
             {
                 Logger.LogMessage($"Line {validationFeedback.Line}, Char {validationFeedback.Character}: " 
                                   + $"{validationFeedback.Rule} {validationFeedback.AdditionalInfo}");
             }
+            Assert.AreEqual(12, validationFeedbacks.Count());
         }
 
         [TestMethod]
@@ -112,9 +113,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                                   + $"{validationFeedback.Rule} {validationFeedback.AdditionalInfo}");
             }
 
-            Assert.AreEqual(10, validationFeedbacks.Count());
+            Assert.AreEqual(12, validationFeedbacks.Count());
         }
-    
-
     }
 }

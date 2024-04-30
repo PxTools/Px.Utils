@@ -10,12 +10,12 @@ namespace PxUtils.Validation.DataValidation
     /// </summary>
     public static class DataValidation
     {
-        private static readonly char[] ValidDataCharacters =
-            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '.', '"'];
+        private const int StreamBufferSize = 4096;
 
+        private static readonly string[] delimiters = [" ", "t"];
         /// <summary>
         /// Validates the data in the stream according to the specified parameters and returns a collection of validation feedback items.
-        /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword).
+        /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
         /// </summary>
         /// <param name="stream">The stream containing the data to be validated.</param>
         /// <param name="rowLen">The expected length of each row in the data.</param>
@@ -65,6 +65,7 @@ namespace PxUtils.Validation.DataValidation
 
         /// <summary>
         /// Validates the data in the specified stream asynchronously.
+        /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
         /// </summary>
         /// <param name="stream">The stream containing the data to validate.</param>
         /// <param name="rowLen">The expected length of each row in the data.</param>
@@ -114,159 +115,231 @@ namespace PxUtils.Validation.DataValidation
         }
 
         /// <summary>
-        /// Tokenizes the given stream according to the specified configuration and encoding.
+        /// Asynchronously tokenizes the data in the stream according to the specified parameters and yields the tokens.
+        /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
         /// </summary>
-        /// <param name="stream">The stream to tokenize.</param>
-        /// <param name="conf">The configuration for tokenizing the stream.</param>
-        /// <param name="streamEncoding">The encoding of the stream. It can be null for the default encoding.</param>
-        /// <returns>An enumerable collection of tokens.</returns>
-        public static IEnumerable<Token> Tokenize(Stream stream, PxFileSyntaxConf conf, Encoding? streamEncoding)
-        {
-            const int streamBufferSize = 1024;
-            int charPosition = 0;
-            int lineNumber = 1;
-            using StreamReader reader = new(stream, streamEncoding, false, streamBufferSize, true);
-            StringBuilder valueBuilder = new();
-
-            while (!reader.EndOfStream)
-            {
-                char currentCharacter = (char)reader.Read();
-                int nextCharacter = reader.EndOfStream ? conf.Symbols.EndOfStream : reader.Peek();
-
-                Token? token = GetToken(currentCharacter, nextCharacter, ref lineNumber, ref charPosition, out bool skipNext,
-                    conf, ref valueBuilder);
-                if (skipNext)
-                {
-                    reader.Read();
-                }
-
-                if (token != null)
-                {
-                    yield return (Token)token;
-                }
-            }
-            yield return new Token(TokenType.EndOfStream, valueBuilder.ToString(), lineNumber, charPosition);
-        }
-
-
-        /// <summary>
-        /// Tokenizes a stream asynchronously.
-        /// </summary>
-        /// <param name="stream">The stream to tokenize.</param>
-        /// <param name="conf">The configuration for tokenization.</param>
-        /// <param name="streamEncoding">The encoding of the stream.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>An asynchronous enumerable of tokens.</returns>
+        /// <param name="stream">The stream containing the data to be tokenized.</param>
+        /// <param name="conf">The syntax configuration for the PX file. Set to null to use the default configuration.</param>
+        /// <param name="streamEncoding">The encoding of the stream. Set to null if the default encoding should be used.</param>
+        /// <param name="cancellationToken">The cancellation token to cancel tokenization.</param>
+        /// <returns>
+        /// An <see cref="IAsyncEnumerable{T}"/> of <see cref="Token"/> representing the tokens in the data.
+        /// </returns>
         public static async IAsyncEnumerable<Token> TokenizeAsync(Stream stream, PxFileSyntaxConf conf,
             Encoding? streamEncoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            const int streamBufferSize = 1024;
             int charPosition = 0;
             int lineNumber = 1;
-            using StreamReader reader = new(stream, streamEncoding, false, streamBufferSize, true);
-            StringBuilder valueBuilder = new();
-            char[] buffer = new char[streamBufferSize];
+            int tokenStartIndex = 0;
+            using StreamReader reader = new(stream, streamEncoding, false, StreamBufferSize, true);
+            char[] buffer = new char[StreamBufferSize];
             int readStartIndex = 0;
-
+            int leftOver = 0;
             int charsRead = 0;
-            bool ignoreNext = false;
             Token? token;
             do
             {
                 charsRead = await reader.ReadAsync(buffer.AsMemory(readStartIndex), cancellationToken);
+                int currentBufferSize = charsRead + readStartIndex;
 
-                for (int currentPos = 0; currentPos < charsRead - 1 + readStartIndex; currentPos++)
+                for (int currentPos = 0; currentPos < currentBufferSize - 1; )
                 {
-                    if (ignoreNext)
-                    {
-                        ignoreNext = false;
-                        continue;
-                    }
-                    char currentCharacter = buffer[currentPos];
-                    char nextCharacter = buffer[currentPos + 1];
-
-                    token = GetToken(currentCharacter, nextCharacter, ref lineNumber, ref charPosition,
-                        out bool skipNext,
-                        conf, ref valueBuilder);
-                    ignoreNext = skipNext;
+                    token = GetToken(ref buffer, ref currentPos, ref tokenStartIndex, 
+                        currentBufferSize -1 , ref lineNumber, ref charPosition,
+                        out leftOver, conf);
                     if (token != null)
                     {
                         yield return (Token)token;
                     }
                 }
-                buffer[0] = buffer[charsRead - 1 + readStartIndex];
-                readStartIndex = 1;
 
+                if (leftOver != 0)
+                {
+                    readStartIndex = 0;
+                    for (int i = tokenStartIndex; i < currentBufferSize; i++)
+                    {
+                        buffer[i - tokenStartIndex] = buffer[i];
+                        readStartIndex++;
+                    }
+                }
+                else
+                {
+                    buffer[0] = buffer[currentBufferSize - 1];
+                    readStartIndex = 1;
+                }
             } while (charsRead > 0);
 
-            if (!ignoreNext)
-            {
-                token = GetToken(buffer[0], 0, ref lineNumber, ref charPosition, out _, conf, ref valueBuilder);
-
-                if (token != null)
-                {
-                    yield return (Token)token;
-                }
-            }
-
-            yield return new Token(TokenType.EndOfStream, valueBuilder.ToString(), lineNumber, charPosition);
+            yield return new Token(TokenType.EndOfStream, "", lineNumber, charPosition);
         }
 
 
-        private static Token? GetToken(char currentCharacter, int nextCharacter, ref int lineNumber,
-            ref int charPosition, out bool skipNext, PxFileSyntaxConf conf, ref StringBuilder valueBuilder)
+        /// <summary>
+        /// Tokenizes the data in the stream and returns a collection of tokens.
+        /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
+        /// </summary>
+        /// <param name="stream">The stream containing the data to be tokenized.</param>
+        /// <param name="conf">The syntax configuration for the PX file.</param>
+        /// <param name="streamEncoding">The encoding of the stream. Set to null if the default encoding should be used.</param>
+        /// <returns>A collection of Token objects representing the tokens in the data stream.</returns>
+        public static IEnumerable<Token> Tokenize(Stream stream, PxFileSyntaxConf conf, Encoding? streamEncoding)
         {
-            skipNext = false;
-            charPosition++;
-            if (currentCharacter is ' ' or '\t')
+            int charPosition = 0;
+            int lineNumber = 1;
+            int tokenStartIndex = 0;
+            using StreamReader reader = new(stream, streamEncoding, false, StreamBufferSize, true);
+            char[] buffer = new char[StreamBufferSize];
+            int readStartIndex = 0;
+            int leftOver = 0;
+            int charsRead = 0;
+            Token? token;
+            do
             {
-                return new Token(TokenType.DataItemSeparator, currentCharacter.ToString(), lineNumber,
+                charsRead = reader.Read(buffer.AsSpan(readStartIndex));
+                
+                int currentBufferSize = charsRead + readStartIndex;
+
+                for (int currentPos = 0; currentPos < currentBufferSize - 1; )
+                {
+                    token = GetToken(ref buffer, ref currentPos, ref tokenStartIndex, 
+                        currentBufferSize -1 , ref lineNumber, ref charPosition,
+                        out leftOver, conf);
+                    if (token != null)
+                    {
+                        yield return (Token)token;
+                    }
+                }
+
+                if (leftOver != 0)
+                {
+                    readStartIndex = 0;
+                    for (int i = tokenStartIndex; i < currentBufferSize; i++)
+                    {
+                        buffer[i - tokenStartIndex] = buffer[i];
+                        readStartIndex++;
+                    }
+                }
+                else
+                {
+                    buffer[0] = buffer[currentBufferSize - 1];
+                    readStartIndex = 1;
+                }
+            } while (charsRead > 0);
+
+            yield return new Token(TokenType.EndOfStream, "", lineNumber, charPosition);
+        }
+
+
+        private static Token? GetToken(ref char[] buffer, ref int currentPos, ref int tokenStartIndex, int bufLen, 
+            ref int lineNumber, ref int charPosition, out int leftOver, PxFileSyntaxConf conf)
+        {
+            leftOver = 0;
+            charPosition++;
+            tokenStartIndex = currentPos;
+            char currentCharacter = buffer[currentPos];
+            if (currentCharacter is ' ')
+            {
+                currentPos++;
+                return new Token(TokenType.DataItemSeparator, delimiters[0], lineNumber,
+                    charPosition);
+            } 
+            if (currentCharacter is '\t')
+            {
+                currentPos++;
+                return new Token(TokenType.DataItemSeparator, delimiters[1], lineNumber,
                     charPosition);
             } 
             if (currentCharacter is '\n' or '\r')
             {
+                int nextCharacter = buffer[currentPos + 1];
+
                 string separator = currentCharacter.ToString();
                 if (nextCharacter is '\n' or '\r')
                 {
                     separator += (char)nextCharacter;
-                    skipNext = true;
+                    currentPos++;
+                    leftOver = currentPos;
+                    tokenStartIndex = currentPos +1 ;
                 }
 
+                currentPos++;
                 Token token = new(TokenType.LineSeparator, separator, lineNumber++, charPosition);
                 charPosition = 0;
                 return token;
             }
             if (currentCharacter == conf.Symbols.EntrySeparator)
             {
+                currentPos++;
                 return new Token(TokenType.EndOfData, currentCharacter.ToString(), lineNumber, charPosition);
             }
-            if (ValidDataCharacters.Contains(currentCharacter))
+            if (IsValidDataValueCharacter(currentCharacter))
             {
-                valueBuilder.Append(currentCharacter);
+                tokenStartIndex = currentPos;
+
+                while (currentPos < bufLen  && IsValidDataValueCharacter(buffer[currentPos + 1]))
+                {
+                    currentPos++; 
+                }
+
+                if (currentPos == bufLen  )
+                {
+                    leftOver = tokenStartIndex;
+                    charPosition--;
+                    return null;
+                }
+                char nextCharacter = buffer[currentPos + 1];               
                 if (nextCharacter is ' ' or '\t' || nextCharacter == conf.Symbols.EntrySeparator)
                 {
                     TokenType tokenType = TokenType.NumDataItem;
-                    if (valueBuilder[0] == '\"')
+                    if (buffer[tokenStartIndex] == '\"')
                     {
                         tokenType = TokenType.StringDataItem;
                     }
 
-                    Token token = new(tokenType, valueBuilder.ToString(), lineNumber,
-                        charPosition - valueBuilder.Length + 1);
-                    valueBuilder.Clear();
+                    Token token = new(tokenType, StringFrom(buffer, tokenStartIndex, currentPos), lineNumber,
+                        charPosition);
+                    charPosition += (currentPos - tokenStartIndex );
+                    currentPos++;
+                    tokenStartIndex = currentPos;
                     return token;
+                }
+                else
+                {
+                    Token token = new(TokenType.InvalidDataChar, currentCharacter.ToString(), lineNumber,
+                        charPosition);
+                    tokenStartIndex = currentPos;
+                    currentPos++;
+                    return token;
+                    
                 }
             }
             else
             {
                 Token token = new(TokenType.InvalidDataChar, currentCharacter.ToString(), lineNumber,
                     charPosition);
-                valueBuilder.Clear();
+                tokenStartIndex = currentPos;
+                currentPos++;
                 return token;
             }
             
-            return null;
         }
+
+        private static string StringFrom(char[] buffer, int startIndex, int currentPosition)
+        {
+            int length = currentPosition - startIndex + 1;
+            var context = new { Buf=buffer, Start = startIndex, Length=length};
+            return string.Create(length, context, (chars, context) =>
+            {
+                Span<char> sp = context.Buf.AsSpan(context.Start, context.Length);
+                sp.CopyTo(chars);
+            });
+        }
+
+        private static bool IsValidDataValueCharacter(char currentCharacter)
+        {
+            //  allowed characters '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '.', '"'
+            return currentCharacter is >= '0' and <= '9' or '-' or '.' or '"';
+        }
+        
     }
 
     /// <summary>

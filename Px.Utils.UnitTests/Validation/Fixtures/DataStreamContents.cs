@@ -9,7 +9,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
             "1 2 3 4 5 \r\n" +
             "6 7 8 9 10 \n\r" +
             "\".\" \"..\" \"...\" \"....\" \".....\" \r"+
-            "\"......\" \"-\" -1 1.2 -1.3; \n";
+            "\"......\" \"-\" -1 1.2 -1.3; \r\n";
 
         internal static string  SIMPLE_INVALID_DATA =>
             "DATA=\n"+
@@ -64,7 +64,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
             new Token(TokenType.NumDataItem, "-1.3", 4, 21),
             new Token(TokenType.EndOfData, ";", 4, 25),
             new Token(TokenType.DataItemSeparator, " ", 4, 26),
-            new Token(TokenType.LineSeparator, "\n", 4, 27),
+            new Token(TokenType.LineSeparator, "\r\n", 4, 27),
             new Token(TokenType.EndOfStream, "", 5, 0)    
             
         ];
