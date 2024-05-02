@@ -16,6 +16,8 @@ namespace ModelBuilderTests
         private MatrixMetadata Actual_1Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_1_Language.Entries);
         private MatrixMetadata Actual_Recommended_3Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Recommended_3_Langs.Entries);
 
+        private const char _stringDelimeter = '"';
+
         [TestMethod]
         public void MultiLangTableLevelMetaLanguageTests()
         {
@@ -300,11 +302,10 @@ namespace ModelBuilderTests
         {
             IDimension? building_type_dim = Actual_3Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
             Assert.IsNotNull(building_type_dim);
-            IReadOnlyDimensionValue? defaultValue = building_type_dim.DefaultValue;
+            MultilanguageString defaultValue = building_type_dim.AdditionalProperties["ELIMINATION"].ValueAsMultilanguageString(_stringDelimeter, "fi");
             Assert.IsNotNull(defaultValue);
-            Assert.AreEqual("0", defaultValue.Code);
             MultilanguageString expected = new([new("fi", "Talotyypit yhteensä"), new("sv", "Hustyp totalt"), new("en", "Building types total")]);
-            Assert.AreEqual(expected, defaultValue.Name);
+            Assert.AreEqual(expected, defaultValue);
         }
 
         [TestMethod]
@@ -312,11 +313,10 @@ namespace ModelBuilderTests
         {
             IDimension? building_type_dim = Actual_1Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
             Assert.IsNotNull(building_type_dim);
-            IReadOnlyDimensionValue? defaultValue = building_type_dim.DefaultValue;
+            string defaultValue = building_type_dim.AdditionalProperties["ELIMINATION"].ValueAsString(_stringDelimeter);
             Assert.IsNotNull(defaultValue);
-            Assert.AreEqual("0", defaultValue.Code);
-            MultilanguageString expected = new("fi", "Talotyypit yhteensä");
-            Assert.AreEqual(expected, defaultValue.Name);
+            string expected = "Talotyypit yhteensä";
+            Assert.AreEqual(expected, defaultValue);
         }
 
         [TestMethod]

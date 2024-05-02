@@ -11,13 +11,11 @@ namespace PxUtils.Models.Metadata.Dimensions
     /// <param name="name">Multilanguage name of the dimension</param>
     /// <param name="additionalProperties">Properties of the dimension, excluding the required properties</param>
     /// <param name="values">Ordered list of dimension values that define the structure of the dimension</param>
-    /// <param name="defaultValue">Default value of the dimension, this property is optional</param>
     public class ContentDimension(
         string code,
         MultilanguageString name,
         Dictionary<string, MetaProperty> additionalProperties,
-        List<ContentDimensionValue> values,
-        ContentDimensionValue? defaultValue = null
+        List<ContentDimensionValue> values
         ) : IDimension
     {
         /// <summary>
@@ -45,18 +43,7 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// </summary>
         public IReadOnlyList<ContentDimensionValue> Values { get; } = values;
 
-        /// <summary>
-        /// The default value of the dimension, this property is optional.
-        /// </summary>
-        public ContentDimensionValue? DefaultValue { get; set; } = defaultValue;
-
         #region Interface implementations
-
-        DimensionValue? IDimension.DefaultValue
-        {
-            get => DefaultValue;
-            set => DefaultValue = value as ContentDimensionValue;
-        }
 
         MultilanguageString IReadOnlyDimension.Name => Name;
 
@@ -65,8 +52,6 @@ namespace PxUtils.Models.Metadata.Dimensions
         IReadOnlyList<DimensionValue> IDimension.Values => Values;
 
         IReadOnlyDictionary<string, MetaProperty> IReadOnlyDimension.AdditionalProperties => AdditionalProperties;
-
-        IReadOnlyDimensionValue? IReadOnlyDimension.DefaultValue => DefaultValue;
 
         IReadOnlyList<string> IDimensionMap.ValueCodes => _valueCodes;
 
@@ -78,7 +63,7 @@ namespace PxUtils.Models.Metadata.Dimensions
                 else throw new ArgumentException($"Value with code {code} not found in dimension");
             }).ToList();
 
-            return new ContentDimension(Code, Name, AdditionalProperties, newValues, DefaultValue);
+            return new ContentDimension(Code, Name, AdditionalProperties, newValues);
         }
 
         #endregion

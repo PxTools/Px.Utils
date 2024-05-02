@@ -11,14 +11,12 @@ namespace PxUtils.Models.Metadata.Dimensions
     /// <param name="name">Multilanguage name of the dimension</param>
     /// <param name="additionalProperties">Properties of the dimension, excluding the required properties</param>
     /// <param name="values">Ordered list of dimension values that define the structure of the dimension</param>
-    /// <param name="defaultValue">Default value of the dimension, this property is optional</param>
     /// <param name="type">Type of the dimension. The dedicated classes must be used for time and content dimensions</param>
     public class Dimension(
         string code,
         MultilanguageString name,
         Dictionary<string, MetaProperty> additionalProperties,
         List<DimensionValue> values,
-        DimensionValue? defaultValue,
         DimensionType type)
         : IDimension
     {
@@ -47,11 +45,6 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// </summary>
         public IReadOnlyList<DimensionValue> Values { get; } = values;
 
-        /// <summary>
-        /// Default value of the dimension, this property is optional.
-        /// </summary>
-        public DimensionValue? DefaultValue { get; set; } = defaultValue;
-
         #region Interface implementations
 
         MultilanguageString IReadOnlyDimension.Name => Name;
@@ -59,8 +52,6 @@ namespace PxUtils.Models.Metadata.Dimensions
         IReadOnlyDictionary<string, MetaProperty> IReadOnlyDimension.AdditionalProperties => AdditionalProperties;
 
         IReadOnlyList<IReadOnlyDimensionValue> IReadOnlyDimension.Values => Values;
-
-        IReadOnlyDimensionValue? IReadOnlyDimension.DefaultValue => DefaultValue;
 
         IReadOnlyList<string> IDimensionMap.ValueCodes => _valueCodes;
 
@@ -72,7 +63,7 @@ namespace PxUtils.Models.Metadata.Dimensions
                 else throw new ArgumentException($"Value with code {code} not found in dimension");
             }).ToList();
 
-            return new Dimension(Code, Name, AdditionalProperties, newValues, DefaultValue, Type);
+            return new Dimension(Code, Name, AdditionalProperties, newValues, Type);
         }
 
         #endregion

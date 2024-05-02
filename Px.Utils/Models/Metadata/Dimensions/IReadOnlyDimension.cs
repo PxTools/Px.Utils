@@ -30,11 +30,6 @@ namespace PxUtils.Models.Metadata.Dimensions
         IReadOnlyList<IReadOnlyDimensionValue> Values { get; }
 
         /// <summary>
-        /// The default value of the dimension, this property is optional.
-        /// </summary>
-        IReadOnlyDimensionValue? DefaultValue { get; }
-
-        /// <summary>
         /// Returns a new dimension object where the order of values is changed or some values are filtered out according to the map.
         /// </summary>
         /// <param name="map">Change the order of values or filter out some values</param>

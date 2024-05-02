@@ -18,10 +18,5 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// Ordered list of editable dimension values that define the structure of the dimension.
         /// </summary>
         new IReadOnlyList<DimensionValue> Values { get; }
-
-        /// <summary>
-        /// The default value of the dimension, this property is optional.
-        /// </summary>
-        new DimensionValue? DefaultValue { get; set; }
     }
 }

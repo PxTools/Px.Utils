@@ -38,7 +38,7 @@ namespace Px.Utils.UnitTests.ModelTests
             {
                 values.Add(BuildTestDimensionValue(code, i));
             }
-            return new TimeDimension(code, name, additionalProperties, values, null, TimeDimensionInterval.Year);
+            return new TimeDimension(code, name, additionalProperties, values, TimeDimensionInterval.Year);
         }
 
         internal static Dimension BuildTestDimension(int ordinal, int numOfValues)
@@ -51,7 +51,7 @@ namespace Px.Utils.UnitTests.ModelTests
             {
                 values.Add(BuildTestDimensionValue(code, i));
             }
-            return new Dimension(code, name, additionalProperties, values, null, DimensionType.Other);
+            return new Dimension(code, name, additionalProperties, values, DimensionType.Other);
         }
 
         internal static ContentDimensionValue BuildTestContentDimensionValue(string parentCode, int ordinal)

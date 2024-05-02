@@ -100,10 +100,9 @@ namespace PxUtils.ModelBuilders
             {
                 string code = GetDimensionCode(entries, langs, dimensionNameToTest);
                 DimensionValue[] values = GetDimensionValues(entries, langs, dimensionNameToTest);
-                DimensionValue? maybeDefault = GetDefaultValue(entries, langs, dimensionNameToTest, values);
                 TimeDimensionInterval interval = ValueParserUtilities.ParseTimeIntervalFromTimeVal(timeVal.GetRawValueString(), _pxFileSyntaxConf);
                 Dictionary<string, MetaProperty> additionalProperties = new() { { timeVal.KeyWord, timeVal } };
-                timeDimension = new TimeDimension(code, dimensionNameToTest, additionalProperties, [.. values], maybeDefault, interval);
+                timeDimension = new TimeDimension(code, dimensionNameToTest, additionalProperties, [.. values], interval);
                 return true;
             }
             else if (TryGetProperty(entries, dimensionTypeKey, langs, out MetaProperty? dimType, dimensionNameToTest) &&
@@ -114,8 +113,7 @@ namespace PxUtils.ModelBuilders
 
                 string code = GetDimensionCode(entries, langs, dimensionNameToTest);
                 DimensionValue[] values = GetDimensionValues(entries, langs, dimensionNameToTest);
-                DimensionValue? maybeDefault = GetDefaultValue(entries, langs, dimensionNameToTest, values);
-                timeDimension = new TimeDimension(code, dimensionNameToTest, [], [.. values], maybeDefault, TimeDimensionInterval.Irregular);
+                timeDimension = new TimeDimension(code, dimensionNameToTest, [], [.. values], TimeDimensionInterval.Irregular);
                 return true;
             }
 
@@ -127,10 +125,9 @@ namespace PxUtils.ModelBuilders
         {
             string code = GetDimensionCode(entries, langs, dimensionName);
             DimensionValue[] values = GetDimensionValues(entries, langs, dimensionName);
-            DimensionValue? maybeDefault = GetDefaultValue(entries, langs, dimensionName, values);
             
             DimensionType type = GetDimensionType(entries, langs, dimensionName);
-            return new Dimension(code, dimensionName, [], [.. values], maybeDefault, type);
+            return new Dimension(code, dimensionName, [], [.. values], type);
         }
 
         private DimensionType GetDimensionType(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName)
@@ -155,21 +152,6 @@ namespace PxUtils.ModelBuilders
         {
             string code = GetDimensionCode(entries, langs, dimensionName);
             List<ContentDimensionValue> values = BuildContentDimensionValues(entries, langs, dimensionName).ToList();
-            string defaultValueKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionDefaultValue;
-            if (TryGetAndRemoveProperty(entries, defaultValueKey, langs, out MetaProperty? defaultValueProperty))
-            {
-                MultilanguageString defaultValueName = defaultValueProperty.ValueAsMultilanguageString(_stringDelimeter, langs.DefaultLanguage);
-                ContentDimensionValue? defaultValue = values.Find(v => v.Name.Equals(defaultValueName));
-
-                if (defaultValue is null)
-                {
-                    string defaultName = defaultValueName[langs.DefaultLanguage];
-                    string eMsg = $"Default value is defined for the content variable but the variable does not contain a value with name {defaultName}";
-                    throw new ArgumentException(eMsg);
-                }
-
-                return new ContentDimension(code, dimensionName, [], values, defaultValue);
-            }
 
             return new ContentDimension(code, dimensionName, [], values);
         }
@@ -355,27 +337,6 @@ namespace PxUtils.ModelBuilders
             }
 
             return 0; // Default value
-        }
-
-        private Dim? GetDefaultValue<Dim>(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName, Dim[] values) where Dim : DimensionValue
-        { 
-            string defaultValueKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionDefaultValue;
-            if (TryGetAndRemoveProperty(entries, defaultValueKey, langs, out MetaProperty? defaultValueName, dimensionName))
-            {
-                MultilanguageString name = defaultValueName.ValueAsMultilanguageString(_stringDelimeter, langs.DefaultLanguage);
-                if (Array.Find(values, v => v.Name.Equals(name)) is Dim dimensionValue)
-                {
-                    return dimensionValue;
-                }
-                else
-                {
-                    string defaultName = defaultValueName.ValueAsMultilanguageString(_stringDelimeter, langs.DefaultLanguage)[langs.DefaultLanguage];
-                    string eMsg = $"Default value is defined for the variable but it does not contain a value with name {defaultName}";
-                    throw new ArgumentException(eMsg);
-                }
-            }
-
-            return null;
         }
 
         #endregion

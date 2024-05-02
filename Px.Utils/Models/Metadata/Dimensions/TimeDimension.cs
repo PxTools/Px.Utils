@@ -11,14 +11,12 @@ namespace PxUtils.Models.Metadata.Dimensions
     /// <param name="name">Multilanguage name of the dimension</param>
     /// <param name="additionalProperties">Properties of the dimension, excluding the required properties</param>
     /// <param name="values">Ordered list of dimension values that define the structure of the dimension</param>
-    /// <param name="defaultValue">The default value of the dimension, this property is optional</param>
     /// <param name="interval">Time interval between the values of this dimension</param>
     public class TimeDimension(
         string code,
         MultilanguageString name,
         Dictionary<string, MetaProperty> additionalProperties,
         List<DimensionValue> values,
-        DimensionValue? defaultValue,
         TimeDimensionInterval interval)
         : IDimension
     {
@@ -48,11 +46,6 @@ namespace PxUtils.Models.Metadata.Dimensions
         public IReadOnlyList<DimensionValue> Values { get; } = values;
 
         /// <summary>
-        /// The default value of the dimension, this property is optional
-        /// </summary>
-        public DimensionValue? DefaultValue { get; set; } = defaultValue;
-
-        /// <summary>
         /// Time interval between the values of this dimension
         /// </summary>
         public TimeDimensionInterval Interval { get; } = interval;
@@ -67,8 +60,6 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         IReadOnlyList<string> IDimensionMap.ValueCodes => _valueCodes;
 
-        IReadOnlyDimensionValue? IReadOnlyDimension.DefaultValue => DefaultValue;
-
         public IDimension GetTransform(IDimensionMap map)
         {
             List<DimensionValue> newValues = map.ValueCodes.Select(code =>
@@ -77,7 +68,7 @@ namespace PxUtils.Models.Metadata.Dimensions
                 else throw new ArgumentException($"Value with code {code} not found in dimension");
             }).ToList();
 
-            return new TimeDimension(Code, Name, AdditionalProperties, newValues, DefaultValue, Interval);
+            return new TimeDimension(Code, Name, AdditionalProperties, newValues, Interval);
         }
 
         #endregion
