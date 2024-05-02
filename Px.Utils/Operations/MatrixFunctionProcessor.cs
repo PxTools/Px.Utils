@@ -3,13 +3,18 @@ using Px.Utils.Models.Data;
 
 namespace Px.Utils.Operations
 {
-    internal class FunctionQueue<T> where T : IDataValue<T>
+    public class MatrixFunctionProcessor<T> where T : IDataValue<T>
     {
         private readonly Queue<MatrixFunction<T>> _queue = new();
 
         public void Add(MatrixFunction<T> function)
         {
             _queue.Enqueue(function);
+        }
+
+        public void Add(IEnumerable<MatrixFunction<T>> functions)
+        {
+            foreach (var function in functions) _queue.Enqueue(function);
         }
 
         public Matrix<T> Compute(Matrix<T> input)

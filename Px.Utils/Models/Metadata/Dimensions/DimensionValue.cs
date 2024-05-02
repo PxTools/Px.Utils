@@ -25,7 +25,7 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// <summary>
         /// True if the value is not from the original data but was created by computing or aggregating other values.
         /// </summary>
-        public bool Virtual { get; }
+        public bool Virtual { get; set; }
 
         /// <summary>
         /// Default constructor for a non-virtual dimension value.

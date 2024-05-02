@@ -5,23 +5,43 @@ using System.Numerics;
 
 namespace Px.Utils.Operations
 {
-    public abstract class MatrixFunction<T>
+    /// <summary>
+    /// Base class for matrix functions, defines some operation that can be applied to a matrix, such as a transformation or a sum
+    /// </summary>
+    /// <typeparam name="TData">Type of the data values in the matrix</typeparam>
+    public abstract class MatrixFunction<TData>
     {
-        public abstract Matrix<T> Apply(Matrix<T> input);
+        public abstract Matrix<TData> Apply(Matrix<TData> input);
     }
 
-    public class SumMatrixFunction<T>(DimensionValue newValue, DimensionMap sumMap) : MatrixFunction<T> where T : IAdditionOperators<T, T, T>
+    /// <summary>
+    /// Function that applies a transformation map to a matrix
+    /// </summary>
+    /// <typeparam name="TData">Type of the data values in the matrix</typeparam>
+    /// <param name="map">The resulting matrix will have this structure</param>
+    public class TransformationMatrixFunction<TData>(IMatrixMap map) : MatrixFunction<TData>
     {
-        public override Matrix<T> Apply(Matrix<T> input)
+        public override Matrix<TData> Apply(Matrix<TData> input)
+        {
+            return input.GetTransform(map);
+        }
+    }
+
+    public class SumMatrixFunction<TData>(DimensionValue newValue, DimensionMap sumMap)
+        : MatrixFunction<TData> where TData : IAdditionOperators<TData, TData, TData>
+    {
+
+        public override Matrix<TData> Apply(Matrix<TData> input)
         {
             SumMatrixFunction<double> sumMatrixFunction = new(newValue, sumMap);
             throw new NotImplementedException();
         }
     }
 
-    public class GroupSumMatrixFunction<T>(IEnumerable<(DimensionValue newValue, DimensionMap sumMap)> parameters) : MatrixFunction<T> where T : IAdditionOperators<T, T, T>
+    public class GroupSumMatrixFunction<TData>(IEnumerable<(DimensionValue newValue, DimensionMap sumMap)> parameters)
+        : MatrixFunction<TData> where TData : IAdditionOperators<TData, TData, TData>
     {
-        public override Matrix<T> Apply(Matrix<T> input)
+        public override Matrix<TData> Apply(Matrix<TData> input)
         {
             throw new NotImplementedException();
         }
