@@ -17,6 +17,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{EB4119B8-8292-418A-9CD3-2905DA67B889}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\CI.yml = .github\workflows\CI.yml
+		SonarScan.yml = SonarScan.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Px.Utils.UnitTests", "Px.Utils.UnitTests\Px.Utils.UnitTests.csproj", "{D72C6067-56A5-4302-838B-41E6CA725C4F}"
@@ -24,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Px.Utils.UnitTests", "Px.Ut
 		{D94934AF-6B41-4C66-818A-C4C33230E9DD} = {D94934AF-6B41-4C66-818A-C4C33230E9DD}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Px.Utils.TestingApp", "Px.Utils.TestingApp\Px.Utils.TestingApp.csproj", "{0C0227EC-68EE-425D-892B-F570EC18E792}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Px.Utils.TestingApp", "Px.Utils.TestingApp\Px.Utils.TestingApp.csproj", "{0C0227EC-68EE-425D-892B-F570EC18E792}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D94934AF-6B41-4C66-818A-C4C33230E9DD} = {D94934AF-6B41-4C66-818A-C4C33230E9DD}
 	EndProjectSection
