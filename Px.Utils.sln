@@ -17,7 +17,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{EB4119B8-8292-418A-9CD3-2905DA67B889}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\CI.yml = .github\workflows\CI.yml
-		SonarScan.yml = SonarScan.yml
+		.github\workflows\SonarScan.yml = .github\workflows\SonarScan.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Px.Utils.UnitTests", "Px.Utils.UnitTests\Px.Utils.UnitTests.csproj", "{D72C6067-56A5-4302-838B-41E6CA725C4F}"
