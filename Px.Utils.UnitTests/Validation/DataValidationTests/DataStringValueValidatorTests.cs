@@ -21,7 +21,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             DataStringValidator validator = new();
             Encoding encoding = Encoding.UTF8;
             List<byte> value = [.. encoding.GetBytes(allowedValue)];
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(value, EntryType.StringDataItem, encoding, 0, 0);
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(value, EntryType.DataItem, encoding, 0, 0);
             Assert.IsFalse(feedbacks.Any());
         }
     
@@ -33,7 +33,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             Encoding encoding = Encoding.UTF8;
             List<byte> value = [.. encoding.GetBytes("X")];
 
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(value, EntryType.StringDataItem, encoding, 0, 0);
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(value, EntryType.DataItem, encoding, 0, 0);
 
             Assert.AreEqual(1, feedbacks.Count());
             Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidString, feedbacks.First().Rule);

@@ -39,6 +39,10 @@ namespace PxUtils.Validation.DataValidation
 
     public class DataNumberValidator : IDataValidator
     {
+        private static readonly int MaxLength = decimal.MaxValue.ToString().Length;
+        private static readonly int zero = 0x30;
+        private static readonly int nine = 0x39;
+
         /// <summary>
         /// Validates a token to determine if it represents a valid number data item.
         /// </summary>
@@ -46,22 +50,96 @@ namespace PxUtils.Validation.DataValidation
         /// <returns>An enumerable of <see cref="ValidationFeedback"/> objects indicating any validation errors.</returns>
         public IEnumerable<ValidationFeedback> Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos)
         {
-            if (double.TryParse(entry.ToArray(), out _))
+            if (entry.Count >= MaxLength && !decimal.TryParse(entry.ToArray(), out _))
             {
-                return Array.Empty<ValidationFeedback>();
+                return [new ValidationFeedback(
+                    ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.DataValidationFeedbackInvalidNumber,
+                    lineNumber,
+                    charPos,
+                    encoding.GetString(entry.ToArray()))
+                ];
             }
-            // Retry if the entry is at the end of the data section and contains a ";"
-            else if (entry[^1] == 0x3B)
+
+            int decimalSeparatorIndex = entry.IndexOf(0x2E);
+            if (decimalSeparatorIndex == -1)
             {
-                entry.RemoveAt(entry.Count - 1);
-                Validate(entry, entryType, encoding, lineNumber, charPos);
-                return Array.Empty<ValidationFeedback>();
+                return IsValidIntegerPart(entry, true) ?
+                    Array.Empty<ValidationFeedback>() :
+                    [new ValidationFeedback(
+                        ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.DataValidationFeedbackInvalidNumber,
+                        lineNumber,
+                        charPos,
+                        encoding.GetString(entry.ToArray()))
+                    ];
             }
-            else
+            else if (decimalSeparatorIndex == 0 || !IsValidIntegerPart(entry[0..decimalSeparatorIndex], false))
             {
-                string a = encoding.GetString(entry.ToArray());
-                return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, lineNumber, charPos, a) };
+                return
+                    [new ValidationFeedback(
+                        ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.DataValidationFeedbackInvalidNumber,
+                        lineNumber,
+                        charPos,
+                        encoding.GetString(entry.ToArray()))
+                    ];
             }
+            else return IsValidDecimalPart(entry[decimalSeparatorIndex..]) ?
+                    Array.Empty<ValidationFeedback>() :
+                    [new ValidationFeedback(
+                        ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.DataValidationFeedbackInvalidNumber,
+                        lineNumber,
+                        charPos,
+                        encoding.GetString(entry.ToArray()))
+                    ];
+        }
+
+        private static bool IsValidIntegerPart(List<byte> entry, bool isInteger)
+        {
+            bool isNegative = entry[0] == 0x2D;
+            bool startsWithZero = isNegative ? entry[1] == zero : entry[0] == zero;
+            List<byte> numbers = isNegative ? entry.Skip(1).ToList() : entry;
+            if (numbers.Count > 1)
+            {
+                if (isInteger && numbers.Sum(x => x - zero) == 0)
+                {
+                    return false;
+                }
+                if (startsWithZero && isInteger)
+                {
+                    return false;
+                }
+            }
+            if (isNegative && isInteger && numbers[0] == zero)
+            {
+                return false;
+            }
+            for (int i = isNegative ? 1 : 0; i < entry.Count; i++)
+            {
+                if (entry[i] < zero || entry[i] > nine)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private static bool IsValidDecimalPart(List<byte> entry)
+        {
+            if (entry.Count == 1)
+            {
+                return false;
+            }
+            for (int i = 1; i < entry.Count; i++)
+            {
+                if (entry[i] < zero || entry[i] > nine)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 
@@ -89,11 +167,19 @@ namespace PxUtils.Validation.DataValidation
             {
                 return _separator == entry[0]
                     ? Array.Empty<ValidationFeedback>()
-                    : [new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.DataValidationFeedbackInconsistentSeparator)];
+                    : [new ValidationFeedback(
+                        ValidationFeedbackLevel.Warning,
+                        ValidationFeedbackRule.DataValidationFeedbackInconsistentSeparator,
+                        lineNumber,
+                        charPos)];
             }
         }
 
         private const byte Sentinel = 0x0;
+
+        public DataSeparatorValidator()
+        {
+        }
     }
 
     public class DataStructureValidator : IDataValidator
@@ -103,9 +189,10 @@ namespace PxUtils.Validation.DataValidation
         private readonly Dictionary<EntryType, EntryType[]>_allowedPreviousTokens = new()
         {
             {EntryType.DataItem, new[] {EntryType.LineSeparator, EntryType.DataItemSeparator, EntryType.Unknown}},
-            {EntryType.DataItemSeparator, new[] {EntryType.DataItem, EntryType.Unknown}},
+            {EntryType.DataItemSeparator, new[] {EntryType.DataItem, EntryType.Unknown, EntryType.EndOfData}},
             {EntryType.LineSeparator, new[] {EntryType.DataItemSeparator, EntryType.Unknown}},
-            {EntryType.Unknown, new[] {EntryType.DataItem, EntryType.Unknown, EntryType.DataItemSeparator, EntryType.LineSeparator} }
+            {EntryType.Unknown, new[] {EntryType.DataItem, EntryType.Unknown, EntryType.DataItemSeparator, EntryType.LineSeparator}},
+            {EntryType.EndOfData, new[] {EntryType.DataItem}}
         };
 
         /// <summary>

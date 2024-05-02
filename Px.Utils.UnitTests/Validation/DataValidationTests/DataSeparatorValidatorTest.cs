@@ -1,29 +1,30 @@
 ﻿using PxUtils.Validation;
 using PxUtils.Validation.DataValidation;
+using System.Text;
 
 namespace Px.Utils.UnitTests.Validation.DataValidationTests
 {
     [TestClass]
     public class DataSeparatorValidatorTest
     {
-        /*
         [TestMethod]
         public void FirstSeparatorIsUsedAsReference()
         {
             DataSeparatorValidator validator = new();
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(EntryType.DataItemSeparator, " ", 1 ,1));
+            List<byte> separator = [.. Encoding.UTF8.GetBytes(" ")];
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
 
             Assert.IsFalse(feedbacks.Any());
-        
         }
     
         [TestMethod]
         public void InconsistentSeparator()
         {
             DataSeparatorValidator validator = new();
-            validator.Validate(new Token(EntryType.DataItemSeparator, " ", 1 ,1));
-
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(EntryType.DataItemSeparator, "\t", 1 ,1));
+            List<byte> separator = [.. Encoding.UTF8.GetBytes(" ")];
+            validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
+            List<byte> otherSeparator = [.. Encoding.UTF8.GetBytes("\t")];
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(otherSeparator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
 
             ValidationFeedback[] validationFeedbacks = feedbacks as ValidationFeedback[] ?? feedbacks.ToArray();
             Assert.AreEqual(1, validationFeedbacks.Length);
@@ -37,12 +38,10 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         public void ConsistentSeparator()
         {
             DataSeparatorValidator validator = new();
-            validator.Validate(new Token(EntryType.DataItemSeparator, " ", 1 ,1));
-
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(new Token(EntryType.DataItemSeparator, " ", 1 ,1));
-
+            List<byte> separator = [.. Encoding.UTF8.GetBytes(" ")];
+            validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
+            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
             Assert.IsFalse(feedbacks.Any());
         }
-    */
     }
 }

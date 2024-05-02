@@ -10,12 +10,24 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
     [TestClass]
     public class DataValidationTest
     {
+        private MemoryStream stream;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_VALID_DATA));
+            stream.Seek(6, 0);
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            stream.Dispose();
+        }
+
         [TestMethod]
         public void TestValidateWithoutErrors()
         {
-            using MemoryStream stream = new(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_VALID_DATA));
-            stream.Seek(6, 0);
-
             IEnumerable<ValidationFeedback> validationFeedbacks =
                 DataValidation.Validate(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
 
@@ -31,9 +43,6 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         [TestMethod]
         public async Task TestValidateAsyncWithoutErrors()
         {
-            await using MemoryStream stream = new(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_VALID_DATA));
-            stream.Seek(6, 0);
-
             IEnumerable<ValidationFeedback> validationFeedbacks =
                 await DataValidation.ValidateAsync(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
 
@@ -49,9 +58,6 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         [TestMethod]
         public void TestValidateWithErrors()
         {
-            using MemoryStream stream = new(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_INVALID_DATA));
-            stream.Seek(6, 0);
-
             IEnumerable<ValidationFeedback> validationFeedbacks =
                 DataValidation.Validate(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
 
@@ -67,9 +73,6 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         [TestMethod]
         public async Task TestValidateAsyncWithErrors()
         {
-            await using MemoryStream stream = new(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_INVALID_DATA));
-            stream.Seek(6, 0);
-
             IEnumerable<ValidationFeedback> validationFeedbacks =
                 await DataValidation.ValidateAsync(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
 

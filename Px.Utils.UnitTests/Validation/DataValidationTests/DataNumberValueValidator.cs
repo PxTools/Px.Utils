@@ -7,7 +7,6 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
     [TestClass]
     public class DataNumberValueValidatorTest
     {
-
         [TestMethod]
         [DataRow("0")]
         [DataRow("0.1")]
@@ -18,6 +17,8 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         [DataRow("9999999999999999999999999999")]
         [DataRow("-79228162514264337593543950335")]
         [DataRow("79228162514264337593543950335")]
+        [DataRow("100")]
+        [DataRow("-100")]
         public void AllowedNumberValues(string allowedValue)
         {
             DataNumberValidator validator = new();
@@ -48,7 +49,6 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             List<byte> value = [.. encoding.GetBytes(notAllowedValue)];
             IEnumerable<ValidationFeedback> feedbacks = validator.Validate(value, EntryType.DataItem, encoding, 0, 0);
 
-        
             Assert.AreEqual(1, feedbacks.Count());
             Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, feedbacks.First().Rule);
             Assert.AreEqual(notAllowedValue, feedbacks.First().AdditionalInfo);

@@ -49,7 +49,7 @@ namespace PxUtils.Validation.DataValidation
 
             // TODO: Remove console logs
             Console.WriteLine($"Starting with parameters: {rowLen} {numOfRows} {startRow} {streamEncoding} {conf}");
-            List<ValidationFeedback> feedbacks = ValidateDataStream(stream, conf, streamEncoding, numOfRows, rowLen);
+            List<ValidationFeedback> feedbacks = ValidateDataStream(stream, streamEncoding, numOfRows, rowLen, conf);
 
             // TODO: Remove console logs
             Console.WriteLine($"Feedbacks: {feedbacks.Count}");
@@ -57,6 +57,9 @@ namespace PxUtils.Validation.DataValidation
             {
                 Console.WriteLine($"{feedback.Rule} - {feedback.AdditionalInfo} - {feedback.Line}/{feedback.Character}");
             }
+
+            ResetValidators();
+
             return feedbacks;
         }
 
@@ -77,80 +80,37 @@ namespace PxUtils.Validation.DataValidation
             int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null,
             CancellationToken cancellationToken = default)
         {
-            conf ??= PxFileSyntaxConf.Default;
+            if (streamEncoding is null)
+            {
+                return [new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.NoEncoding, 0, 0)];
+            }
 
-            List<ValidationFeedback> feedbacks = [];
+            conf ??= PxFileSyntaxConf.Default;
+            commonValidators.Add(new DataStructureValidator());
+            dataNumValidators.AddRange(commonValidators);
+            dataNumValidators.Add(new DataNumberValidator());
+            dataStringValidators.AddRange(commonValidators);
+            dataStringValidators.Add(new DataStringValidator());
+            dataSeparatorValidators.AddRange(commonValidators);
+            dataSeparatorValidators.Add(new DataSeparatorValidator());
+
+            List<ValidationFeedback> feedbacks = await Task.Factory.StartNew(() => 
+                ValidateDataStream(stream, streamEncoding, numOfRows, rowLen, conf));
+
+            foreach (ValidationFeedback feedback in feedbacks)
+            {
+                Console.WriteLine($"{feedback.Rule} - {feedback.AdditionalInfo} - {feedback.Line}/{feedback.Character}");
+            }
+
+            ResetValidators();
 
             return feedbacks;
         }
 
-        /// <summary>
-        /// Asynchronously tokenizes the data in the stream according to the specified parameters and yields the tokens.
-        /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
-        /// </summary>
-        /// <param name="stream">The stream containing the data to be tokenized.</param>
-        /// <param name="conf">The syntax configuration for the PX file. Set to null to use the default configuration.</param>
-        /// <param name="streamEncoding">The encoding of the stream. Set to null if the default encoding should be used.</param>
-        /// <param name="cancellationToken">The cancellation token to cancel tokenization.</param>
-        /// <returns>
-        /// An <see cref="IAsyncEnumerable{T}"/> of <see cref="Token"/> representing the tokens in the data.
-        /// </returns>
-        public static async Task TokenizeAsync(Stream stream, PxFileSyntaxConf conf,
-            Encoding? streamEncoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        private static List<ValidationFeedback> ValidateDataStream(Stream stream, Encoding streamEncoding, int expectedRows, int expectedRowLength, PxFileSyntaxConf conf)
         {
-            int charPosition = 0;
-            int lineNumber = 1;
-            int tokenStartIndex = 0;
-            using StreamReader reader = new(stream, streamEncoding, false, StreamBufferSize, true);
-            char[] buffer = new char[StreamBufferSize];
-            int readStartIndex = 0;
-            int leftOver = 0;
-            int charsRead = 0;
-            do
-            {
-                charsRead = await reader.ReadAsync(buffer.AsMemory(readStartIndex), cancellationToken);
-                int currentBufferSize = charsRead + readStartIndex;
-
-                for (int currentPos = 0; currentPos < currentBufferSize - 1; )
-                {
-                    /*token = GetToken(ref buffer, ref currentPos, ref tokenStartIndex, 
-                        currentBufferSize -1 , ref lineNumber, ref charPosition,
-                        out leftOver, conf);
-                    if (token != null)
-                    {
-                        yield return (Token)token;
-                    }*/
-                }
-
-                if (leftOver != 0)
-                {
-                    readStartIndex = 0;
-                    for (int i = tokenStartIndex; i < currentBufferSize; i++)
-                    {
-                        buffer[i - tokenStartIndex] = buffer[i];
-                        readStartIndex++;
-                    }
-                }
-                else
-                {
-                    buffer[0] = buffer[currentBufferSize - 1];
-                    readStartIndex = 1;
-                }
-            } while (charsRead > 0);
-
-        }
-
-
-        /// <summary>
-        /// Tokenizes the data in the stream and returns a collection of tokens.
-        /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
-        /// </summary>
-        /// <param name="stream">The stream containing the data to be tokenized.</param>
-        /// <param name="conf">The syntax configuration for the PX file.</param>
-        /// <param name="streamEncoding">The encoding of the stream. Set to null if the default encoding should be used.</param>
-        /// <returns>A collection of Token objects representing the tokens in the data stream.</returns>
-        public static List<ValidationFeedback> ValidateDataStream(Stream stream, PxFileSyntaxConf conf, Encoding streamEncoding, int expectedRows, int expectedRowLength)
-        {
+            byte endOfData = (byte)conf.Symbols.EntrySeparator;
+            byte stringDelimeter = (byte)conf.Symbols.Value.StringDelimeter;
             EntryType currentEntryType = EntryType.Unknown;
             List<byte> currentEntry = new(StreamBufferSize);
             List<ValidationFeedback> feedbacks = new(StreamBufferSize);
@@ -166,9 +126,10 @@ namespace PxUtils.Validation.DataValidation
                     byte currentByte = buffer[i];
                     EntryType currentType = currentByte switch
                     {
-                        >= 0x22 => EntryType.DataItem,
                         0x20 or 0x09 => EntryType.DataItemSeparator,
                         0x0A or 0x0D => EntryType.LineSeparator,
+                        >= 0x22 and not 0x3B => EntryType.DataItem,
+                        _ when currentByte == endOfData => EntryType.EndOfData,
                         _ => EntryType.Unknown
                     };
                     if (currentType != currentEntryType)
@@ -187,7 +148,7 @@ namespace PxUtils.Validation.DataValidation
                             List<IDataValidator> validators = currentEntryType switch
                             {
                                 EntryType.DataItemSeparator => dataSeparatorValidators,
-                                EntryType.DataItem => currentEntry[0] is 0x22 ? dataStringValidators : dataNumValidators,
+                                EntryType.DataItem => currentEntry[0] == stringDelimeter ? dataStringValidators : dataNumValidators,
                                 _ => commonValidators
                             };
 
@@ -214,7 +175,6 @@ namespace PxUtils.Validation.DataValidation
                                 }
                             }
                         }
-                        
                         currentEntryType = currentType;
                         currentEntry.Clear();
                     }
@@ -231,6 +191,14 @@ namespace PxUtils.Validation.DataValidation
 
             return feedbacks;
         }
+
+        private static void ResetValidators()
+        {
+            commonValidators.Clear();
+            dataNumValidators.Clear();
+            dataStringValidators.Clear();
+            dataSeparatorValidators.Clear();
+        }
     }
 
     /// <summary>
@@ -241,6 +209,7 @@ namespace PxUtils.Validation.DataValidation
         DataItem,
         DataItemSeparator,
         LineSeparator,
+        EndOfData,
         Unknown
     }
 
