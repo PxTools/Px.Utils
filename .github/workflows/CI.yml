@@ -4,10 +4,10 @@ run-name: CI for PR ${{ github.event.pull_request.number }}
 
 on:
   pull_request:
+    types: [opened, edited]
     branches:
       - dev/**
       - test/**
-      - master/**
 
 jobs:
   build:
