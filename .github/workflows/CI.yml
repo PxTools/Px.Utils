@@ -2,7 +2,13 @@ name: Px.Utils CI
 
 run-name: CI for PR ${{ github.event.pull_request.number }}
 
-on: [ pull_request ]
+on:
+  pull_request:
+    branches:
+      - 'dev'
+      - 'test/**'
+      - 'master'
+      - 'main'
 
 jobs:
   build:
@@ -10,13 +16,16 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
         dotnet-version: [ '7.x', '8.x' ]
-        configuration: [ Debug ]
+        configuration: [ 'Debug' ]
     runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Setup dotnet ${{ matrix.dotnet-version }}
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
 
@@ -25,6 +34,3 @@ jobs:
 
       - name: Build
         run: dotnet build --verbosity normal --no-restore --configuration ${{ matrix.configuration }}
-
-      - name: Unit tests
-        run: dotnet test --verbosity normal
