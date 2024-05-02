@@ -2,7 +2,13 @@ name: Px.Utils SonarScan
 
 run-name: SonarScan for PR ${{ github.event.pull_request.number }}
 
-on: [ pull_request ]
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+    branches:
+      - 'dev/**'
 
 jobs:
  sonar:
