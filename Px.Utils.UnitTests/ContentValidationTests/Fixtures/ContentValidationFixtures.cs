@@ -22,7 +22,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 1,
                 [],
                 8,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry axisVersionEntry =
             new(filename,
@@ -31,7 +31,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 1,
                 [],
                 14,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry codepageEntry =
             new(filename,
@@ -40,7 +40,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 2,
                 [],
                 10,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry languageEntry =
             new(filename,
@@ -49,7 +49,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 3,
                 [],
                 8,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry nextUpdateEntry =
             new(filename,
@@ -67,7 +67,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 6,
                 [],
                 14,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry copyrightEntry =
             new(filename,
@@ -103,7 +103,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 10,
                 [],
                 8,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry contVariableEnEntry =
             new(filename,
@@ -112,7 +112,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 11,
                 [],
                 12,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry tableIdEntry =
             new(filename,
@@ -121,7 +121,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 12,
                 [],
                 9,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry descriptionEntry =
             new(filename,
@@ -130,7 +130,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 13,
                 [],
                 12,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry descriptionEnEntry =
             new(filename,
@@ -139,7 +139,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 14,
                 [],
                 16,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry valuesBarEntry =
             new(filename,
@@ -175,7 +175,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 19,
                 [],
                 13,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry unitsBarFooEnEntry =
             new(filename,
@@ -184,7 +184,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 20,
                 [],
                 17,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry precisionBarFooEntry =
             new(filename,
@@ -202,7 +202,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 22,
                 [],
                 13,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry timevalEntry =
             new(filename,
@@ -247,7 +247,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 27,
                 [],
                 5,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry variableCodeBarEnEntry =
             new(filename,
@@ -256,7 +256,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 28,
                 [],
                 9,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry variableTypeBarTimeEntry =
             new(filename,
@@ -265,7 +265,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 29,
                 [],
                 13,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry codesBarEntry =
             new(filename,
@@ -310,7 +310,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 34,
                 [],
                 17,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry variableCodeBarTimeEnEntry =
             new(filename,
@@ -319,7 +319,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 35,
                 [],
                 17,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         internal static ValidationStructuredEntry[] MINIMAL_STRUCTURED_ENTRY_ARRAY =>
         new[]
@@ -453,7 +453,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 20,
                 [],
                 17,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         internal static ValidationStructuredEntry StructuredEntryWithUndefinedSecondSpecifier =>
             new(filename,
@@ -462,7 +462,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 20,
                 [],
                 17,
-                Validation.ValueType.String);
+                Validation.ValueType.StringValue);
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_INVALID_VALUE_TYPES =>
             new[]
@@ -480,21 +480,21 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                     languagesEntry.ValueStartIndex,
                     languagesEntry.LineChangeIndexes,
                     languagesEntry.ValueStartIndex,
-                    Validation.ValueType.String),
+                    Validation.ValueType.StringValue),
                 new ValidationStructuredEntry(filename,
                     lastUpdatedBarFooEntry.Key,
                     "1/1/2023",
                     lastUpdatedBarFooEntry.ValueStartIndex,
                     lastUpdatedBarFooEntry.LineChangeIndexes,
                     lastUpdatedBarFooEntry.ValueStartIndex,
-                    Validation.ValueType.String),
+                    Validation.ValueType.StringValue),
                 new ValidationStructuredEntry(filename,
                     precisionBarFooEntry.Key,
                     "100%",
                     precisionBarFooEntry.ValueStartIndex,
                     precisionBarFooEntry.LineChangeIndexes,
                     precisionBarFooEntry.ValueStartIndex,
-                    Validation.ValueType.String),
+                    Validation.ValueType.StringValue),
                 new ValidationStructuredEntry(filename,
                     timevalEntry.Key,
                     lastUpdatedBarFooEntry.Value,
@@ -513,21 +513,21 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                     charsetEntry.ValueStartIndex,
                     charsetEntry.LineChangeIndexes,
                     charsetEntry.ValueStartIndex,
-                    Validation.ValueType.String),
+                    Validation.ValueType.StringValue),
                 new ValidationStructuredEntry(filename,
                     codepageEntry.Key,
                     "bar",
                     codepageEntry.ValueStartIndex,
                     codepageEntry.LineChangeIndexes,
                     codepageEntry.ValueStartIndex,
-                    Validation.ValueType.String),
+                    Validation.ValueType.StringValue),
                 new ValidationStructuredEntry(filename,
                     variableTypeBarEntry.Key,
                     "foo",
                     variableTypeBarEntry.ValueStartIndex,
                     variableTypeBarEntry.LineChangeIndexes,
                     variableTypeBarEntry.ValueStartIndex,
-                    Validation.ValueType.String),
+                    Validation.ValueType.StringValue),
             };
 
         internal static ValidationStructuredEntry StructuredEntryWithUnmatchingAmountOfElements =>
@@ -546,6 +546,6 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
             codepageEntry.ValueStartIndex,
             codepageEntry.LineChangeIndexes,
             codepageEntry.ValueStartIndex,
-            Validation.ValueType.String);
+            Validation.ValueType.StringValue);
     }
 }

@@ -20,8 +20,8 @@ namespace PxUtils.Validation.DataValidation
         private static int expectedRows;
         private static int expectedRowLength;
         private static int startRow;
-        private static Encoding streamEncoding;
-        private static PxFileSyntaxConf conf;
+        private static Encoding streamEncoding = Encoding.Default;
+        private static PxFileSyntaxConf conf = PxFileSyntaxConf.Default;
 
         /// <summary>
         /// Validates the data in the stream according to the specified parameters and returns a collection of validation feedback items.
@@ -39,21 +39,7 @@ namespace PxUtils.Validation.DataValidation
         public static IEnumerable<ValidationFeedback> Validate(Stream stream, int rowLen, int numOfRows,
             int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null)
         {
-            streamEncoding ??= Encoding.Default;
-            conf ??= PxFileSyntaxConf.Default;
-            expectedRows = numOfRows;
-            expectedRowLength = rowLen;
-            DataValidation.startRow = startRow;
-            DataValidation.streamEncoding = streamEncoding;
-            DataValidation.conf = conf;
-
-            commonValidators.Add(new DataStructureValidator());
-            dataNumValidators.AddRange(commonValidators);
-            dataNumValidators.Add(new DataNumberValidator());
-            dataStringValidators.AddRange(commonValidators);
-            dataStringValidators.Add(new DataStringValidator());
-            dataSeparatorValidators.AddRange(commonValidators);
-            dataSeparatorValidators.Add(new DataSeparatorValidator());
+            SetValidationParameters(streamEncoding, conf, numOfRows, rowLen, startRow);
 
             List<ValidationFeedback> feedbacks = ValidateDataStream(stream);
 
@@ -79,13 +65,23 @@ namespace PxUtils.Validation.DataValidation
             int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null,
             CancellationToken cancellationToken = default)
         {
-            streamEncoding ??= Encoding.Default;
-            conf ??= PxFileSyntaxConf.Default;
-            expectedRows = numOfRows;
-            expectedRowLength = rowLen;
-            DataValidation.startRow = startRow;
-            DataValidation.streamEncoding = streamEncoding;
-            DataValidation.conf = conf;
+            SetValidationParameters(streamEncoding, conf, numOfRows, rowLen, startRow);
+
+            List<ValidationFeedback> feedbacks = await Task.Factory.StartNew(() => 
+                ValidateDataStream(stream));
+
+            ResetValidators();
+
+            return feedbacks;
+        }
+
+        private static void SetValidationParameters(Encoding? _streamEncoding, PxFileSyntaxConf? _conf, int _numOfRows, int _rowLen, int _startRow)
+        {
+            streamEncoding = _streamEncoding ?? Encoding.Default;
+            conf  = _conf ?? PxFileSyntaxConf.Default;
+            expectedRows = _numOfRows;
+            expectedRowLength = _rowLen;
+            startRow = _startRow;
 
             commonValidators.Add(new DataStructureValidator());
             dataNumValidators.AddRange(commonValidators);
@@ -94,13 +90,6 @@ namespace PxUtils.Validation.DataValidation
             dataStringValidators.Add(new DataStringValidator());
             dataSeparatorValidators.AddRange(commonValidators);
             dataSeparatorValidators.Add(new DataSeparatorValidator());
-
-            List<ValidationFeedback> feedbacks = await Task.Factory.StartNew(() => 
-                ValidateDataStream(stream));
-
-            ResetValidators();
-
-            return feedbacks;
         }
 
         private static List<ValidationFeedback> ValidateDataStream(Stream stream)

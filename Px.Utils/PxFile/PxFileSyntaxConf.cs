@@ -2,7 +2,7 @@
 {
     public class PxFileSyntaxConf
     {
-        public class SymbolCollection
+        public class SymbolDefinitions
         {
             public class KeySymbols
             {
@@ -59,16 +59,16 @@
             public KeySymbols Key { get; set; }
             public ValueSymbols Value { get; set; }
 
-            private SymbolCollection()
+            private SymbolDefinitions()
             {
                 Key = KeySymbols.DefaultKeySymbols;
                 Value = ValueSymbols.DefaultValueSymbols;
             }
 
-            public static SymbolCollection DefaultSymbols => new();
+            public static SymbolDefinitions DefaultSymbols => new();
         }
 
-        public class TokenCollection
+        public class TokenDefinitions
         {
             public class TimeValue
             {
@@ -224,7 +224,7 @@
             
             public DataValueTokens DataValues { get; set; }
 
-            private TokenCollection()
+            private TokenDefinitions()
             {
                 Time = TimeValue.DefaultTimeValue;
                 KeyWords = KeyWordTokens.DefaultKeyWordTokens;
@@ -233,16 +233,16 @@
                 DataValues = DataValueTokens.DefaultDataValueTokens;
             }
 
-            public static TokenCollection DefaultTokens => new();
+            public static TokenDefinitions DefaultTokens => new();
         }
 
-        public SymbolCollection Symbols { get; set; }
-        public TokenCollection Tokens { get; set; }
+        public SymbolDefinitions Symbols { get; set; }
+        public TokenDefinitions Tokens { get; set; }
 
         private PxFileSyntaxConf()
         {
-            Symbols = SymbolCollection.DefaultSymbols;
-            Tokens = TokenCollection.DefaultTokens;
+            Symbols = SymbolDefinitions.DefaultSymbols;
+            Tokens = TokenDefinitions.DefaultTokens;
         }
 
         public static PxFileSyntaxConf Default => new();

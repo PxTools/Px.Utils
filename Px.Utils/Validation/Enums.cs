@@ -14,7 +14,7 @@
     /// </summary>
     public enum ValueType
     {
-        String,
+        StringValue,
         ListOfStrings,
         Number,
         Boolean,

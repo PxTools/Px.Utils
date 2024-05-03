@@ -196,7 +196,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
             else if (IsStringFormat(input, syntaxConf.Symbols.Key.StringDelimeter))
             {
-                return ValueType.String;
+                return ValueType.StringValue;
             }
             else if (input == syntaxConf.Tokens.Booleans.Yes || input == syntaxConf.Tokens.Booleans.No)
             {
