@@ -9,7 +9,7 @@ namespace Px.Utils.UnitTests.ModelTests
     {
         internal static MatrixMetadata BuildTestMetadata(int[] dimensionSizes)
         {
-            List<IDimension> dimensions = [BuildTestContentDimension(0, dimensionSizes[0])];
+            List<Dimension> dimensions = [BuildTestContentDimension(0, dimensionSizes[0])];
             if(dimensionSizes.Length > 1) dimensions.Add(BuildTestTimeDimension(1, dimensionSizes[1]));
             if(dimensionSizes.Length > 2) dimensions.AddRange(dimensionSizes.Skip(2).Select((size, i) => BuildTestDimension(i + 2, size)));
             return new MatrixMetadata("en", ["en"], dimensions, []);

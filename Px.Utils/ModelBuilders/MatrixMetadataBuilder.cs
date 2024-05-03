@@ -1,11 +1,11 @@
-﻿using PxUtils.Language;
+﻿using Px.Utils.Models.Metadata.Dimensions;
+using PxUtils.Language;
 using PxUtils.Models.Metadata;
 using PxUtils.Models.Metadata.Dimensions;
 using PxUtils.Models.Metadata.Enums;
 using PxUtils.Models.Metadata.ExtensionMethods;
 using PxUtils.PxFile;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 
 namespace PxUtils.ModelBuilders
 {
@@ -60,8 +60,8 @@ namespace PxUtils.ModelBuilders
 
             ContentDimension? maybeCd = GetContentDimensionIfAvailable(entries, langs);
 
-            IEnumerable<IDimension> dimensions = stubDimensionNames.Concat(headingDimensionNames)
-                .Select<MultilanguageString, IDimension>(name =>
+            IEnumerable<Dimension> dimensions = stubDimensionNames.Concat(headingDimensionNames)
+                .Select(name =>
                 {
                     if (maybeCd is not null && name.Equals(maybeCd.Name)) return maybeCd;
                     else if(TestIfTimeAndBuild(entries, langs, name, out TimeDimension? timeDim)) return timeDim;
@@ -99,10 +99,10 @@ namespace PxUtils.ModelBuilders
             if(TryGetAndRemoveProperty(entries, timeValIdentifierKey, langs, out MetaProperty? timeVal, dimensionNameToTest))
             {
                 string code = GetDimensionCode(entries, langs, dimensionNameToTest);
-                DimensionValue[] values = GetDimensionValues(entries, langs, dimensionNameToTest);
+                ValueList values = GetDimensionValues(entries, langs, dimensionNameToTest);
                 TimeDimensionInterval interval = ValueParserUtilities.ParseTimeIntervalFromTimeVal(timeVal.GetRawValueString(), _pxFileSyntaxConf);
                 Dictionary<string, MetaProperty> additionalProperties = new() { { timeVal.KeyWord, timeVal } };
-                timeDimension = new TimeDimension(code, dimensionNameToTest, additionalProperties, [.. values], interval);
+                timeDimension = new TimeDimension(code, dimensionNameToTest, additionalProperties, values, interval);
                 return true;
             }
             else if (TryGetProperty(entries, dimensionTypeKey, langs, out MetaProperty? dimType, dimensionNameToTest) &&
@@ -112,8 +112,8 @@ namespace PxUtils.ModelBuilders
                 keys.ForEach(k => entries.Remove(k));
 
                 string code = GetDimensionCode(entries, langs, dimensionNameToTest);
-                DimensionValue[] values = GetDimensionValues(entries, langs, dimensionNameToTest);
-                timeDimension = new TimeDimension(code, dimensionNameToTest, [], [.. values], TimeDimensionInterval.Irregular);
+                ValueList values = GetDimensionValues(entries, langs, dimensionNameToTest);
+                timeDimension = new TimeDimension(code, dimensionNameToTest, [], values, TimeDimensionInterval.Irregular);
                 return true;
             }
 
@@ -124,10 +124,10 @@ namespace PxUtils.ModelBuilders
         private Dimension BuildDimension(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName)
         {
             string code = GetDimensionCode(entries, langs, dimensionName);
-            DimensionValue[] values = GetDimensionValues(entries, langs, dimensionName);
+            ValueList values = GetDimensionValues(entries, langs, dimensionName);
             
             DimensionType type = GetDimensionType(entries, langs, dimensionName);
-            return new Dimension(code, dimensionName, [], [.. values], type);
+            return new Dimension(code, dimensionName, [], values, type);
         }
 
         private DimensionType GetDimensionType(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName)
@@ -151,13 +151,13 @@ namespace PxUtils.ModelBuilders
         private ContentDimension BuildContentDimension(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName)
         {
             string code = GetDimensionCode(entries, langs, dimensionName);
-            List<ContentDimensionValue> values = BuildContentDimensionValues(entries, langs, dimensionName).ToList();
+            ContentValueList values = BuildContentDimensionValues(entries, langs, dimensionName);
 
             return new ContentDimension(code, dimensionName, [], values);
         }
 
         private static void AddAdditionalPropertiesToDimensions(
-            IEnumerable<IDimension> dimensions,
+            IEnumerable<Dimension> dimensions,
             Dictionary<MetadataEntryKey, string> entries,
             KeyValuePair<MetadataEntryKey, string> current,
             PxFileLanguages pxLangs)
@@ -165,7 +165,7 @@ namespace PxUtils.ModelBuilders
             string firstIdentifier = current.Key.FirstIdentifier ??
                 throw new ArgumentException($"First identifier is required in the key {current.Key.KeyWord} for setting variable properties");
 
-            IDimension? targetDimension = dimensions.FirstOrDefault(d =>
+            Dimension? targetDimension = dimensions.FirstOrDefault(d =>
                         d.Name[current.Key.Language ?? pxLangs.DefaultLanguage] == firstIdentifier);
 
             if (current.Key.SecondIdentifier is null)
@@ -183,7 +183,7 @@ namespace PxUtils.ModelBuilders
             }
             else
             {
-                DimensionValue? value = targetDimension?.Values.FirstOrDefault(v => v.Name[current.Key.Language ?? pxLangs.DefaultLanguage] == current.Key.SecondIdentifier) ??
+                DimensionValue? value = targetDimension?.Values.Find(v => v.Name[current.Key.Language ?? pxLangs.DefaultLanguage] == current.Key.SecondIdentifier) ??
                     throw new ArgumentException($"Failed to build property for key {current.Key} because the value with name {current.Key.SecondIdentifier} was not found.");
                 AddPropertyToDimensionValue(entries, current, targetDimension.Name, value, pxLangs);
             }
@@ -192,7 +192,7 @@ namespace PxUtils.ModelBuilders
         private static void AddAdditionalPropertyToDimension(
             Dictionary<MetadataEntryKey, string> entries,
             KeyValuePair<MetadataEntryKey, string> current,
-            IDimension targetDimension,
+            Dimension targetDimension,
             PxFileLanguages pxLangs)
         {
             if (TryGetAndRemoveProperty(entries, current.Key.KeyWord, pxLangs, out MetaProperty? prop, targetDimension.Name))
@@ -210,7 +210,7 @@ namespace PxUtils.ModelBuilders
 
         #region Dimension value building
 
-        private DimensionValue[] GetDimensionValues(
+        private ValueList GetDimensionValues(
             Dictionary<MetadataEntryKey, string> entries,
             PxFileLanguages langs,
             MultilanguageString dimensionName)
@@ -233,7 +233,7 @@ namespace PxUtils.ModelBuilders
                     values[index] = new DimensionValue(codes[index], valueNamesList[index]);
                 }
 
-                return values;
+                return new(values);
             }
 
             throw new ArgumentException($"Value names not found for dimension {dimensionName[langs.DefaultLanguage]}");
@@ -250,15 +250,17 @@ namespace PxUtils.ModelBuilders
             }
         }
 
-        private IEnumerable<ContentDimensionValue> BuildContentDimensionValues(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName)
+        private ContentValueList BuildContentDimensionValues(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName)
         {
+            List<ContentDimensionValue> values = [];
             foreach(DimensionValue value in GetDimensionValues(entries, langs, dimensionName))
             {
                 MultilanguageString unit = GetUnit(entries, langs, dimensionName, value.Name);
                 DateTime lastUpdated = GetLastUpdated(entries, langs, dimensionName, value.Name);
                 int precision = GetPrecision(entries, langs, dimensionName, value.Name);
-                yield return new ContentDimensionValue(value, unit, lastUpdated, precision);
+                values.Add(new ContentDimensionValue(value, unit, lastUpdated, precision));
             }
+            return new(values);
         }
 
         private static void AddPropertyToDimensionValue(
@@ -396,12 +398,14 @@ namespace PxUtils.ModelBuilders
             }
         }
 
-        private static bool HasContentDimensionWithValue(IEnumerable<IDimension> dimensions, string name, [MaybeNullWhen(false)] out DimensionValue value)
+        private static bool HasContentDimensionWithValue(IEnumerable<Dimension> dimensions, string name, [MaybeNullWhen(false)] out DimensionValue value)
         {
-            IDimension? contentDimension = dimensions.FirstOrDefault(d => d.Type == DimensionType.Content);
+            Dimension? contentDimension = dimensions.FirstOrDefault(d => d.Type == DimensionType.Content);
             if (contentDimension is not null)
             {
-                value = contentDimension.Values.FirstOrDefault(v => v.Name.Languages.Any(l => v.Name[l] == name));
+                value = contentDimension.Values
+                    .Cast<ContentDimensionValue>()
+                    .FirstOrDefault(v => v.Name.Languages.Any(l => v.Name[l] == name));
                 return value is not null;
             }
             else

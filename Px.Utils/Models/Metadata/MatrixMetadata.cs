@@ -13,8 +13,9 @@ namespace PxUtils.Models.Metadata
     public class MatrixMetadata(
         string defaultLanguage,
         IReadOnlyList<string> availableLanguages,
-        List<IDimension> dimensions,
-        Dictionary<string, MetaProperty> additionalProperties) : IReadOnlyMatrixMetadata
+        List<Dimension> dimensions,
+        Dictionary<string, MetaProperty> additionalProperties)
+        : IReadOnlyMatrixMetadata
     {
         /// <summary>
         /// The default language of the matrix
@@ -29,7 +30,7 @@ namespace PxUtils.Models.Metadata
         /// <summary>
         /// Ordered list of dimension objects that define the structure of the matrix
         /// </summary>
-        public List<IDimension> Dimensions { get; } = dimensions;
+        public List<Dimension> Dimensions { get; } = dimensions;
 
         /// <summary>
         /// Additional properties of the matrix object, does not include properties of the dimensions or their values.
@@ -46,9 +47,9 @@ namespace PxUtils.Models.Metadata
 
         public MatrixMetadata GetTransform(IMatrixMap map)
         {
-            List<IDimension> newDimensions = map.DimensionMaps.Select(map =>
+            List<Dimension> newDimensions = map.DimensionMaps.Select(map =>
             {
-                if(Dimensions.Find(dimension => dimension.Code == map.Code) is IDimension dimension) return dimension.GetTransform(map);
+                if(Dimensions.Find(dimension => dimension.Code == map.Code) is Dimension dimension) return dimension.GetTransform(map);
                 else throw new ArgumentException($"Dimension with code {map.Code} not found in metadata");
 
             }).ToList();
