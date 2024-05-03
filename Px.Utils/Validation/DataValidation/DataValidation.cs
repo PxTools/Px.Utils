@@ -47,12 +47,8 @@ namespace PxUtils.Validation.DataValidation
             dataSeparatorValidators.AddRange(commonValidators);
             dataSeparatorValidators.Add(new DataSeparatorValidator());
 
-            // TODO: Remove console logs
-            Console.WriteLine($"Starting with parameters: {rowLen} {numOfRows} {startRow} {streamEncoding} {conf}");
             List<ValidationFeedback> feedbacks = ValidateDataStream(stream, streamEncoding, numOfRows, rowLen, conf);
 
-            // TODO: Remove console logs
-            Console.WriteLine($"Feedbacks: {feedbacks.Count}");
             foreach (ValidationFeedback feedback in feedbacks)
             {
                 Console.WriteLine($"{feedback.Rule} - {feedback.AdditionalInfo} - {feedback.Line}/{feedback.Character}");

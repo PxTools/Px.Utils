@@ -23,15 +23,17 @@ namespace Px.Utils.TestingApp.Commands
 
         internal override string Description => "Benchmarks the data validation capabilities of the DataValidator.";
 
-        private long start = 0;
+        private long start;
         private const string dataKeyword = "DATA";
 
         private Encoding encoding;
 
+        private const int readStartOffset = 3;
+
         internal DataValidationBenchmark()
         {
             BenchmarkFunctions = [ValidateDataBenchmarks];
-            // BenchmarkFunctionsAsync = [ValidateDataAsyncBenchmarks, ValidateDataTokenAsyncBenchmarks];
+            BenchmarkFunctionsAsync = [ValidateDataBenchmarksAsync];
             ParameterFlags.Add(expectedRowsFlags);
             ParameterFlags.Add(expectedColsFlags);
             encoding = Encoding.UTF8;
@@ -51,30 +53,15 @@ namespace Px.Utils.TestingApp.Commands
         private void ValidateDataBenchmarks()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            stream.Position = start + dataKeyword.Length + 1 + 2; // +1 to skip the '='
+            stream.Position = start + dataKeyword.Length + readStartOffset; // skip the '=' and linechange
             DataValidation.Validate(stream, expectedCols, expectedRows, 0, encoding);
         }
         
-       /* private async Task ValidateDataTokenAsyncBenchmarks()
+        private async Task ValidateDataBenchmarksAsync()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            
-            stream.Position = start + dataKeyword.Length + 1 +2 ; // +1 to skip the '='
+            stream.Position = start + dataKeyword.Length + readStartOffset; // skip the '=' and linechange
 
-            IAsyncEnumerable<Token> tokens = DataValidation.TokenizeAsync(stream, PxFileSyntaxConf.Default,null);
-                
-            int j = 0;
-            await foreach (Token token in tokens)
-            {
-                j++;
-            }
-        }*/
-        
-        private async Task ValidateDataAsyncBenchmarks()
-        {
-            using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            stream.Position = start + dataKeyword.Length + 1 + 2; // +1 to skip the '='
-                
             await DataValidation.ValidateAsync(stream, expectedCols, expectedRows, 0, null);
         }
 
@@ -85,10 +72,13 @@ namespace Px.Utils.TestingApp.Commands
             Dictionary<string, List<string>> parameters = GroupParameters(Inputs ?? [], ParameterFlags.SelectMany(x => x).ToList());
             foreach (string key in parameters.Keys)
             {
-                if ((expectedColsFlags.Contains(key) && !int.TryParse(parameters[key][0], out expectedCols)) &&
-                    (expectedRowsFlags.Contains(key) && !int.TryParse(parameters[key][0], out expectedRows)))
+                if (expectedColsFlags.Contains(key) && !int.TryParse(parameters[key][0], out expectedCols))
                 {
-                        throw new ArgumentException($"Invalid argument {key} {string.Join(' ', parameters[key])}");
+                    throw new ArgumentException($"Invalid argument {key} {string.Join(' ', parameters[key])}");
+                }
+                if (expectedRowsFlags.Contains(key) && !int.TryParse(parameters[key][0], out expectedRows))
+                {
+                    throw new ArgumentException($"Invalid argument {key} {string.Join(' ', parameters[key])}");
                 }
             }
         }
