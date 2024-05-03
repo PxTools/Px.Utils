@@ -14,21 +14,21 @@ namespace Px.Utils.Models.Metadata.Dimensions
     /// </summary>
     public class ValueList : IReadOnlyList<IReadOnlyDimensionValue>
     {
-        protected List<DimensionValue> Dimensions { get; }
+        protected List<DimensionValue> Values { get; }
 
         /// <summary>
         /// Gets the dimension value at the specified index.
         /// </summary>
         /// <param name="index">The zero-based index of the dimension value to get.</param>
         /// <returns>The dimension value at the specified index.</returns>
-        public virtual DimensionValue this[int index] => Dimensions[index];
+        public virtual DimensionValue this[int index] => Values[index];
 
-        IReadOnlyDimensionValue IReadOnlyList<IReadOnlyDimensionValue>.this[int index] => Dimensions[index];
+        IReadOnlyDimensionValue IReadOnlyList<IReadOnlyDimensionValue>.this[int index] => Values[index];
 
         /// <summary>
         /// Gets the number of dimension values in the list.
         /// </summary>
-        public int Count => Dimensions.Count;
+        public int Count => Values.Count;
 
         /// <summary>
         /// Gets the list of codes associated with the dimension values in the same order.
@@ -41,8 +41,8 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <param name="dimensions">The collection of dimension values in order.</param>
         public ValueList(IEnumerable<DimensionValue> dimensions)
         {
-            Dimensions = dimensions.ToList();
-            Codes = Dimensions.Select(d => d.Code).ToList();
+            Values = dimensions.ToList();
+            Codes = Values.Select(d => d.Code).ToList();
         }
 
         /// <summary>
@@ -50,25 +50,55 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// </summary>
         /// <param name="code">The code of the dimension value to find.</param>
         /// <returns>The dimension value with the specified code, or null if not found.</returns>
-        public virtual DimensionValue? Find(string code) => Dimensions.Find(d => d.Code == code);
+        public virtual DimensionValue? Find(string code) => Values.Find(d => d.Code == code);
 
         /// <summary>
         /// Returns the first dimension value that fills the specified condition.
         /// </summary>
         /// <param name="match">The condition the check the dimension value against.</param>
         /// <returns>The first dimension value that matches the specified predicate, or null if not found.</returns>
-        public DimensionValue? Find(Predicate<DimensionValue> match) => Dimensions.Find(match);
+        public DimensionValue? Find(Predicate<DimensionValue> match) => Values.Find(match);
+
+        /// <summary>
+        /// Adds a dimension value to the end of the list.
+        /// </summary>
+        /// <param name="value">Value to add.</param>
+        public void Add(DimensionValue value) => Values.Add(value);
+
+        /// <summary>
+        /// Inserts a dimension value into the list at the specified index.
+        /// </summary>
+        /// <param name="index">Index at which to insert the value.</param>
+        /// <param name="value">Value to be added.</param>
+        public void Insert(int index, DimensionValue value) => Values.Insert(index, value);
+
+        /// <summary>
+        /// Removes the dimension value with the specified code from the list.
+        /// </summary>
+        /// <param name="code">Code of the dimension value to remove.</param>
+        /// <exception cref="ArgumentException">Thrown when the dimension value with the specified code is not found in the list.</exception>
+        public void Remove(string code)
+        {
+            if (Find(code) is DimensionValue value)
+            {
+                Values.Remove(value);
+            }
+            else
+            {
+                throw new ArgumentException($"Dimension value with code {code} not found in value list");
+            }
+        }
 
         /// <summary>
         /// Returns an enumerator that iterates through the dimension values in order.
         /// </summary>
         /// <returns>An enumerator that can be used to iterate through the dimension values.</returns>
-        public virtual IEnumerator<DimensionValue> GetEnumerator() => Dimensions.GetEnumerator();
+        public virtual IEnumerator<DimensionValue> GetEnumerator() => Values.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => Dimensions.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => Values.GetEnumerator();
 
         IEnumerator<IReadOnlyDimensionValue> IEnumerable<IReadOnlyDimensionValue>.GetEnumerator()
-            => Dimensions.GetEnumerator();
+            => Values.GetEnumerator();
     }
 
     /// <summary>
@@ -87,7 +117,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <param name="index">The zero-based index of the value to get.</param>
         /// <returns>The <see cref="ContentDimensionValue"/> at the specified index.</returns>
         public override ContentDimensionValue this[int index]
-            => (ContentDimensionValue)Dimensions[index];
+            => (ContentDimensionValue)Values[index];
 
         /// <summary>
         /// Finds the <see cref="ContentDimensionValue"/> with the specified code.
@@ -95,7 +125,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <param name="code">The code of the value to find.</param>
         /// <returns>The <see cref="ContentDimensionValue"/> with the specified code, or null if not found.</returns>
         public override ContentDimensionValue? Find(string code)
-            => (ContentDimensionValue?)Dimensions.Find(d => d.Code == code);
+            => (ContentDimensionValue?)Values.Find(d => d.Code == code);
 
         /// <summary>
         /// Returns the first <see cref="ContentDimensionValue"/> that fills the specified condition.
@@ -104,7 +134,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <returns> The first <see cref="ContentDimensionValue"/> that matches the specified predicate, or null if not found.</returns>
         public ContentDimensionValue? Find(Predicate<ContentDimensionValue> match)
         {
-            foreach (var dimension in Dimensions)
+            foreach (var dimension in Values)
             {
                 if (dimension is ContentDimensionValue value && match(value))
                 {
@@ -120,6 +150,6 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// </summary>
         /// <returns>An enumerator that can be used to iterate through the content dimension values.</returns>
         public override IEnumerator<ContentDimensionValue> GetEnumerator()
-            => Dimensions.Cast<ContentDimensionValue>().GetEnumerator();
+            => Values.Cast<ContentDimensionValue>().GetEnumerator();
     }
 }

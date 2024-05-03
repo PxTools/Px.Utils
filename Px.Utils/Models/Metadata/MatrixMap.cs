@@ -5,9 +5,9 @@
     /// Can be used to map a matrix from one structure to another.
     /// </summary>
     /// <param name="dimensionMaps">Maps for each dimension in the matrix</param>
-    public class MatrixMap(List<DimensionMap> dimensionMaps) : IMatrixMap
+    public class MatrixMap(List<IDimensionMap> dimensionMaps) : IMatrixMap
     {
-        public List<DimensionMap> DimensionMaps { get; } = dimensionMaps;
+        public List<IDimensionMap> DimensionMaps { get; } = dimensionMaps;
 
         IReadOnlyList<IDimensionMap> IMatrixMap.DimensionMaps => DimensionMaps;
     }
