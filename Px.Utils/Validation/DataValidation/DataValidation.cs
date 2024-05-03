@@ -49,11 +49,6 @@ namespace PxUtils.Validation.DataValidation
 
             List<ValidationFeedback> feedbacks = ValidateDataStream(stream, streamEncoding, numOfRows, rowLen, conf);
 
-            foreach (ValidationFeedback feedback in feedbacks)
-            {
-                Console.WriteLine($"{feedback.Rule} - {feedback.AdditionalInfo} - {feedback.Line}/{feedback.Character}");
-            }
-
             ResetValidators();
 
             return feedbacks;
@@ -92,11 +87,6 @@ namespace PxUtils.Validation.DataValidation
 
             List<ValidationFeedback> feedbacks = await Task.Factory.StartNew(() => 
                 ValidateDataStream(stream, streamEncoding, numOfRows, rowLen, conf));
-
-            foreach (ValidationFeedback feedback in feedbacks)
-            {
-                Console.WriteLine($"{feedback.Rule} - {feedback.AdditionalInfo} - {feedback.Line}/{feedback.Character}");
-            }
 
             ResetValidators();
 
