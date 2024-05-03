@@ -17,6 +17,6 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
             "6 7 +8\t9 10 \n\r" +
             "\".\" \"..\" \"...\" \"....\" \".....\" \r" +
             "\"dots\" \"-\" \"..123\" -1 1.2 -1.3 \r\n" +
-            "1 2 3 4 5 \r\n;";
+            "1 2 \0 4 5 \r\n;";
     }
 }
