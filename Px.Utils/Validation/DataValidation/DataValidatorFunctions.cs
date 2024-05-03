@@ -1,5 +1,5 @@
 ﻿using PxUtils.PxFile;
-using PxUtils.Validation;
+using System.Globalization;
 using System.Text;
 
 namespace PxUtils.Validation.DataValidation
@@ -22,24 +22,20 @@ namespace PxUtils.Validation.DataValidation
         /// </summary>
         /// <param name="token">The token to be validated.</param>
         /// <returns>An enumerable collection of <see cref="ValidationFeedback"/> objects containing any validation feedback.</returns>
-        public IEnumerable<ValidationFeedback> Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos)
+        public void Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, ref List<ValidationFeedback> feedbacks)
         {
-            ArgumentNullException.ThrowIfNull(encoding);
-
             string value = encoding.GetString(entry.ToArray());
-            if (ValidStringDataItems.Contains(value))
+            if (!ValidStringDataItems.Contains(value))
             {
-                return Array.Empty<ValidationFeedback>();
+                feedbacks.Add(new ValidationFeedback(ValidationFeedbackLevel.Error,
+                ValidationFeedbackRule.DataValidationFeedbackInvalidString, lineNumber, charPos, $"{value}"));
             }
-
-            return new[] { new ValidationFeedback(ValidationFeedbackLevel.Error, 
-                ValidationFeedbackRule.DataValidationFeedbackInvalidString, lineNumber, charPos, $"{value}") };
         }
     }
 
     public class DataNumberValidator : IDataValidator
     {
-        private static readonly int MaxLength = decimal.MaxValue.ToString().Length;
+        private static readonly int MaxLength = decimal.MaxValue.ToString(CultureInfo.InvariantCulture).Length;
         private static readonly int zero = 0x30;
         private static readonly int nine = 0x39;
 
@@ -48,62 +44,52 @@ namespace PxUtils.Validation.DataValidation
         /// </summary>
         /// <param name="token">The token to validate.</param>
         /// <returns>An enumerable of <see cref="ValidationFeedback"/> objects indicating any validation errors.</returns>
-        public IEnumerable<ValidationFeedback> Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos)
+        public void Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, ref List<ValidationFeedback> feedbacks)
         {
             if (entry.Count >= MaxLength && !decimal.TryParse(entry.ToArray(), out _))
             {
-                return [new ValidationFeedback(
+                feedbacks.Add(new ValidationFeedback(
                     ValidationFeedbackLevel.Error,
                     ValidationFeedbackRule.DataValidationFeedbackInvalidNumber,
                     lineNumber,
                     charPos,
-                    encoding.GetString(entry.ToArray()))
-                ];
+                    encoding.GetString(entry.ToArray())));
+
+                return;
             }
 
             int decimalSeparatorIndex = entry.IndexOf(0x2E);
             if (decimalSeparatorIndex == -1)
             {
-                return IsValidIntegerPart(entry, true) ?
-                    Array.Empty<ValidationFeedback>() :
-                    [new ValidationFeedback(
+                if (!IsValidIntegerPart(entry, true))
+                {
+                    feedbacks.Add(new ValidationFeedback(
                         ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.DataValidationFeedbackInvalidNumber,
                         lineNumber,
                         charPos,
-                        encoding.GetString(entry.ToArray()))
-                    ];
+                        encoding.GetString(entry.ToArray())));
+                }
             }
-            else if (decimalSeparatorIndex == 0 || !IsValidIntegerPart(entry[0..decimalSeparatorIndex], false))
+            else if (decimalSeparatorIndex == 0 || !IsValidIntegerPart(entry[0..decimalSeparatorIndex], false) || !IsValidDecimalPart(entry[decimalSeparatorIndex..]))
             {
-                return
-                    [new ValidationFeedback(
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.DataValidationFeedbackInvalidNumber,
-                        lineNumber,
-                        charPos,
-                        encoding.GetString(entry.ToArray()))
-                    ];
+                feedbacks.Add(new ValidationFeedback(
+                    ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.DataValidationFeedbackInvalidNumber,
+                    lineNumber,
+                    charPos,
+                    encoding.GetString(entry.ToArray())));
             }
-            else return IsValidDecimalPart(entry[decimalSeparatorIndex..]) ?
-                    Array.Empty<ValidationFeedback>() :
-                    [new ValidationFeedback(
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.DataValidationFeedbackInvalidNumber,
-                        lineNumber,
-                        charPos,
-                        encoding.GetString(entry.ToArray()))
-                    ];
         }
 
         private static bool IsValidIntegerPart(List<byte> entry, bool isInteger)
         {
             bool isNegative = entry[0] == 0x2D;
             bool startsWithZero = isNegative ? entry[1] == zero : entry[0] == zero;
-            List<byte> numbers = isNegative ? entry.Skip(1).ToList() : entry;
-            if (numbers.Count > 1)
+            List<byte> digits = isNegative ? entry.Skip(1).ToList() : entry;
+            if (digits.Count > 1)
             {
-                if (isInteger && numbers.Sum(x => x - zero) == 0)
+                if (isInteger && digits.Sum(x => x - zero) == 0)
                 {
                     return false;
                 }
@@ -112,7 +98,7 @@ namespace PxUtils.Validation.DataValidation
                     return false;
                 }
             }
-            if (isNegative && isInteger && numbers[0] == zero)
+            if (isNegative && isInteger && digits[0] == zero)
             {
                 return false;
             }
@@ -152,34 +138,27 @@ namespace PxUtils.Validation.DataValidation
         /// </summary>
         /// <param name="token">The token to validate.</param>
         /// <returns>A collection of validation feedback.</returns>
-        public IEnumerable<ValidationFeedback> Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos)
+        public void Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, ref List<ValidationFeedback> feedbacks)
         {
             if (_separator == entry[0])
             {
-                return Array.Empty<ValidationFeedback>();
+                return;
             }
             else if (_separator == Sentinel)
             {
                 _separator = entry[0];
-                return Array.Empty<ValidationFeedback>();
+                return;
             }
-            else
-            {
-                return _separator == entry[0]
-                    ? Array.Empty<ValidationFeedback>()
-                    : [new ValidationFeedback(
-                        ValidationFeedbackLevel.Warning,
-                        ValidationFeedbackRule.DataValidationFeedbackInconsistentSeparator,
-                        lineNumber,
-                        charPos)];
-            }
+
+            feedbacks.Add(
+                new ValidationFeedback(
+                    ValidationFeedbackLevel.Warning,
+                    ValidationFeedbackRule.DataValidationFeedbackInconsistentSeparator,
+                    lineNumber,
+                    charPos));
         }
 
         private const byte Sentinel = 0x0;
-
-        public DataSeparatorValidator()
-        {
-        }
     }
 
     public class DataStructureValidator : IDataValidator
@@ -200,21 +179,23 @@ namespace PxUtils.Validation.DataValidation
         /// </summary>
         /// <param name="token">The token to be validated.</param>
         /// <returns>A collection of validation feedback.</returns>
-        public IEnumerable<ValidationFeedback> Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos)
+        public void Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, ref List<ValidationFeedback> feedbacks)
         {
             if (_allowedPreviousTokens[entryType].Contains(_previousTokenType))
             {
                 _previousTokenType = entryType;
-                return Array.Empty<ValidationFeedback>();
+                return;
             }
 
-            ValidationFeedback[] feedback =
-            [
-                new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidStructure,
-                lineNumber, charPos, $"{_previousTokenType},{entryType}")
-            ];
+            feedbacks.Add(
+                new ValidationFeedback(
+                    ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.DataValidationFeedbackInvalidStructure,
+                    lineNumber,
+                    charPos,
+                    $"{_previousTokenType},{entryType}"));
+            
             _previousTokenType = entryType;
-            return feedback;
         }
 
     }

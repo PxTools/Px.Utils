@@ -25,10 +25,10 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             DataStructureValidator validator = new();
             foreach (EntryType tokenType in tokenSequence)
             {
-                feedbacks.AddRange(validator.Validate([], tokenType, Encoding.UTF8, 1, 1));
+                validator.Validate([], tokenType, Encoding.UTF8, 1, 1, ref feedbacks);
             }
         
-            Assert.IsFalse(feedbacks.Any());
+            Assert.IsTrue(feedbacks.Count == 0);
         }
     
     
@@ -44,7 +44,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             DataStructureValidator validator = new();
             foreach (EntryType tokenType in tokenSequence)
             {
-                feedbacks.AddRange(validator.Validate([], tokenType, Encoding.UTF8, 1, 1));
+                validator.Validate([], tokenType, Encoding.UTF8, 1, 1, ref feedbacks);
             }
 
             Assert.AreEqual(1, feedbacks.Count);

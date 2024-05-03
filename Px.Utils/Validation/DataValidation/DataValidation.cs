@@ -134,46 +134,10 @@ namespace PxUtils.Validation.DataValidation
                     };
                     if (currentType != currentEntryType)
                     {
-                        if (currentEntryType == EntryType.Unknown && 
-                            (lineNumber > 1 || charPosition > 0))
+                        HandleEntryTypeChange(currentEntryType, currentEntry, streamEncoding, lineNumber, charPosition, stringDelimeter, ref feedbacks);
+                        if (currentType != EntryType.DataItemSeparator)
                         {
-                            feedbacks.Add(
-                                new(ValidationFeedbackLevel.Error,
-                                ValidationFeedbackRule.DataValidationFeedbackInvalidChar,
-                                lineNumber,
-                                charPosition));
-                        }
-                        else
-                        {
-                            List<IDataValidator> validators = currentEntryType switch
-                            {
-                                EntryType.DataItemSeparator => dataSeparatorValidators,
-                                EntryType.DataItem => currentEntry[0] == stringDelimeter ? dataStringValidators : dataNumValidators,
-                                _ => commonValidators
-                            };
-
-                            foreach (IDataValidator validator in validators)
-                            {
-                                feedbacks.AddRange(validator.Validate(currentEntry, currentEntryType, streamEncoding, lineNumber, charPosition));
-                            }
-
-                            if (currentType != EntryType.DataItemSeparator)
-                            {
-                                if (currentType == EntryType.DataItem)
-                                {
-                                    currentRowLength++;
-                                }
-                                else if (currentType == EntryType.LineSeparator)
-                                {
-                                    if (currentRowLength != expectedRowLength)
-                                    {
-                                        feedbacks.Add(new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength, lineNumber, charPosition));
-                                    }
-                                    lineNumber++;
-                                    currentRowLength = 0;
-                                    charPosition = 0;
-                                }
-                            }
+                            HandleNonSeparatorType(currentType, ref currentRowLength, ref lineNumber, ref charPosition, expectedRowLength, ref feedbacks);
                         }
                         currentEntryType = currentType;
                         currentEntry.Clear();
@@ -192,6 +156,59 @@ namespace PxUtils.Validation.DataValidation
             return feedbacks;
         }
 
+        private static void HandleEntryTypeChange(
+            EntryType currentEntryType,
+            List<byte> currentEntry,
+            Encoding streamEncoding,
+            int lineNumber,
+            int charPosition,
+            byte stringDelimeter,
+            ref List<ValidationFeedback> feedbacks)
+        {
+            if (currentEntryType == EntryType.Unknown && (lineNumber > 1 || charPosition > 0))
+            {
+                feedbacks.Add(new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidChar, lineNumber, charPosition));
+            }
+            else
+            {
+                List<IDataValidator> validators = currentEntryType switch
+                {
+                    EntryType.DataItemSeparator => dataSeparatorValidators,
+                    EntryType.DataItem => currentEntry[0] == stringDelimeter ? dataStringValidators : dataNumValidators,
+                    _ => commonValidators
+                };
+
+                foreach (IDataValidator validator in validators)
+                {
+                    validator.Validate(currentEntry, currentEntryType, streamEncoding, lineNumber, charPosition, ref feedbacks);
+                }
+            }
+        }
+
+        private static void HandleNonSeparatorType(
+            EntryType currentType,
+            ref long currentRowLength, 
+            ref int lineNumber,
+            ref int charPosition,
+            int expectedRowLength, 
+            ref List<ValidationFeedback> feedbacks)
+        {
+            if (currentType == EntryType.DataItem)
+            {
+                currentRowLength++;
+            }
+            else if (currentType == EntryType.LineSeparator)
+            {
+                if (currentRowLength != expectedRowLength)
+                {
+                    feedbacks.Add(new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength, lineNumber, charPosition));
+                }
+                lineNumber++;
+                currentRowLength = 0;
+                charPosition = 0;
+            }
+        }
+
         private static void ResetValidators()
         {
             commonValidators.Clear();
@@ -202,7 +219,7 @@ namespace PxUtils.Validation.DataValidation
     }
 
     /// <summary>
-    /// Represents the different types of tokens used in data validation.
+    /// Represents the different types of entries encountered during data validation.
     /// </summary>
     public enum EntryType
     {
@@ -215,6 +232,6 @@ namespace PxUtils.Validation.DataValidation
 
     internal interface IDataValidator
     {
-        internal IEnumerable<ValidationFeedback> Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos);
+        internal void Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, ref List<ValidationFeedback> feedbacks);
     }
 }

@@ -24,8 +24,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             DataNumberValidator validator = new();
             Encoding encoding = Encoding.UTF8;
             List<byte> value = [.. encoding.GetBytes(allowedValue)];
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(value, EntryType.DataItem, encoding, 0, 0);
-            Assert.IsFalse(feedbacks.Any());
+            List<ValidationFeedback> feedbacks = [];
+            validator.Validate(value, EntryType.DataItem, encoding, 0, 0, ref feedbacks);
+            Assert.IsTrue(feedbacks.Count == 0);
         }
     
         [TestMethod]
@@ -47,12 +48,13 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
 
             Encoding encoding = Encoding.UTF8;
             List<byte> value = [.. encoding.GetBytes(notAllowedValue)];
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(value, EntryType.DataItem, encoding, 0, 0);
+            List<ValidationFeedback> feedbacks = [];
+            validator.Validate(value, EntryType.DataItem, encoding, 0, 0, ref feedbacks);
 
-            Assert.AreEqual(1, feedbacks.Count());
-            Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, feedbacks.First().Rule);
-            Assert.AreEqual(notAllowedValue, feedbacks.First().AdditionalInfo);
-            Assert.AreEqual(ValidationFeedbackLevel.Error, feedbacks.First().Level);
+            Assert.AreEqual(1, feedbacks.Count);
+            Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidNumber, feedbacks[0].Rule);
+            Assert.AreEqual(notAllowedValue, feedbacks[0].AdditionalInfo);
+            Assert.AreEqual(ValidationFeedbackLevel.Error, feedbacks[0].Level);
         }
 
 

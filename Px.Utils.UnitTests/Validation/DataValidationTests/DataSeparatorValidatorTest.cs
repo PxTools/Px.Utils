@@ -12,9 +12,10 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             DataSeparatorValidator validator = new();
             List<byte> separator = [.. Encoding.UTF8.GetBytes(" ")];
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
+            List<ValidationFeedback> feedbacks = [];
+            validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1, ref feedbacks);
 
-            Assert.IsFalse(feedbacks.Any());
+            Assert.IsTrue(feedbacks.Count == 0);
         }
     
         [TestMethod]
@@ -22,14 +23,14 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             DataSeparatorValidator validator = new();
             List<byte> separator = [.. Encoding.UTF8.GetBytes(" ")];
-            validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
+            List<ValidationFeedback> feedbacks = [];
+            validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1, ref feedbacks);
             List<byte> otherSeparator = [.. Encoding.UTF8.GetBytes("\t")];
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(otherSeparator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
+            validator.Validate(otherSeparator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1, ref feedbacks);
 
-            ValidationFeedback[] validationFeedbacks = feedbacks as ValidationFeedback[] ?? feedbacks.ToArray();
-            Assert.AreEqual(1, validationFeedbacks.Length);
-            Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInconsistentSeparator, validationFeedbacks[0].Rule);
-            Assert.AreEqual(ValidationFeedbackLevel.Warning, validationFeedbacks[0].Level);
+            Assert.AreEqual(1, feedbacks.Count);
+            Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInconsistentSeparator, feedbacks[0].Rule);
+            Assert.AreEqual(ValidationFeedbackLevel.Warning, feedbacks[0].Level);
 
         
         }
@@ -39,9 +40,10 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             DataSeparatorValidator validator = new();
             List<byte> separator = [.. Encoding.UTF8.GetBytes(" ")];
-            validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
-            IEnumerable<ValidationFeedback> feedbacks = validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
-            Assert.IsFalse(feedbacks.Any());
+            List<ValidationFeedback> feedbacks = [];
+            validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1, ref feedbacks);
+            validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1, ref feedbacks);
+            Assert.IsTrue(feedbacks.Count == 0);
         }
     }
 }
