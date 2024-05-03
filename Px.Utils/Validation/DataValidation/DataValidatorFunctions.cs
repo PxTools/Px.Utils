@@ -18,10 +18,14 @@ namespace PxUtils.Validation.DataValidation
         ];
 
         /// <summary>
-        /// Validates a token as a string data item.
+        /// Validates an entry that has been identified as a string type data item.
         /// </summary>
-        /// <param name="token">The token to be validated.</param>
-        /// <returns>An enumerable collection of <see cref="ValidationFeedback"/> objects containing any validation feedback.</returns>
+        /// <param name="entry">List of bytes that represents the entry being validated.</param>
+        /// <param name="entryType"><see cref="EntryType"/> enum that represents the type of the validation entry.</param>
+        /// <param name="encoding">Encoding format of the Px file.</param>
+        /// <param name="lineNumber">Line number for the validation item.</param>
+        /// <param name="charPos">Represents the position relative to the line for the validation item.</param>
+        /// <param name="feedbacks">Reference to a list of feedback items to which any validation feedback is added to.</param>
         public void Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, ref List<ValidationFeedback> feedbacks)
         {
             string value = encoding.GetString(entry.ToArray());
@@ -41,9 +45,13 @@ namespace PxUtils.Validation.DataValidation
 
         /// <summary>
         /// Validates a token to determine if it represents a valid number data item.
-        /// </summary>
-        /// <param name="token">The token to validate.</param>
-        /// <returns>An enumerable of <see cref="ValidationFeedback"/> objects indicating any validation errors.</returns>
+        /// </summary>        
+        /// <param name="entry">List of bytes that represents the entry being validated.</param>
+        /// <param name="entryType"><see cref="EntryType"/> enum that represents the type of the validation entry.</param>
+        /// <param name="encoding">Encoding format of the Px file.</param>
+        /// <param name="lineNumber">Line number for the validation item.</param>
+        /// <param name="charPos">Represents the position relative to the line for the validation item.</param>
+        /// <param name="feedbacks">Reference to a list of feedback items to which any validation feedback is added to.</param>
         public void Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, ref List<ValidationFeedback> feedbacks)
         {
             if (entry.Count >= MaxLength && !decimal.TryParse(entry.ToArray(), out _))
@@ -135,9 +143,13 @@ namespace PxUtils.Validation.DataValidation
 
         /// <summary>
         /// Validates the consistency of the data item separator.
-        /// </summary>
-        /// <param name="token">The token to validate.</param>
-        /// <returns>A collection of validation feedback.</returns>
+        /// </summary>        
+        /// <param name="entry">List of bytes that represents the entry being validated.</param>
+        /// <param name="entryType"><see cref="EntryType"/> enum that represents the type of the validation entry.</param>
+        /// <param name="encoding">Encoding format of the Px file.</param>
+        /// <param name="lineNumber">Line number for the validation item.</param>
+        /// <param name="charPos">Represents the position relative to the line for the validation item.</param>
+        /// <param name="feedbacks">Reference to a list of feedback items to which any validation feedback is added to.</param>
         public void Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, ref List<ValidationFeedback> feedbacks)
         {
             if (_separator == entry[0])
@@ -176,9 +188,13 @@ namespace PxUtils.Validation.DataValidation
 
         /// <summary>
         /// Validates a token based on allowed previous tokens and returns validation feedback.
-        /// </summary>
-        /// <param name="token">The token to be validated.</param>
-        /// <returns>A collection of validation feedback.</returns>
+        /// </summary>        
+        /// <param name="entry">List of bytes that represents the entry being validated.</param>
+        /// <param name="entryType"><see cref="EntryType"/> enum that represents the type of the validation entry.</param>
+        /// <param name="encoding">Encoding format of the Px file.</param>
+        /// <param name="lineNumber">Line number for the validation item.</param>
+        /// <param name="charPos">Represents the position relative to the line for the validation item.</param>
+        /// <param name="feedbacks">Reference to a list of feedback items to which any validation feedback is added to.</param>
         public void Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, ref List<ValidationFeedback> feedbacks)
         {
             if (_allowedPreviousTokens[entryType].Contains(_previousTokenType))
