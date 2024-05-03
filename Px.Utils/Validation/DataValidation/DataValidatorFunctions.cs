@@ -110,30 +110,13 @@ namespace PxUtils.Validation.DataValidation
             {
                 return false;
             }
-            for (int i = isNegative ? 1 : 0; i < entry.Count; i++)
-            {
-                if (entry[i] < zero || entry[i] > nine)
-                {
-                    return false;
-                }
-            }
-            return true;
+
+            return digits.TrueForAll(x => x >= zero && x <= nine);
         }
 
         private static bool IsValidDecimalPart(List<byte> entry)
         {
-            if (entry.Count == 1)
-            {
-                return false;
-            }
-            for (int i = 1; i < entry.Count; i++)
-            {
-                if (entry[i] < zero || entry[i] > nine)
-                {
-                    return false;
-                }
-            }
-            return true;
+            return entry.Count > 1 && entry.Skip(1).All(x => x >= zero && x <= nine);
         }
     }
 
