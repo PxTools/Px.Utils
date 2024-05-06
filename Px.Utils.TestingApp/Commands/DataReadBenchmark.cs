@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal class DataReadBenchmark : Benchmark
+    internal sealed class DataReadBenchmark : Benchmark
     {
         private IReadOnlyMatrixMetadata? MetaData { get; set; }
 
@@ -23,7 +23,7 @@ namespace Px.Utils.TestingApp.Commands
 
         internal override string Description => "Benchmarks the data reading capabilities of the PxFileStreamDataReader.";
 
-        private DataIndexer? Indexer { get; set; } = null;
+        private DataIndexer? Indexer { get; set; }
 
         private int _numberOfCells = 1000000;
 

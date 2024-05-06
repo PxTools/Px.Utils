@@ -316,7 +316,7 @@ namespace PxUtils.Validation.SyntaxValidation
             int firstIndex = -1;
             foreach (string substring in substrings)
             {
-                int index = input.IndexOf(substring);
+                int index = input.IndexOf(substring, StringComparison.Ordinal);
                 if (
                     index != -1 && 
                     (index < firstIndex || firstIndex == -1) &&
@@ -415,7 +415,7 @@ namespace PxUtils.Validation.SyntaxValidation
             string timeIntervalIndicator = syntaxConf.Tokens.Time.TimeIntervalIndicator;
 
             // Value has to start with the time interval indicator (TLIST by default)
-            if (!input.StartsWith(timeIntervalIndicator))
+            if (!input.StartsWith(timeIntervalIndicator, StringComparison.Ordinal))
             {
                 valueFormat = null;
                 return false;

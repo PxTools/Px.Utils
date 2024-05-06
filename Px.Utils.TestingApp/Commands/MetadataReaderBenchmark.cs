@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal class MetadataReaderBenchmark : Benchmark
+    internal sealed class MetadataReaderBenchmark : Benchmark
     {
         internal override string Help => "Tests the performance of the metadata reading.";
 

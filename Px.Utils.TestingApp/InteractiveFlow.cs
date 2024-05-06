@@ -7,7 +7,7 @@ namespace PxUtils.TestingApp
     /// Runs the interactive flow of the application.
     /// Prompts the user for a commands and parameters and then runs the commands.
     /// </summary>
-    internal class InteractiveFlow
+    internal sealed class InteractiveFlow
     {
         /// <summary>
         /// Collection of commands that can be run.

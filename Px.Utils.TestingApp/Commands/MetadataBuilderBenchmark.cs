@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal class MetadataBuilderBenchmark : Benchmark
+    internal sealed class MetadataBuilderBenchmark : Benchmark
     {
         internal override string Help => "Tests the performance of the metadata building.";
 
@@ -30,7 +30,7 @@ namespace Px.Utils.TestingApp.Commands
             _metaEntries = PxFileMetadataReader.ReadMetadata(fileStream, encoding).ToList();
         }
 
-        protected void BuildMetadata()
+        private void BuildMetadata()
         {
             var builder = new MatrixMetadataBuilder();
             IEnumerable<KeyValuePair<string, string>> copyMeta = [.. _metaEntries];

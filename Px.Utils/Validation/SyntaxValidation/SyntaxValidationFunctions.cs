@@ -4,18 +4,18 @@ using System.Text.RegularExpressions;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
-    public delegate ValidationFeedbackItem? EntryValidationFunctionDelegate(ValidationEntry validationObject, PxFileSyntaxConf syntaxConf);
-    public delegate ValidationFeedbackItem? KeyValuePairValidationFunctionDelegate(ValidationKeyValuePair validationObject, PxFileSyntaxConf syntaxConf);
-    public delegate ValidationFeedbackItem? StructuredValidationFunctionDelegate(ValidationStructuredEntry validationObject, PxFileSyntaxConf syntaxConf);
+    public delegate ValidationFeedbackItem? EntryValidationFunction(ValidationEntry validationObject, PxFileSyntaxConf syntaxConf);
+    public delegate ValidationFeedbackItem? KeyValuePairValidationFunction(ValidationKeyValuePair validationObject, PxFileSyntaxConf syntaxConf);
+    public delegate ValidationFeedbackItem? StructuredValidationFunction(ValidationStructuredEntry validationObject, PxFileSyntaxConf syntaxConf);
 
     /// <summary>
     /// Contains the default validation functions for syntax validation.
     /// </summary>
     public class SyntaxValidationFunctions
     {
-        public List<EntryValidationFunctionDelegate> DefaultStringValidationFunctions { get; }
-        public List<KeyValuePairValidationFunctionDelegate> DefaultKeyValueValidationFunctions { get; }
-        public List<StructuredValidationFunctionDelegate> DefaultStructuredValidationFunctions { get; }
+        public List<EntryValidationFunction> DefaultStringValidationFunctions { get; }
+        public List<KeyValuePairValidationFunction> DefaultKeyValueValidationFunctions { get; }
+        public List<StructuredValidationFunction> DefaultStructuredValidationFunctions { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyntaxValidationFunctions"/> class with default validation functions.
@@ -71,8 +71,8 @@ namespace PxUtils.Validation.SyntaxValidation
             // If the entry does not start with a line separator, it is not on its own line. For the first entry this is not relevant.
             if (
                 validationEntry.EntryIndex == 0 || 
-                validationEntry.EntryString.StartsWith(CharacterConstants.UnixNewLine) ||
-                validationEntry.EntryString.StartsWith(CharacterConstants.WindowsNewLine))
+                validationEntry.EntryString.StartsWith(CharacterConstants.UnixNewLine, StringComparison.Ordinal) ||
+                validationEntry.EntryString.StartsWith(CharacterConstants.WindowsNewLine, StringComparison.Ordinal))
             {
                 return null;
             }
@@ -742,7 +742,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 {
                     KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                         validationStructuredEntry.KeyStartLineIndex,
-                        keyword.IndexOf(illegalSymbolsInKeyWord.First()),
+                        keyword.IndexOf(illegalSymbolsInKeyWord.First(), StringComparison.Ordinal),
                         validationStructuredEntry.LineChangeIndexes);
 
                     return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
@@ -1017,7 +1017,7 @@ namespace PxUtils.Validation.SyntaxValidation
         public static ValidationFeedbackItem? KeywordIsNotInUpperCase(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
             string keyword = validationStructuredEntry.Key.Keyword;
-            string uppercaseKeyword = keyword.ToUpper();
+            string uppercaseKeyword = keyword.ToUpper(CultureInfo.InvariantCulture);
 
             if (uppercaseKeyword != keyword)
             {

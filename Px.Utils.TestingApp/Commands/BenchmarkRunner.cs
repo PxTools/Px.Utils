@@ -1,6 +1,6 @@
 ﻿namespace Px.Utils.TestingApp.Commands
 {
-    internal class BenchmarkRunner : Command
+    internal sealed class BenchmarkRunner : Command
     {
         private readonly Dictionary<string, Benchmark> _benchmarks = [];
 

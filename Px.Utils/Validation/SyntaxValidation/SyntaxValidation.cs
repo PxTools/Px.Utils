@@ -14,13 +14,13 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Collection of custom validation functions to be used during validation.
         /// </summary>
         public class CustomValidationFunctions(
-            List<EntryValidationFunctionDelegate> stringValidationFunctions,
-            List<KeyValuePairValidationFunctionDelegate> keyValueValidationFunctions,
-            List<StructuredValidationFunctionDelegate> structuredValidationFunctions)
+            List<EntryValidationFunction> stringValidationFunctions,
+            List<KeyValuePairValidationFunction> keyValueValidationFunctions,
+            List<StructuredValidationFunction> structuredValidationFunctions)
         {
-            public List<EntryValidationFunctionDelegate> CustomStringValidationFunctions { get; } = stringValidationFunctions;
-            public List<KeyValuePairValidationFunctionDelegate> CustomKeyValueValidationFunctions { get; } = keyValueValidationFunctions;
-            public List<StructuredValidationFunctionDelegate> CustomStructuredValidationFunctions { get; } = structuredValidationFunctions;
+            public List<EntryValidationFunction> CustomStringValidationFunctions { get; } = stringValidationFunctions;
+            public List<KeyValuePairValidationFunction> CustomKeyValueValidationFunctions { get; } = keyValueValidationFunctions;
+            public List<StructuredValidationFunction> CustomStructuredValidationFunctions { get; } = structuredValidationFunctions;
         }
 
         private const int DEFAULT_BUFFER_SIZE = 4096;
@@ -47,9 +47,9 @@ namespace PxUtils.Validation.SyntaxValidation
             CustomValidationFunctions? customValidationFunctions = null)
         {
             SyntaxValidationFunctions validationFunctions = new();
-            IEnumerable<EntryValidationFunctionDelegate> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
-            IEnumerable<KeyValuePairValidationFunctionDelegate> keyValueValidationFunctions = validationFunctions.DefaultKeyValueValidationFunctions;
-            IEnumerable<StructuredValidationFunctionDelegate> structuredValidationFunctions = validationFunctions.DefaultStructuredValidationFunctions;
+            IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
+            IEnumerable<KeyValuePairValidationFunction> keyValueValidationFunctions = validationFunctions.DefaultKeyValueValidationFunctions;
+            IEnumerable<StructuredValidationFunction> structuredValidationFunctions = validationFunctions.DefaultStructuredValidationFunctions;
 
             if (customValidationFunctions is not null)
             {
@@ -95,9 +95,9 @@ namespace PxUtils.Validation.SyntaxValidation
             CancellationToken cancellationToken = default)
         {
             SyntaxValidationFunctions validationFunctions = new();
-            IEnumerable<EntryValidationFunctionDelegate> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
-            IEnumerable<KeyValuePairValidationFunctionDelegate> keyValueValidationFunctions = validationFunctions.DefaultKeyValueValidationFunctions;
-            IEnumerable<StructuredValidationFunctionDelegate> structuredValidationFunctions = validationFunctions.DefaultStructuredValidationFunctions;
+            IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
+            IEnumerable<KeyValuePairValidationFunction> keyValueValidationFunctions = validationFunctions.DefaultKeyValueValidationFunctions;
+            IEnumerable<StructuredValidationFunction> structuredValidationFunctions = validationFunctions.DefaultStructuredValidationFunctions;
 
             if (customValidationFunctions is not null)
             {
@@ -118,12 +118,12 @@ namespace PxUtils.Validation.SyntaxValidation
             return new([.. validationFeedback], structuredEntries);
         }
 
-        private static List<ValidationFeedbackItem> ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunctionDelegate> validationFunctions, PxFileSyntaxConf syntaxConf)
+        private static List<ValidationFeedbackItem> ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunction> validationFunctions, PxFileSyntaxConf syntaxConf)
         {
             List<ValidationFeedbackItem> validationFeedback = [];
             foreach (ValidationEntry entry in entries)
             {
-                foreach (EntryValidationFunctionDelegate function in validationFunctions)
+                foreach (EntryValidationFunction function in validationFunctions)
                 {
                     ValidationFeedbackItem? feedback = function(entry, syntaxConf);
                     if (feedback is not null)
@@ -137,13 +137,13 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static List<ValidationFeedbackItem> ValidateKeyValuePairs(
             IEnumerable<ValidationKeyValuePair> kvpObjects,
-            IEnumerable<KeyValuePairValidationFunctionDelegate> validationFunctions,
+            IEnumerable<KeyValuePairValidationFunction> validationFunctions,
             PxFileSyntaxConf syntaxConf)
         {
             List<ValidationFeedbackItem> validationFeedback = [];
             foreach (ValidationKeyValuePair kvpObject in kvpObjects)
             {
-                foreach (KeyValuePairValidationFunctionDelegate function in validationFunctions)
+                foreach (KeyValuePairValidationFunction function in validationFunctions)
                 {
                     ValidationFeedbackItem? feedback = function(kvpObject, syntaxConf);
                     if (feedback is not null)
@@ -157,13 +157,13 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static List<ValidationFeedbackItem> ValidateStructs(
             IEnumerable<ValidationStructuredEntry> structuredEntries, 
-            IEnumerable<StructuredValidationFunctionDelegate> validationFunctions,
+            IEnumerable<StructuredValidationFunction> validationFunctions,
             PxFileSyntaxConf syntaxConf)
         {
             List<ValidationFeedbackItem> validationFeedback = [];
             foreach (ValidationStructuredEntry structuredEntry in structuredEntries)
             {
-                foreach (StructuredValidationFunctionDelegate function in validationFunctions)
+                foreach (StructuredValidationFunction function in validationFunctions)
                 {
                     ValidationFeedbackItem? feedback = function(structuredEntry, syntaxConf);
                     if (feedback is not null)
@@ -310,7 +310,7 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 string stringEntry = entryBuilder.ToString();
                 // When DATA keyword is reached, metadata parsing is complete
-                return SyntaxValidationUtilityMethods.CleanString(stringEntry, syntaxConf).Equals(syntaxConf.Tokens.KeyWords.Data);
+                return SyntaxValidationUtilityMethods.CleanString(stringEntry, syntaxConf).Equals(syntaxConf.Tokens.KeyWords.Data, StringComparison.Ordinal);
             }
             return false;
         }

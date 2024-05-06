@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal class MetadataContentValidationBenchmark : Benchmark
+    internal sealed class MetadataContentValidationBenchmark : Benchmark
     {
         internal override string Help =>
         "Validates the contents of the Px file metadata given amount of times." + Environment.NewLine +

@@ -11,7 +11,7 @@ namespace Px.Utils.TestingApp.Commands
         /// <summary>
         /// Represents one result of a benchmark run. Contains iteration times and metrics such as min, max, mean, median and standard deviation calculated from the iteration times.
         /// </summary>
-        internal class BenchmarkResult
+        internal sealed class BenchmarkResult
         {
             internal readonly string Name;
             internal bool Error { get; }
