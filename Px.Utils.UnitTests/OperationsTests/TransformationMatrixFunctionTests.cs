@@ -1,4 +1,5 @@
 ﻿using Px.Utils.Models;
+using Px.Utils.Models.Metadata;
 using Px.Utils.Operations;
 using PxUtils.Models.Metadata;
 
@@ -26,6 +27,42 @@ namespace Px.Utils.UnitTests.OperationsTests
             for (int i = 0; i < meta.Dimensions.Count; i++)
             {
                 CollectionAssert.AreEqual(meta.Dimensions[i].Values.Select(v => v.Code).ToArray(), result.Metadata.Dimensions[i].Values.Select(v => v.Code).ToArray());
+            }
+        }
+
+        [TestMethod]
+        public void Apply_WhenCalledWithTransformationMap_ReturnsReorderedSubset()
+        {
+            // Arrange
+            MatrixMetadata meta = TestModelBuilder.BuildTestMetadata([5, 5, 10]);
+            int[] testData = new int[250];
+            for (int i = 0; i < 250; i++) testData[i] = i;
+            var matrix = new Matrix<int>(meta, testData);
+
+            MatrixMap matrixMap = new(
+            [
+                new DimensionMap("var0", ["var0_val3", "var0_val0", "var0_val4"]),
+                new DimensionMap("var2", ["var2_val1", "var2_val7"]),
+                new DimensionMap("var1", ["var1_val0", "var1_val1", "var1_val2", "var1_val4"])
+            ]);
+
+            var function = new TransformationMatrixFunction<int>(matrixMap);
+
+            // Act
+            var result = function.Apply(matrix);
+
+            // Assert
+            int[] expectedData = [
+                151, 161, 171, 191, 157, 167,
+                177, 197, 1, 11, 21, 41,
+                7, 17, 27, 47, 201, 211,
+                221, 241, 207, 217, 227, 247];
+            CollectionAssert.AreEqual(expectedData, result.Data);
+            CollectionAssert.AreEqual(matrixMap.DimensionMaps.Select(c => c.Code).ToArray(), result.Metadata.Dimensions.Select(c => c.Code).ToArray());
+
+            for (int i = 0; i < meta.Dimensions.Count; i++)
+            {
+                CollectionAssert.AreEqual(matrixMap.DimensionMaps[i].ValueCodes.ToArray(), result.Metadata.Dimensions[i].Values.Select(v => v.Code).ToArray());
             }
         }
     }

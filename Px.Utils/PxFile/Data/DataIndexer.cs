@@ -114,7 +114,7 @@ namespace Px.Utils.PxFile.Data
             for (int i = _lastCoordinateIndex; i >= 0; i--)
             {
                 int dimIndex = _dimOrder[i];
-                if (_indices[dimIndex] < _lastIndices[dimIndex])
+                if (_indices[dimIndex] < _lastIndices[i])
                 {
                     _indices[dimIndex]++;
                     SetCurrentIndex();

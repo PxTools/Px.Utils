@@ -111,6 +111,31 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
+        public void MatrixMetadataTransformationTest_SubsetAndReorder_NoUniformDimensions()
+        {
+            int[] dimensionSizes = [2, 3, 4];
+            MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata(dimensionSizes);
+
+
+            double[] data = new double[24];
+            for (int i = 0; i < 24; i++) data[i] = i;
+
+            Matrix<double> matrix = new(metadata, data);
+
+            MatrixMap matrixMap = new(
+            [
+                new DimensionMap("var2", ["var2_val1", "var2_val0", "var2_val3"]),
+                new DimensionMap("var0", ["var0_val1"]),
+                new DimensionMap("var1", ["var1_val2", "var1_val1"])
+            ]);
+
+            Matrix<double> newMatrix = matrix.GetTransform(matrixMap);
+            double[] expected = [21.0, 17.0, 20.0, 16.0, 23.0, 19.0];
+
+            CollectionAssert.AreEqual(expected, newMatrix.Data);
+        }
+
+        [TestMethod]
         public void MatrixMetadataTransformationTest_Identity()
         {
             int[] dimensionSizes = [3, 3, 2];
