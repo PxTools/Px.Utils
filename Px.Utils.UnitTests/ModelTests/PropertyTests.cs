@@ -16,7 +16,7 @@ namespace ModelTests
             MultilanguageString multilanguageString = new(lang, text);
 
             // Act
-            Property property = new(keyWord, multilanguageString);
+            MetaProperty property = new(keyWord, multilanguageString);
 
             // Assert
             Assert.AreEqual(keyWord, property.KeyWord);
@@ -37,7 +37,7 @@ namespace ModelTests
                 ]);
 
             // Act
-            Property property = new(keyWord, multilanguageString);
+            MetaProperty property = new(keyWord, multilanguageString);
 
             // Assert
             Assert.AreEqual(keyWord, property.KeyWord);
@@ -57,7 +57,7 @@ namespace ModelTests
                 ]);
 
             // Act
-            Property property = new(keyWord, multilanguageString);
+            MetaProperty property = new(keyWord, multilanguageString);
 
             // Assert
             Assert.AreEqual(keyWord, property.KeyWord);
@@ -74,7 +74,7 @@ namespace ModelTests
             string value = "test_value";
 
             // Act
-            Property property = new(keyWord, value);
+            MetaProperty property = new(keyWord, value);
 
             // Assert
             Assert.AreEqual(keyWord, property.KeyWord);
@@ -90,7 +90,7 @@ namespace ModelTests
             string lang = "lang";
             string text = "text";
             MultilanguageString multilanguageString = new(lang, text);
-            Property property = new(keyWord, multilanguageString);
+            MetaProperty property = new(keyWord, multilanguageString);
 
             // Act
             bool result = property.TryGetRawValueString(out string? value);
@@ -109,7 +109,7 @@ namespace ModelTests
                 new KeyValuePair<string, string>("lang1", "text1"),
                 new KeyValuePair<string, string>("lang2", "text2")
                 ]);
-            Property property = new(keyWord, multilanguageString);
+            MetaProperty property = new(keyWord, multilanguageString);
 
             // Act
             bool result = property.TryGetRawValueString(out string? value);
@@ -128,7 +128,7 @@ namespace ModelTests
                 new KeyValuePair<string, string>("lang1", "text"),
                 new KeyValuePair<string, string>("lang2", "text")
                 ]);
-            Property property = new(keyWord, multilanguageString);
+            MetaProperty property = new(keyWord, multilanguageString);
 
             // Act
             bool result = property.TryGetRawValueString(out string? value);
@@ -144,7 +144,7 @@ namespace ModelTests
             // Arrange
             string keyWord = "keyWord";
             string value = "test_value";
-            Property property = new(keyWord, value);
+            MetaProperty property = new(keyWord, value);
 
             // Act and assert
             Assert.AreEqual(value, property.GetRawValueString());
@@ -158,7 +158,7 @@ namespace ModelTests
             string lang = "lang";
             string text = "text";
             MultilanguageString multilanguageString = new(lang, text);
-            Property property = new(keyWord, multilanguageString);
+            MetaProperty property = new(keyWord, multilanguageString);
 
             // Act and assert
             Assert.AreEqual(text, property.GetRawValueString());
@@ -173,7 +173,7 @@ namespace ModelTests
                 new KeyValuePair<string, string>("lang1", "text1"),
                 new KeyValuePair<string, string>("lang2", "text2")
                 ]);
-            Property property = new(keyWord, multilanguageString);
+            MetaProperty property = new(keyWord, multilanguageString);
 
             // Act and assert
             Assert.ThrowsException<InvalidOperationException>(() => property.GetRawValueString());
@@ -187,7 +187,7 @@ namespace ModelTests
             string lang = "lang";
             string text = "text";
             MultilanguageString multilanguageString = new(lang, text);
-            Property property = new(keyWord, multilanguageString);
+            MetaProperty property = new(keyWord, multilanguageString);
 
             // Act
             bool result = property.TryGetRawValueMultilanguageString(out MultilanguageString? value);
@@ -206,7 +206,7 @@ namespace ModelTests
                 new KeyValuePair<string, string>("lang1", "text1"),
                 new KeyValuePair<string, string>("lang2", "text2")
                 ]);
-            Property property = new(keyWord, multilanguageString);
+            MetaProperty property = new(keyWord, multilanguageString);
 
             // Act
             bool result = property.TryGetRawValueMultilanguageString(out MultilanguageString? value);
@@ -226,7 +226,7 @@ namespace ModelTests
                 new KeyValuePair<string, string>("lang1", "text"),
                 new KeyValuePair<string, string>("lang2", "text")
                 ]);
-            Property property = new(keyWord, multilanguageString);
+            MetaProperty property = new(keyWord, multilanguageString);
 
             // Act
             bool result = property.TryGetRawValueMultilanguageString(out MultilanguageString? value);
@@ -242,7 +242,7 @@ namespace ModelTests
             // Arrange
             string keyWord = "keyWord";
             string value = "test_value";
-            Property property = new(keyWord, value);
+            MetaProperty property = new(keyWord, value);
 
             // Act
             bool result = property.TryGetRawValueMultilanguageString(out MultilanguageString? mls);
@@ -260,7 +260,7 @@ namespace ModelTests
             string lang = "lang";
             string text = "text";
             MultilanguageString multilanguageString = new(lang, text);
-            Property property = new(keyWord, multilanguageString);
+            MetaProperty property = new(keyWord, multilanguageString);
 
             // Act and assert
             Assert.AreEqual(multilanguageString, property.GetRawValueMultiLanguageString());
@@ -275,7 +275,7 @@ namespace ModelTests
                 new KeyValuePair<string, string>("lang1", "text1"),
                 new KeyValuePair<string, string>("lang2", "text2")
                 ]);
-            Property property = new(keyWord, multilanguageString);
+            MetaProperty property = new(keyWord, multilanguageString);
 
             // Act and assert
             Assert.AreEqual(multilanguageString, property.GetRawValueMultiLanguageString());
@@ -287,7 +287,7 @@ namespace ModelTests
             // Arrange
             string keyWord = "keyWord";
             string text = "text";
-            Property property = new(keyWord, text);
+            MetaProperty property = new(keyWord, text);
 
             // Act and assert
             Assert.ThrowsException<InvalidOperationException>(() => property.GetRawValueMultiLanguageString());

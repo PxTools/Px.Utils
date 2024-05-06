@@ -37,7 +37,7 @@ namespace PxUtils.Validation.ContentValidation
                 {
                     ValidationStructuredEntry? valuesEntry = Array.Find(entries,
                         e => e.Key.FirstSpecifier is not null &&
-                        e.Key.FirstSpecifier.Equals(dimension));
+                        e.Key.FirstSpecifier.Equals(dimension, StringComparison.Ordinal));
                     if (valuesEntry is not null)
                     {
                         string[] values = valuesEntry.Value.Split(syntaxConf.Symbols.Value.ListSeparator);
@@ -94,7 +94,7 @@ namespace PxUtils.Validation.ContentValidation
             string dimensionName = languageAndDimensionPair.Value;
 
             ValidationStructuredEntry? entry = Array.Find(entries,
-                            e => e.Key.Keyword.Equals(keyword) &&
+                            e => e.Key.Keyword.Equals(keyword, StringComparison.Ordinal) &&
                             (e.Key.Language == language || (language == validator.defaultLanguage && e.Key.Language is null)) &&
                             (e.Key.FirstSpecifier == dimensionName || e.Key.FirstSpecifier == dimensionValueName) &&
                             (e.Key.SecondSpecifier == dimensionValueName || e.Key.SecondSpecifier == null));
@@ -154,7 +154,7 @@ namespace PxUtils.Validation.ContentValidation
             ContentValidator validator, 
             string? dimensionName = null)
         {
-            ValidationStructuredEntry[] keywordEntries = entries.Where(e => e.Key.Keyword.Equals(keyword)).ToArray();
+            ValidationStructuredEntry[] keywordEntries = entries.Where(e => e.Key.Keyword.Equals(keyword, StringComparison.Ordinal)).ToArray();
             ValidationStructuredEntry? entry = Array.Find(keywordEntries,
                 e => ((language == validator.defaultLanguage && e.Key.Language is null) || language == e.Key.Language) &&
                 (e.Key.FirstSpecifier == dimensionName || dimensionName is null));

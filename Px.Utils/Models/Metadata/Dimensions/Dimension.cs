@@ -16,7 +16,7 @@ namespace PxUtils.Models.Metadata.Dimensions
     public class Dimension(
         string code,
         MultilanguageString name,
-        Dictionary<string, Property> additionalProperties,
+        Dictionary<string, MetaProperty> additionalProperties,
         List<DimensionValue> values,
         DimensionValue? defaultValue,
         DimensionType type)
@@ -40,7 +40,7 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// <summary>
         /// Properties of the dimension, excluding the required properties.
         /// </summary>
-        public Dictionary<string, Property> AdditionalProperties { get; } = additionalProperties;
+        public Dictionary<string, MetaProperty> AdditionalProperties { get; } = additionalProperties;
 
         /// <summary>
         /// Ordered list of dimension values that define the structure of the dimension.
@@ -56,7 +56,7 @@ namespace PxUtils.Models.Metadata.Dimensions
 
         MultilanguageString IReadOnlyDimension.Name => Name;
 
-        IReadOnlyDictionary<string, Property> IReadOnlyDimension.AdditionalProperties => AdditionalProperties;
+        IReadOnlyDictionary<string, MetaProperty> IReadOnlyDimension.AdditionalProperties => AdditionalProperties;
 
         IReadOnlyList<IReadOnlyDimensionValue> IReadOnlyDimension.Values => Values;
 

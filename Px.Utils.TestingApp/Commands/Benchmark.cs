@@ -82,7 +82,7 @@ namespace Px.Utils.TestingApp.Commands
         protected List<string[]> ParameterFlags { get; } = [fileFlags, iterFlags];
 
         internal List<BenchmarkResult> Results { get; } = [];
-        private int processesCompleted = 0;
+        private int processesCompleted;
         private const int minResultsLongestNameLength = 4;
         private const int resultsTableWidth = 79;
 
@@ -173,7 +173,7 @@ namespace Px.Utils.TestingApp.Commands
             Console.WriteLine("Enter the path to the PX file to benchmark");
             string file = Console.ReadLine() ?? "";
 
-            while (!Path.Exists(file) || !Path.GetFileName(file).EndsWith(".px"))
+            while (!Path.Exists(file) || !Path.GetFileName(file).EndsWith(".px", StringComparison.Ordinal))
             {
                 Console.WriteLine("File provided is not valid, please enter a path to a valid px file");
                 file = Console.ReadLine() ?? "";

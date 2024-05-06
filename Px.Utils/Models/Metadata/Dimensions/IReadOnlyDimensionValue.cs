@@ -20,6 +20,6 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// <summary>
         /// Additional properties of the dimension value.
         /// </summary>
-        IReadOnlyDictionary<string, Property> AdditionalProperties { get; }
+        IReadOnlyDictionary<string, MetaProperty> AdditionalProperties { get; }
     }
 }

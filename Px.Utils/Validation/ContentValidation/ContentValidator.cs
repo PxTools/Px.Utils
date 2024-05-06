@@ -7,14 +7,14 @@ namespace PxUtils.Validation.ContentValidation
 {
     /// <summary>
     /// Provides methods for validating the content of Px file metadata
-    /// <param name="_filename">Name of the Px file</param>
-    /// <param name="_encoding"> _encoding of the Px file</param>
-    /// <param name="_syntaxConf">Object that stores syntax specific symbols and tokens for the Px file</param>
+    /// <param name="filename">Name of the Px file</param>
+    /// <param name="encoding"> encoding of the Px file</param>
+    /// <param name="syntaxConf">Object that stores syntax specific symbols and tokens for the Px file</param>
     /// </summary>
-    public sealed partial class ContentValidator(string _filename, Encoding _encoding, PxFileSyntaxConf? _syntaxConf = null)
+    public sealed partial class ContentValidator(string filename, Encoding encoding, PxFileSyntaxConf? syntaxConf = null)
     {
-        private readonly string filename = _filename;
-        private readonly Encoding encoding = _encoding;
+        private readonly string filename = filename;
+        private readonly Encoding encoding = encoding;
         /// <summary>
         /// Default language of the Px file defined with LANGUAGE keyword by default
         /// </summary>
@@ -42,7 +42,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <summary>
         /// Object that stores syntax specific symbols and tokens for the Px file
         /// </summary>
-        private PxFileSyntaxConf SyntaxConf { get; } = _syntaxConf ?? PxFileSyntaxConf.Default;
+        private PxFileSyntaxConf SyntaxConf { get; } = syntaxConf ?? PxFileSyntaxConf.Default;
 
         /// <summary>
         /// Validates contents of Px file metadata. Metadata syntax must be valid for this method to work properly.
@@ -55,8 +55,8 @@ namespace PxUtils.Validation.ContentValidation
             )
         {
 
-            IEnumerable<ContentValidationEntryDelegate> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
-            IEnumerable<ContentValidationFindKeywordDelegate> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
+            IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
+            IEnumerable<ContentValidationFindKeywordValidator> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
 
             if (customContentValidationFunctions is not null)
             {
@@ -66,7 +66,7 @@ namespace PxUtils.Validation.ContentValidation
 
             List <ValidationFeedbackItem> feedbackItems = [];
 
-            foreach (ContentValidationFindKeywordDelegate findingFunction in contentValidationFindKeywordFunctions)
+            foreach (ContentValidationFindKeywordValidator findingFunction in contentValidationFindKeywordFunctions)
             {
                 ValidationFeedbackItem[]? feedback = findingFunction(entries, this);
                 if (feedback is not null)
@@ -74,7 +74,7 @@ namespace PxUtils.Validation.ContentValidation
                     feedbackItems.AddRange(feedback);
                 }
             }
-            foreach (ContentValidationEntryDelegate entryFunction in contentValidationEntryFunctions)
+            foreach (ContentValidationEntryValidator entryFunction in contentValidationEntryFunctions)
             {
                 foreach (ValidationStructuredEntry entry in entries)
                 {
@@ -104,8 +104,8 @@ namespace PxUtils.Validation.ContentValidation
             CancellationToken cancellationToken = default
             )
         {
-            IEnumerable<ContentValidationEntryDelegate> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
-            IEnumerable<ContentValidationFindKeywordDelegate> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
+            IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
+            IEnumerable<ContentValidationFindKeywordValidator> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
 
             if (customContentValidationFunctions is not null)
             {

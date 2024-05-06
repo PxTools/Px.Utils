@@ -23,7 +23,7 @@ namespace PxUtils.ModelBuilders
             string intervalPart = new(input.TakeWhile(c => c != conf.Symbols.Value.ListSeparator).ToArray());
             string inputStart = conf.Tokens.Time.TimeIntervalIndicator + conf.Symbols.Value.TimeSeriesIntervalStart;
             char inputEnd = conf.Symbols.Value.TimeSeriesIntervalEnd;
-            if(!string.IsNullOrEmpty(intervalPart) && intervalPart.StartsWith(inputStart) && intervalPart.EndsWith(inputEnd))
+            if(!string.IsNullOrEmpty(intervalPart) && intervalPart.StartsWith(inputStart, StringComparison.InvariantCulture) && intervalPart.EndsWith(inputEnd))
             {
                 Dictionary<string, TimeDimensionInterval> map = new()
                 {

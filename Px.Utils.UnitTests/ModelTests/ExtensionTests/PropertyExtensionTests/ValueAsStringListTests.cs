@@ -13,7 +13,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \"b\", \"c\"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -31,7 +31,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \r\n \"b\", \r\n \"c\"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -49,7 +49,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = " \" a \",   \" b \",   \" c \"  ";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -67,7 +67,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a,a\", \"b,b\", \"c,c\"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -85,7 +85,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -103,7 +103,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -121,7 +121,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\",,\"b\"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -139,7 +139,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\",\"\",\"b\"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -161,7 +161,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\" \"b\", \"c\"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -178,7 +178,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", b\", \"c\"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -195,7 +195,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \"b, \"c\"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -212,7 +212,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \", \"c\"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -230,7 +230,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \"\"\", \"c\"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -247,7 +247,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \"b\", \"c";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
@@ -264,7 +264,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \"b\", \"c\",";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';

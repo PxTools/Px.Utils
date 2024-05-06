@@ -1,17 +1,18 @@
 ﻿using PxUtils.PxFile;
 using PxUtils.Validation.SyntaxValidation;
+using System.Globalization;
 
 namespace PxUtils.Validation.ContentValidation
 {
-    public delegate ValidationFeedbackItem[]? ContentValidationEntryDelegate(ValidationStructuredEntry entry, ContentValidator validator);
-    public delegate ValidationFeedbackItem[]? ContentValidationFindKeywordDelegate(ValidationStructuredEntry[] entries, ContentValidator validator); 
+    public delegate ValidationFeedbackItem[]? ContentValidationEntryValidator(ValidationStructuredEntry entry, ContentValidator validator);
+    public delegate ValidationFeedbackItem[]? ContentValidationFindKeywordValidator(ValidationStructuredEntry[] entries, ContentValidator validator); 
     
     /// <summary>
     /// Collection of functions for validating Px file metadata contents
     /// </summary>
     public sealed partial class ContentValidator
     {
-        public List<ContentValidationEntryDelegate> DefaultContentValidationEntryFunctions { get; } = [
+        public List<ContentValidationEntryValidator> DefaultContentValidationEntryFunctions { get; } = [
             ValidateUnexpectedSpecifiers,
             ValidateUnexpectedLanguageParams,
             ValidateLanguageParams,
@@ -22,7 +23,7 @@ namespace PxUtils.Validation.ContentValidation
             ValidateValueUppercaseRecommendations
         ];
 
-        public List<ContentValidationFindKeywordDelegate> DefaultContentValidationFindKeywordFunctions { get; } = [
+        public List<ContentValidationFindKeywordValidator> DefaultContentValidationFindKeywordFunctions { get; } = [
             ValidateFindDefaultLanguage,
             ValidateFindAvailableLanguages,
             ValidateDefaultLanguageDefinedInAvailableLanguages,
@@ -44,7 +45,7 @@ namespace PxUtils.Validation.ContentValidation
         public static ValidationFeedbackItem[]? ValidateFindDefaultLanguage(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
             ValidationStructuredEntry[] langEntries = entries.Where(
-                e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.DefaultLanguage)).ToArray();
+                e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.DefaultLanguage, StringComparison.Ordinal)).ToArray();
 
             if (langEntries.Length > 1)
             {
@@ -98,7 +99,9 @@ namespace PxUtils.Validation.ContentValidation
         /// Error is returned if multiple entries are found.</returns>
         public static ValidationFeedbackItem[]? ValidateFindAvailableLanguages(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
-            ValidationStructuredEntry[] availableLanguageEntries = entries.Where(e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.AvailableLanguages)).ToArray();
+            ValidationStructuredEntry[] availableLanguageEntries = entries
+                .Where(e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.AvailableLanguages, StringComparison.Ordinal))
+                .ToArray();
 
             if (availableLanguageEntries.Length > 1)
             {
@@ -157,7 +160,7 @@ namespace PxUtils.Validation.ContentValidation
         {
             if (validator.availableLanguages is not null && !validator.availableLanguages.Contains(validator.defaultLanguage))
             {
-                ValidationStructuredEntry? defaultLanguageEntry = Array.Find(entries, e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.DefaultLanguage));
+                ValidationStructuredEntry? defaultLanguageEntry = Array.Find(entries, e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.DefaultLanguage, StringComparison.Ordinal));
 
                 if (defaultLanguageEntry is null)
                 {
@@ -197,7 +200,9 @@ namespace PxUtils.Validation.ContentValidation
         public static ValidationFeedbackItem[]? ValidateFindContentDimension(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
             List<ValidationFeedbackItem> feedbackItems = [];
-            ValidationStructuredEntry[] contentDimensionEntries = entries.Where(e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.ContentVariableIdentifier)).ToArray();
+            ValidationStructuredEntry[] contentDimensionEntries = entries
+                .Where(e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.ContentVariableIdentifier, StringComparison.Ordinal))
+                .ToArray();
 
             string defaultLanguage = validator.defaultLanguage ?? string.Empty;
             string[] languages = validator.availableLanguages ?? [defaultLanguage];
@@ -247,7 +252,7 @@ namespace PxUtils.Validation.ContentValidation
 
             foreach (string keyword in alwaysRequiredKeywords)
             {
-                if (!Array.Exists(entries, e => e.Key.Keyword.Equals(keyword)))
+                if (!Array.Exists(entries, e => e.Key.Keyword.Equals(keyword, StringComparison.Ordinal)))
                 {
                     ValidationFeedback feedback = new (
                                 ValidationFeedbackLevel.Error,
@@ -277,8 +282,8 @@ namespace PxUtils.Validation.ContentValidation
         /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if stub and heading dimension entries are not found for any available language</returns>
         public static ValidationFeedbackItem[]? ValidateFindStubAndHeading(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
-            ValidationStructuredEntry[] stubEntries = entries.Where(e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.StubDimensions)).ToArray();
-            ValidationStructuredEntry[] headingEntries = entries.Where(e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.HeadingDimensions)).ToArray();
+            ValidationStructuredEntry[] stubEntries = entries.Where(e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.StubDimensions, StringComparison.Ordinal)).ToArray();
+            ValidationStructuredEntry[] headingEntries = entries.Where(e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.HeadingDimensions, StringComparison.Ordinal)).ToArray();
 
             if (stubEntries.Length == 0 && headingEntries.Length == 0)
             {
@@ -358,7 +363,7 @@ namespace PxUtils.Validation.ContentValidation
 
             foreach (string keyword in commonKeys)
             {
-                if (!Array.Exists(entries, e => e.Key.Keyword.Equals(keyword)))
+                if (!Array.Exists(entries, e => e.Key.Keyword.Equals(keyword, StringComparison.Ordinal)))
                 {
                     ValidationFeedback feedback = new (
                                 ValidationFeedbackLevel.Warning,
@@ -384,7 +389,7 @@ namespace PxUtils.Validation.ContentValidation
             {
                 foreach(string keyword in languageSpecific)
                 {
-                    if (!Array.Exists(entries, e => e.Key.Keyword.Equals(keyword) && 
+                    if (!Array.Exists(entries, e => e.Key.Keyword.Equals(keyword, StringComparison.Ordinal) && 
                     (e.Key.Language == language || (language == defaultLanguage && e.Key.Language is null))))
                     {
                         ValidationFeedback feedback = new (
@@ -418,7 +423,7 @@ namespace PxUtils.Validation.ContentValidation
         {
             List<ValidationFeedbackItem> feedbackItems = [];
             ValidationStructuredEntry[] dimensionEntries = entries.Where(
-                e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.VariableValues)).ToArray();
+                e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.VariableValues, StringComparison.Ordinal)).ToArray();
 
             IEnumerable<KeyValuePair<KeyValuePair<string, string>, string[]>> dimensionValues = [];
             dimensionValues = dimensionValues.Concat(
@@ -877,7 +882,7 @@ namespace PxUtils.Validation.ContentValidation
                     ];
 
             if ((entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.Charset && !allowedCharsets.Contains(entry.Value)) ||
-                (entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.CodePage && !entry.Value.Equals(validator.encoding.BodyName, StringComparison.CurrentCultureIgnoreCase)) ||
+                (entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.CodePage && !entry.Value.Equals(validator.encoding.BodyName, StringComparison.OrdinalIgnoreCase)) ||
                 (entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.DimensionType && !dimensionTypes.Contains(entry.Value)))
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
@@ -991,7 +996,7 @@ namespace PxUtils.Validation.ContentValidation
             }
 
             // Check if entry.value is in upper case
-            string valueUppercase = entry.Value.ToUpper();
+            string valueUppercase = entry.Value.ToUpper(CultureInfo.InvariantCulture);
             if (entry.Value != valueUppercase)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(

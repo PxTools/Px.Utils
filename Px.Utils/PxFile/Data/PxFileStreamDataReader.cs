@@ -11,7 +11,7 @@ namespace PxUtils.PxFile.Data
     {
         private readonly Stream _stream;
         private readonly PxFileSyntaxConf _conf;
-        private long readIndex = 0;
+        private long readIndex;
         private readonly int _readBufferSize;
         private readonly char _valueSeparator = ' ';
         private const int validCharactersMinIndex = 0x21;

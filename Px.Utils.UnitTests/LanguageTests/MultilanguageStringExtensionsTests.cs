@@ -6,7 +6,7 @@ namespace LanguageTests
     public class MultilanguageStringExtensionsTests
     {
         [TestMethod]
-        public void TestWithOneLanguage_ReturnsValue()
+        public void TestWithOneLanguageReturnsValue()
         {
             string testvalue = "test_value";
             var multilanguageString = new MultilanguageString("test_lang", testvalue);
@@ -15,7 +15,7 @@ namespace LanguageTests
         }
 
         [TestMethod]
-        public void TestWithTwoLanguageWithSameValue_ReturnsValue()
+        public void TestWithTwoLanguageWithSameValueReturnsValue()
         {
             string testvalue = "test_value";
             var multilanguageString = new MultilanguageString([new("a", testvalue), new("b", testvalue)]);
@@ -24,7 +24,7 @@ namespace LanguageTests
         }
 
         [TestMethod]
-        public void TestWithOneEmptyValue_ReturnsValue()
+        public void TestWithOneEmptyValueReturnsValue()
         {
             string testvalue = "";
             var multilanguageString = new MultilanguageString("test_lang", testvalue);
@@ -33,7 +33,7 @@ namespace LanguageTests
         }
 
         [TestMethod]
-        public void TestWithTwoDifferentLanguages_ThrowsException()
+        public void TestWithTwoDifferentLanguagesThrowsException()
         {
             var multilanguageString = new MultilanguageString([new("a", "test_value"), new("b", "different_value")]);
             Assert.ThrowsException<InvalidOperationException>(() => multilanguageString.UniformValue());

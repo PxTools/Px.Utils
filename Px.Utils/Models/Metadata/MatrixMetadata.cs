@@ -14,7 +14,7 @@ namespace PxUtils.Models.Metadata
         string defaultLanguage,
         IReadOnlyList<string> availableLanguages,
         List<IDimension> dimensions,
-        Dictionary<string, Property> additionalProperties) : IReadOnlyMatrixMetadata
+        Dictionary<string, MetaProperty> additionalProperties) : IReadOnlyMatrixMetadata
     {
         /// <summary>
         /// The default language of the matrix
@@ -34,13 +34,13 @@ namespace PxUtils.Models.Metadata
         /// <summary>
         /// Additional properties of the matrix object, does not include properties of the dimensions or their values.
         /// </summary>
-        public Dictionary<string, Property> AdditionalProperties { get; } = additionalProperties;
+        public Dictionary<string, MetaProperty> AdditionalProperties { get; } = additionalProperties;
 
         #region Interface implementation
 
         IReadOnlyList<IReadOnlyDimension> IReadOnlyMatrixMetadata.Dimensions => Dimensions;
 
-        IReadOnlyDictionary<string, Property> IReadOnlyMatrixMetadata.AdditionalProperties => AdditionalProperties;
+        IReadOnlyDictionary<string, MetaProperty> IReadOnlyMatrixMetadata.AdditionalProperties => AdditionalProperties;
 
         IReadOnlyList<IDimensionMap> IMatrixMap.DimensionMaps => Dimensions;
 

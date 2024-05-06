@@ -8,11 +8,11 @@
     /// <param name="contentValidationEntryFunctions">Functions that are executed for individual entries. Used when specific properties of each or specific entries are to be validated. 
     /// These functions are ran after the search functions in the validation process.</param>
     public class CustomContentValidationFunctions(
-        List<ContentValidationFindKeywordDelegate> contentValidationSearchFunctions,
-        List<ContentValidationEntryDelegate> contentValidationEntryFunctions
+        List<ContentValidationFindKeywordValidator> contentValidationSearchFunctions,
+        List<ContentValidationEntryValidator> contentValidationEntryFunctions
         )
     {
-        public List<ContentValidationFindKeywordDelegate> CustomContentValidationFindKeywordFunctions { get; } = contentValidationSearchFunctions;
-        public List<ContentValidationEntryDelegate> CustomContentValidationEntryFunctions { get; } = contentValidationEntryFunctions;
+        public List<ContentValidationFindKeywordValidator> CustomContentValidationFindKeywordFunctions { get; } = contentValidationSearchFunctions;
+        public List<ContentValidationEntryValidator> CustomContentValidationEntryFunctions { get; } = contentValidationEntryFunctions;
     }
 }

@@ -26,7 +26,7 @@ namespace PxUtils.Models.Metadata
         /// <summary>
         /// Additional properties of the matrix object, does not include properties of the dimensions or their values.
         /// </summary>
-        public IReadOnlyDictionary<string, Property> AdditionalProperties { get; }
+        public IReadOnlyDictionary<string, MetaProperty> AdditionalProperties { get; }
 
         /// <summary>
         /// Returns a new metadata object with the specified transform map applied.
