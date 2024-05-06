@@ -7,8 +7,10 @@ namespace PxUtils.Models.Metadata.ExtensionMethods
     {
         /// <summary>
         /// Extension method that returns the value of a <see cref="Property"/> object as a list of <see cref="MultilanguageString"/> objects, using the provided list separator and string delimiter.
-        /// This method checks if the input <see cref="Property"/> can get a multilanguage value. If it can, it parses each language string into a list of strings and constructs a list of <see cref="MultilanguageString"/> objects.
-        /// If the input <see cref="Property"/> cannot get a multilanguage value, it parses the string value of the <see cref="Property"/> into a list of strings and constructs a list of <see cref="MultilanguageString"/> objects with the backup language.
+        /// This method checks if the input <see cref="Property"/> can get a multilanguage value.
+        /// If it can, it parses each language string into a list of strings and constructs a list of <see cref="MultilanguageString"/> objects.
+        /// If the input <see cref="Property"/> cannot get a multilanguage value, it parses the string value of the <see cref="Property"/> into a list of strings 
+        /// and constructs a list of <see cref="MultilanguageString"/> objects with the backup language.
         /// </summary>
         /// <param name="input">The <see cref="Property"/> object to read the value from.</param>
         /// <param name="backupLang">The backup language to use if the <see cref="Property"/> cannot get a multilanguage value.</param>

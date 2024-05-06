@@ -20,6 +20,8 @@ namespace Px.Utils.TestingApp.Commands
         {             
             BenchmarkFunctions = [ValidateContentBenchmark];
             BenchmarkFunctionsAsync = [ValidateContentAsyncBenchmark];
+            entries = [];
+            validator = new("", Encoding.Default);
         }
 
         protected override void OneTimeBenchmarkSetup()

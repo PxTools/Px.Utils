@@ -25,8 +25,8 @@ namespace PxUtils.TestingApp
         {
             while(true)
             {
-                string q = "Enter the command and optional parameters:";
-                string followUp = "Valid command is required, please input the command:";
+                const string q = "Enter the command and optional parameters:";
+                const string followUp = "Valid command is required, please input the command:";
                 List<string> inputs = TestAppConsole.AskQuestion(q, true, followUp);
                 while (!_commands.ContainsKey(inputs[0]))
                 {

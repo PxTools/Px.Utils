@@ -1,6 +1,5 @@
 ﻿using PxUtils.PxFile.Metadata;
 using PxUtils.Validation.SyntaxValidation;
-using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
@@ -20,6 +19,7 @@ namespace Px.Utils.TestingApp.Commands
         {             
             BenchmarkFunctions = [SyntaxValidationBenchmark];
             BenchmarkFunctionsAsync = [SyntaxValidationAsyncBenchmark];
+            encoding = Encoding.Default;
         }
 
         protected override void OneTimeBenchmarkSetup()

@@ -30,7 +30,8 @@ namespace PxUtils.Validation.SyntaxValidation
     }
 
     /// <summary>
-    /// Provides a collection of helper methods used during the syntax validation process. These methods include functionality for extracting sections from a string, checking the format of a string, and determining the type of a value from a string.
+    /// Provides a collection of helper methods used during the syntax validation process. 
+    /// These methods include functionality for extracting sections from a string, checking the format of a string, and determining the type of a value from a string.
     /// </summary>
     public static class SyntaxValidationUtilityMethods
     {
@@ -43,7 +44,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="input">The input string to extract from</param>
         /// <param name="startSymbol">Symbol that starts enclosement</param>
         /// <param name="endSymbol">Optional symbol that closes the enclosement. If none given, startSymbol is used for both starting and ending the enclosement</param>
-        /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the extracted sections, the string that remains after the operation and starting indexes of extracted sections</return>
+        /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the extracted sections,
+        /// the string that remains after the operation and starting indexes of extracted sections</return>
         internal static ExtractSectionResult ExtractSectionFromString(string input, char startSymbol, char stringDelimeter, char? endSymbol = null)
         {
             // If no end symbol is provided, the start symbol is used for both starting and ending the enclosement
@@ -123,7 +125,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>Returns a boolean which is true if the input string is in a number format</returns>
         internal static bool IsNumberFormat(string input)
         {
-            if (input.Length > 29)
+            const int maxNumberLength = 29;
+            if (input.Length > maxNumberLength)
             {
                 return false;
             }
@@ -133,7 +136,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
 
             // Create a regex pattern to match valid number format
-            string pattern = @"^-?(\d+\.?\d*|\.\d+)$";
+            const string pattern = @"^-?(\d+\.?\d*|\.\d+)$";
 
             try
             {
@@ -150,7 +153,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Determines whether the line changes in a string are compliant with the syntax configuration.
         /// </summary>
         /// <param name="input">The input string to check</param>
-        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
+        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. 
+        /// The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <param name="isList">A boolean that is true if the input string is a list</param>
         /// <returns>Returns a boolean which is true if the line changes in the input string are compliant with the syntax configuration</returns>
         internal static bool ValueLineChangesAreCompliant(string input, PxFileSyntaxConf syntaxConf, bool isList)
@@ -173,7 +177,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Determines the type of a value from a string.
         /// </summary>
         /// <param name="input">The input string to check</param>
-        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
+        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax.
+        /// The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <returns>Returns a <see cref="ValueType"/> object that represents the type of the value in the input string. If the type cannot be determined, null is returned.</returns>
         internal static ValueType? GetValueTypeFromString(string input, PxFileSyntaxConf syntaxConf)
         {
@@ -416,7 +421,11 @@ namespace PxUtils.Validation.SyntaxValidation
                 return false;
             }
 
-            ExtractSectionResult intervalSection = ExtractSectionFromString(input, syntaxConf.Symbols.Value.TimeSeriesIntervalStart, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Value.TimeSeriesIntervalEnd);
+            ExtractSectionResult intervalSection = ExtractSectionFromString(
+                input, 
+                syntaxConf.Symbols.Value.TimeSeriesIntervalStart, 
+                syntaxConf.Symbols.Key.StringDelimeter,
+                syntaxConf.Symbols.Value.TimeSeriesIntervalEnd);
             // There can only be one time interval specifier section
             if (intervalSection.Sections.Length != 1)
             {
@@ -539,7 +548,14 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         }
 
-        private static void HandleStringDelimiter(ref bool insideString, ref bool insideSection, bool ignoreStringContents, StringBuilder sectionBuilder, List<string> sections, List<int> startIndexes, int i)
+        private static void HandleStringDelimiter(
+            ref bool insideString,
+            ref bool insideSection,
+            bool ignoreStringContents,
+            StringBuilder sectionBuilder,
+            List<string> sections, 
+            List<int> startIndexes, 
+            int i)
         {
             insideString = !insideString;
             if (!ignoreStringContents)
