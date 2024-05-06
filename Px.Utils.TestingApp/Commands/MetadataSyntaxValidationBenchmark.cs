@@ -18,7 +18,7 @@ namespace Px.Utils.TestingApp.Commands
         internal MetadataSyntaxValidationBenchmark()
         {             
             BenchmarkFunctions = [SyntaxValidationBenchmark];
-            BenchmarkFunctionsAsync = [SyntaxValidationAsyncBenchmark];
+            BenchmarkFunctionsAsync = [SyntaxValidationBenchmarkAsync];
             encoding = Encoding.Default;
         }
 
@@ -39,7 +39,7 @@ namespace Px.Utils.TestingApp.Commands
             SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, TestFilePath);
         }
 
-        private async Task SyntaxValidationAsyncBenchmark()
+        private async Task SyntaxValidationBenchmarkAsync()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             stream.Seek(0, SeekOrigin.Begin);

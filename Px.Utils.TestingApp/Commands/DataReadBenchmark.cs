@@ -29,10 +29,12 @@ namespace Px.Utils.TestingApp.Commands
 
         private static readonly string[] cellFlags = ["-c", "-cells"];
 
+        private const string metadataNotFoundMessage = "Metadata not found.";
+
         internal DataReadBenchmark()
         {
             BenchmarkFunctions = [RunReadDoubleDataValuesBenchmarks, RunReadDecimalDataValuesBenchmarks, RunReadUnsafeDoubleBenchmarks];
-            BenchmarkFunctionsAsync = [RunReadDoubleDataValuesAsyncBenchmarks, RunReadDecimalDataValuesAsyncBenchmarks, RunReadUnsafeDoubleAsyncBenchmarks];
+            BenchmarkFunctionsAsync = [RunReadDoubleDataValuesBenchmarksAsync, RunReadDecimalDataValuesBenchmarksAsync, RunReadUnsafeDoubleBenchmarksAsync];
             ParameterFlags.Add(cellFlags);
         }
 
@@ -51,7 +53,7 @@ namespace Px.Utils.TestingApp.Commands
 
         private void RunReadDoubleDataValuesBenchmarks()
         {
-            if(MetaData is null) throw new InvalidOperationException("Metadata not found.");
+            if(MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Indexer = GenerateBenchmarkIndexer(MetaData, _numberOfCells);
 
             DoubleDataValue[] buffer = new DoubleDataValue[Indexer.DataLength];
@@ -64,7 +66,7 @@ namespace Px.Utils.TestingApp.Commands
 
         private void RunReadDecimalDataValuesBenchmarks()
         {
-            if (MetaData is null) throw new InvalidOperationException("Metadata not found.");
+            if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Indexer = GenerateBenchmarkIndexer(MetaData, _numberOfCells);
 
             DecimalDataValue[] buffer = new DecimalDataValue[Indexer.DataLength];
@@ -77,7 +79,7 @@ namespace Px.Utils.TestingApp.Commands
 
         private void RunReadUnsafeDoubleBenchmarks()
         {
-            if (MetaData is null) throw new InvalidOperationException("Metadata not found.");
+            if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Indexer = GenerateBenchmarkIndexer(MetaData, _numberOfCells);
 
             double[] buffer = new double[Indexer.DataLength];
@@ -89,9 +91,9 @@ namespace Px.Utils.TestingApp.Commands
             reader.ReadUnsafeDoubles(buffer, 0, Indexer, missingValueEncodings);
         }
 
-        private async Task RunReadDoubleDataValuesAsyncBenchmarks()
+        private async Task RunReadDoubleDataValuesBenchmarksAsync()
         {
-            if (MetaData is null) throw new InvalidOperationException("Metadata not found.");
+            if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Indexer = GenerateBenchmarkIndexer(MetaData, _numberOfCells);
 
             DoubleDataValue[] buffer = new DoubleDataValue[Indexer.DataLength];
@@ -102,9 +104,9 @@ namespace Px.Utils.TestingApp.Commands
             await reader.ReadDoubleDataValuesAsync(buffer, 0, Indexer);
         }
 
-        private async Task RunReadDecimalDataValuesAsyncBenchmarks()
+        private async Task RunReadDecimalDataValuesBenchmarksAsync()
         {
-            if (MetaData is null) throw new InvalidOperationException("Metadata not found.");
+            if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Indexer = GenerateBenchmarkIndexer(MetaData, _numberOfCells);
 
             DecimalDataValue[] buffer = new DecimalDataValue[Indexer.DataLength];
@@ -115,9 +117,9 @@ namespace Px.Utils.TestingApp.Commands
             await reader.ReadDecimalDataValuesAsync(buffer, 0, Indexer);
         }
 
-        private async Task RunReadUnsafeDoubleAsyncBenchmarks()
+        private async Task RunReadUnsafeDoubleBenchmarksAsync()
         {
-            if (MetaData is null) throw new InvalidOperationException("Metadata not found.");
+            if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Indexer = GenerateBenchmarkIndexer(MetaData, _numberOfCells);
 
             double[] buffer = new double[Indexer.DataLength];
