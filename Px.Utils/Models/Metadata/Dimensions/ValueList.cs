@@ -55,9 +55,20 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <summary>
         /// Returns the first dimension value that fills the specified condition.
         /// </summary>
-        /// <param name="match">The condition the check the dimension value against.</param>
+        /// <typeparam name="T">Type of the dimension value to find.</typeparam>
+        /// <param name="match">The condition the check the value against.</param>
         /// <returns>The first dimension value that matches the specified predicate, or null if not found.</returns>
-        public DimensionValue? Find(Predicate<DimensionValue> match) => Values.Find(match);
+        public T? Find<T>(Predicate<T> match) where T : DimensionValue
+        {
+            foreach (var dimension in Values)
+            {
+                if (dimension is T value && match(value))
+                {
+                    return value;
+                }
+            }
+            return null;
+        }
 
         /// <summary>
         /// Adds a dimension value to the end of the list.
@@ -126,24 +137,6 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <returns>The <see cref="ContentDimensionValue"/> with the specified code, or null if not found.</returns>
         public override ContentDimensionValue? Find(string code)
             => (ContentDimensionValue?)Values.Find(d => d.Code == code);
-
-        /// <summary>
-        /// Returns the first <see cref="ContentDimensionValue"/> that fills the specified condition.
-        /// </summary>
-        /// <param name="match">The condition the check the value against.</param>
-        /// <returns> The first <see cref="ContentDimensionValue"/> that matches the specified predicate, or null if not found.</returns>
-        public ContentDimensionValue? Find(Predicate<ContentDimensionValue> match)
-        {
-            foreach (var dimension in Values)
-            {
-                if (dimension is ContentDimensionValue value && match(value))
-                {
-                    return value;
-                }
-            }
-
-            return null;
-        }
 
         /// <summary>
         /// Returns an enumerator that iterates through the content dimension values.
