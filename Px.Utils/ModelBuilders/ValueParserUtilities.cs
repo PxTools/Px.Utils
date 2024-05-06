@@ -18,6 +18,7 @@ namespace PxUtils.ModelBuilders
         /// <returns>A <see cref="TimeDimensionInterval"/> enumeration value parsed from the input string.</returns>
         public static TimeDimensionInterval ParseTimeIntervalFromTimeVal(string input, PxFileSyntaxConf? conf = null)
         {
+            const int intervalStart = 6;
             conf ??= PxFileSyntaxConf.Default;
             string intervalPart = new(input.TakeWhile(c => c != conf.Symbols.Value.ListSeparator).ToArray());
             string inputStart = conf.Tokens.Time.TimeIntervalIndicator + conf.Symbols.Value.TimeSeriesIntervalStart;
@@ -33,7 +34,7 @@ namespace PxUtils.ModelBuilders
                     {conf.Tokens.Time.WeekInterval, TimeDimensionInterval.Week}
                 };
 
-                if(map.TryGetValue(intervalPart[6..^1], out TimeDimensionInterval interval)) return interval;
+                if(map.TryGetValue(intervalPart[intervalStart..^1], out TimeDimensionInterval interval)) return interval;
                 else return TimeDimensionInterval.Other;
             }
             else

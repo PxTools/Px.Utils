@@ -245,11 +245,12 @@ namespace PxUtils.PxFile.Metadata
         /// <returns>A Task that represents the asynchronous operation. The Task result contains the determined encoding of the stream.</returns>
         public static async Task<Encoding> GetEncodingAsync(Stream stream, PxFileSyntaxConf? symbolsConf = null, CancellationToken cancellationToken = default)
         {
+            const int bomLength = 3;
             symbolsConf ??= PxFileSyntaxConf.Default;
             long position = stream.Position;
 
-            byte[] bom = new byte[3];
-            await stream.ReadAsync(bom.AsMemory(0, 3), cancellationToken);
+            byte[] bom = new byte[bomLength];
+            await stream.ReadAsync(bom.AsMemory(0, bomLength), cancellationToken);
 
             stream.Position = position;
 
@@ -283,20 +284,15 @@ namespace PxUtils.PxFile.Metadata
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Encoding? GetBom(byte[] buffer)
         {
-            // UTF8 BOM
-            if (buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF)
+            if (buffer.Take(CharacterConstants.BOM_UTF_8.Length).SequenceEqual(CharacterConstants.BOM_UTF_8))
             {
                 return Encoding.UTF8;
             }
-
-            // UTF16 BOM
-            else if (buffer[0] == 0xFE && buffer[1] == 0xFF)
+            else if (buffer.Take(CharacterConstants.BOM_UTF_16.Length).SequenceEqual(CharacterConstants.BOM_UTF_16))
             {
                 return Encoding.Unicode;
             }
-
-            // UTF32 BOM
-            else if (buffer[0] == 0x00 && buffer[1] == 0x00 && buffer[2] == 0xFE)
+            else if (buffer.Take(CharacterConstants.BOM_UTF_32.Length).SequenceEqual(CharacterConstants.BOM_UTF_32))
             {
                 return Encoding.UTF32;
             }

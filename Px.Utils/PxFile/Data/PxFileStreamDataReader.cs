@@ -14,6 +14,7 @@ namespace PxUtils.PxFile.Data
         private long readIndex = 0;
         private readonly int _readBufferSize;
         private readonly char _valueSeparator = ' ';
+        private const int validCharactersMinIndex = 0x21;
 
         #region Constructors
 
@@ -287,7 +288,7 @@ namespace PxUtils.PxFile.Data
                 for (int i = 0; i < read; i++) // Hot loop, mind the performance!
                 {
                     char c = (char)internalBuffer[i];
-                    if (c > 0x21)
+                    if (c > validCharactersMinIndex)
                     {
                         valueBuffer[valueBufferIndex++] = c;
                     }

@@ -680,8 +680,9 @@ namespace PxUtils.Validation.SyntaxValidation
         {
             // We only need to run this validation if the value is less than 150 characters long and it is a string or list
             ValueType? type = SyntaxValidationUtilityMethods.GetValueTypeFromString(validationKeyValuePair.KeyValuePair.Value, syntaxConf);
-            
-            if (validationKeyValuePair.KeyValuePair.Value.Length > 150 ||
+            const int oneLineValueLengthRecommendedLimit = 150;
+
+            if (validationKeyValuePair.KeyValuePair.Value.Length > oneLineValueLengthRecommendedLimit ||
                 (type != ValueType.String &&
                 type != ValueType.ListOfStrings))
             {
@@ -1045,9 +1046,10 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier is excessively long, otherwise null</returns>
         public static ValidationFeedbackItem? KeywordIsExcessivelyLong(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
+            const int keywordLengthRecommendedLimit = 20;
             string keyword = validationStructuredEntry.Key.Keyword;
 
-            if (keyword.Length > 20)
+            if (keyword.Length > keywordLengthRecommendedLimit)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     validationStructuredEntry.KeyStartLineIndex,
