@@ -5,13 +5,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage(
-    "Major Bug", "S2583:Conditionally executed code should be reachable", 
-    Justification = "False positive", 
-    Scope = "member", 
-    Target = "~M:PxUtils.Models.Metadata.ExtensionMethods.PropertyExtensions.ParseStringList(System.String,System.Char,System.Char)~System.Collections.Generic.List{System.String}")]
-[assembly: SuppressMessage(
-    "Blocker Code Smell", "S2368:Public methods should not have multidimensional array parameters", 
-    Justification = "Index arithmetic is a key feature of this library",
-    Scope = "member", 
-    Target = "~M:Px.Utils.PxFile.Data.DataIndexer.#ctor(System.Int32[][],System.Int32[])")]
+[assembly: SuppressMessage("Major Bug", "S2583:Conditionally executed code should be reachable", Justification = "False positive", Scope = "member", Target = "~M:PxUtils.Models.Metadata.ExtensionMethods.PropertyExtensions.ParseStringList(System.String,System.Char,System.Char)~System.Collections.Generic.List{System.String}")]
+[assembly: SuppressMessage("Blocker Code Smell", "S2368:Public methods should not have multidimensional array parameters", Justification = "Index arithmetic is a key feature of this library", Scope = "member", Target = "~M:Px.Utils.PxFile.Data.DataIndexer.#ctor(System.Int32[][],System.Int32[])")]
+[assembly: SuppressMessage("Blocker Code Smell", "S2368:Public methods should not have multidimensional array parameters", Justification = "Index arithmetic is a key feature of this library", Scope = "member", Target = "~M:Px.Utils.PxFile.Data.DataIndexer.#ctor(System.Int32[][],System.Int32[],System.Int32[])")]

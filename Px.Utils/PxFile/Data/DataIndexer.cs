@@ -18,6 +18,7 @@ namespace Px.Utils.PxFile.Data
         private readonly int[][] _coordinates;
         private readonly int[] _lastIndices;
         private readonly int[] _indices;
+        private readonly int[] _dimOrder;
         private readonly int _lastCoordinateIndex;
         private readonly int[] _ReverseCumulativeProducts;
 
@@ -30,15 +31,17 @@ namespace Px.Utils.PxFile.Data
         {
             int[] dimensionSizes = completeMetaMap.DimensionMaps.Select(d => d.ValueCodes.Count).ToArray();
             _coordinates = new int[targetMap.DimensionMaps.Count][];
-            for (int dimIndex = 0; dimIndex < targetMap.DimensionMaps.Count; dimIndex++)
+            _dimOrder = GetDimensionOrder(completeMetaMap, targetMap);
+            for (int targetIndex = 0; targetIndex < targetMap.DimensionMaps.Count; targetIndex++)
             {
-                IDimensionMap dimension = completeMetaMap.DimensionMaps.First(d => d.Code == targetMap.DimensionMaps[dimIndex].Code);
-                _coordinates[dimIndex] = new int[targetMap.DimensionMaps[dimIndex].ValueCodes.Count];
-                for (int mapIndex = 0; mapIndex < targetMap.DimensionMaps[dimIndex].ValueCodes.Count; mapIndex++)
+                int dimIndex = _dimOrder[targetIndex];
+                IDimensionMap dimension = completeMetaMap.DimensionMaps.First(d => d.Code == targetMap.DimensionMaps[targetIndex].Code);
+                _coordinates[dimIndex] = new int[targetMap.DimensionMaps[targetIndex].ValueCodes.Count];
+                for (int mapIndex = 0; mapIndex < targetMap.DimensionMaps[targetIndex].ValueCodes.Count; mapIndex++)
                 {
                     for (int valIndex = 0; valIndex < dimension.ValueCodes.Count; valIndex++)
                     {
-                        if (dimension.ValueCodes[valIndex] == targetMap.DimensionMaps[dimIndex].ValueCodes[mapIndex])
+                        if (dimension.ValueCodes[valIndex] == targetMap.DimensionMaps[targetIndex].ValueCodes[mapIndex])
                         {
                             _coordinates[dimIndex][mapIndex] = valIndex;
                         }
@@ -67,6 +70,33 @@ namespace Px.Utils.PxFile.Data
         public DataIndexer(int[][] coordinates, int[] dimensionSizes)
         {
             _coordinates = [.. coordinates];
+            _dimOrder = Enumerable.Range(0, _coordinates.Length).ToArray();
+            DataLength = _coordinates.Select(c => c.Length).Aggregate(1, (a, b) => a * b);
+            _indices = new int[_coordinates.Length];
+            _lastIndices = _coordinates.Select(d => d.Length - 1).ToArray();
+            _lastCoordinateIndex = _coordinates.Length - 1;
+            _ReverseCumulativeProducts = GenerateRCP(dimensionSizes);
+            SetCurrentIndex();
+        }
+
+        /// <summary>
+        /// Builds an indexer based on a set of coordinates and the sizes of the dimensions in the original set.
+        /// </summary>
+        /// <param name="coordinates">
+        /// Produces the indexes of the items in these coordinates.
+        /// Each sublist in the list represents a dimension and the values in the sublist are the indexes of the values in the original set.
+        /// </param>
+        /// <param name="dimensionOrder">
+        /// If the order of the dimensions in the original set is different from the order of the dimensions in the coordinates, this list can be used to specify the order.
+        /// [0] = 1 means that the first dimension in the coordinates corresponds to the second dimension in the original set.
+        /// </param>
+        /// <param name="dimensionSizes">
+        /// Sizes of the dimensions in the original set.
+        /// </param>
+        public DataIndexer(int[][] coordinates, int[] dimensionOrder, int[] dimensionSizes)
+        {
+            _coordinates = [.. coordinates];
+            _dimOrder = [.. dimensionOrder];
             DataLength = _coordinates.Select(c => c.Length).Aggregate(1, (a, b) => a * b);
             _indices = new int[_coordinates.Length];
             _lastIndices = _coordinates.Select(d => d.Length - 1).ToArray();
@@ -83,13 +113,14 @@ namespace Px.Utils.PxFile.Data
         {
             for (int i = _lastCoordinateIndex; i >= 0; i--)
             {
-                if (_indices[i] < _lastIndices[i])
+                int dimIndex = _dimOrder[i];
+                if (_indices[dimIndex] < _lastIndices[dimIndex])
                 {
-                    _indices[i]++;
+                    _indices[dimIndex]++;
                     SetCurrentIndex();
                     return true;
                 }
-                else _indices[i] = 0;
+                else _indices[dimIndex] = 0;
             }
             return false;
         }
@@ -100,8 +131,15 @@ namespace Px.Utils.PxFile.Data
             CurrentIndex = 0;
             for (int i = 0; i <= _lastCoordinateIndex; i++)
             {
-                CurrentIndex += _ReverseCumulativeProducts[i] * _coordinates[i][_indices[i]];
+                int dimIndex = _dimOrder[i];
+                CurrentIndex += _ReverseCumulativeProducts[dimIndex] * _coordinates[dimIndex][_indices[dimIndex]];
             }
+        }
+
+        private static int[] GetDimensionOrder(IMatrixMap completeMetaMap, IMatrixMap targetMap)
+        {
+            string[] sourceCodes = completeMetaMap.DimensionMaps.Select(d => d.Code).ToArray();
+            return targetMap.DimensionMaps.Select(d => Array.IndexOf(sourceCodes, d.Code)).ToArray();
         }
 
         private static int[] GenerateRCP(int[] dimensionSizes)
