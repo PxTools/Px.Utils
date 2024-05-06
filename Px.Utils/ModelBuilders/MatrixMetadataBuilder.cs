@@ -183,7 +183,7 @@ namespace PxUtils.ModelBuilders
             }
             else
             {
-                DimensionValue? value = targetDimension?.Values.Find(v => v.Name[current.Key.Language ?? pxLangs.DefaultLanguage] == current.Key.SecondIdentifier) ??
+                DimensionValue? value = targetDimension?.Values.Find<DimensionValue>(v => v.Name[current.Key.Language ?? pxLangs.DefaultLanguage] == current.Key.SecondIdentifier) ??
                     throw new ArgumentException($"Failed to build property for key {current.Key} because the value with name {current.Key.SecondIdentifier} was not found.");
                 AddPropertyToDimensionValue(entries, current, targetDimension.Name, value, pxLangs);
             }

@@ -60,7 +60,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <returns>The first dimension value that matches the specified predicate, or null if not found.</returns>
         public T? Find<T>(Predicate<T> match) where T : DimensionValue
         {
-            foreach (var dimension in Values)
+            foreach (DimensionValue dimension in Values)
             {
                 if (dimension is T value && match(value))
                 {

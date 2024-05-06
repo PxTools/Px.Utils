@@ -3,15 +3,15 @@ using PxUtils.Models.Metadata;
 using PxUtils.Models.Metadata.Dimensions;
 using PxUtils.Models.Metadata.Enums;
 
-namespace Px.Utils.UnitTests.ModelTests
+namespace Px.Utils.UnitTests
 {
     internal static class TestModelBuilder
     {
         internal static MatrixMetadata BuildTestMetadata(int[] dimensionSizes)
         {
             List<Dimension> dimensions = [BuildTestContentDimension(0, dimensionSizes[0])];
-            if(dimensionSizes.Length > 1) dimensions.Add(BuildTestTimeDimension(1, dimensionSizes[1]));
-            if(dimensionSizes.Length > 2) dimensions.AddRange(dimensionSizes.Skip(2).Select((size, i) => BuildTestDimension(i + 2, size)));
+            if (dimensionSizes.Length > 1) dimensions.Add(BuildTestTimeDimension(1, dimensionSizes[1]));
+            if (dimensionSizes.Length > 2) dimensions.AddRange(dimensionSizes.Skip(2).Select((size, i) => BuildTestDimension(i + 2, size)));
             return new MatrixMetadata("en", ["en"], dimensions, []);
         }
 
