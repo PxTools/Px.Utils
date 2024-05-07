@@ -33,7 +33,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <summary>
         /// Gets the list of codes associated with the dimension values in the same order.
         /// </summary>
-        public IReadOnlyList<string> Codes { get; }
+        public IReadOnlyList<string> Codes { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValueList"/> class.
@@ -74,14 +74,22 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// Adds a dimension value to the end of the list.
         /// </summary>
         /// <param name="value">Value to add.</param>
-        public void Add(DimensionValue value) => Values.Add(value);
+        public void Add(DimensionValue value)
+        {
+            Values.Add(value);
+            Codes = Values.Select(d => d.Code).ToList();
+        }
 
         /// <summary>
         /// Inserts a dimension value into the list at the specified index.
         /// </summary>
         /// <param name="index">Index at which to insert the value.</param>
         /// <param name="value">Value to be added.</param>
-        public void Insert(int index, DimensionValue value) => Values.Insert(index, value);
+        public void Insert(int index, DimensionValue value)
+        {
+            Values.Insert(index, value);
+            Codes = Values.Select(d => d.Code).ToList();
+        }
 
         /// <summary>
         /// Removes the dimension value with the specified code from the list.
@@ -93,6 +101,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
             if (Find(code) is DimensionValue value)
             {
                 Values.Remove(value);
+                Codes = Values.Select(d => d.Code).ToList();
             }
             else
             {

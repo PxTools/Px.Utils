@@ -122,5 +122,27 @@ namespace PxFileTests.DataTests
             }
             while (generator.Next());
         }
+
+        [TestMethod]
+        public void ThreeDimensions_3_2_5_MultidimensionalReorderingTestWithDimOrderChange()
+        {
+            var coordinates = new int[][]
+            {
+                [ 2, 1 ],
+                [ 0, 1 ],
+                [ 4, 3, 2 ]
+            };
+            int[] dimOrder = [1, 0, 2];
+            int[] dimSizes = [3, 2, 5];
+            DataIndexer generator = new(coordinates, dimOrder, dimSizes);
+            long[] expected = [24, 23, 22, 14, 13, 12, 29, 28, 27, 19, 18, 17];
+            int i = 0;
+
+            do
+            {
+                Assert.AreEqual(expected[i++], generator.CurrentIndex);
+            }
+            while (generator.Next());
+        }
     }
 }

@@ -83,7 +83,7 @@ namespace Px.Utils.Operations
             // Compute sum values to the output matrix
 
             IMatrixMap sumOnlyMap = newMeta.CollapseDimension(_sumMap.Code, _newValue.Code);
-            TData[] outData = new TData[input.Data.Length + sumOnlyMap.GetSize()];
+            TData[] outData = new TData[input.Metadata.GetSize() + sumOnlyMap.GetSize()];
 
             for(int i = 0; i < _sumMap.ValueCodes.Count; i++)
             {

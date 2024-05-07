@@ -65,7 +65,7 @@ namespace Px.Utils.PxFile.Data
         /// Each sublist in the list represents a dimension and the values in the sublist are the indexes of the values in the original set.
         /// </param>
         /// <param name="dimensionSizes">
-        /// Sizes of the dimensions in the original set.
+        /// Sizes of the dimensions in the original set, the order matches the dimension order of the coordinates and the original set.
         /// </param>
         public DataIndexer(int[][] coordinates, int[] dimensionSizes)
         {
@@ -85,13 +85,15 @@ namespace Px.Utils.PxFile.Data
         /// <param name="coordinates">
         /// Produces the indexes of the items in these coordinates.
         /// Each sublist in the list represents a dimension and the values in the sublist are the indexes of the values in the original set.
+        /// The order of the dimensions must match the original set.
         /// </param>
         /// <param name="dimensionOrder">
-        /// If the order of the dimensions in the original set is different from the order of the dimensions in the coordinates, this list can be used to specify the order.
-        /// [0] = 1 means that the first dimension in the coordinates corresponds to the second dimension in the original set.
+        /// This list is used to change the order of dimensions. The values in the list are the indexes of the dimensions in the original set.
+        /// [0] = 1 means that the second dimension in the original set is used as the first dimension.
+        /// [1] = 0 means that the first dimension in the original set is used as the second dimension.
         /// </param>
         /// <param name="dimensionSizes">
-        /// Sizes of the dimensions in the original set.
+        /// Sizes of the dimensions in the original set, the order must match the coordinates and the original set.
         /// </param>
         public DataIndexer(int[][] coordinates, int[] dimensionOrder, int[] dimensionSizes)
         {
