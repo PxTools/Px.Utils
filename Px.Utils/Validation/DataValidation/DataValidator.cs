@@ -12,10 +12,10 @@ namespace PxUtils.Validation.DataValidation
     {
         private const int StreamBufferSize = 4096;
 
-        private readonly static List<IDataValidator> commonValidators = [];
-        private readonly static List<IDataValidator> dataNumValidators = [];
-        private readonly static List<IDataValidator> dataStringValidators = [];
-        private readonly static List<IDataValidator> dataSeparatorValidators = [];
+        private readonly List<IDataValidator> commonValidators = [];
+        private readonly List<IDataValidator> dataNumValidators = [];
+        private readonly List<IDataValidator> dataStringValidators = [];
+        private readonly List<IDataValidator> dataSeparatorValidators = [];
 
         private int expectedRows;
         private int expectedRowLength;
@@ -47,10 +47,9 @@ namespace PxUtils.Validation.DataValidation
         public IEnumerable<ValidationFeedback> Validate(Stream stream, int rowLen, int numOfRows,
             int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null)
         {
-            IEnumerable<ValidationFeedback> validationFeedbacks = [];
             SetValidationParameters(streamEncoding, conf, numOfRows, rowLen, startRow);
 
-            validationFeedbacks = ValidateDataStream(stream);
+            IEnumerable<ValidationFeedback> validationFeedbacks = ValidateDataStream(stream);
 
             ResetValidator();
 
@@ -74,10 +73,9 @@ namespace PxUtils.Validation.DataValidation
             int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null,
             CancellationToken cancellationToken = default)
         {
-            IEnumerable<ValidationFeedback> validationFeedbacks;
             SetValidationParameters(streamEncoding, conf, numOfRows, rowLen, startRow);
 
-            validationFeedbacks = await Task.Factory.StartNew(() => 
+            IEnumerable<ValidationFeedback> validationFeedbacks =  await Task.Factory.StartNew(() => 
                 ValidateDataStream(stream), cancellationToken);
 
             ResetValidator();
