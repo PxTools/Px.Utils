@@ -265,7 +265,7 @@ namespace PxUtils.Validation.SyntaxValidation
             Dictionary<int, int> stringIndeces = GetEnclosingCharacterIndexes(input, syntaxConf.Symbols.Key.StringDelimeter);
             List<int> separators = [];
 
-            // Find all indeces of syntaxConf.Symbols.KeywordSeparator in the input string that are not enclosed within strings using FindSymbolIndex method
+            // Find all indeces of SyntaxConf.Symbols.KeywordSeparator in the input string that are not enclosed within strings using FindSymbolIndex method
             int separatorIndex = -1;
             do
             {

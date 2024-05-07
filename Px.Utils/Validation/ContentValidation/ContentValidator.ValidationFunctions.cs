@@ -80,13 +80,13 @@ namespace PxUtils.Validation.ContentValidation
 
                 return [
                     new ValidationFeedbackItem(
-                    new ContentValidationObject(validator.filename, 0, []),
+                    new ContentValidationObject(validator._filename, 0, []),
                     feedback
                     ),
                 ];
             }
 
-            validator.defaultLanguage = langEntries[0].Value;
+            validator._defaultLanguage = langEntries[0].Value;
             return null;
         }
 
@@ -128,7 +128,7 @@ namespace PxUtils.Validation.ContentValidation
 
             if (availableLanguageEntries.Length == 1)
             {
-                validator.availableLanguages = availableLanguageEntries[0].Value.Split(validator.SyntaxConf.Symbols.Value.ListSeparator); 
+                validator._availableLanguages = availableLanguageEntries[0].Value.Split(validator.SyntaxConf.Symbols.Value.ListSeparator); 
                 return null;
             }
             else
@@ -143,7 +143,7 @@ namespace PxUtils.Validation.ContentValidation
 
                 return [
                     new ValidationFeedbackItem(
-                    new ContentValidationObject(validator.filename, 0, []),
+                    new ContentValidationObject(validator._filename, 0, []),
                     feedback
                     )
                ];
@@ -158,7 +158,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <returns>Null of no issues are found. <see cref="ValidationFeedbackItem"/> object is returned if default language is not defined in the available languages entry</returns>
         public static ValidationFeedbackItem[]? ValidateDefaultLanguageDefinedInAvailableLanguages(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
-            if (validator.availableLanguages is not null && !validator.availableLanguages.Contains(validator.defaultLanguage))
+            if (validator._availableLanguages is not null && !validator._availableLanguages.Contains(validator._defaultLanguage))
             {
                 ValidationStructuredEntry? defaultLanguageEntry = Array.Find(entries, e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.DefaultLanguage, StringComparison.Ordinal));
 
@@ -177,7 +177,7 @@ namespace PxUtils.Validation.ContentValidation
                         ValidationFeedbackRule.UndefinedLanguageFound,
                         feedbackIndexes.Key,
                         0,
-                        validator.defaultLanguage
+                        validator._defaultLanguage
                         );
 
                 return [
@@ -204,8 +204,8 @@ namespace PxUtils.Validation.ContentValidation
                 .Where(e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.ContentVariableIdentifier, StringComparison.Ordinal))
                 .ToArray();
 
-            string defaultLanguage = validator.defaultLanguage ?? string.Empty;
-            string[] languages = validator.availableLanguages ?? [defaultLanguage];
+            string defaultLanguage = validator._defaultLanguage ?? string.Empty;
+            string[] languages = validator._availableLanguages ?? [defaultLanguage];
             foreach (string language in languages)
             {
                 ValidationStructuredEntry? contentDimension = Array.Find(contentDimensionEntries, c => c.Key.Language == language || (c.Key.Language is null && language == defaultLanguage));
@@ -221,13 +221,13 @@ namespace PxUtils.Validation.ContentValidation
 
                     feedbackItems.Add(
                         new ValidationFeedbackItem(
-                        new ContentValidationObject(validator.filename, 0, []),
+                        new ContentValidationObject(validator._filename, 0, []),
                         feedback
                         ));
                 }
             }
 
-            validator.contentDimensionNames = contentDimensionEntries.ToDictionary(
+            validator._contentDimensionNames = contentDimensionEntries.ToDictionary(
                 e => e.Key.Language ?? defaultLanguage, 
                 e => e.Value);
             
@@ -264,7 +264,7 @@ namespace PxUtils.Validation.ContentValidation
 
                     feedbackItems.Add(
                         new ValidationFeedbackItem(
-                            new ContentValidationObject(validator.filename, 0, []),
+                            new ContentValidationObject(validator._filename, 0, []),
                             feedback
                             )
                     );
@@ -296,31 +296,31 @@ namespace PxUtils.Validation.ContentValidation
 
                 return [
                     new(
-                    new ContentValidationObject(validator.filename, 0, []),
+                    new ContentValidationObject(validator._filename, 0, []),
                     feedback
                     )
                 ];
             }
 
-            string defaultLanguage = validator.defaultLanguage ?? string.Empty;
+            string defaultLanguage = validator._defaultLanguage ?? string.Empty;
 
-            validator.stubDimensionNames = stubEntries.ToDictionary(
+            validator._stubDimensionNames = stubEntries.ToDictionary(
                 e => e.Key.Language ?? defaultLanguage, 
                 e => e.Value.Split(validator.SyntaxConf.Symbols.Key.ListSeparator));
             
-            validator.headingDimensionNames = headingEntries.ToDictionary(
+            validator._headingDimensionNames = headingEntries.ToDictionary(
                 e => e.Key.Language ?? defaultLanguage, 
                 e => e.Value.Split(validator.SyntaxConf.Symbols.Key.ListSeparator));
 
             List<ValidationFeedbackItem> feedbackItems = [];
 
-            string[] languages = validator.availableLanguages ?? [defaultLanguage];
+            string[] languages = validator._availableLanguages ?? [defaultLanguage];
 
             foreach (string language in languages)
             {
-                if ((validator.stubDimensionNames is null || !validator.stubDimensionNames.ContainsKey(language))
+                if ((validator._stubDimensionNames is null || !validator._stubDimensionNames.ContainsKey(language))
                     &&
-                    (validator.headingDimensionNames is null || !validator.headingDimensionNames.ContainsKey(language)))
+                    (validator._headingDimensionNames is null || !validator._headingDimensionNames.ContainsKey(language)))
                 {
                     ValidationFeedback feedback = new (
                                 ValidationFeedbackLevel.Error,
@@ -332,7 +332,7 @@ namespace PxUtils.Validation.ContentValidation
 
                     feedbackItems.Add(
                         new ValidationFeedbackItem(
-                            new ContentValidationObject(validator.filename, 0, []),
+                            new ContentValidationObject(validator._filename, 0, []),
                             feedback
                             )
                         );
@@ -375,15 +375,15 @@ namespace PxUtils.Validation.ContentValidation
 
                     feedbackItems.Add(
                         new ValidationFeedbackItem(
-                            new ContentValidationObject(validator.filename, 0, []),
+                            new ContentValidationObject(validator._filename, 0, []),
                             feedback
                             )
                         );
                 }
             }
 
-            string defaultLanguage = validator.defaultLanguage ?? string.Empty;
-            string[] languages = validator.availableLanguages ?? [defaultLanguage];
+            string defaultLanguage = validator._defaultLanguage ?? string.Empty;
+            string[] languages = validator._availableLanguages ?? [defaultLanguage];
 
             foreach(string language in languages)
             {
@@ -402,7 +402,7 @@ namespace PxUtils.Validation.ContentValidation
 
                         feedbackItems.Add(
                             new ValidationFeedbackItem(
-                                new ContentValidationObject(validator.filename, 0, []),
+                                new ContentValidationObject(validator._filename, 0, []),
                                 feedback
                                 )
                             );
@@ -430,23 +430,23 @@ namespace PxUtils.Validation.ContentValidation
                 FindDimensionValues(
                     dimensionEntries,
                     validator.SyntaxConf,
-                    validator.stubDimensionNames, 
+                    validator._stubDimensionNames, 
                     ref feedbackItems, 
-                    validator.filename)
+                    validator._filename)
                 );
             dimensionValues = dimensionValues.Concat(
                 FindDimensionValues(
                     dimensionEntries,
                     validator.SyntaxConf, 
-                    validator.headingDimensionNames, 
+                    validator._headingDimensionNames, 
                     ref feedbackItems,
-                    validator.filename)
+                    validator._filename)
                 );
 
-            validator.dimensionValueNames = [];
+            validator._dimensionValueNames = [];
             foreach (KeyValuePair<KeyValuePair<string, string>, string[]> item in dimensionValues)
             {
-                validator.dimensionValueNames.Add(item.Key, item.Value);
+                validator._dimensionValueNames.Add(item.Key, item.Value);
             }
 
             return [.. feedbackItems];
@@ -478,11 +478,11 @@ namespace PxUtils.Validation.ContentValidation
                 ];
 
             string[] contentDimensionNames =
-                validator.contentDimensionNames is not null ?
-                [.. validator.contentDimensionNames.Values] : [];
+                validator._contentDimensionNames is not null ?
+                [.. validator._contentDimensionNames.Values] : [];
 
             Dictionary<KeyValuePair<string, string>, string[]> dimensionValueNames = 
-                validator.dimensionValueNames ?? [];
+                validator._dimensionValueNames ?? [];
 
             Dictionary<KeyValuePair<string, string>, string[]> contentDimensionValueNames = dimensionValueNames
                 .Where(e => contentDimensionNames.Contains(e.Key.Value))
@@ -516,8 +516,8 @@ namespace PxUtils.Validation.ContentValidation
                     validator.SyntaxConf.Tokens.KeyWords.VariableValueCodes
                 ];
 
-            Dictionary<string, string[]> stubDimensions = validator.stubDimensionNames ?? [];
-            Dictionary<string, string[]> headingDimensions =  validator.headingDimensionNames ?? [];
+            Dictionary<string, string[]> stubDimensions = validator._stubDimensionNames ?? [];
+            Dictionary<string, string[]> headingDimensions =  validator._headingDimensionNames ?? [];
             Dictionary<string, string[]> allDimensions = stubDimensions
                 .Concat(headingDimensions)
                 .GroupBy(kvp => kvp.Key)
@@ -683,7 +683,7 @@ namespace PxUtils.Validation.ContentValidation
                 return null;
             }
 
-            if (validator.availableLanguages is not null && !validator.availableLanguages.Contains(entry.Key.Language))
+            if (validator._availableLanguages is not null && !validator._availableLanguages.Contains(entry.Key.Language))
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
@@ -719,7 +719,7 @@ namespace PxUtils.Validation.ContentValidation
         {
             List<ValidationFeedbackItem> feedbackItems = [];
             if ((entry.Key.FirstSpecifier is null && entry.Key.SecondSpecifier is null) || 
-                validator.dimensionValueNames is null)
+                validator._dimensionValueNames is null)
             {
                 return null;
             }
@@ -739,8 +739,8 @@ namespace PxUtils.Validation.ContentValidation
                 return null;
             }
 
-            if ((validator.stubDimensionNames is null || !validator.stubDimensionNames.Values.Any(v => v.Contains(entry.Key.FirstSpecifier))) &&
-                (validator.headingDimensionNames is null || !validator.headingDimensionNames.Values.Any(v => v.Contains(entry.Key.FirstSpecifier))))
+            if ((validator._stubDimensionNames is null || !validator._stubDimensionNames.Values.Any(v => v.Contains(entry.Key.FirstSpecifier))) &&
+                (validator._headingDimensionNames is null || !validator._headingDimensionNames.Values.Any(v => v.Contains(entry.Key.FirstSpecifier))))
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
@@ -762,7 +762,7 @@ namespace PxUtils.Validation.ContentValidation
                 );
             }
             else if (entry.Key.SecondSpecifier is not null && 
-                !validator.dimensionValueNames.Values.Any(v => v.Contains(entry.Key.SecondSpecifier)))
+                !validator._dimensionValueNames.Values.Any(v => v.Contains(entry.Key.SecondSpecifier)))
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
@@ -882,7 +882,7 @@ namespace PxUtils.Validation.ContentValidation
                     ];
 
             if ((entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.Charset && !allowedCharsets.Contains(entry.Value)) ||
-                (entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.CodePage && !entry.Value.Equals(validator.encoding.BodyName, StringComparison.OrdinalIgnoreCase)) ||
+                (entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.CodePage && !entry.Value.Equals(validator._encoding.BodyName, StringComparison.OrdinalIgnoreCase)) ||
                 (entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.DimensionType && !dimensionTypes.Contains(entry.Value)))
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
@@ -906,10 +906,10 @@ namespace PxUtils.Validation.ContentValidation
             }
             else if (entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.ContentVariableIdentifier)
             {
-                string defaultLanguage = validator.defaultLanguage ?? string.Empty;
+                string defaultLanguage = validator._defaultLanguage ?? string.Empty;
                 string lang = entry.Key.Language ?? defaultLanguage;
-                if (validator.stubDimensionNames is not null && !Array.Exists(validator.stubDimensionNames[lang], d => d == entry.Value) &&
-                (validator.headingDimensionNames is not null && !Array.Exists(validator.headingDimensionNames[lang], d => d == entry.Value)))
+                if (validator._stubDimensionNames is not null && !Array.Exists(validator._stubDimensionNames[lang], d => d == entry.Value) &&
+                (validator._headingDimensionNames is not null && !Array.Exists(validator._headingDimensionNames[lang], d => d == entry.Value)))
                 {
                     KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                         entry.KeyStartLineIndex,
@@ -944,16 +944,16 @@ namespace PxUtils.Validation.ContentValidation
         public static ValidationFeedbackItem[]? ValidateValueAmounts(ValidationStructuredEntry entry, ContentValidator validator)
         {
             if (entry.Key.Keyword != validator.SyntaxConf.Tokens.KeyWords.VariableValueCodes ||
-                validator.dimensionValueNames is null ||
+                validator._dimensionValueNames is null ||
                 entry.Key.FirstSpecifier is null)
             {
                 return null;
             }
 
             string[] codes = entry.Value.Split(validator.SyntaxConf.Symbols.Value.ListSeparator);
-            string defaultLanguage =  validator.defaultLanguage ?? string.Empty;
+            string defaultLanguage =  validator._defaultLanguage ?? string.Empty;
             string lang = entry.Key.Language ?? defaultLanguage;
-            if (codes.Length != validator.dimensionValueNames[new(lang, entry.Key.FirstSpecifier)].Length)
+            if (codes.Length != validator._dimensionValueNames[new(lang, entry.Key.FirstSpecifier)].Length)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,

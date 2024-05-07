@@ -29,7 +29,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Validates the syntax of a PX file's metadata.
         ///</summary>
         /// <param name="stream">The stream of the PX file to be validated.</param>
-        /// <param name="encoding">The encoding format to use for the PX file reading</param>
+        /// <param name="encoding">The _encoding format to use for the PX file reading</param>
         /// <param name="filename">The name of the file to be validated.</param>
         /// <param name="syntaxConf">An optional <see cref="PxFileSyntaxConf"/> parameter that specifies the syntax configuration for the PX file. 
         /// If not provided, the default syntax configuration is used.</param>
@@ -75,7 +75,7 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Asynchronously validates the syntax of a PX file's metadata.
         /// </summary>
         /// <param name="stream">The stream of the PX file to be validated.</param>
-        /// <param name="encoding">The encoding format to use for the PX file reading</param>
+        /// <param name="encoding">The _encoding format to use for the PX file reading</param>
         /// <param name="filename">The name of the file to be validated.</param>
         /// <param name="syntaxConf">An optional <see cref="PxFileSyntaxConf"/> parameter that specifies the syntax configuration for the PX file. 
         /// If not provided, the default syntax configuration is used.</param>

@@ -5,7 +5,7 @@ using System.Text;
 namespace PxUtils.PxFile.Metadata
 {
     /// <summary>
-    /// Provides methods to read metadata and get the encoding from a stream of a Px file.
+    /// Provides methods to read metadata and get the _encoding from a stream of a Px file.
     /// </summary>
     public static class PxFileMetadataReader
     {
@@ -13,10 +13,10 @@ namespace PxUtils.PxFile.Metadata
 
         /// <summary>
         /// Processes a provided stream to extract metadata, returning the results as an IEnumerable of key-value pairs.
-        /// The method uses the specified encoding and symbols configuration (or defaults if not provided) to interpret the stream.
+        /// The method uses the specified _encoding and symbols configuration (or defaults if not provided) to interpret the stream.
         /// </summary>
         /// <param name="stream">The stream from which to read the metadata.</param>
-        /// <param name="encoding">The encoding to use when reading the stream.</param>
+        /// <param name="encoding">The _encoding to use when reading the stream.</param>
         /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="readBufferSize">The size of the buffer to use when reading the stream. If not specified, the default buffer size is used.</param>
         /// <returns>An IEnumerable of key-value pairs representing the metadata entries in the file.</returns>
@@ -83,10 +83,10 @@ namespace PxUtils.PxFile.Metadata
 
         /// <summary>
         /// Asynchronausly processes a provided stream to extract metadata, returning the results as an IEnumerable of key-value pairs.
-        /// The method uses the specified encoding and symbols configuration (or defaults if not provided) to interpret the stream.
+        /// The method uses the specified _encoding and symbols configuration (or defaults if not provided) to interpret the stream.
         /// </summary>
         /// <param name="stream">The stream from which to read the metadata.</param>
-        /// <param name="encoding">The encoding to use when reading the stream.</param>
+        /// <param name="encoding">The _encoding to use when reading the stream.</param>
         /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="readBufferSize">The size of the buffer to use when reading the stream. If not specified, the default buffer size is used.</param>
         /// <param name="cancellationToken">Can be used to cancel the operation.</param>
@@ -166,10 +166,10 @@ namespace PxUtils.PxFile.Metadata
 
         /// <summary>
         /// Reads the metadata from the provided stream and returns it as a dictionary of key-value pairs.
-        /// The method uses the specified encoding and symbols configuration (or defaults if not provided) to interpret the stream.
+        /// The method uses the specified _encoding and symbols configuration (or defaults if not provided) to interpret the stream.
         /// </summary>
         /// <param name="stream">The stream from which to read the metadata.</param>
-        /// <param name="encoding">The encoding to use when reading the stream.</param>
+        /// <param name="encoding">The _encoding to use when reading the stream.</param>
         /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="readBufferSize">The size of the buffer to use when reading the stream. If not specified, the default buffer size is used.</param>
         /// <returns>A dictionary containing the metadata entries in the file.</returns>
@@ -182,10 +182,10 @@ namespace PxUtils.PxFile.Metadata
 
         /// <summary>
         /// Asynchronously reads the metadata from the provided stream and returns it as a dictionary of key-value pairs.
-        /// The method uses the specified encoding and symbols configuration (or defaults if not provided) to interpret the stream.
+        /// The method uses the specified _encoding and symbols configuration (or defaults if not provided) to interpret the stream.
         /// </summary>
         /// <param name="stream">The stream from which to read the metadata.</param>
-        /// <param name="encoding">The encoding to use when reading the stream.</param>
+        /// <param name="encoding">The _encoding to use when reading the stream.</param>
         /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="readBufferSize">The size of the buffer to use when reading the stream. If not specified, the default buffer size is used.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
@@ -208,13 +208,13 @@ namespace PxUtils.PxFile.Metadata
         }
 
         /// <summary>
-        /// Determines the encoding of the provided stream based on the Byte Order Mark (BOM) or the CODEPAGE keyword in the metadata.
-        /// If no BOM or CODEPAGE keyword is found, an exception is thrown. If the encoding specified by the CODEPAGE keyword is not available,
+        /// Determines the _encoding of the provided stream based on the Byte Order Mark (BOM) or the CODEPAGE keyword in the metadata.
+        /// If no BOM or CODEPAGE keyword is found, an exception is thrown. If the _encoding specified by the CODEPAGE keyword is not available,
         /// it attempts to register it using the CodePagesEncodingProvider.
         /// </summary>
-        /// <param name="stream">The stream from which to determine the encoding.</param>
+        /// <param name="stream">The stream from which to determine the _encoding.</param>
         /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
-        /// <returns>The determined encoding of the stream.</returns>
+        /// <returns>The determined _encoding of the stream.</returns>
         public static Encoding GetEncoding(Stream stream, PxFileSyntaxConf? symbolsConf = null)
         {
             symbolsConf ??= PxFileSyntaxConf.Default;
@@ -227,7 +227,7 @@ namespace PxUtils.PxFile.Metadata
 
             if (GetBom(bom) is Encoding utf) return utf;
 
-            // Use ASCII because encoding is still unknown, CODEPAGE keyword is readable as ASCII
+            // Use ASCII because _encoding is still unknown, CODEPAGE keyword is readable as ASCII
             KeyValuePair<string, string> encoding = ReadMetadata(stream, Encoding.ASCII, symbolsConf, 512)
                 .FirstOrDefault(kvp => kvp.Key == symbolsConf.Tokens.KeyWords.CodePage);
 
@@ -235,14 +235,14 @@ namespace PxUtils.PxFile.Metadata
         }
 
         /// <summary>
-        /// Asynchronously determines the encoding of the provided stream based on the Byte Order Mark (BOM) or the CODEPAGE keyword in the metadata.
-        /// If no BOM or CODEPAGE keyword is found, an exception is thrown. If the encoding specified by the CODEPAGE keyword is not available,
+        /// Asynchronously determines the _encoding of the provided stream based on the Byte Order Mark (BOM) or the CODEPAGE keyword in the metadata.
+        /// If no BOM or CODEPAGE keyword is found, an exception is thrown. If the _encoding specified by the CODEPAGE keyword is not available,
         /// it attempts to register it using the CodePagesEncodingProvider.
         /// </summary>
-        /// <param name="stream">The stream from which to determine the encoding.</param>
+        /// <param name="stream">The stream from which to determine the _encoding.</param>
         /// <param name="symbolsConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
-        /// <returns>A Task that represents the asynchronous operation. The Task result contains the determined encoding of the stream.</returns>
+        /// <returns>A Task that represents the asynchronous operation. The Task result contains the determined _encoding of the stream.</returns>
         public static async Task<Encoding> GetEncodingAsync(Stream stream, PxFileSyntaxConf? symbolsConf = null, CancellationToken cancellationToken = default)
         {
             const int bomLength = 3;
@@ -256,7 +256,7 @@ namespace PxUtils.PxFile.Metadata
 
             if (GetBom(bom) is Encoding utf) return utf;
 
-            // Use ASCII because encoding is still unknown, CODEPAGE keyword is readable as ASCII
+            // Use ASCII because _encoding is still unknown, CODEPAGE keyword is readable as ASCII
             KeyValuePair<string, string> encoding = await ReadMetadataAsync(stream, Encoding.ASCII, symbolsConf, 512, cancellationToken)
                 .FirstOrDefaultAsync(kvp => kvp.Key == symbolsConf.Tokens.KeyWords.CodePage, cancellationToken);
 
@@ -316,7 +316,7 @@ namespace PxUtils.PxFile.Metadata
             }
             catch (ArgumentException aExp)
             {
-                throw new InvalidPxFileMetadataException($"The encoding {encodingName} provided with the CODEPAGE keyword is not available", aExp);
+                throw new InvalidPxFileMetadataException($"The _encoding {encodingName} provided with the CODEPAGE keyword is not available", aExp);
             }
         }
 

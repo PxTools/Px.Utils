@@ -95,7 +95,7 @@ namespace PxUtils.Validation.ContentValidation
 
             ValidationStructuredEntry? entry = Array.Find(entries,
                             e => e.Key.Keyword.Equals(keyword, StringComparison.Ordinal) &&
-                            (e.Key.Language == language || (language == validator.defaultLanguage && e.Key.Language is null)) &&
+                            (e.Key.Language == language || (language == validator._defaultLanguage && e.Key.Language is null)) &&
                             (e.Key.FirstSpecifier == dimensionName || e.Key.FirstSpecifier == dimensionValueName) &&
                             (e.Key.SecondSpecifier == dimensionValueName || e.Key.SecondSpecifier == null));
 
@@ -110,7 +110,7 @@ namespace PxUtils.Validation.ContentValidation
                             );
                 return
                     new ValidationFeedbackItem(
-                        new ContentValidationObject(validator.filename, 0, []),
+                        new ContentValidationObject(validator._filename, 0, []),
                         feedback
                         );
             }
@@ -156,7 +156,7 @@ namespace PxUtils.Validation.ContentValidation
         {
             ValidationStructuredEntry[] keywordEntries = entries.Where(e => e.Key.Keyword.Equals(keyword, StringComparison.Ordinal)).ToArray();
             ValidationStructuredEntry? entry = Array.Find(keywordEntries,
-                e => ((language == validator.defaultLanguage && e.Key.Language is null) || language == e.Key.Language) &&
+                e => ((language == validator._defaultLanguage && e.Key.Language is null) || language == e.Key.Language) &&
                 (e.Key.FirstSpecifier == dimensionName || dimensionName is null));
 
             if (entry is null)
@@ -169,7 +169,7 @@ namespace PxUtils.Validation.ContentValidation
                             $"{language}, {keyword}, {dimensionName}");
 
                 return new ValidationFeedbackItem(
-                        new ContentValidationObject(validator.filename, 0, []),
+                        new ContentValidationObject(validator._filename, 0, []),
                         feedback
                         );
             }
@@ -206,7 +206,7 @@ namespace PxUtils.Validation.ContentValidation
                 }
             }
 
-            if (languageAndDimensionPair.Key == validator.defaultLanguage)
+            if (languageAndDimensionPair.Key == validator._defaultLanguage)
             {
                 foreach (string keyword in commonKeywords)
                 {
@@ -257,7 +257,7 @@ namespace PxUtils.Validation.ContentValidation
                 }
             }
 
-            if (language == validator.defaultLanguage)
+            if (language == validator._defaultLanguage)
             {
                 ValidationFeedbackItem? variableTypeFeedback = FindDimensionRecommendedKey(entries, dimensionTypeKeyword, language, validator, dimensionName);
                 if (variableTypeFeedback is not null)

@@ -279,7 +279,7 @@ namespace Px.Utils.TestingApp.Commands
                 Console.Write(new string(' ', Console.WindowWidth));
                 Console.SetCursorPosition(0, Console.CursorTop - 1);
             }
-            float progress = (float)processesCompleted / totalProcesses;
+            double progress = (double)processesCompleted / totalProcesses;
 
             // Progress bar
             const int progressBarLength = 100;
@@ -287,7 +287,7 @@ namespace Px.Utils.TestingApp.Commands
             Console.Write(new string('█', progressBlocks));
             Console.Write(new string('░', progressBarLength - progressBlocks));
             Console.WriteLine();
-            const float percentageMultiplier = 100f;
+            const double percentageMultiplier = 100f;
             Console.Write($"Progress: {Math.Round(progress * percentageMultiplier)}% - {processesCompleted} operations completed out of total {totalProcesses}");
 
             if (processesCompleted == totalProcesses)

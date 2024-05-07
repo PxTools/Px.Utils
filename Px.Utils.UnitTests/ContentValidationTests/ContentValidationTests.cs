@@ -66,7 +66,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateFindDefaultLanguageWithEmptyStructuredENtryArrayReturnsWithError()
+        public void ValidateFindDefaultLanguageWithEmptyStructuredEntryArrayReturnsWithError()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.EMPTY_STRUCTURED_ENTRY_ARRAY;

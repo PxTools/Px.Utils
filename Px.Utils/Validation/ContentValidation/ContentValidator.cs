@@ -8,37 +8,37 @@ namespace PxUtils.Validation.ContentValidation
     /// <summary>
     /// Provides methods for validating the content of Px file metadata
     /// <param name="filename">Name of the Px file</param>
-    /// <param name="encoding"> encoding of the Px file</param>
+    /// <param name="encoding"> _encoding of the Px file</param>
     /// <param name="syntaxConf">Object that stores syntax specific symbols and tokens for the Px file</param>
     /// </summary>
     public sealed partial class ContentValidator(string filename, Encoding encoding, PxFileSyntaxConf? syntaxConf = null)
     {
-        private readonly string filename = filename;
-        private readonly Encoding encoding = encoding;
+        private readonly string _filename = filename;
+        private readonly Encoding _encoding = encoding;
         /// <summary>
         /// Default language of the Px file defined with LANGUAGE keyword by default
         /// </summary>
-        private string? defaultLanguage;
+        private string? _defaultLanguage;
         /// <summary>
         /// Array of supported languages in the Px file. Defined with LANGUAGES keyword by default
         /// </summary>
-        private string[]? availableLanguages;
+        private string[]? _availableLanguages;
         /// <summary>
         /// Dictionary that define content dimension names for available languages. Key represents the language, while the value is the dimension name.
         /// </summary>
-        private Dictionary<string, string>? contentDimensionNames;
+        private Dictionary<string, string>? _contentDimensionNames;
         /// <summary>
         /// Dictionary that define stub dimension names for available languages. Key represents the language, while the value is the dimension name.
         /// </summary>
-        private Dictionary<string, string[]>? stubDimensionNames;
+        private Dictionary<string, string[]>? _stubDimensionNames;
         /// <summary>
         /// Dictionary that define heading dimension names for available languages. Key represents the language, while the value is the dimension name.
         /// </summary>
-        private Dictionary<string, string[]>? headingDimensionNames;
+        private Dictionary<string, string[]>? _headingDimensionNames;
         /// <summary>
         /// Dictionary of key value pairs that define names for dimension values. Key is a key value pair of language and dimension name, while the value is an array of dimension value names.
         /// </summary>
-        private Dictionary<KeyValuePair<string, string>, string[]>? dimensionValueNames;
+        private Dictionary<KeyValuePair<string, string>, string[]>? _dimensionValueNames;
         /// <summary>
         /// Object that stores syntax specific symbols and tokens for the Px file
         /// </summary>
@@ -142,12 +142,12 @@ namespace PxUtils.Validation.ContentValidation
 
         private void ResetFields()
         {
-            defaultLanguage = null;
-            availableLanguages = null;
-            contentDimensionNames = null;
-            stubDimensionNames = null;
-            headingDimensionNames = null;
-            dimensionValueNames = null;
+            _defaultLanguage = null;
+            _availableLanguages = null;
+            _contentDimensionNames = null;
+            _stubDimensionNames = null;
+            _headingDimensionNames = null;
+            _dimensionValueNames = null;
         }
     }
 }
