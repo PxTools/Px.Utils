@@ -106,8 +106,8 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_DEFAULT_LANGUAGE;
-            SetValidatorFIeld("defaultLanguage", "foo");
-            SetValidatorFIeld("availableLanguages", availableLanguages);
+            SetValidatorField("_defaultLanguage", "foo");
+            SetValidatorField("_availableLanguages", availableLanguages);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidator.ValidateDefaultLanguageDefinedInAvailableLanguages(
@@ -126,8 +126,8 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_MISSING_CONTVARIABLE;
-            SetValidatorFIeld("defaultLanguage", defaultLanguage);
-            SetValidatorFIeld("availableLanguages", availableLanguages);
+            SetValidatorField("_defaultLanguage", defaultLanguage);
+            SetValidatorField("_availableLanguages", availableLanguages);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidator.ValidateFindContentDimension(
@@ -166,8 +166,8 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_STUB;
-            SetValidatorFIeld("defaultLanguage", defaultLanguage);
-            SetValidatorFIeld("availableLanguages", availableLanguages);
+            SetValidatorField("_defaultLanguage", defaultLanguage);
+            SetValidatorField("_availableLanguages", availableLanguages);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidator.ValidateFindStubAndHeading(
@@ -187,8 +187,8 @@ namespace PxUtils.UnitTests.ContentValidationTests
 
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_DESCRIPTION;
-            SetValidatorFIeld("defaultLanguage", defaultLanguage);
-            SetValidatorFIeld("availableLanguages", availableLanguages);
+            SetValidatorField("_defaultLanguage", defaultLanguage);
+            SetValidatorField("_availableLanguages", availableLanguages);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidator.ValidateFindRecommendedKeys(
@@ -208,9 +208,9 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_DIMENSIONVALUES;
-            SetValidatorFIeld("defaultLanguage", defaultLanguage);
-            SetValidatorFIeld("availableLanguages", availableLanguages);
-            SetValidatorFIeld("stubDimensionNames", new Dictionary<string, string[]>
+            SetValidatorField("_defaultLanguage", defaultLanguage);
+            SetValidatorField("_availableLanguages", availableLanguages);
+            SetValidatorField("_stubDimensionNames", new Dictionary<string, string[]>
                 {
                     { "fi", ["bar", "bar-time"] },
                     { "en", ["bar-en", "bar-time-en"] }
@@ -235,10 +235,10 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_INVALID_CONTENT_VALUE_KEY_ENTRIES;
-            SetValidatorFIeld("defaultLanguage", defaultLanguage);
-            SetValidatorFIeld("availableLanguages", availableLanguages);
-            SetValidatorFIeld("contentDimensionNames", contentDimensionNames);
-            SetValidatorFIeld("dimensionValueNames", new Dictionary<KeyValuePair<string, string>, string[]>
+            SetValidatorField("_defaultLanguage", defaultLanguage);
+            SetValidatorField("_availableLanguages", availableLanguages);
+            SetValidatorField("_contentDimensionNames", contentDimensionNames);
+            SetValidatorField("_dimensionValueNames", new Dictionary<KeyValuePair<string, string>, string[]>
                 {
                     { new KeyValuePair<string, string>( "fi", "bar" ), ["foo"] },
                     { new KeyValuePair<string, string>( "en", "bar-en" ), ["foo-en"] },
@@ -262,10 +262,10 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_INCOMPLETE_VARIABLE_RECOMMENDED_KEYS;
-            SetValidatorFIeld("defaultLanguage", defaultLanguage);
-            SetValidatorFIeld("availableLanguages", availableLanguages);
-            SetValidatorFIeld("contentDimensionNames", contentDimensionNames);
-            SetValidatorFIeld("stubDimensionNames", stubDimensionNames);
+            SetValidatorField("_defaultLanguage", defaultLanguage);
+            SetValidatorField("_availableLanguages", availableLanguages);
+            SetValidatorField("contentDimensionNames", contentDimensionNames);
+            SetValidatorField("_stubDimensionNames", stubDimensionNames);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidator.ValidateFindDimensionRecommendedKeys(
@@ -323,8 +323,8 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithUndefinedLanguage;
-            SetValidatorFIeld("defaultLanguage", defaultLanguage);
-            SetValidatorFIeld("availableLanguages", availableLanguages);
+            SetValidatorField("_defaultLanguage", defaultLanguage);
+            SetValidatorField("_availableLanguages", availableLanguages);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidator.ValidateLanguageParams(
@@ -343,10 +343,10 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithUndefinedFirstSpecifier;
-            SetValidatorFIeld("defaultLanguage", defaultLanguage);
-            SetValidatorFIeld("availableLanguages", availableLanguages);
-            SetValidatorFIeld("stubDimensionNames", stubDimensionNames);
-            SetValidatorFIeld("dimensionValueNames", dimensionValueNames);
+            SetValidatorField("_defaultLanguage", defaultLanguage);
+            SetValidatorField("_availableLanguages", availableLanguages);
+            SetValidatorField("_stubDimensionNames", stubDimensionNames);
+            SetValidatorField("_dimensionValueNames", dimensionValueNames);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidator.ValidateSpecifiers(
@@ -365,10 +365,10 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithUndefinedSecondSpecifier;
-            SetValidatorFIeld("defaultLanguage", defaultLanguage);
-            SetValidatorFIeld("availableLanguages", availableLanguages);
-            SetValidatorFIeld("stubDimensionNames", stubDimensionNames);
-            SetValidatorFIeld("dimensionValueNames", dimensionValueNames);
+            SetValidatorField("_defaultLanguage", defaultLanguage);
+            SetValidatorField("_availableLanguages", availableLanguages);
+            SetValidatorField("_stubDimensionNames", stubDimensionNames);
+            SetValidatorField("_dimensionValueNames", dimensionValueNames);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidator.ValidateSpecifiers(
@@ -429,10 +429,10 @@ namespace PxUtils.UnitTests.ContentValidationTests
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithUnmatchingAmountOfElements;
-            SetValidatorFIeld("defaultLanguage", defaultLanguage);
-            SetValidatorFIeld("availableLanguages", availableLanguages);
-            SetValidatorFIeld("stubDimensionNames", stubDimensionNames);
-            SetValidatorFIeld("dimensionValueNames", dimensionValueNames);
+            SetValidatorField("_defaultLanguage", defaultLanguage);
+            SetValidatorField("_availableLanguages", availableLanguages);
+            SetValidatorField("_stubDimensionNames", stubDimensionNames);
+            SetValidatorField("_dimensionValueNames", dimensionValueNames);
 
             // Act
             ValidationFeedbackItem[]? result = ContentValidator.ValidateValueAmounts(
@@ -464,7 +464,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
             Assert.AreEqual(ValidationFeedbackRule.ValueIsNotInUpperCase, result[0].Feedback.Rule);
         }
 
-        private void SetValidatorFIeld(string fieldName, object value)
+        private void SetValidatorField(string fieldName, object value)
         {
             var propertyInfo = validator.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
             propertyInfo?.SetValue(validator, value);

@@ -8,7 +8,7 @@ namespace PxUtils.Validation.ContentValidation
     /// <summary>
     /// Provides methods for validating the content of Px file metadata
     /// <param name="filename">Name of the Px file</param>
-    /// <param name="encoding"> _encoding of the Px file</param>
+    /// <param name="encoding"> encoding of the Px file</param>
     /// <param name="syntaxConf">Object that stores syntax specific symbols and tokens for the Px file</param>
     /// </summary>
     public sealed partial class ContentValidator(string filename, Encoding encoding, PxFileSyntaxConf? syntaxConf = null)
