@@ -18,7 +18,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             stream.Seek(6, 0);
 
             IEnumerable<ValidationFeedback> validationFeedbacks =
-                DataValidation.Validate(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
+                DataValidator.Validate(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
 
             foreach (ValidationFeedback validationFeedback in validationFeedbacks)
             {
@@ -35,7 +35,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             stream.Seek(6, 0);
 
             IEnumerable<ValidationFeedback> validationFeedbacks =
-                await DataValidation.ValidateAsync(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
+                await DataValidator.ValidateAsync(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
 
             foreach (ValidationFeedback validationFeedback in validationFeedbacks)
             {
@@ -53,7 +53,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             stream.Seek(6, 0);
 
             IEnumerable<ValidationFeedback> validationFeedbacks =
-                DataValidation.Validate(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
+                DataValidator.Validate(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
 
             foreach (ValidationFeedback validationFeedback in validationFeedbacks)
             {
@@ -70,7 +70,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             stream.Seek(6, 0);
 
             IEnumerable<ValidationFeedback> validationFeedbacks =
-                await DataValidation.ValidateAsync(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
+                await DataValidator.ValidateAsync(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
 
             foreach (ValidationFeedback validationFeedback in validationFeedbacks)
             {
