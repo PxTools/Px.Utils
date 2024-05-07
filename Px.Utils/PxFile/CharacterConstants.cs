@@ -2,18 +2,21 @@
 {
     public static class CharacterConstants
     {
-        public static char[] WhitespaceCharacters { get; } = [SPACE, HORIZONTALTAB, CARRIAGERETURN, LINEFEED];
+        public static char[] WhitespaceCharacters { get; } = [CHARSPACE, CHARHORIZONTALTAB, CHARCARRIAGERETURN, CHARLINEFEED];
 
         public static string UnixNewLine => "\n";
         public static string WindowsNewLine => "\r\n";
 
-        public const char SPACE = (char)0x20;
-        public const char HORIZONTALTAB = (char)0x09;
-        public const char CARRIAGERETURN = (char)0x0D;
-        public const char LINEFEED = (char)0x0A;
+        public const byte SPACE = 0x20;
+        public const byte HORIZONTALTAB = 0x09;
+        public const byte CARRIAGERETURN = 0x0D;
+        public const byte LINEFEED = 0x0A;
+        public const byte QUOTATIONMARK = 0x22;
+        public const byte SEMICOLON = 0x3B;
 
-        public readonly static byte[] BOMUTF8 = [0xEF, 0xBB, 0xBF];
-        public readonly static byte[] BOMUTF16 = [0xFE, 0xFF];
-        public readonly static byte[] BOMUTF32 = [0x00, 0x00, 0xFE];
+        public const char CHARSPACE = (char)SPACE;
+        public const char CHARHORIZONTALTAB = (char)HORIZONTALTAB;
+        public const char CHARCARRIAGERETURN = (char)CARRIAGERETURN;
+        public const char CHARLINEFEED = (char)LINEFEED;
     }
 }

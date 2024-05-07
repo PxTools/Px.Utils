@@ -23,9 +23,13 @@ namespace PxUtils.Validation.DataValidation
         private Encoding streamEncoding = Encoding.Default;
         private PxFileSyntaxConf conf = PxFileSyntaxConf.Default;
 
-        private List<ValidationFeedback> validationFeedbacks = [];
         private EntryType currentEntryType = EntryType.Unknown;
         private byte stringDelimeter;
+        private List<byte> currentEntry = [];
+        private int lineNumber = 1;
+        private int charPosition;
+        private EntryType currentCharacterType;
+        private long currentRowLength;
 
         /// <summary>
         /// Validates the data in the stream according to the specified parameters and returns a collection of validation feedback items.
@@ -40,14 +44,17 @@ namespace PxUtils.Validation.DataValidation
         /// <returns>
         /// A collection of ValidationFeedbackItem objects representing the feedback for the data validation.
         /// </returns>
-        public void Validate(Stream stream, int rowLen, int numOfRows,
+        public IEnumerable<ValidationFeedback> Validate(Stream stream, int rowLen, int numOfRows,
             int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null)
         {
+            IEnumerable<ValidationFeedback> validationFeedbacks = [];
             SetValidationParameters(streamEncoding, conf, numOfRows, rowLen, startRow);
 
-            ValidateDataStream(stream);
+            validationFeedbacks = ValidateDataStream(stream);
 
-            ResetValidators();
+            ResetValidator();
+
+            return validationFeedbacks;
         }
 
         /// <summary>
@@ -62,17 +69,20 @@ namespace PxUtils.Validation.DataValidation
         /// <param name="conf">The configuration for validating the data file syntax. Can be null, in which case the default configuration is used.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A collection of validation feedback for the data.</returns>
-        public async Task ValidateAsync(Stream stream, int rowLen,
+        public async Task<IEnumerable<ValidationFeedback>> ValidateAsync(Stream stream, int rowLen,
             int numOfRows,
             int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null,
             CancellationToken cancellationToken = default)
         {
+            IEnumerable<ValidationFeedback> validationFeedbacks;
             SetValidationParameters(streamEncoding, conf, numOfRows, rowLen, startRow);
 
-            await Task.Factory.StartNew(() => 
+            validationFeedbacks = await Task.Factory.StartNew(() => 
                 ValidateDataStream(stream), cancellationToken);
 
-            ResetValidators();
+            ResetValidator();
+
+            return validationFeedbacks;
         }
 
         private void SetValidationParameters(Encoding? _streamEncoding, PxFileSyntaxConf? _conf, int _numOfRows, int _rowLen, int _startRow)
@@ -92,37 +102,35 @@ namespace PxUtils.Validation.DataValidation
             dataSeparatorValidators.Add(new DataSeparatorValidator());
         }
 
-        private void ValidateDataStream(Stream stream)
+        private List<ValidationFeedback> ValidateDataStream(Stream stream)
         {
+            List<ValidationFeedback> validationFeedbacks = [];
             byte endOfData = (byte)conf.Symbols.EntrySeparator;
             stringDelimeter = (byte)conf.Symbols.Value.StringDelimeter;
-            List<byte> currentEntry = new(StreamBufferSize);
-            int charPosition = 0;
-            int lineNumber = 1;
+            currentEntry = new(StreamBufferSize);
             byte[] buffer = new byte[StreamBufferSize];
             int bytesRead;
-            long currentRowLength = 0;
             while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
             {
                 for (int i = 0; i < bytesRead; i++)
                 {
                     byte currentByte = buffer[i];
-                    EntryType currentType = currentByte switch
+                    currentCharacterType = currentByte switch
                     {
-                        0x20 or 0x09 => EntryType.DataItemSeparator,
-                        0x0A or 0x0D => EntryType.LineSeparator,
-                        >= 0x22 and not 0x3B => EntryType.DataItem,
+                        CharacterConstants.SPACE or CharacterConstants.HORIZONTALTAB => EntryType.DataItemSeparator,
+                        CharacterConstants.LINEFEED or CharacterConstants.CARRIAGERETURN => EntryType.LineSeparator,
+                        >= CharacterConstants.QUOTATIONMARK and not CharacterConstants.SEMICOLON => EntryType.DataItem,
                         _ when currentByte == endOfData => EntryType.EndOfData,
                         _ => EntryType.Unknown
                     };
-                    if (currentType != currentEntryType)
+                    if (currentCharacterType != currentEntryType)
                     {
-                        HandleEntryTypeChange(currentEntryType, currentEntry, lineNumber, charPosition, stringDelimeter);
-                        if (currentType != EntryType.DataItemSeparator)
+                        HandleEntryTypeChange(ref validationFeedbacks);
+                        if (currentCharacterType != EntryType.DataItemSeparator)
                         {
-                            HandleNonSeparatorType(currentType, ref currentRowLength, ref lineNumber, ref charPosition);
+                            HandleNonSeparatorType(ref validationFeedbacks);
                         }
-                        currentEntryType = currentType;
+                        currentEntryType = currentCharacterType;
                         currentEntry.Clear();
                     }
 
@@ -135,19 +143,15 @@ namespace PxUtils.Validation.DataValidation
             {
                 validationFeedbacks.Add(new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidRowCount, lineNumber + startRow, charPosition));
             }
+
+            return validationFeedbacks;
         }
 
-        private void HandleEntryTypeChange(
-            EntryType currentEntryType,
-            List<byte> currentEntry,
-            int lineNumber,
-            int charPosition,
-            byte stringDelimeter,
-            ref List<ValidationFeedback> feedbacks)
+        private void HandleEntryTypeChange(ref List<ValidationFeedback> validationFeedbacks)
         {
             if (currentEntryType == EntryType.Unknown && (lineNumber > 1 || charPosition > 0))
             {
-                feedbacks.Add(new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidChar, lineNumber + startRow, charPosition));
+                validationFeedbacks.Add(new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidChar, lineNumber + startRow, charPosition));
             }
             else
             {
@@ -160,22 +164,18 @@ namespace PxUtils.Validation.DataValidation
 
                 foreach (IDataValidator validator in validators)
                 {
-                    validator.Validate(currentEntry, currentEntryType, streamEncoding, lineNumber + startRow, charPosition, ref feedbacks);
+                    validator.Validate(currentEntry, currentEntryType, streamEncoding, lineNumber + startRow, charPosition, ref validationFeedbacks);
                 }
             }
         }
 
-        private void HandleNonSeparatorType(
-            EntryType currentType,
-            ref long currentRowLength, 
-            ref int lineNumber,
-            ref int charPosition)
+        private void HandleNonSeparatorType(ref List<ValidationFeedback> validationFeedbacks)
         {
-            if (currentType == EntryType.DataItem)
+            if (currentCharacterType == EntryType.DataItem)
             {
                 currentRowLength++;
             }
-            else if (currentType == EntryType.LineSeparator)
+            else if (currentCharacterType == EntryType.LineSeparator)
             {
                 if (currentRowLength != expectedRowLength)
                 {
@@ -187,12 +187,17 @@ namespace PxUtils.Validation.DataValidation
             }
         }
 
-        private static void ResetValidators()
+        private void ResetValidator()
         {
             commonValidators.Clear();
             dataNumValidators.Clear();
             dataStringValidators.Clear();
             dataSeparatorValidators.Clear();
+            currentEntryType = EntryType.Unknown;
+            currentEntry.Clear();
+            lineNumber = 1;
+            charPosition = 0;
+            currentRowLength = 0;
         }
     }
 
