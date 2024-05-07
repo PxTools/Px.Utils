@@ -41,6 +41,37 @@ namespace Px.Utils.UnitTests.OperationsTests
         }
 
         [TestMethod]
+        public void Apply_WhenCalledWithNonContentSumMapWithValueInsertion_ReturnsNewMatrixWithSummedValuesInserted()
+        {
+            // Arrange
+            MatrixMetadata meta = TestModelBuilder.BuildTestMetadata([2, 3, 2]);
+            int[] testData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+            var matrix = new Matrix<int>(meta, testData);
+
+            DimensionMap sumMap = new("var2", ["var2_val0", "var2_val1"]);
+            DimensionValue sumValue = new("var2_sumval0", new("fi", "var2_sumval0"));
+
+            SumMatrixFunction<int> function = new(sumValue, sumMap, 1); // Insert at index 1
+
+            // Act
+            Matrix<int> result = function.Apply(matrix);
+
+            // Assert
+            int[] expectedData = [0, 1, 1, 2, 5, 3, 4, 9, 5, 6, 13, 7, 8, 17, 9, 10, 21, 11];
+            CollectionAssert.AreEqual(expectedData, result.Data);
+            CollectionAssert.AreEqual(meta.Dimensions.Select(c => c.Code).ToArray(), result.Metadata.Dimensions.Select(c => c.Code).ToArray());
+
+            string[] expectedVar0Vals = ["var0_val0", "var0_val1"];
+            CollectionAssert.AreEqual(expectedVar0Vals, result.Metadata.Dimensions[0].Values.Select(v => v.Code).ToArray());
+
+            string[] expectedVar1Vals = ["var1_val0", "var1_val1", "var1_val2"];
+            CollectionAssert.AreEqual(expectedVar1Vals, result.Metadata.Dimensions[1].Values.Select(v => v.Code).ToArray());
+
+            string[] expectedVar2Vals = ["var2_val0", "var2_sumval0", "var2_val1"];
+            CollectionAssert.AreEqual(expectedVar2Vals, result.Metadata.Dimensions[2].Values.Select(v => v.Code).ToArray());
+        }
+
+        [TestMethod]
         public void Apply_WhenCalledWithContentSumMap_ReturnsNewMatrixWithSummedValues()
         {
             // Arrange

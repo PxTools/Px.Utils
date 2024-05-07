@@ -1,8 +1,10 @@
 ﻿using Px.Utils.Models;
 using Px.Utils.Models.Data;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Px.Utils.Operations
 {
+    [ExcludeFromCodeCoverage] // Tests for this class will be added once more operations are implemented and this feature is integrated.
     public class MatrixFunctionProcessor<T> where T : IDataValue<T>
     {
         private readonly Queue<MatrixFunction<T>> _queue = new();
