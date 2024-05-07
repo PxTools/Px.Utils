@@ -105,13 +105,4 @@ namespace Px.Utils.Operations
             return new Matrix<TData>(newMeta, outData);
         }
     }
-
-    public class GroupSumMatrixFunction<TData>(IEnumerable<(DimensionValue newValue, DimensionMap sumMap)> parameters)
-        : MatrixFunction<TData> where TData : IAdditionOperators<TData, TData, TData>
-    {
-        public override Matrix<TData> Apply(Matrix<TData> input)
-        {
-            throw new NotImplementedException();
-        }
-    }
 }
