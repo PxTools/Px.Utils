@@ -18,7 +18,7 @@ namespace Px.Utils.UnitTests.OperationsTests
             var matrix = new Matrix<int>(meta, testData);
 
             DimensionMap sumMap = new("var2", ["var2_val0", "var2_val1"]);
-            DimensionValue sumValue = new("var2_sumval0", new("fi", "var2_sumval0"));
+            DimensionValue sumValue = new("var2_sumval0", new("fi", "var2_sumval0"), true);
 
             SumMatrixFunction<int> function = new(sumValue, sumMap);
 
@@ -49,7 +49,7 @@ namespace Px.Utils.UnitTests.OperationsTests
             var matrix = new Matrix<int>(meta, testData);
 
             DimensionMap sumMap = new("var2", ["var2_val0", "var2_val1"]);
-            DimensionValue sumValue = new("var2_sumval0", new("fi", "var2_sumval0"));
+            DimensionValue sumValue = new("var2_sumval0", new("fi", "var2_sumval0"), true);
 
             SumMatrixFunction<int> function = new(sumValue, sumMap, 1); // Insert at index 1
 
@@ -80,7 +80,7 @@ namespace Px.Utils.UnitTests.OperationsTests
             var matrix = new Matrix<int>(meta, testData);
 
             DimensionMap sumMap = new("var0", ["var0_val0", "var0_val1"]);
-            ContentDimensionValue sumValue = new("var0_sumval0", new("fi", "var0_sumval0"), new("fi", "var0_unit"), new(2020, 1, 1, 12, 0, 0, DateTimeKind.Utc), 0);
+            ContentDimensionValue sumValue = new("var0_sumval0", new("fi", "var0_sumval0"), new("fi", "var0_unit"), new(2020, 1, 1, 12, 0, 0, DateTimeKind.Utc), 0, true);
 
             SumMatrixFunction<int> function = new(sumValue, sumMap);
 
@@ -112,7 +112,7 @@ namespace Px.Utils.UnitTests.OperationsTests
             var matrix = new Matrix<int>(meta, testData);
 
             DimensionMap sumMap = new("var2", ["var2_val0"]);
-            DimensionValue sumValue = new("var2_sumval0", new("fi", "var2_sumval0"));
+            DimensionValue sumValue = new("var2_sumval0", new("fi", "var2_sumval0"), true);
 
             SumMatrixFunction<int> function = new(sumValue, sumMap);
 

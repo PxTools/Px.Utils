@@ -57,7 +57,7 @@ namespace PxUtils.Models.Data.DataValue
                 if (left.Type == right.Type) return new(0, left.Type);
                 return new(0, DataValueType.Missing);
             }
-            return new(left.UnsafeValue + right.UnsafeValue, DataValueType.Exists);
+            return new(left.UnsafeValue - right.UnsafeValue, DataValueType.Exists);
         }
 
         public static DecimalDataValue operator *(DecimalDataValue left, DecimalDataValue right)

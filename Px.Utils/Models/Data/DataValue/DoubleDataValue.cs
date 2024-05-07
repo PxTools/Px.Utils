@@ -77,6 +77,7 @@ namespace PxUtils.Models.Data.DataValue
                 if (left.Type == right.Type) return new(0, left.Type);
                 return new(0, DataValueType.Missing);
             }
+            if(right.UnsafeValue == 0) throw new DivideByZeroException();
             return new(left.UnsafeValue / right.UnsafeValue, DataValueType.Exists);
         }
     }
