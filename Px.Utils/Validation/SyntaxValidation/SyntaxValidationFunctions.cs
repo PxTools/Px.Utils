@@ -825,9 +825,9 @@ namespace PxUtils.Validation.SyntaxValidation
                 syntaxConf.Symbols.EntrySeparator,
                 syntaxConf.Symbols.KeywordSeparator,
                 CharacterConstants.SPACE,
-                CharacterConstants.CARRIAGE_RETURN,
-                CharacterConstants.LINE_FEED,
-                CharacterConstants.HORIZONTAL_TAB
+                CharacterConstants.CARRIAGERETURN,
+                CharacterConstants.LINEFEED,
+                CharacterConstants.HORIZONTALTAB
             ];
 
             IEnumerable<char> foundIllegalCharacters = lang.Where(c => illegalCharacters.Contains(c));

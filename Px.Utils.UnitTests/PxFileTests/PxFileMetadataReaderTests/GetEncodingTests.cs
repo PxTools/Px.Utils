@@ -8,7 +8,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
     public class GetEncodingTests
     {
         [TestMethod]
-        public void GetEncoding_CalledFor_MINIMAL_UTF8_N_ReturnsUtf8()
+        public void GetEncodingCalledForMinimalUTF8NReturnsUtf8()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N);
@@ -22,7 +22,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public void GetEncoding_CalledFor_MINIMAL_N_WithUtf8BOM_ReturnsUtf8()
+        public void GetEncodingCalledForMinimalUTF8BUsingBOMReturnsUtf8()
         {
             // Arrange
             byte[] bom = [0xEF, 0xBB, 0xBF];
@@ -38,7 +38,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public void GetEncoding_CalledFor_MINIMAL_N_WithUtf16BOM_ReturnsUtf16()
+        public void GetEncodingCalledForMinimalUTF8NUsingUTF16BOMReturnsUtf16()
         {
             // Arrange
             byte[] bom = [0xFE, 0xFF];
@@ -54,7 +54,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public void GetEncoding_CalledFor_MINIMAL_UTF8_RN_ReturnsUtf8()
+        public void GetEncodingCalledForMinimalUTF8RNReturnsUtf8()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_RN);
@@ -68,7 +68,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public void GetEncoding_CalledFor_MINIMAL_ISO_8859_15_N_ReturnsIso885915()
+        public void GetEncodingCalledForMinimalISO885915ReturnsIso885915()
         {
             // Arrange
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -84,7 +84,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public void GetEncoding_CalledFor_MINIMAL_ISO_8859_1_RN_ReturnsIso88591()
+        public void GetEncodingCalledForMinimalISO88591ReturnsIso88591()
         {
             // Arrange
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

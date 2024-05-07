@@ -15,7 +15,7 @@ namespace Px.Utils.TestingApp.Commands
             BenchmarkFunctionsAsync = [BuildMetadataAsync];
         }
 
-        protected void BuildMetadata()
+        private void BuildMetadata()
         {
             using FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
             Encoding encoding = PxFileMetadataReader.GetEncoding(fileStream);
@@ -24,7 +24,7 @@ namespace Px.Utils.TestingApp.Commands
             _ = PxFileMetadataReader.ReadMetadata(fileStream, encoding).ToList();
         }
 
-        protected async Task BuildMetadataAsync()
+        private async Task BuildMetadataAsync()
         {
             using FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
             Encoding encoding = PxFileMetadataReader.GetEncoding(fileStream);

@@ -159,8 +159,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>Returns a boolean which is true if the line changes in the input string are compliant with the syntax configuration</returns>
         internal static bool ValueLineChangesAreCompliant(string input, PxFileSyntaxConf syntaxConf, bool isList)
         {
-            string trimmedInput = input.Replace(CharacterConstants.CARRIAGE_RETURN.ToString(), "");
-            int lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LINE_FEED);
+            string trimmedInput = input.Replace(CharacterConstants.CARRIAGERETURN.ToString(), "");
+            int lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LINEFEED);
             while (lineChangeIndex != -1)
             {
                 char symbolBefore = isList ? syntaxConf.Symbols.Key.ListSeparator : syntaxConf.Symbols.Key.StringDelimeter;
@@ -168,7 +168,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 {
                     return false;
                 }
-                lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LINE_FEED, lineChangeIndex + 1);
+                lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LINEFEED, lineChangeIndex + 1);
             }
             return true;
         }
@@ -221,7 +221,7 @@ namespace PxUtils.Validation.SyntaxValidation
         internal static string CleanString(string input, PxFileSyntaxConf syntaxConf)
         {
             char[] charactersToTrim = [
-                CharacterConstants.CARRIAGE_RETURN,
+                CharacterConstants.CARRIAGERETURN,
                 syntaxConf.Symbols.Linebreak,
                 syntaxConf.Symbols.Key.StringDelimeter
             ];
@@ -389,7 +389,7 @@ namespace PxUtils.Validation.SyntaxValidation
                         syntaxConf.Symbols.Key.StringDelimeter;
 
                     // In case of Windows linebreak, check if the character before the linebreak is the correct symbol
-                    char characterToInspect = value[i - 1] != CharacterConstants.CARRIAGE_RETURN ? value[i - 1] : value[i - 2];
+                    char characterToInspect = value[i - 1] != CharacterConstants.CARRIAGERETURN ? value[i - 1] : value[i - 2];
 
                     if (characterToInspect != symbolBefore)
                     {
@@ -476,7 +476,7 @@ namespace PxUtils.Validation.SyntaxValidation
         private static bool IsValidTimestampFormat(string input, string timeInterval, PxFileSyntaxConf syntaxConf)
         {
             input = input
-                .Replace(CharacterConstants.CARRIAGE_RETURN.ToString(), "")
+                .Replace(CharacterConstants.CARRIAGERETURN.ToString(), "")
                 .Replace(syntaxConf.Symbols.Linebreak.ToString(), "")
                 .Replace(CharacterConstants.SPACE.ToString(), "");
             

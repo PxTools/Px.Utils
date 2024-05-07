@@ -36,7 +36,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
                 };
 
         [TestMethod]
-        public void ValidatePxFileContent_Called_With_MINIMAL_STRUCTURED_ENTRY_ARRAY_Returns_Valid_Result()
+        public void ValidatePxFileContentCalledWithMinimalStructuredEntryReturnsValidResult()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.MINIMAL_STRUCTURED_ENTRY_ARRAY;
@@ -51,7 +51,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public async Task ValidatePxFileContentAsync_Called_With_MINIMAL_STRUCTURED_ENTRY_ARRAY_Returns_Valid_Result()
+        public async Task ValidatePxFileContentAsyncCalledWithMinimalStructuredEntryReturnsValidResult()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.MINIMAL_STRUCTURED_ENTRY_ARRAY;
@@ -66,7 +66,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateFindDefaultLanguage_With_EMPTY_STRUCTURED_ENTRY_ARRAY_Returns_With_Error()
+        public void ValidateFindDefaultLanguageWithEmptyStructuredENtryArrayReturnsWithError()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.EMPTY_STRUCTURED_ENTRY_ARRAY;
@@ -84,7 +84,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateFindAvailableLanguages_With_EMPTY_STRUCTURED_ENTRY_ARRAY_Returns_With_Warning()
+        public void ValidateFindAvailableLanguagesWithEmptyStructuredArrayReturnsWithWarning()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.EMPTY_STRUCTURED_ENTRY_ARRAY;
@@ -102,7 +102,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateDefaultLanguageDefinedInAvailableLanguages_Called_With_Undefined_DefaultLanguage_Returns_With_Error()
+        public void ValidateDefaultLanguageDefinedInAvailableLanguagesCalledWithUndefinedDefaultLanguageReturnsWithError()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_DEFAULT_LANGUAGE;
@@ -122,7 +122,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateFindContentDimension_Called_With_STRUCTURED_ENTRY_ARRAY_WITH_MISSING_CONTVARIABLE_Returns_With_Error()
+        public void ValidateFindContentDimensionCalledWithMissingContVariableReturnsWithError()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_MISSING_CONTVARIABLE;
@@ -142,7 +142,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateFindRequiredCommonKeys_Called_With_EMPTY_STRUCTURE_ENTRY_ARRAY_Returns_With_Error()
+        public void ValidateFindRequiredCommonKeysCalledWithEmptyStructuredEntryArrayYReturnsWithError()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.EMPTY_STRUCTURED_ENTRY_ARRAY;
@@ -162,7 +162,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateFindStubOrHeading_Called_With_STRUCTURED_ENTRY_ARRAY_WITH_STUB_Returns_With_Error()
+        public void ValidateFindStubOrHeadingCalledWithWithMissingHeadingReturnsWithError()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_STUB;
@@ -182,7 +182,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateFindRecommendedKeys_Called_With_STRUCTURED_ENTRY_ARRAY_WITH_DESCRIPTION_Returns_With_Warnings()
+        public void ValidateFindRecommendedKeysCalledWithMissingDescriptionsReturnsWithWarnings()
         {
 
             // Arrange
@@ -204,7 +204,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateFindDimenionsValues_Called_With_STRUCTURED_ENTRY_ARRAY_WITH_DIMENSIONVALUES_Returns_Errors()
+        public void ValidateFindDimenionsValuesCalledWithMissingDimensionValuesReturnsErrors()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_DIMENSIONVALUES;
@@ -231,7 +231,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateFindContentDimensionKeys_Called_With_STRUCTURED_ENTRY_ARRAY_WITH_INVALID_CONTENT_VALUE_KEY_ENTRIES_Returns_With_Errors()
+        public void ValidateFindContentDimensionKeysCalledWithInvalidContentValueKeyEntriesSReturnsWithErrors()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_INVALID_CONTENT_VALUE_KEY_ENTRIES;
@@ -258,7 +258,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateFindDimensionRecommendedKeys_Called_With_STRUCTURED_ENTRY_ARRAY_WITH_INCOMPLETE_VARIABLE_RECOMMENDED_KEYS_Returns_With_Errors()
+        public void ValidateFindDimensionRecommendedKeysCalledWithIncompleteVariableRecommendedKeysReturnsWithErrors()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_INCOMPLETE_VARIABLE_RECOMMENDED_KEYS;
@@ -283,7 +283,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateUnexpectedSpecifiers_Called_With_StructuredEntryWithIllegalSpecifiers_Returns_With_Errors()
+        public void ValidateUnexpectedSpecifiersCalledWithStructuredEntryWithIllegalSpecifiersReturnsWithErrors()
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithIllegalSpecifiers;
@@ -301,7 +301,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateUnexpectedSpecifiers_Called_With_StructuredEntryWithIllegalLanguageParameter_Returns_With_Errors()
+        public void ValidateUnexpectedSpecifiersCalledWithStructuredEntryWithIllegalLanguageParameterReturnsWithErrors()
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithIllegalLanguageParameter;
@@ -319,7 +319,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateLanguageParams_Called_With_Undefined_Language_Returns_With_Errors()
+        public void ValidateLanguageParamsCalledWithUndefinedLanguageReturnshWithErrors()
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithUndefinedLanguage;
@@ -339,7 +339,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateSpecifiers_Called_With_Undefined_First_Specifier_Returns_With_Errors()
+        public void ValidateSpecifiersCalledWithUndefinedFirstSpecifierReturnsWithErrors()
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithUndefinedFirstSpecifier;
@@ -361,7 +361,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateSpecifiers_Called_With_Undefined_Second_Specifier_Returns_With_Errors()
+        public void ValidateSpecifiersCalledWithUndefinedSecondSpecifierReturnsWithErrors()
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithUndefinedSecondSpecifier;
@@ -383,7 +383,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateValueTypes_Called_With_STRUCTURED_ENTRY_ARRAY_WITH_INVALID_VALUE_TYPES_Returns_With_Errors()
+        public void ValidateValueTypesCalledWithStructuredEntryArrayWithInvalidValueTypesReturnsWithErrors()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_INVALID_VALUE_TYPES;
@@ -404,7 +404,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateValueTypes_Called_With_STRUCTURED_ENTRY_ARRAY_WITH_WRONG_VALUES_Returns_With_Errors()
+        public void ValidateValueTypesCalledWithStructuredEntryArrayWithWrongValuesReturnsWithErrors()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_WRONG_VALUES;
@@ -425,7 +425,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateValueAmounts_Called_With_Unmatching_Amount_Of_Elements_Returns_With_Error()
+        public void ValidateValueAmountsCalledWithUnmatchingAmountOfElementsReturnsWithError()
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithUnmatchingAmountOfElements;
@@ -447,7 +447,7 @@ namespace PxUtils.UnitTests.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateValueUppercaseRecommendations_Called_With_Lower_Case_Entry_Returns_With_Warning()
+        public void ValidateValueUppercaseRecommendationsCalledWithLowerCaseEntryReturnsWithWarning()
         {
             // Arrange
             ValidationStructuredEntry entry = ContentValidationFixtures.StructuredEntryWithLowerCaseValue;

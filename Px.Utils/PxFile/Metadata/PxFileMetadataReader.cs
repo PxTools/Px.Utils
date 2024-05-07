@@ -284,15 +284,15 @@ namespace PxUtils.PxFile.Metadata
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Encoding? GetBom(byte[] buffer)
         {
-            if (buffer.Take(CharacterConstants.BOM_UTF_8.Length).SequenceEqual(CharacterConstants.BOM_UTF_8))
+            if (buffer.Take(CharacterConstants.BOMUTF8.Length).SequenceEqual(CharacterConstants.BOMUTF8))
             {
                 return Encoding.UTF8;
             }
-            else if (buffer.Take(CharacterConstants.BOM_UTF_16.Length).SequenceEqual(CharacterConstants.BOM_UTF_16))
+            else if (buffer.Take(CharacterConstants.BOMUTF16.Length).SequenceEqual(CharacterConstants.BOMUTF16))
             {
                 return Encoding.Unicode;
             }
-            else if (buffer.Take(CharacterConstants.BOM_UTF_32.Length).SequenceEqual(CharacterConstants.BOM_UTF_32))
+            else if (buffer.Take(CharacterConstants.BOMUTF32.Length).SequenceEqual(CharacterConstants.BOMUTF32))
             {
                 return Encoding.UTF32;
             }

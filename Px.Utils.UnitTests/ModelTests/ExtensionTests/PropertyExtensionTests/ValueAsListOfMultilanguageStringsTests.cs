@@ -8,7 +8,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
     public class ValueAsListOfMultilanguageStringsTests
     {
         [TestMethod]
-        public void ParseListOfMultilanguageStrings_ValidInput_ReturnsList()
+        public void ParseListOfMultilanguageStringsValidInputReturnsList()
         {
             // Arrange
             string a_list_string = "\"a_0\", \"a_1\", \"a_2\"";
@@ -32,7 +32,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ParseListOfMultilanguageStrings_ValidInputWithLineBreaks_ReturnsList()
+        public void ParseListOfMultilanguageStringsValidInputWithLineBreaksReturnsList()
         {
             // Arrange
             string a_list_string = "\"a_0\", \r\n \"a_1\", \r\n \"a_2\"";
@@ -56,7 +56,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ParseListOfMultilanguageStrings_NoLanguageProperty_Throws()
+        public void ParseListOfMultilanguageStringsNoLanguagePropertyThrows()
         {
             // Arrange
             MetaProperty property = new("test_key", "test_value");
@@ -66,7 +66,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ParseListOfMultilanguageStrings_OneLanguageMLS()
+        public void ParseListOfMultilanguageStringsOneLanguageMLS()
         {
             // Arrange
             MultilanguageString mls = new("lang_a", "\"a_0\"");

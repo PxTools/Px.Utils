@@ -13,7 +13,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         private readonly double[] missingMarkers = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6];
 
         [TestMethod]
-        public void ReadDoubleDataValues_ValidIntegers_ReturnsCorrectDoubleDataValues()
+        public void ReadDoubleDataValuesValidIntegersReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -46,7 +46,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadDoubleDataValues_ValidIntegersWithSmallBuffer_ReturnsCorrectDoubleDataValues()
+        public void ReadDoubleDataValuesValidIntegersWithSmallBufferReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -79,7 +79,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadDoubleDataValues_ValidIntegersAndMissing_ReturnsCorrectDoubleDataValues()
+        public void ReadDoubleDataValuesValidIntegersAndMissingReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES_WITH_MISSING);
@@ -115,7 +115,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadEveryOtherDoubleDataValueFrom1stRow_ValidIntegers_ReturnsCorrectDoubleDataValues()
+        public void ReadEveryOtherDoubleDataValueFrom1stRowValidIntegersReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -144,7 +144,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadEveryOtherDoubleDataValueFrom2ndRow_ValidIntegers_ReturnsCorrectDoubleDataValues()
+        public void ReadEveryOtherDoubleDataValueFrom2ndRowValidIntegersReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -169,7 +169,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadDoubleDataValues_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        public void ReadDoubleDataValuesValidDecimalsReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DECIMALVALUES);
@@ -199,7 +199,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadEveryOtherDoubleDataValueFrom1stRow_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        public void ReadEveryOtherDoubleDataValueFrom1stRowValidDecimalsReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DECIMALVALUES);
@@ -224,7 +224,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadEveryOtherDoubleDataValueFrom2ndRow_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        public void ReadEveryOtherDoubleDataValueFrom2ndRowValidDecimalsReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DECIMALVALUES);
@@ -249,7 +249,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void EveryValueOnSeparateRows_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        public void EveryValueOnSeparateRowsValidDecimalsReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20ROWS);
@@ -279,7 +279,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadDecimalDataValues_ValidIntegers_ReturnsCorrectDoubleDataValues()
+        public void ReadDecimalDataValuesValidIntegersReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -309,7 +309,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadDecimalDataValues_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        public void ReadDecimalDataValuesValidDecimalsReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DECIMALVALUES);
@@ -339,7 +339,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadUnsafeDoubleValues_ValidIntegers_ReturnsCorrectDoubleDataValues()
+        public void ReadUnsafeDoubleValuesValidIntegersReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -369,7 +369,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadUnsafeDoubleValues_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        public void ReadUnsafeDoubleValuesValidDecimalsReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DECIMALVALUES);

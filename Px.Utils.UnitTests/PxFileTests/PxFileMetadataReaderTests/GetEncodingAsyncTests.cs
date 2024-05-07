@@ -8,7 +8,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
     public class GetEncodingAsyncTests
     {
         [TestMethod]
-        public async Task GetEncodingAsync_CalledFor_MINIMAL_UTF8_N_ReturnsUtf8()
+        public async Task GetEncodingAsyncCalledForMinimalUTF8NReturnsUtf8()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N);
@@ -22,7 +22,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public async Task GetEncodingAsync_CalledFor_MINIMAL_N_WithUtf8BOM_ReturnsUtf8()
+        public async Task GetEncodingAsyncCalledForMinimalUTF8NUsingBOMReturnsUtf8()
         {
             // Arrange
             byte[] bom = [0xEF, 0xBB, 0xBF];
@@ -38,7 +38,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public async Task GetEncodingAsync_CalledFor_MINIMAL_N_WithUtf16BOM_ReturnsUtf16()
+        public async Task GetEncodingAsyncCalledForMinimalUTF8NUsingUTF16BOMReturnsUtf16()
         {
             // Arrange
             byte[] bom = [0xFE, 0xFF];
@@ -54,7 +54,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public async Task GetEncodingAsync_CalledFor_MINIMAL_UTF8_RN_ReturnsUtf8()
+        public async Task GetEncodingAsyncCalledForMinimalUTF8RNReturnsUtf8()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_RN);
@@ -68,7 +68,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public async Task GetEncodingAsync_CalledFor_MINIMAL_ISO_8859_15_N_ReturnsIso885915()
+        public async Task GetEncodingAsyncCalledForMinimalISO885915ReturnsIso885915()
         {
             // Arrange
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -84,7 +84,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public async Task GetEncodingAsync_CalledFor_MINIMAL_ISO_8859_1_RN_ReturnsIso88591()
+        public async Task GetEncodingAsyncCalledForMinimalISO88591ReturnsIso88591()
         {
             // Arrange
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

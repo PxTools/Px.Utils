@@ -9,7 +9,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
     public class ReadMetadataTests
     {
         [TestMethod]
-        public void ReadMetadata_CalledWith_MINIMAL_UTF8_N_ReturnsMetadata()
+        public void ReadMetadataCalledWithMinimalUTF8NReturnsMetadata()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N);
@@ -49,7 +49,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public void ReadMetadata_CalledWith_MINIMAL_UTF8_RN_ReturnsMetadata()
+        public void ReadMetadataCalledWithMinimalUTF8RNReturnsMetadata()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_RN);
@@ -90,7 +90,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
 
 
         [TestMethod]
-        public void ReadMetadata_CalledWith_MINIMAL_UTF8_N_WITH_DELIMETERS_IN_VALUESTRING_ReturnsMetadata()
+        public void ReadMetadataCalledWithDelimetersInValueStringReturnsMetadata()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_WITH_DELIMETERS_IN_VALUESTRING);
@@ -130,7 +130,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public void ReadMetadata_CalledWith_MINIMAL_UTF8_N_WITH_DELIMETERS_IN_VALUESTRING_And_Small_Buffer_Size_ReturnsMetadata()
+        public void ReadMetadataCalledWithDelimetersInValueStringAndSmallBufferSizeReturnsMetadata()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_WITH_DELIMETERS_IN_VALUESTRING);
@@ -170,7 +170,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public void ReadMetadata_CalledWith_BROKEN_UTF8_N_Throws_InvalidPxFileMetadataException()
+        public void ReadMetadataCalledWithBrokenUTF8ThrowsInvalidPxFileMetadataException()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.BROKEN_UTF8_N);
@@ -182,7 +182,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public void ReadMetadata_CalledWith_MINIMAL_UTF8_N_WITH_MULTILINE_VALUES_ReturnsMetadata()
+        public void ReadMetadataCalledWithMultilineValuesReturnsMetadata()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_WITH_MULTILINE_VALUES);

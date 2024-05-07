@@ -9,7 +9,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         #region Valid input tests
 
         [TestMethod]
-        public void ValueToStringList_ValidValue_ReturnsList()
+        public void ValueToStringListValidValueReturnsList()
         {
             // Arrange
             string input = "\"a\", \"b\", \"c\"";
@@ -27,7 +27,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_ValidValueWithLineBreaks_ReturnsList()
+        public void ValueToStringListValidValueWithLineBreaksReturnsList()
         {
             // Arrange
             string input = "\"a\", \r\n \"b\", \r\n \"c\"";
@@ -45,7 +45,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_ValidValueWithWhiteSpaces_ReturnsList()
+        public void ValueToStringListValidValueWithWhiteSpacesReturnsList()
         {
             // Arrange
             string input = " \" a \",   \" b \",   \" c \"  ";
@@ -63,7 +63,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_ValidValueWithSeparators_ReturnsList()
+        public void ValueToStringListValidValueWithSeparatorsReturnsList()
         {
             // Arrange
             string input = "\"a,a\", \"b,b\", \"c,c\"";
@@ -81,7 +81,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_ValidValueWithOneElement_ReturnsList()
+        public void ValueToStringListValidValueWithOneElementReturnsList()
         {
             // Arrange
             string input = "\"a\"";
@@ -99,7 +99,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_EmptyString_ReturnsEmptyList()
+        public void ValueToStringListEmptyStringReturnsEmptyList()
         {
             // Arrange
             string input = "";
@@ -117,7 +117,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_EmptySubstring_ReturnsList()
+        public void ValueToStringListEmptySubstringReturnsList()
         {
             // Arrange
             string input = "\"a\",,\"b\"";
@@ -135,7 +135,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_EmptySubstringWithDelimeters_ReturnsList()
+        public void ValueToStringListEmptySubstringWithDelimetersReturnsList()
         {
             // Arrange
             string input = "\"a\",\"\",\"b\"";
@@ -157,7 +157,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         #region Invalid input tests
 
         [TestMethod]
-        public void ValueToStringListt_MissingListSeparator_ThrowsArgumentException()
+        public void ValueToStringListMissingListSeparatorThrowsArgumentException()
         {
             // Arrange
             string input = "\"a\" \"b\", \"c\"";
@@ -174,7 +174,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_MissingOpeningDelimeterInSubstring_ThrowsArgumentException()
+        public void ValueToStringListMissingOpeningDelimeterInSubstringThrowsArgumentException()
         {
             // Arrange
             string input = "\"a\", b\", \"c\"";
@@ -191,7 +191,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_MissingClosingDelimeterInSubstring_ThrowsArgumentException()
+        public void ValueToStringListMissingClosingDelimeterInSubstringThrowsArgumentException()
         {
             // Arrange
             string input = "\"a\", \"b, \"c\"";
@@ -208,7 +208,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_SingleDelimeterAsSubstring_ThrowsArgumentException()
+        public void ValueToStringListSingleDelimeterAsSubstringThrowsArgumentException()
         {
             // Arrange
             string input = "\"a\", \", \"c\"";
@@ -226,7 +226,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
 
 
         [TestMethod]
-        public void ValueToStringList_ThreeDelimetersAsSubstring_ThrowsArgumentException()
+        public void ValueToStringListThreeDelimetersAsSubstringThrowsArgumentException()
         {
             // Arrange
             string input = "\"a\", \"\"\", \"c\"";
@@ -243,7 +243,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_MissingClosingDelimeter_ThrowsArgumentException()
+        public void ValueToStringListMissingClosingDelimeterThrowsArgumentException()
         {
             // Arrange
             string input = "\"a\", \"b\", \"c";
@@ -260,7 +260,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_EndsWithListSeparator_ThrowsArgumentException()
+        public void ValueToStringListEndsWithListSeparatorThrowsArgumentException()
         {
             // Arrange
             string input = "\"a\", \"b\", \"c\",";

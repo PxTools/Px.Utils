@@ -13,7 +13,7 @@ namespace PxFileTests.DataTests
          */
 
         [TestMethod]
-        public void FindKeywordTest_DataKeywordAtStartOfStream_ReturnsZero()
+        public void FindKeywordTestDataKeywordAtStartOfStreamReturnsZero()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes("DATA=");
@@ -27,7 +27,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FindKeywordTest_TwoDataKeywords_ReturnsNegative1()
+        public void FindKeywordTestTwoDataKeywordsReturnsNegative1()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes("DATADATA=");
@@ -41,7 +41,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FindKeywordTest_DataKeywordInTheMiddleOfStream_ReturnsIndex()
+        public void FindKeywordTestDataKeywordInTheMiddleOfStreamReturnsIndex()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes("KEYWORD=\"foo\";\nDATA=123 345");
@@ -55,7 +55,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FindKeywordTest_DataKeywordAtTheEndOfStream_ReturnsIndex()
+        public void FindKeywordTestDataKeywordAtTheEndOfStreamReturnsIndex()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes("DADADADATA=");
@@ -69,7 +69,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FindKeywordTest_DKeywordInTheMiddleOfStream_ReturnsIndex()
+        public void FindKeywordTestDKeywordInTheMiddleOfStreamReturnsIndex()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes("FFFFFF;D=AAAA");
@@ -83,7 +83,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FindKeywordTest_DATAKeywordInTheMiddleOfUtfFixtureStream_ReturnsIndex()
+        public void FindKeywordTestDATAKeywordInTheMiddleOfUtfFixtureStreamReturnsIndex()
         {
             string keyword = "DATA";
 
@@ -100,7 +100,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FindKeywordTest_DATAKeywordInTheMiddleOfAsciiFixtureStream_ReturnsIndex()
+        public void FindKeywordTestDATAKeywordInTheMiddleOfAsciiFixtureStreamReturnsIndex()
         {
             string keyword = "DATA";
 
@@ -117,7 +117,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FindKeywordTest_DATAKeywordInTheMiddleOfAsciiFixtureStream_ShortBufferSplitsKeyword_ReturnsIndex()
+        public void FindKeywordTestDATAKeywordInTheMiddleOfAsciiFixtureStreamShortBufferSplitsKeywordReturnsIndex()
         {
             string keyword = "DATA";
 
@@ -134,7 +134,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FindKeywordTest_DATAKeywordInTheMiddleOfDataFinderFixtureStream_ReturnsIndex()
+        public void FindKeywordTestDATAKeywordInTheMiddleOfDataFinderFixtureStreamReturnsIndex()
         {
             string keyword = "DATA";
 

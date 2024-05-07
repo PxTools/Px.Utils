@@ -7,7 +7,7 @@ namespace ModelTests
     public class PropertyTests
     {
         [TestMethod]
-        public void ConstructorTest_WithSingleTranslation_CreatesPropertyWithSingleTranslation()
+        public void ConstructorTestWithSingleTranslationCreatesPropertyWithSingleTranslation()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -27,7 +27,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void ConstructorTest_WithMultipleTranslations_CreatesPropertyWithMultipleTranslations()
+        public void ConstructorTestWithMultipleTranslationsCreatesPropertyWithMultipleTranslations()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -47,7 +47,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void ConstructorTest_WithMultipleTranslationsWithSameValue_CreatesPropertyWithMultipleTranslations()
+        public void ConstructorTestWithMultipleTranslationsWithSameValueCreatesPropertyWithMultipleTranslations()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -67,7 +67,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void ConstructorTest_NoLanguage_CreatesPropertyWithNoLanguage()
+        public void ConstructorTestNoLanguageCreatesPropertyWithNoLanguage()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -83,7 +83,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void TryGetStringTest_WithSingleTranslation_ReturnsTrueAndValue()
+        public void TryGetStringTestWithSingleTranslationReturnsTrueAndValue()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -101,7 +101,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void TryGetStringTest_WithMultipleTranslations_ReturnsFalseAndNull()
+        public void TryGetStringTestWithMultipleTranslationsReturnsFalseAndNull()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -120,7 +120,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void TryGetStringTest_TranslationswithSameValues_ReturnsTrueAndValue()
+        public void TryGetStringTestTranslationswithSameValuesReturnsTrueAndValue()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -139,7 +139,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void GetStringTest_NoLanguage_ReturnValue()
+        public void GetStringTestNoLanguageReturnValue()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -151,7 +151,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void GetStringTest_WithSingleTranslation_ReturnValue()
+        public void GetStringTestWithSingleTranslationReturnValue()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -165,7 +165,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void GetStringTest_WithMultipleTranslations_ReturnsInvalidOperationException()
+        public void GetStringTestWithMultipleTranslationsReturnsInvalidOperationException()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -180,7 +180,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void TryGetMultilanguageStringTest_WithSingleTranslation_ReturnsTrueAndValue()
+        public void TryGetMultilanguageStringTestWithSingleTranslationReturnsTrueAndValue()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -198,7 +198,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void TryGetMultilanguageStringTest_WithMultipleTranslations_ReturnsTrueAndValue()
+        public void TryGetMultilanguageStringTestWithMultipleTranslationsReturnsTrueAndValue()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -218,7 +218,7 @@ namespace ModelTests
 
 
         [TestMethod]
-        public void TryGetMultilanguageStringTest_TranslationsWithSameValues_ReturnsTrueAndValue()
+        public void TryGetMultilanguageStringTestTranslationsWithSameValuesReturnsTrueAndValue()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -237,7 +237,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void TryGetMultilanguageStringTest_NoLanguage_ReturnsFalseAndNull()
+        public void TryGetMultilanguageStringTestNoLanguageReturnsFalseAndNull()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -253,7 +253,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void GetMultiLanguageStringTest_WithSingleTranslation_ReturnsValue()
+        public void GetMultiLanguageStringTestWithSingleTranslationReturnsValue()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -267,7 +267,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void GetMultiLanguageStringTest_WithMultipleTranslations_ReturnsValue()
+        public void GetMultiLanguageStringTestWithMultipleTranslationsReturnsValue()
         {
             // Arrange
             string keyWord = "keyWord";
@@ -282,7 +282,7 @@ namespace ModelTests
         }
 
         [TestMethod]
-        public void GetMultiLanguageStringTest_WithSingleTranslation_ThrwosInvalidOperationException()
+        public void GetMultiLanguageStringTestWithSingleTranslationThrowsInvalidOperationException()
         {
             // Arrange
             string keyWord = "keyWord";

@@ -8,7 +8,7 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
     public class ValueAsStringTests
     {
         [TestMethod]
-        public void ValueAsString_ValidValue_ReturnsString()
+        public void ValueAsStringValidValueReturnsString()
         {
             // Arrange
             string input = "\"aa\"";
@@ -25,7 +25,7 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueAsString_ValidValueWithWhitespace_ReturnsString()
+        public void ValueAsStringValidValueWithWhitespaceReturnsString()
         {
             // Arrange
             string input = "\" a a \"";
@@ -42,7 +42,7 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueAsString_ValidValueWithTrimmableWhitespace_ReturnsString()
+        public void ValueAsStringValidValueWithTrimmableWhitespaceReturnsString()
         {
             // Arrange
             string input = " \"a a\" ";
@@ -59,7 +59,7 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueAsString_MultilineString_ReturnsString()
+        public void ValueAsStringMultilineStringReturnsString()
         {
             // Arrange
             string input = "\"foo\" \n\"bar\"";
@@ -76,7 +76,7 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_MissingListSeparator_ThrowsArgumentException()
+        public void ValueToStringListMissingListSeparatorThrowsArgumentException()
         {
             // Arrange
             string a_list_string = "\"a_0\", \"a_1\", \"a_2\"";

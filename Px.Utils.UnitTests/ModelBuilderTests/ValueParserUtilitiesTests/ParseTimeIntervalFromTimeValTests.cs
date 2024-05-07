@@ -7,7 +7,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
     public class ParseTimeIntervalFromTimeValTests
     {
         [TestMethod]
-        public void ParseTimeIntervalFromTimeValTest_A1Input_ReturnsYear()
+        public void ParseTimeIntervalFromTimeValTestA1InputReturnsYear()
         {
             string input = "TLIST(A1)";
             TimeDimensionInterval expected = TimeDimensionInterval.Year;
@@ -17,7 +17,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
         }
 
         [TestMethod]
-        public void ParseTimeIntervalFromTimeValTest_H1Input_ReturnsHalfYear()
+        public void ParseTimeIntervalFromTimeValTestH1InputReturnsHalfYear()
         {
             string input = "TLIST(H1)";
             TimeDimensionInterval expected = TimeDimensionInterval.HalfYear;
@@ -27,7 +27,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
         }
 
         [TestMethod]
-        public void ParseTimeIntervalFromTimeValTest_Q1Input_ReturnQuarter()
+        public void ParseTimeIntervalFromTimeValTestQ1InputReturnQuarter()
         {
             string input = "TLIST(Q1)";
             TimeDimensionInterval expected = TimeDimensionInterval.Quarter;
@@ -38,7 +38,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
 
 
         [TestMethod]
-        public void ParseTimeIntervalFromTimeValTest_M1Input_ReturnsMonth()
+        public void ParseTimeIntervalFromTimeValTestM1InputReturnsMonth()
         {
             string input = "TLIST(M1)";
             TimeDimensionInterval expected = TimeDimensionInterval.Month;
@@ -48,7 +48,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
         }
 
         [TestMethod]
-        public void ParseTimeIntervalFromTimeValTest_W1Input_ReturnsWeek()
+        public void ParseTimeIntervalFromTimeValTestW1InputReturnsWeek()
         {
             string input = "TLIST(W1)";
             TimeDimensionInterval expected = TimeDimensionInterval.Week;
@@ -58,7 +58,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
         }
 
         [TestMethod]
-        public void ParseTimeIntervalFromTimeValTest_UnknownInteralValidInput_ReturnsOther()
+        public void ParseTimeIntervalFromTimeValTestUnknownInteralValidInputReturnsOther()
         {
             string input = "TLIST(F1)";
             TimeDimensionInterval expected = TimeDimensionInterval.Other;
@@ -68,7 +68,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
         }
 
         [TestMethod]
-        public void ParseTimeIntervalFromTimeValTest_InvalidInput_ThrowsArgumentException()
+        public void ParseTimeIntervalFromTimeValTestInvalidInputThrowsArgumentException()
         {
             string input = "FOO";
             void act() => ValueParserUtilities.ParseTimeIntervalFromTimeVal(input);
