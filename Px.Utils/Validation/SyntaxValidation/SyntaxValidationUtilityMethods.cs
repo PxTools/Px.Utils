@@ -30,7 +30,8 @@ namespace PxUtils.Validation.SyntaxValidation
     }
 
     /// <summary>
-    /// Provides a collection of helper methods used during the syntax validation process. These methods include functionality for extracting sections from a string, checking the format of a string, and determining the type of a value from a string.
+    /// Provides a collection of helper methods used during the syntax validation process. 
+    /// These methods include functionality for extracting sections from a string, checking the format of a string, and determining the type of a value from a string.
     /// </summary>
     public static class SyntaxValidationUtilityMethods
     {
@@ -43,7 +44,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="input">The input string to extract from</param>
         /// <param name="startSymbol">Symbol that starts enclosement</param>
         /// <param name="endSymbol">Optional symbol that closes the enclosement. If none given, startSymbol is used for both starting and ending the enclosement</param>
-        /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the extracted sections, the string that remains after the operation and starting indexes of extracted sections</return>
+        /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the extracted sections,
+        /// the string that remains after the operation and starting indexes of extracted sections</return>
         internal static ExtractSectionResult ExtractSectionFromString(string input, char startSymbol, char stringDelimeter, char? endSymbol = null)
         {
             // If no end symbol is provided, the start symbol is used for both starting and ending the enclosement
@@ -123,7 +125,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>Returns a boolean which is true if the input string is in a number format</returns>
         internal static bool IsNumberFormat(string input)
         {
-            if (input.Length > 29)
+            const int maxNumberLength = 29;
+            if (input.Length > maxNumberLength)
             {
                 return false;
             }
@@ -133,7 +136,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
 
             // Create a regex pattern to match valid number format
-            string pattern = @"^-?(\d+\.?\d*|\.\d+)$";
+            const string pattern = @"^-?(\d+\.?\d*|\.\d+)$";
 
             try
             {
@@ -150,13 +153,14 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Determines whether the line changes in a string are compliant with the syntax configuration.
         /// </summary>
         /// <param name="input">The input string to check</param>
-        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
+        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. 
+        /// The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <param name="isList">A boolean that is true if the input string is a list</param>
         /// <returns>Returns a boolean which is true if the line changes in the input string are compliant with the syntax configuration</returns>
         internal static bool ValueLineChangesAreCompliant(string input, PxFileSyntaxConf syntaxConf, bool isList)
         {
-            string trimmedInput = input.Replace(CharacterConstants.CARRIAGE_RETURN.ToString(), "");
-            int lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LINE_FEED);
+            string trimmedInput = input.Replace(CharacterConstants.CARRIAGERETURN.ToString(), "");
+            int lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LINEFEED);
             while (lineChangeIndex != -1)
             {
                 char symbolBefore = isList ? syntaxConf.Symbols.Key.ListSeparator : syntaxConf.Symbols.Key.StringDelimeter;
@@ -164,7 +168,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 {
                     return false;
                 }
-                lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LINE_FEED, lineChangeIndex + 1);
+                lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LINEFEED, lineChangeIndex + 1);
             }
             return true;
         }
@@ -173,7 +177,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Determines the type of a value from a string.
         /// </summary>
         /// <param name="input">The input string to check</param>
-        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
+        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax.
+        /// The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
         /// <returns>Returns a <see cref="ValueType"/> object that represents the type of the value in the input string. If the type cannot be determined, null is returned.</returns>
         internal static ValueType? GetValueTypeFromString(string input, PxFileSyntaxConf syntaxConf)
         {
@@ -216,7 +221,7 @@ namespace PxUtils.Validation.SyntaxValidation
         internal static string CleanString(string input, PxFileSyntaxConf syntaxConf)
         {
             char[] charactersToTrim = [
-                CharacterConstants.CARRIAGE_RETURN,
+                CharacterConstants.CARRIAGERETURN,
                 syntaxConf.Symbols.Linebreak,
                 syntaxConf.Symbols.Key.StringDelimeter
             ];
@@ -260,7 +265,7 @@ namespace PxUtils.Validation.SyntaxValidation
             Dictionary<int, int> stringIndeces = GetEnclosingCharacterIndexes(input, syntaxConf.Symbols.Key.StringDelimeter);
             List<int> separators = [];
 
-            // Find all indeces of syntaxConf.Symbols.KeywordSeparator in the input string that are not enclosed within strings using FindSymbolIndex method
+            // Find all indeces of SyntaxConf.Symbols.KeywordSeparator in the input string that are not enclosed within strings using FindSymbolIndex method
             int separatorIndex = -1;
             do
             {
@@ -311,7 +316,7 @@ namespace PxUtils.Validation.SyntaxValidation
             int firstIndex = -1;
             foreach (string substring in substrings)
             {
-                int index = input.IndexOf(substring);
+                int index = input.IndexOf(substring, StringComparison.Ordinal);
                 if (
                     index != -1 && 
                     (index < firstIndex || firstIndex == -1) &&
@@ -384,7 +389,7 @@ namespace PxUtils.Validation.SyntaxValidation
                         syntaxConf.Symbols.Key.StringDelimeter;
 
                     // In case of Windows linebreak, check if the character before the linebreak is the correct symbol
-                    char characterToInspect = value[i - 1] != CharacterConstants.CARRIAGE_RETURN ? value[i - 1] : value[i - 2];
+                    char characterToInspect = value[i - 1] != CharacterConstants.CARRIAGERETURN ? value[i - 1] : value[i - 2];
 
                     if (characterToInspect != symbolBefore)
                     {
@@ -410,13 +415,17 @@ namespace PxUtils.Validation.SyntaxValidation
             string timeIntervalIndicator = syntaxConf.Tokens.Time.TimeIntervalIndicator;
 
             // Value has to start with the time interval indicator (TLIST by default)
-            if (!input.StartsWith(timeIntervalIndicator))
+            if (!input.StartsWith(timeIntervalIndicator, StringComparison.Ordinal))
             {
                 valueFormat = null;
                 return false;
             }
 
-            ExtractSectionResult intervalSection = ExtractSectionFromString(input, syntaxConf.Symbols.Value.TimeSeriesIntervalStart, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Value.TimeSeriesIntervalEnd);
+            ExtractSectionResult intervalSection = ExtractSectionFromString(
+                input, 
+                syntaxConf.Symbols.Value.TimeSeriesIntervalStart, 
+                syntaxConf.Symbols.Key.StringDelimeter,
+                syntaxConf.Symbols.Value.TimeSeriesIntervalEnd);
             // There can only be one time interval specifier section
             if (intervalSection.Sections.Length != 1)
             {
@@ -467,7 +476,7 @@ namespace PxUtils.Validation.SyntaxValidation
         private static bool IsValidTimestampFormat(string input, string timeInterval, PxFileSyntaxConf syntaxConf)
         {
             input = input
-                .Replace(CharacterConstants.CARRIAGE_RETURN.ToString(), "")
+                .Replace(CharacterConstants.CARRIAGERETURN.ToString(), "")
                 .Replace(syntaxConf.Symbols.Linebreak.ToString(), "")
                 .Replace(CharacterConstants.SPACE.ToString(), "");
             
@@ -539,7 +548,14 @@ namespace PxUtils.Validation.SyntaxValidation
             }
         }
 
-        private static void HandleStringDelimiter(ref bool insideString, ref bool insideSection, bool ignoreStringContents, StringBuilder sectionBuilder, List<string> sections, List<int> startIndexes, int i)
+        private static void HandleStringDelimiter(
+            ref bool insideString,
+            ref bool insideSection,
+            bool ignoreStringContents,
+            StringBuilder sectionBuilder,
+            List<string> sections, 
+            List<int> startIndexes, 
+            int i)
         {
             insideString = !insideString;
             if (!ignoreStringContents)

@@ -13,7 +13,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         private readonly List<ValidationFeedbackItem> feedback = [];
 
         [TestMethod]
-        public async Task ValidatePxFileSyntaxAsync_CalledWith_MINIMAL_UTF8_Returns_Valid_Result()
+        public async Task ValidatePxFileSyntaxAsyncCalledWithMinumalUTF8ReturnsValidResult()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N);
@@ -31,7 +31,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        public async Task ValidatePxFileSyntaxAsync_CalledWith_UTF8_N_WITH_SPECIFIERS_Returns_Result_With_Right_Structure()
+        public async Task ValidatePxFileSyntaxAsyncCalledWithSpecifiersReturnsResultWithRightStructure()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_SPECIFIERS);

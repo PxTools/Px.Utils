@@ -12,7 +12,12 @@ namespace PxUtils.Validation.SyntaxValidation
     /// <param name="keyStartLineIndex">Index of the line where the entry starts.</param>
     /// <param name="lineChangeIndexes">Character indexes of the line changes in the entry starting from the entry start.</param>
     /// <param name="valueStartIndex">Index of the first character of the value in the entry.</param>
-    public class ValidationKeyValuePair(string file, KeyValuePair<string, string> keyValuePair, int keyStartLineIndex, int[] lineChangeIndexes, int valueStartIndex) : ValidationObject(file, keyStartLineIndex, lineChangeIndexes)
+    public class ValidationKeyValuePair(
+        string file,
+        KeyValuePair<string, string> keyValuePair,
+        int keyStartLineIndex,
+        int[] lineChangeIndexes, 
+        int valueStartIndex) : ValidationObject(file, keyStartLineIndex, lineChangeIndexes)
     {
         /// <summary>
         /// Contents of the entry, represented as a key-value pair.

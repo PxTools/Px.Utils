@@ -1,11 +1,10 @@
 ﻿using PxUtils.PxFile.Metadata;
 using PxUtils.Validation.SyntaxValidation;
-using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal class MetadataSyntaxValidationBenchmark : Benchmark
+    internal sealed class MetadataSyntaxValidationBenchmark : Benchmark
     {
         internal override string Help =>
         "Validates the syntax of the Px file metadata given amount of times." + Environment.NewLine +
@@ -19,7 +18,8 @@ namespace Px.Utils.TestingApp.Commands
         internal MetadataSyntaxValidationBenchmark()
         {             
             BenchmarkFunctions = [SyntaxValidationBenchmark];
-            BenchmarkFunctionsAsync = [SyntaxValidationAsyncBenchmark];
+            BenchmarkFunctionsAsync = [SyntaxValidationBenchmarkAsync];
+            encoding = Encoding.Default;
         }
 
         protected override void OneTimeBenchmarkSetup()
@@ -39,7 +39,7 @@ namespace Px.Utils.TestingApp.Commands
             SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, TestFilePath);
         }
 
-        private async Task SyntaxValidationAsyncBenchmark()
+        private async Task SyntaxValidationBenchmarkAsync()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             stream.Seek(0, SeekOrigin.Begin);

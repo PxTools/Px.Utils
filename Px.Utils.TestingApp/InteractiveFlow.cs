@@ -7,7 +7,7 @@ namespace PxUtils.TestingApp
     /// Runs the interactive flow of the application.
     /// Prompts the user for a commands and parameters and then runs the commands.
     /// </summary>
-    internal class InteractiveFlow
+    internal sealed class InteractiveFlow
     {
         /// <summary>
         /// Collection of commands that can be run.
@@ -25,8 +25,8 @@ namespace PxUtils.TestingApp
         {
             while(true)
             {
-                string q = "Enter the command and optional parameters:";
-                string followUp = "Valid command is required, please input the command:";
+                const string q = "Enter the command and optional parameters:";
+                const string followUp = "Valid command is required, please input the command:";
                 List<string> inputs = TestAppConsole.AskQuestion(q, true, followUp);
                 while (!_commands.ContainsKey(inputs[0]))
                 {

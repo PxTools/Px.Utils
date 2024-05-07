@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal class MetadataContentValidationBenchmark : Benchmark
+    internal sealed class MetadataContentValidationBenchmark : Benchmark
     {
         internal override string Help =>
         "Validates the contents of the Px file metadata given amount of times." + Environment.NewLine +
@@ -19,7 +19,9 @@ namespace Px.Utils.TestingApp.Commands
         internal MetadataContentValidationBenchmark()
         {             
             BenchmarkFunctions = [ValidateContentBenchmark];
-            BenchmarkFunctionsAsync = [ValidateContentAsyncBenchmark];
+            BenchmarkFunctionsAsync = [ValidateContentBenchmarkAsync];
+            entries = [];
+            validator = new("", Encoding.Default);
         }
 
         protected override void OneTimeBenchmarkSetup()
@@ -29,7 +31,7 @@ namespace Px.Utils.TestingApp.Commands
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            entries = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, TestFilePath).Result.ToArray();
+            entries = [.. SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, TestFilePath).Result];
 
             validator = new(TestFilePath, encoding);
         }
@@ -39,7 +41,7 @@ namespace Px.Utils.TestingApp.Commands
             validator.Validate(entries);
         }
 
-        private async Task ValidateContentAsyncBenchmark()
+        private async Task ValidateContentBenchmarkAsync()
         {
             await validator.ValidateAsync(entries);
         }

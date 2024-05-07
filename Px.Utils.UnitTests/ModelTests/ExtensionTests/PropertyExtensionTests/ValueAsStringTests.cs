@@ -8,11 +8,11 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
     public class ValueAsStringTests
     {
         [TestMethod]
-        public void ValueAsString_ValidValue_ReturnsString()
+        public void ValueAsStringValidValueReturnsString()
         {
             // Arrange
             string input = "\"aa\"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char stringDelimeter = '"';
             string expected = "aa";
@@ -25,11 +25,11 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueAsString_ValidValueWithWhitespace_ReturnsString()
+        public void ValueAsStringValidValueWithWhitespaceReturnsString()
         {
             // Arrange
             string input = "\" a a \"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char stringDelimeter = '"';
             string expected = " a a ";
@@ -42,11 +42,11 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueAsString_ValidValueWithTrimmableWhitespace_ReturnsString()
+        public void ValueAsStringValidValueWithTrimmableWhitespaceReturnsString()
         {
             // Arrange
             string input = " \"a a\" ";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char stringDelimeter = '"';
             string expected = "a a";
@@ -59,11 +59,11 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueAsString_MultilineString_ReturnsString()
+        public void ValueAsStringMultilineStringReturnsString()
         {
             // Arrange
             string input = "\"foo\" \n\"bar\"";
-            Property property = new("key", input);
+            MetaProperty property = new("key", input);
 
             char stringDelimeter = '"';
             string expected = "foobar";
@@ -76,14 +76,14 @@ namespace ModelTests.ExtensionTests.PropertyExtensionTests
         }
 
         [TestMethod]
-        public void ValueToStringList_MissingListSeparator_ThrowsArgumentException()
+        public void ValueToStringListMissingListSeparatorThrowsArgumentException()
         {
             // Arrange
             string a_list_string = "\"a_0\", \"a_1\", \"a_2\"";
             string b_list_string = "\"b_0\", \"b_1\", \"b_2\"";
             string c_list_string = "\"c_0\", \"c_1\", \"c_2\"";
             MultilanguageString mls = new([new("a", a_list_string), new("b", b_list_string), new("c", c_list_string)]);
-            Property property = new("test_property", mls);
+            MetaProperty property = new("test_property", mls);
 
             char stringDelimeter = '"';
 

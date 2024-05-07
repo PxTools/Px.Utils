@@ -13,7 +13,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         private readonly double[] missingMarkers = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6];
 
         [TestMethod]
-        public async Task ReadDoubleDataValuesAsync_ValidIntegers_ReturnsCorrectDoubleDataValues()
+        public async Task ReadDoubleDataValuesAsyncValidIntegersReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -46,7 +46,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadDoubleDataValuesAsync_ValidIntegersWithSmallBuffer_ReturnsCorrectDoubleDataValues()
+        public async Task ReadDoubleDataValuesAsyncValidIntegersWithSmallBufferReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -79,7 +79,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadDoubleDataValuesAsync_ValidIntegersAndMissing_ReturnsCorrectDoubleDataValues()
+        public async Task ReadDoubleDataValuesAsyncValidIntegersAndMissingReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES_WITH_MISSING);
@@ -115,7 +115,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadDoubleDataValuesAsyncWithCancellationToken_ValidIntegers_ReturnsCorrectDoubleDataValues()
+        public async Task ReadDoubleDataValuesAsyncWithCancellationTokenValidIntegersReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -147,7 +147,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task CancelReadDoubleDataValuesAsync_ValidIntegers_IsCancelled()
+        public async Task CancelReadDoubleDataValuesAsyncValidIntegersIsCancelled()
         {
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
             using Stream stream = new MemoryStream(data);
@@ -172,7 +172,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadDecimalDataValuesAsyncWithCancellationToken_ValidIntegers_ReturnsCorrectDecimalValues()
+        public async Task ReadDecimalDataValuesAsyncWithCancellationTokenValidIntegersReturnsCorrectDecimalValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -205,7 +205,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task CancelReadAddDecimalDataValuesAsync_ValidIntegers_IsCancelled()
+        public async Task CancelReadAddDecimalDataValuesAsyncValidIntegersIsCancelled()
         {
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
             using Stream stream = new MemoryStream(data);
@@ -231,7 +231,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadUnsafeDoubleValuesAsyncWithCancellationToken_ValidIntegers_ReturnsCorrectUnsafeDoubleValues()
+        public async Task ReadUnsafeDoubleValuesAsyncWithCancellationTokenValidIntegersReturnsCorrectUnsafeDoubleValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -264,7 +264,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task CancelReadUnsafeDoubleValuesAsync_ValidIntegers_IsCancelled()
+        public async Task CancelReadUnsafeDoubleValuesAsyncValidIntegersIsCancelled()
         {
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
             using Stream stream = new MemoryStream(data);
@@ -290,7 +290,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadEveryOtherDoubleDataValueFrom1stRowAsync_ValidIntegers_ReturnsCorrectDoubleDataValues()
+        public async Task ReadEveryOtherDoubleDataValueFrom1stRowAsyncValidIntegersReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -320,7 +320,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadEveryOtherDoubleDataValueFrom2ndRowAsync_ValidIntegers_ReturnsCorrectDoubleDataValues()
+        public async Task ReadEveryOtherDoubleDataValueFrom2ndRowAsyncValidIntegersReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -345,7 +345,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadDoubleDataValuesAsync_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        public async Task ReadDoubleDataValuesAsyncValidDecimalsReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DECIMALVALUES);
@@ -375,7 +375,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadEveryOtherDoubleDataValueFrom1stRowAsync_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        public async Task ReadEveryOtherDoubleDataValueFrom1stRowAsyncValidDecimalsReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DECIMALVALUES);
@@ -400,7 +400,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadEveryOtherDoubleDataValueFrom2ndRowAsync_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        public async Task ReadEveryOtherDoubleDataValueFrom2ndRowAsyncValidDecimalsReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DECIMALVALUES);
@@ -425,7 +425,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task EveryValueOnSeparateRowsAsync_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        public async Task EveryValueOnSeparateRowsAsyncValidDecimalsReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20ROWS);
@@ -455,7 +455,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadAddDecimalDataValuesAsync_ValidIntegers_ReturnsCorrectDecimalDataValues()
+        public async Task ReadAddDecimalDataValuesAsyncValidIntegersReturnsCorrectDecimalDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -485,7 +485,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadDecimalDataValuesAsync_ValidDecimals_ReturnsCorrectDecimalDataValues()
+        public async Task ReadDecimalDataValuesAsyncValidDecimalsReturnsCorrectDecimalDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DECIMALVALUES);
@@ -515,7 +515,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadUnsafeDoubleValuesAsync_ValidIntegers_ReturnsCorrectDoubleDataValues()
+        public async Task ReadUnsafeDoubleValuesAsyncValidIntegersReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -545,7 +545,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadUnsafeDoubleValuesAsync_ValidDecimals_ReturnsCorrectDoubleDataValues()
+        public async Task ReadUnsafeDoubleValuesAsyncValidDecimalsReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DECIMALVALUES);

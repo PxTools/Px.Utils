@@ -9,7 +9,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
     public class ReadMetadataAsyncTests
     {
         [TestMethod]
-        public async Task ReadMetadataAsync_CalledWith_MINIMAL_UTF8_N_ReturnsMetadata()
+        public async Task ReadMetadataAsyncCalledWithMinimalUTF8NReturnsMetadata()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N);
@@ -50,7 +50,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadMetadataAsync_CalledWith_MINIMAL_UTF8_RN_ReturnsMetadata()
+        public async Task ReadMetadataAsyncCalledWithMinimalUTF8RNReturnsMetadata()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_RN);
@@ -92,7 +92,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
 
 
         [TestMethod]
-        public async Task ReadMetadataAsync_CalledWith_MINIMAL_UTF8_N_WITH_DELIMETERS_IN_VALUESTRING_ReturnsMetadata()
+        public async Task ReadMetadataAsyncCalledWithDelimetersInValueStringReturnsMetadata()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_WITH_DELIMETERS_IN_VALUESTRING);
@@ -133,7 +133,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadMetadataAsync_CalledWith_MINIMAL_UTF8_N_WITH_DELIMETERS_IN_VALUESTRING_And_Small_Buffer_Size_ReturnsMetadata()
+        public async Task ReadMetadataAsyncCalledWithDelimetersInValueStringAndSmallBufferSizeReturnsMetadata()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_WITH_DELIMETERS_IN_VALUESTRING);
@@ -174,7 +174,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadMetadata_CalledWith_BROKEN_UTF8_N_Throws_InvalidPxFileMetadataException()
+        public async Task ReadMetadataCalledWithBrokenUTF8ThrowsInvalidPxFileMetadataException()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.BROKEN_UTF8_N);
@@ -190,7 +190,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadMetadataAsync_CalledWith_MINIMAL_UTF8_N_WITH_MULTILINE_VALUES_ReturnsMetadata()
+        public async Task ReadMetadataAsyncCalledWithMultilineValuesReturnsMetadata()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_WITH_MULTILINE_VALUES);

@@ -92,7 +92,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void MultiLangVariableBuildTest_FromRecommendedFixture()
+        public void MultiLangVariableBuildTestFromRecommendedFixture()
         {
             Assert.AreEqual(4, Actual_Recommended_3Lang.Dimensions.Count);
 
@@ -220,7 +220,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void MultiLangContentDimensionBuildTest_FromRecommendedFixture()
+        public void MultiLangContentDimensionBuildTestFromRecommendedFixture()
         {
             IDimension? contentDimension = Actual_Recommended_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
             Assert.IsInstanceOfType<ContentDimension>(contentDimension);
@@ -234,7 +234,7 @@ namespace ModelBuilderTests
         [DataRow(0, "indeksipisteluku", "indextal", "index point")]
         [DataRow(1, "%", "%", "%")]
         [DataRow(2, "lukumäärä", "antal", "number")]
-        public void MultiLangUnitsTest_FromRecommendedFixture(int index, string fi, string sv, string en)
+        public void MultiLangUnitsTestFromRecommendedFixture(int index, string fi, string sv, string en)
         {
             ContentDimension? contentDimension = (ContentDimension?)Actual_Recommended_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
             MultilanguageString expected = new([new("fi", fi), new("sv", sv), new("en", en)]);
@@ -246,7 +246,7 @@ namespace ModelBuilderTests
         [DataRow(0, "20230131 08:00")]
         [DataRow(1, "20230131 09:00")]
         [DataRow(2, "20230131 10:00")]
-        public void MultiLangLastUpdatedTest_FromRecommendedFixture(int index, string timeStamp)
+        public void MultiLangLastUpdatedTestFromRecommendedFixture(int index, string timeStamp)
         {
             ContentDimension? contentDimension = (ContentDimension?)Actual_Recommended_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
             DateTime expected = DateTime.ParseExact(timeStamp, "yyyyMMdd HH:mm", CultureInfo.InvariantCulture);
@@ -258,7 +258,7 @@ namespace ModelBuilderTests
         [DataRow(0, 1)]
         [DataRow(1, 1)]
         [DataRow(2, 0)]
-        public void MultiLangPrecisionTest_FromRecommendedFixture(int index, int expected)
+        public void MultiLangPrecisionTestFromRecommendedFixture(int index, int expected)
         {
             ContentDimension? contentDimension = (ContentDimension?)Actual_Recommended_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
             Assert.AreEqual(expected, contentDimension?.Values[index].Precision);
@@ -368,7 +368,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void MultiLangMapTest_FromRecommendedFixture()
+        public void MultiLangMapTestFromRecommendedFixture()
         {
             IDimension? area_dim = Actual_Recommended_3Lang.Dimensions.Find(d => d.Code == "area");
             Assert.IsNotNull(area_dim);

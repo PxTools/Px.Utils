@@ -1,6 +1,6 @@
 ﻿namespace Px.Utils.TestingApp.Commands
 {
-    internal class BenchmarkRunner : Command
+    internal sealed class BenchmarkRunner : Command
     {
         private readonly Dictionary<string, Benchmark> _benchmarks = [];
 
@@ -27,8 +27,8 @@
 
         internal override void Run(bool batchMode, List<string>? inputs = null)
         {
-            string q = "Enter the benchmark name and optional parameters:";
-            string followUp = "Valid benchmark name is required, please input the benchmark name:";
+            const string q = "Enter the benchmark name and optional parameters:";
+            const string followUp = "Valid benchmark name is required, please input the benchmark name:";
 
             if (inputs is null || inputs.Count == 0)
             {

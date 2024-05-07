@@ -10,7 +10,7 @@ namespace ModelBuilderTests
         #region Valid key tests
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_KeyWithLangAndTwoSpecifiers_ReturnsEntryKey()
+        public void ParseMetadataEntryKeyTestKeyWithLangAndTwoSpecifiersReturnsEntryKey()
         {
             // Arrange
             string key = "FOOBAR";
@@ -30,7 +30,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_KeyWithLangAndTwoSpecifiersWithSpace_ReturnsEntryKey()
+        public void ParseMetadataEntryKeyTestKeyWithLangAndTwoSpecifiersWithSpaceReturnsEntryKey()
         {
             // Arrange
             string key = "FOOBAR";
@@ -50,7 +50,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_KeyWithLang_ReturnsEntryKey()
+        public void ParseMetadataEntryKeyTestKeyWithLangReturnsEntryKey()
         {
             // Arrange
             string key = "FOOBAR";
@@ -68,7 +68,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_KeyWithTwoSpesifiers_ReturnsEntryKey()
+        public void ParseMetadataEntryKeyTestKeyWithTwoSpesifiersReturnsEntryKey()
         {
             // Arrange
             string key = "FOOBAR";
@@ -87,7 +87,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_KeyWithOneSpesifier_ReturnsEntryKey()
+        public void ParseMetadataEntryKeyTestKeyWithOneSpesifierReturnsEntryKey()
         {
             // Arrange
             string key = "FOOBAR";
@@ -105,7 +105,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_OnlyKeyword_ReturnsEntryKey()
+        public void ParseMetadataEntryKeyTestOnlyKeywordReturnsEntryKey()
         {
             // Arrange
             string key = "FOOBAR";
@@ -121,7 +121,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_OnlyKeywordWithMinusSign_ReturnsEntryKey()
+        public void ParseMetadataEntryKeyTestOnlyKeywordWithMinusSignReturnsEntryKey()
         {
             // Arrange
             string key = "FOO-BAR";
@@ -137,7 +137,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_KeyWithOneSpecifierWithBrackets_ReturnsEntryKey()
+        public void ParseMetadataEntryKeyTestKeyWithOneSpecifierWithBracketsReturnsEntryKey()
         {
             // Arrange
             string key = "FOOBAR";
@@ -159,7 +159,7 @@ namespace ModelBuilderTests
         #region Invalid key tests
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_SymbolBetweenLangAndSpecifierBlocks_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestSymbolBetweenLangAndSpecifierBlocksThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -175,7 +175,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_SymbolBetweenSpecifiers_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestSymbolBetweenSpecifiersThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -191,7 +191,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_SymbolAfterSpecifiers_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestSymbolAfterSpecifiersThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -207,7 +207,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_SymbolAfterKey_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestSymbolAfterKeyThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -223,7 +223,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_TwoLangBlocks_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestTwoLangBlocksThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -239,7 +239,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_TwoSpecifierBlocks_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestTwoSpecifierBlocksThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -255,7 +255,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_MissingSeparatorBetweenSpecifier_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestMissingSeparatorBetweenSpecifierThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -272,7 +272,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_ThreeSpecifiers_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestThreeSpecifiersThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -289,7 +289,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_ExtraLangBracket_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestExtraLangBracketThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -305,7 +305,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_QuotesInSpecifier_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestQuotesInSpecifierThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -321,7 +321,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_EmptySpecifierBlock_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestEmptySpecifierBlockThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -335,7 +335,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_EmptyLangBlock_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestEmptyLangBlockThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";
@@ -351,7 +351,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_KeyWordHasWhiteSpace_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestKeyWordHasWhiteSpaceThrowsArgumentException()
         {
             // Arrange
             string key = "FOO BAR";
@@ -368,7 +368,7 @@ namespace ModelBuilderTests
         }
 
         [TestMethod]
-        public void ParseMetadataEntryKeyTest_LangBlockHasTwoClosingBrackets_ThrowsArgumentException()
+        public void ParseMetadataEntryKeyTestLangBlockHasTwoClosingBracketsThrowsArgumentException()
         {
             // Arrange
             string key = "FOOBAR";

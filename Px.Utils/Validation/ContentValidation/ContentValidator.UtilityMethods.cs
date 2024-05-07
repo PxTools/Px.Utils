@@ -37,7 +37,7 @@ namespace PxUtils.Validation.ContentValidation
                 {
                     ValidationStructuredEntry? valuesEntry = Array.Find(entries,
                         e => e.Key.FirstSpecifier is not null &&
-                        e.Key.FirstSpecifier.Equals(dimension));
+                        e.Key.FirstSpecifier.Equals(dimension, StringComparison.Ordinal));
                     if (valuesEntry is not null)
                     {
                         string[] values = valuesEntry.Value.Split(syntaxConf.Symbols.Value.ListSeparator);
@@ -80,15 +80,22 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="dimensionValueName">Name of the content dimension value requiring the entry</param>
         /// <param name="validator">Object that stores required information about the validation process</param>
         /// <param name="recommended">Optional that indicates if the keyword entry is recommended and should yield a warning if not found</param>
-        /// <returns>Returns a <see cref="ValidationFeedbackItem"/> object with an error if required entry is not found or with a warning if the entry specifiers are defined in an unexpected way</returns>
-        private static ValidationFeedbackItem? FindContentVariableKey(ValidationStructuredEntry[] entries, string keyword, KeyValuePair<string, string> languageAndDimensionPair, string dimensionValueName, ContentValidator validator, bool recommended = false)
+        /// <returns>Returns a <see cref="ValidationFeedbackItem"/> object with an error if required entry is not found 
+        /// or with a warning if the entry specifiers are defined in an unexpected way</returns>
+        private static ValidationFeedbackItem? FindContentVariableKey(
+            ValidationStructuredEntry[] entries, 
+            string keyword, 
+            KeyValuePair<string, string> languageAndDimensionPair, 
+            string dimensionValueName,
+            ContentValidator validator, 
+            bool recommended = false)
         {
             string language = languageAndDimensionPair.Key;
             string dimensionName = languageAndDimensionPair.Value;
 
             ValidationStructuredEntry? entry = Array.Find(entries,
-                            e => e.Key.Keyword.Equals(keyword) &&
-                            (e.Key.Language == language || (language == validator.defaultLanguage && e.Key.Language is null)) &&
+                            e => e.Key.Keyword.Equals(keyword, StringComparison.Ordinal) &&
+                            (e.Key.Language == language || (language == validator._defaultLanguage && e.Key.Language is null)) &&
                             (e.Key.FirstSpecifier == dimensionName || e.Key.FirstSpecifier == dimensionValueName) &&
                             (e.Key.SecondSpecifier == dimensionValueName || e.Key.SecondSpecifier == null));
 
@@ -103,7 +110,7 @@ namespace PxUtils.Validation.ContentValidation
                             );
                 return
                     new ValidationFeedbackItem(
-                        new ContentValidationObject(validator.filename, 0, []),
+                        new ContentValidationObject(validator._filename, 0, []),
                         feedback
                         );
             }
@@ -141,11 +148,15 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="validator">Object that stores required information about the validation process</param>
         /// <param name="dimensionName">Name of the dimension</param>
         /// <returns>Returns a <see cref="ValidationFeedbackItem"/> object with a warning if the recommended entry is not found</returns>
-        private static ValidationFeedbackItem? FindDimensionRecommendedKey(ValidationStructuredEntry[] entries, string keyword, string language, ContentValidator validator, string? dimensionName = null)
+        private static ValidationFeedbackItem? FindDimensionRecommendedKey(
+            ValidationStructuredEntry[] entries, 
+            string keyword, string language, 
+            ContentValidator validator, 
+            string? dimensionName = null)
         {
-            ValidationStructuredEntry[] keywordEntries = entries.Where(e => e.Key.Keyword.Equals(keyword)).ToArray();
+            ValidationStructuredEntry[] keywordEntries = entries.Where(e => e.Key.Keyword.Equals(keyword, StringComparison.Ordinal)).ToArray();
             ValidationStructuredEntry? entry = Array.Find(keywordEntries,
-                e => ((language == validator.defaultLanguage && e.Key.Language is null) || language == e.Key.Language) &&
+                e => ((language == validator._defaultLanguage && e.Key.Language is null) || language == e.Key.Language) &&
                 (e.Key.FirstSpecifier == dimensionName || dimensionName is null));
 
             if (entry is null)
@@ -158,7 +169,7 @@ namespace PxUtils.Validation.ContentValidation
                             $"{language}, {keyword}, {dimensionName}");
 
                 return new ValidationFeedbackItem(
-                        new ContentValidationObject(validator.filename, 0, []),
+                        new ContentValidationObject(validator._filename, 0, []),
                         feedback
                         );
             }
@@ -195,7 +206,7 @@ namespace PxUtils.Validation.ContentValidation
                 }
             }
 
-            if (languageAndDimensionPair.Key == validator.defaultLanguage)
+            if (languageAndDimensionPair.Key == validator._defaultLanguage)
             {
                 foreach (string keyword in commonKeywords)
                 {
@@ -246,7 +257,7 @@ namespace PxUtils.Validation.ContentValidation
                 }
             }
 
-            if (language == validator.defaultLanguage)
+            if (language == validator._defaultLanguage)
             {
                 ValidationFeedbackItem? variableTypeFeedback = FindDimensionRecommendedKey(entries, dimensionTypeKeyword, language, validator, dimensionName);
                 if (variableTypeFeedback is not null)

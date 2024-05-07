@@ -6,7 +6,7 @@ namespace PxFileTests.DataTests
     public class DataIndexerTests
     {
         [TestMethod]
-        public void OneDimension_1_NextTest()
+        public void OneDimension1NextTest()
         {
             var coordinates = new int[][]
             {
@@ -26,7 +26,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void OneDimension_5_NextTest()
+        public void OneDimension5NextTest()
         {
             var coordinates = new int[][]
             {
@@ -46,7 +46,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void OneDimension_5_LastTest()
+        public void OneDimension5LastTest()
         {
             var coordinates = new int[][]
             {
@@ -64,7 +64,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ThreeDimensions_3_2_5_NextTest()
+        public void ThreeDimensions325NextTest()
         {
             var coordinates = new int[][]
             {
@@ -84,7 +84,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ThreeDimensions_3_2_5_ReorderingTest()
+        public void ThreeDimensions325ReorderingTest()
         {
             var coordinates = new int[][]
             {
@@ -104,7 +104,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ThreeDimensions_3_2_5_MultidimensionalReorderingTest()
+        public void ThreeDimensions325MultidimensionalReorderingTest()
         {
             var coordinates = new int[][]
             {

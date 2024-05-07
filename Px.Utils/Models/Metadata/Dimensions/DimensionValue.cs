@@ -22,13 +22,13 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// <summary>
         /// Additional properties of the dimension value, excluding the required properties.
         /// </summary>
-        public Dictionary<string, Property> AdditionalProperties { get; } = [];
+        public Dictionary<string, MetaProperty> AdditionalProperties { get; } = [];
 
         #region Interface implementations
 
         MultilanguageString IReadOnlyDimensionValue.Name => Name;
 
-        IReadOnlyDictionary<string, Property> IReadOnlyDimensionValue.AdditionalProperties => AdditionalProperties;
+        IReadOnlyDictionary<string, MetaProperty> IReadOnlyDimensionValue.AdditionalProperties => AdditionalProperties;
 
         #endregion
     }

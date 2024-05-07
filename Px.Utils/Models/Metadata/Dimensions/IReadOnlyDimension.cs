@@ -22,7 +22,7 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// <summary>
         /// Properties of the dimension, excluding the required properties.
         /// </summary>
-        IReadOnlyDictionary<string, Property> AdditionalProperties { get; }
+        IReadOnlyDictionary<string, MetaProperty> AdditionalProperties { get; }
 
         /// <summary>
         /// Ordered list of dimension values that define the structure of the dimension.

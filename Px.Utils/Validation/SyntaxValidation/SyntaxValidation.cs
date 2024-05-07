@@ -14,13 +14,13 @@ namespace PxUtils.Validation.SyntaxValidation
         /// Collection of custom validation functions to be used during validation.
         /// </summary>
         public class CustomValidationFunctions(
-            List<EntryValidationFunctionDelegate> stringValidationFunctions,
-            List<KeyValuePairValidationFunctionDelegate> keyValueValidationFunctions,
-            List<StructuredValidationFunctionDelegate> structuredValidationFunctions)
+            List<EntryValidationFunction> stringValidationFunctions,
+            List<KeyValuePairValidationFunction> keyValueValidationFunctions,
+            List<StructuredValidationFunction> structuredValidationFunctions)
         {
-            public List<EntryValidationFunctionDelegate> CustomStringValidationFunctions { get; } = stringValidationFunctions;
-            public List<KeyValuePairValidationFunctionDelegate> CustomKeyValueValidationFunctions { get; } = keyValueValidationFunctions;
-            public List<StructuredValidationFunctionDelegate> CustomStructuredValidationFunctions { get; } = structuredValidationFunctions;
+            public List<EntryValidationFunction> CustomStringValidationFunctions { get; } = stringValidationFunctions;
+            public List<KeyValuePairValidationFunction> CustomKeyValueValidationFunctions { get; } = keyValueValidationFunctions;
+            public List<StructuredValidationFunction> CustomStructuredValidationFunctions { get; } = structuredValidationFunctions;
         }
 
         private const int DEFAULT_BUFFER_SIZE = 4096;
@@ -31,10 +31,13 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="stream">The stream of the PX file to be validated.</param>
         /// <param name="encoding">The encoding format to use for the PX file reading</param>
         /// <param name="filename">The name of the file to be validated.</param>
-        /// <param name="syntaxConf">An optional <see cref="PxFileSyntaxConf"/> parameter that specifies the syntax configuration for the PX file. If not provided, the default syntax configuration is used.</param>
+        /// <param name="syntaxConf">An optional <see cref="PxFileSyntaxConf"/> parameter that specifies the syntax configuration for the PX file. 
+        /// If not provided, the default syntax configuration is used.</param>
         /// <param name="bufferSize">An optional parameter that specifies the buffer size for reading the file. If not provided, a default buffer size of 4096 is used.</param>
-        /// <param name="customValidationFunctions">An optional <see cref="CustomValidationFunctions"/> parameter that specifies custom validation functions to be used during validation. If not provided, the default validation functions are used.</param>
-        /// <returns>A <see cref="SyntaxValidationResult"/> entry which contains a list of <see cref="ValidationStructuredEntry"/> entries and a list of <see cref="ValidationFeedbackItem"/> entries accumulated during the validation.</returns>
+        /// <param name="customValidationFunctions">An optional <see cref="CustomValidationFunctions"/> parameter that specifies custom validation functions to be used during validation. 
+        /// If not provided, the default validation functions are used.</param>
+        /// <returns>A <see cref="SyntaxValidationResult"/> entry which contains a list of <see cref="ValidationStructuredEntry"/> entries 
+        /// and a list of <see cref="ValidationFeedbackItem"/> entries accumulated during the validation.</returns>
         public static SyntaxValidationResult ValidatePxFileMetadataSyntax(
             Stream stream,
             Encoding encoding,
@@ -44,9 +47,9 @@ namespace PxUtils.Validation.SyntaxValidation
             CustomValidationFunctions? customValidationFunctions = null)
         {
             SyntaxValidationFunctions validationFunctions = new();
-            IEnumerable<EntryValidationFunctionDelegate> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
-            IEnumerable<KeyValuePairValidationFunctionDelegate> keyValueValidationFunctions = validationFunctions.DefaultKeyValueValidationFunctions;
-            IEnumerable<StructuredValidationFunctionDelegate> structuredValidationFunctions = validationFunctions.DefaultStructuredValidationFunctions;
+            IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
+            IEnumerable<KeyValuePairValidationFunction> keyValueValidationFunctions = validationFunctions.DefaultKeyValueValidationFunctions;
+            IEnumerable<StructuredValidationFunction> structuredValidationFunctions = validationFunctions.DefaultStructuredValidationFunctions;
 
             if (customValidationFunctions is not null)
             {
@@ -74,11 +77,14 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <param name="stream">The stream of the PX file to be validated.</param>
         /// <param name="encoding">The encoding format to use for the PX file reading</param>
         /// <param name="filename">The name of the file to be validated.</param>
-        /// <param name="syntaxConf">An optional <see cref="PxFileSyntaxConf"/> parameter that specifies the syntax configuration for the PX file. If not provided, the default syntax configuration is used.</param>
+        /// <param name="syntaxConf">An optional <see cref="PxFileSyntaxConf"/> parameter that specifies the syntax configuration for the PX file. 
+        /// If not provided, the default syntax configuration is used.</param>
         /// <param name="bufferSize">An optional parameter that specifies the buffer size for reading the file. If not provided, a default buffer size of 4096 is used.</param>
-        /// <param name="customValidationFunctions">An optional <see cref="CustomValidationFunctions"/> parameter that specifies custom validation functions to be used during validation. If not provided, the default validation functions are used.</param>
+        /// <param name="customValidationFunctions">An optional <see cref="CustomValidationFunctions"/> parameter that specifies custom validation functions to be used during validation. 
+        /// If not provided, the default validation functions are used.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> parameter that can be used to cancel the operation.</param>
-        /// <returns>A task that contains a <see cref="SyntaxValidationResult"/> entry, which contains the structured validation entries and a list of <see cref="ValidationStructuredEntry"/> entries accumulated during the validation.</returns>
+        /// <returns>A task that contains a <see cref="SyntaxValidationResult"/> entry, which contains the structured validation entries 
+        /// and a list of <see cref="ValidationStructuredEntry"/> entries accumulated during the validation.</returns>
         public static async Task<SyntaxValidationResult> ValidatePxFileMetadataSyntaxAsync(
             Stream stream,
             Encoding encoding,
@@ -89,9 +95,9 @@ namespace PxUtils.Validation.SyntaxValidation
             CancellationToken cancellationToken = default)
         {
             SyntaxValidationFunctions validationFunctions = new();
-            IEnumerable<EntryValidationFunctionDelegate> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
-            IEnumerable<KeyValuePairValidationFunctionDelegate> keyValueValidationFunctions = validationFunctions.DefaultKeyValueValidationFunctions;
-            IEnumerable<StructuredValidationFunctionDelegate> structuredValidationFunctions = validationFunctions.DefaultStructuredValidationFunctions;
+            IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
+            IEnumerable<KeyValuePairValidationFunction> keyValueValidationFunctions = validationFunctions.DefaultKeyValueValidationFunctions;
+            IEnumerable<StructuredValidationFunction> structuredValidationFunctions = validationFunctions.DefaultStructuredValidationFunctions;
 
             if (customValidationFunctions is not null)
             {
@@ -112,12 +118,12 @@ namespace PxUtils.Validation.SyntaxValidation
             return new([.. validationFeedback], structuredEntries);
         }
 
-        private static List<ValidationFeedbackItem> ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunctionDelegate> validationFunctions, PxFileSyntaxConf syntaxConf)
+        private static List<ValidationFeedbackItem> ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunction> validationFunctions, PxFileSyntaxConf syntaxConf)
         {
             List<ValidationFeedbackItem> validationFeedback = [];
             foreach (ValidationEntry entry in entries)
             {
-                foreach (EntryValidationFunctionDelegate function in validationFunctions)
+                foreach (EntryValidationFunction function in validationFunctions)
                 {
                     ValidationFeedbackItem? feedback = function(entry, syntaxConf);
                     if (feedback is not null)
@@ -129,12 +135,15 @@ namespace PxUtils.Validation.SyntaxValidation
             return validationFeedback;
         }
 
-        private static List<ValidationFeedbackItem> ValidateKeyValuePairs(IEnumerable<ValidationKeyValuePair> kvpObjects, IEnumerable<KeyValuePairValidationFunctionDelegate> validationFunctions, PxFileSyntaxConf syntaxConf)
+        private static List<ValidationFeedbackItem> ValidateKeyValuePairs(
+            IEnumerable<ValidationKeyValuePair> kvpObjects,
+            IEnumerable<KeyValuePairValidationFunction> validationFunctions,
+            PxFileSyntaxConf syntaxConf)
         {
             List<ValidationFeedbackItem> validationFeedback = [];
             foreach (ValidationKeyValuePair kvpObject in kvpObjects)
             {
-                foreach (KeyValuePairValidationFunctionDelegate function in validationFunctions)
+                foreach (KeyValuePairValidationFunction function in validationFunctions)
                 {
                     ValidationFeedbackItem? feedback = function(kvpObject, syntaxConf);
                     if (feedback is not null)
@@ -146,12 +155,15 @@ namespace PxUtils.Validation.SyntaxValidation
             return validationFeedback;
         }
 
-        private static List<ValidationFeedbackItem> ValidateStructs(IEnumerable<ValidationStructuredEntry> structuredEntries, IEnumerable<StructuredValidationFunctionDelegate> validationFunctions, PxFileSyntaxConf syntaxConf)
+        private static List<ValidationFeedbackItem> ValidateStructs(
+            IEnumerable<ValidationStructuredEntry> structuredEntries, 
+            IEnumerable<StructuredValidationFunction> validationFunctions,
+            PxFileSyntaxConf syntaxConf)
         {
             List<ValidationFeedbackItem> validationFeedback = [];
             foreach (ValidationStructuredEntry structuredEntry in structuredEntries)
             {
-                foreach (StructuredValidationFunctionDelegate function in validationFunctions)
+                foreach (StructuredValidationFunction function in validationFunctions)
                 {
                     ValidationFeedbackItem? feedback = function(structuredEntry, syntaxConf);
                     if (feedback is not null)
@@ -242,7 +254,13 @@ namespace PxUtils.Validation.SyntaxValidation
             return entryLineChangeIndexes;
         }
 
-        private static async Task<List<ValidationEntry>> BuildValidationEntriesAsync(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize, CancellationToken cancellationToken)
+        private static async Task<List<ValidationEntry>> BuildValidationEntriesAsync(
+            Stream stream, 
+            Encoding encoding,
+            PxFileSyntaxConf syntaxConf,
+            string filename,
+            int bufferSize,
+            CancellationToken cancellationToken)
         {
             bool isProcessingString = false;
             int characterIndex = 0;
@@ -292,7 +310,7 @@ namespace PxUtils.Validation.SyntaxValidation
             {
                 string stringEntry = entryBuilder.ToString();
                 // When DATA keyword is reached, metadata parsing is complete
-                return SyntaxValidationUtilityMethods.CleanString(stringEntry, syntaxConf).Equals(syntaxConf.Tokens.KeyWords.Data);
+                return SyntaxValidationUtilityMethods.CleanString(stringEntry, syntaxConf).Equals(syntaxConf.Tokens.KeyWords.Data, StringComparison.Ordinal);
             }
             return false;
         }
@@ -313,9 +331,18 @@ namespace PxUtils.Validation.SyntaxValidation
 
         private static ValidationStructuredEntryKey ParseStructuredValidationEntryKey(string input, PxFileSyntaxConf syntaxConf)
         {
-            ExtractSectionResult languageResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(input, syntaxConf.Symbols.Key.LangParamStart, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.LangParamEnd);
-            string? language = languageResult.Sections.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(languageResult.Sections[0], syntaxConf).Trim(syntaxConf.Symbols.Key.StringDelimeter) : null;
-            ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageResult.Remainder, syntaxConf.Symbols.Key.SpecifierParamStart, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.SpecifierParamEnd);
+            ExtractSectionResult languageResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(
+                input, 
+                syntaxConf.Symbols.Key.LangParamStart, 
+                syntaxConf.Symbols.Key.StringDelimeter,
+                syntaxConf.Symbols.Key.LangParamEnd);
+            string? language = languageResult.Sections.Length > 0 ? 
+                SyntaxValidationUtilityMethods.CleanString(languageResult.Sections[0], syntaxConf).Trim(syntaxConf.Symbols.Key.StringDelimeter) :
+                null;
+            ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageResult.Remainder,
+                syntaxConf.Symbols.Key.SpecifierParamStart, 
+                syntaxConf.Symbols.Key.StringDelimeter, 
+                syntaxConf.Symbols.Key.SpecifierParamEnd);
             string[] specifiers = specifierResult.Sections.Length > 0
                 ? SyntaxValidationUtilityMethods.ExtractSectionFromString(
                     specifierResult.Sections[0], 
@@ -323,8 +350,12 @@ namespace PxUtils.Validation.SyntaxValidation
                     syntaxConf.Symbols.Key.StringDelimeter)
                 .Sections 
                 : [];
-            string? firstSpecifier = specifiers.Length > 0 ? SyntaxValidationUtilityMethods.CleanString(specifiers[0], syntaxConf).Trim(syntaxConf.Symbols.Key.StringDelimeter) : null;
-            string? secondSpecifier = specifiers.Length > 1 ? SyntaxValidationUtilityMethods.CleanString(specifiers[1], syntaxConf).Trim(syntaxConf.Symbols.Key.StringDelimeter) : null;
+            string? firstSpecifier = specifiers.Length > 0 ?
+                SyntaxValidationUtilityMethods.CleanString(specifiers[0], syntaxConf).Trim(syntaxConf.Symbols.Key.StringDelimeter) : 
+                null;
+            string? secondSpecifier = specifiers.Length > 1 ?
+                SyntaxValidationUtilityMethods.CleanString(specifiers[1], syntaxConf).Trim(syntaxConf.Symbols.Key.StringDelimeter) :
+                null;
             string keyword = SyntaxValidationUtilityMethods.CleanString(specifierResult.Remainder, syntaxConf);
 
             return new(keyword, language, firstSpecifier, secondSpecifier);

@@ -6,16 +6,19 @@ namespace PxUtils.Models.Metadata.ExtensionMethods
     public static class PropertyExtensions
     {
         /// <summary>
-        /// Extension method that returns the value of a <see cref="Property"/> object as a list of <see cref="MultilanguageString"/> objects, using the provided list separator and string delimiter.
-        /// This method checks if the input <see cref="Property"/> can get a multilanguage value. If it can, it parses each language string into a list of strings and constructs a list of <see cref="MultilanguageString"/> objects.
-        /// If the input <see cref="Property"/> cannot get a multilanguage value, it parses the string value of the <see cref="Property"/> into a list of strings and constructs a list of <see cref="MultilanguageString"/> objects with the backup language.
+        /// Extension method that returns the value of a <see cref="MetaProperty"/> object as a list of <see cref="MultilanguageString"/> objects,
+        /// using the provided list separator and string delimiter.
+        /// This method checks if the input <see cref="MetaProperty"/> can get a multilanguage value.
+        /// If it can, it parses each language string into a list of strings and constructs a list of <see cref="MultilanguageString"/> objects.
+        /// If the input <see cref="MetaProperty"/> cannot get a multilanguage value, it parses the string value of the <see cref="MetaProperty"/> into a list of strings 
+        /// and constructs a list of <see cref="MultilanguageString"/> objects with the backup language.
         /// </summary>
-        /// <param name="input">The <see cref="Property"/> object to read the value from.</param>
-        /// <param name="backupLang">The backup language to use if the <see cref="Property"/> cannot get a multilanguage value.</param>
+        /// <param name="input">The <see cref="MetaProperty"/> object to read the value from.</param>
+        /// <param name="backupLang">The backup language to use if the <see cref="MetaProperty"/> cannot get a multilanguage value.</param>
         /// <param name="listSeparator">The character used to separate items in the list.</param>
         /// <param name="stringDelimeter">The character used to delimit strings in the list.</param>
-        /// <returns>A list of <see cref="MultilanguageString"/> objects parsed from the input <see cref="Property"/>.</returns>
-        public static List<MultilanguageString> ValueAsListOfMultilanguageStrings(this Property input, string backupLang, char listSeparator, char stringDelimeter)
+        /// <returns>A list of <see cref="MultilanguageString"/> objects parsed from the input <see cref="MetaProperty"/>.</returns>
+        public static List<MultilanguageString> ValueAsListOfMultilanguageStrings(this MetaProperty input, string backupLang, char listSeparator, char stringDelimeter)
         {
             if (input.CanGetMultilanguageValue)
             {
@@ -43,14 +46,14 @@ namespace PxUtils.Models.Metadata.ExtensionMethods
         }
 
         /// <summary>
-        /// Extension method that returns the value of a <see cref="Property"/> object as a list of strings, using the provided list separator and string delimiter.
+        /// Extension method that returns the value of a <see cref="MetaProperty"/> object as a list of strings, using the provided list separator and string delimiter.
         /// </summary>
-        /// <param name="input">The <see cref="Property"/> object to read the value from.</param>
+        /// <param name="input">The <see cref="MetaProperty"/> object to read the value from.</param>
         /// <param name="listSeparator">The character used to separate items in the list.</param>
         /// <param name="stringDelimeter">The character used to delimit strings in the list.</param>
-        /// <returns>A list of strings parsed from the input <see cref="Property"/>.</returns>
-        /// <exception cref="ArgumentException">Thrown when the value of the <see cref="Property"/> cannot be presented as a list of strings.</exception>
-        public static List<string> ValueAsListOfStrings(this Property input, char listSeparator, char stringDelimeter, string? forceLanguage = null)
+        /// <returns>A list of strings parsed from the input <see cref="MetaProperty"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown when the value of the <see cref="MetaProperty"/> cannot be presented as a list of strings.</exception>
+        public static List<string> ValueAsListOfStrings(this MetaProperty input, char listSeparator, char stringDelimeter, string? forceLanguage = null)
         {
             if(input.CanGetStringValue)
             {
@@ -69,7 +72,7 @@ namespace PxUtils.Models.Metadata.ExtensionMethods
             }
         }
 
-        public static MultilanguageString ValueAsMultilanguageString(this Property input, char stringDelimeter, string backupLang)
+        public static MultilanguageString ValueAsMultilanguageString(this MetaProperty input, char stringDelimeter, string backupLang)
         {
             if (input.CanGetMultilanguageValue)
             {
@@ -82,13 +85,13 @@ namespace PxUtils.Models.Metadata.ExtensionMethods
         }
 
         /// <summary>
-        /// Extension method that returns the value of a <see cref="Property"/> object as a string, using the provided string delimiter.
+        /// Extension method that returns the value of a <see cref="MetaProperty"/> object as a string, using the provided string delimiter.
         /// </summary>
-        /// <param name="input">The <see cref="Property"/> object to read the value from.</param>
+        /// <param name="input">The <see cref="MetaProperty"/> object to read the value from.</param>
         /// <param name="stringDelimeter">The character used to delimit strings in the list.</param>
-        /// <returns>A string parsed from the input <see cref="Property"/>.</returns>
-        /// <exception cref="ArgumentException">Thrown when the value of the <see cref="Property"/> cannot be presented as a string.</exception>
-        public static string ValueAsString(this Property input, char stringDelimeter)
+        /// <returns>A string parsed from the input <see cref="MetaProperty"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown when the value of the <see cref="MetaProperty"/> cannot be presented as a string.</exception>
+        public static string ValueAsString(this MetaProperty input, char stringDelimeter)
         {
             if(input.CanGetStringValue)
             {
@@ -102,14 +105,14 @@ namespace PxUtils.Models.Metadata.ExtensionMethods
 
 
         /// <summary>
-        /// Extension method that returns the value of a <see cref="Property"/> object as a <see cref="DateTime"/> object, using the provided string delimiter and format string.
+        /// Extension method that returns the value of a <see cref="MetaProperty"/> object as a <see cref="DateTime"/> object, using the provided string delimiter and format string.
         /// </summary>
         /// <param name="input">Input property</param>
         /// <param name="stringDelimeter">The datetimes are surrounded by this character in the px file</param>
         /// <param name="formatString">The format string to use when parsing the datetime</param></param>
-        /// <returns>A <see cref="DateTime"/> object parsed from the input <see cref="Property"/>.</returns>
-        /// <exception cref="ArgumentException">Thrown when the value of the <see cref="Property"/> cannot be presented as a <see cref="DateTime"/>.</exception>
-        public static DateTime ValueAsDateTime(this Property input, char stringDelimeter, string formatString)
+        /// <returns>A <see cref="DateTime"/> object parsed from the input <see cref="MetaProperty"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown when the value of the <see cref="MetaProperty"/> cannot be presented as a <see cref="DateTime"/>.</exception>
+        public static DateTime ValueAsDateTime(this MetaProperty input, char stringDelimeter, string formatString)
         {
             if (input.CanGetStringValue)
             {

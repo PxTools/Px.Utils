@@ -7,6 +7,11 @@ namespace PxUtils.PxFile.Data
 {
     public static class DataValueParsers
     {
+        const int decimalPlaceShift = 10;
+        const int stringDelimiterOffset = 2;
+        const int missingDataEntryMinLength = 3;
+        const int missingDataEntryMaxLength = 8;
+
         /// <summary>
         /// This method uses a fast, but potentially unsafe, parser to convert the characters into a <see cref="DoubleDataValue"/>.
         /// It is important that the input has been validated before using this method since the method does not perform any validation.
@@ -23,7 +28,7 @@ namespace PxUtils.PxFile.Data
             if (buffer[0] == '"')
             {
                 if (buffer[1] == '-') return new DoubleDataValue(0, DataValueType.Nill);
-                return new DoubleDataValue(0, (DataValueType)(len - 2));
+                return new DoubleDataValue(0, (DataValueType)(len - stringDelimiterOffset));
             }
             else
             {
@@ -48,7 +53,7 @@ namespace PxUtils.PxFile.Data
             if (buffer[0] == '"')
             {
                 if (buffer[1] == '-') return new DecimalDataValue(0, DataValueType.Nill);
-                return new DecimalDataValue(0, (DataValueType)(len - 2));
+                return new DecimalDataValue(0, (DataValueType)(len - stringDelimiterOffset));
             }
             else
             {
@@ -82,7 +87,7 @@ namespace PxUtils.PxFile.Data
             if (buffer[0] == '"')
             {
                 if (buffer[1] == '-') return missingValueEncodings[0];
-                return missingValueEncodings[len - 2];
+                return missingValueEncodings[len - stringDelimiterOffset];
             }
             else
             {
@@ -106,7 +111,7 @@ namespace PxUtils.PxFile.Data
             }
             else
             {
-                if (buffer[0] != '"' || buffer[len - 1] != '"' || len < 3 || len > 8)
+                if (buffer[0] != '"' || buffer[len - 1] != '"' || len < missingDataEntryMinLength || len > missingDataEntryMaxLength)
                 {
                     throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
                 }
@@ -114,7 +119,7 @@ namespace PxUtils.PxFile.Data
                 if (buffer[1] == '-') return new DoubleDataValue(0.0, DataValueType.Nill);
 
                 int dots = 0;
-                while (dots < len - 2)
+                while (dots < len - stringDelimiterOffset)
                 {
                     if (buffer[dots + 1] == '.') dots++;
                     else throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
@@ -140,7 +145,7 @@ namespace PxUtils.PxFile.Data
             }
             else
             {
-                if (buffer[0] != '"' || buffer[len - 1] != '"' || len < 3 || len > 8)
+                if (buffer[0] != '"' || buffer[len - 1] != '"' || len < missingDataEntryMinLength || len > missingDataEntryMaxLength)
                 {
                     throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
                 }
@@ -148,7 +153,7 @@ namespace PxUtils.PxFile.Data
                 if (buffer[1] == '-') return new DecimalDataValue(decimal.Zero, DataValueType.Nill);
 
                 int dots = 0;
-                while (dots < len - 2)
+                while (dots < len - stringDelimiterOffset)
                 {
                     if (buffer[dots + 1] == '.') dots++;
                     else throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
@@ -186,7 +191,7 @@ namespace PxUtils.PxFile.Data
             }
             else
             {
-                if (buffer[0] != '"' || buffer[len - 1] != '"' || len < 3 || len > 8)
+                if (buffer[0] != '"' || buffer[len - 1] != '"' || len < missingDataEntryMinLength || len > missingDataEntryMaxLength)
                 {
                     throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
                 }
@@ -194,7 +199,7 @@ namespace PxUtils.PxFile.Data
                 if (buffer[1] == '-') return missingValueEncodings[0];
 
                 int dots = 0;
-                while (dots < len - 2)
+                while (dots < len - stringDelimiterOffset)
                 {
                     if (buffer[dots + 1] == '.') dots++;
                     else throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
@@ -232,7 +237,7 @@ namespace PxUtils.PxFile.Data
                 char c = buffer[k];
                 if (c >= '0')
                 {
-                    n = (n * 10) + (c - '0');
+                    n = (n * decimalPlaceShift) + (c - '0');
                 }
                 else if (c == '.')
                 {
@@ -271,7 +276,7 @@ namespace PxUtils.PxFile.Data
                 char c = buffer[k];
                 if (c >= '0')
                 {
-                    n = (n * 10) + (c - '0');
+                    n = (n * decimalPlaceShift) + (c - '0');
                 }
                 else if (c == '.')
                 {

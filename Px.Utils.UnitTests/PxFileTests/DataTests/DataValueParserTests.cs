@@ -15,7 +15,7 @@ namespace PxFileTests.DataTests
         */
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_ValidInteger_ReturnsDoubleDataValue()
+        public void FastParseDoubleDataValueDangerousValidIntegerReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -30,7 +30,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_ValidZeroInteger_ReturnsDoubleDataValue()
+        public void FastParseDoubleDataValueDangerousValidZeroIntegerReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['0'];
@@ -45,7 +45,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_ValidNegativeInteger_ReturnsDoubleDataValue()
+        public void FastParseDoubleDataValueDangerousValidNegativeIntegerReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['-', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -60,7 +60,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_NillSymbol_ReturnsNillValueType()
+        public void FastParseDoubleDataValueDangerousNillSymbolReturnsNillValueType()
         {
             // Arrange
             char[] buffer = ['"', '-', '"'];
@@ -75,7 +75,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_ValidWithDecimalPart_ReturnsDoubleDataValue()
+        public void FastParseDoubleDataValueDangerousValidWithDecimalPartReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '.', '5', '6', '7', '8', '9'];
@@ -90,7 +90,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_ValidZeroWithDecimalPart_ReturnsDoubleDataValue()
+        public void FastParseDoubleDataValueDangerousValidZeroWithDecimalPartReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['0', '.', '0', '0'];
@@ -105,7 +105,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_ValidNegativeWithDecimalPart_ReturnsDoubleDataValue()
+        public void FastParseDoubleDataValueDangerousValidNegativeWithDecimalPartReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['-', '1', '2', '3', '4', '.', '5', '6', '7', '8', '9'];
@@ -120,7 +120,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_ValidWithDecimalPartAndTrailingZeroes_ReturnsDoubleDataValue()
+        public void FastParseDoubleDataValueDangerousValidWithDecimalPartAndTrailingZeroesReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '.', '5', '6', '0', '0', '0'];
@@ -135,7 +135,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_MissingSymbol_ReturnsMissingValueType()
+        public void FastParseDoubleDataValueDangerousMissingSymbolReturnsMissingValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '"'];
@@ -149,7 +149,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_CanNotRepresentSymbol_ReturnsCanNotRepresentValueType()
+        public void FastParseDoubleDataValueDangerousCanNotRepresentSymbolReturnsCanNotRepresentValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '"'];
@@ -163,7 +163,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_ConfidentialSymbol_ReturnsConfidentialValueType()
+        public void FastParseDoubleDataValueDangerousConfidentialSymbolReturnsConfidentialValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '"'];
@@ -177,7 +177,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_NotAcquiredSymbol_ReturnsNotAcquiredValueType()
+        public void FastParseDoubleDataValueDangerousNotAcquiredSymbolReturnsNotAcquiredValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '"'];
@@ -191,7 +191,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_NotAskedSymbol_ReturnsNotAskedValueType()
+        public void FastParseDoubleDataValueDangerousNotAskedSymbolReturnsNotAskedValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '"'];
@@ -205,7 +205,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDoubleDataValueDangerous_EmptySymbol_ReturnsEmptyValueType()
+        public void FastParseDoubleDataValueDangerousEmptySymbolReturnsEmptyValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '.', '"'];
@@ -228,7 +228,7 @@ namespace PxFileTests.DataTests
         */
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_ValidInteger_ReturnsDecimalDataValue()
+        public void FastParseDecimalDataValueDangerousValidIntegerReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -243,7 +243,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_ValidZeroInteger_ReturnsDecimalDataValue()
+        public void FastParseDecimalDataValueDangerousValidZeroIntegerReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['0'];
@@ -258,7 +258,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_ValidNegativeInteger_ReturnsDecimalDataValue()
+        public void FastParseDecimalDataValueDangerousValidNegativeIntegerReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['-', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -273,7 +273,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_NillSymbol_ReturnsNillValueType()
+        public void FastParseDecimalDataValueDangerousNillSymbolReturnsNillValueType()
         {
             // Arrange
             char[] buffer = ['"', '-', '"'];
@@ -288,7 +288,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_ValidWithDecimalPart_ReturnsDecimalDataValue()
+        public void FastParseDecimalDataValueDangerousValidWithDecimalPartReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '.', '5', '6', '7', '8', '9'];
@@ -303,7 +303,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_ValidZeroWithDecimalPart_ReturnsDecimalDataValue()
+        public void FastParseDecimalDataValueDangerousValidZeroWithDecimalPartReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['0', '.', '0', '0'];
@@ -318,7 +318,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_ValidNegativeWithDecimalPart_ReturnsDecimalDataValue()
+        public void FastParseDecimalDataValueDangerousValidNegativeWithDecimalPartReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['-', '1', '2', '3', '4', '.', '5', '6', '7', '8', '9'];
@@ -333,7 +333,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_ValidWithDecimalPartAndTrailingZeroes_ReturnsDecimalDataValue()
+        public void FastParseDecimalDataValueDangerousValidWithDecimalPartAndTrailingZeroesReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '.', '5', '6', '0', '0', '0'];
@@ -348,7 +348,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_MissingSymbol_ReturnsMissingValueType()
+        public void FastParseDecimalDataValueDangerousMissingSymbolReturnsMissingValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '"'];
@@ -362,7 +362,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_CanNotRepresentSymbol_ReturnsCanNotRepresentValueType()
+        public void FastParseDecimalDataValueDangerousCanNotRepresentSymbolReturnsCanNotRepresentValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '"'];
@@ -376,7 +376,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_ConfidentialSymbol_ReturnsConfidentialValueType()
+        public void FastParseDecimalDataValueDangerousConfidentialSymbolReturnsConfidentialValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '"'];
@@ -390,7 +390,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_NotAcquiredSymbol_ReturnsNotAcquiredValueType()
+        public void FastParseDecimalDataValueDangerousNotAcquiredSymbolReturnsNotAcquiredValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '"'];
@@ -404,7 +404,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_NotAskedSymbol_ReturnsNotAskedValueType()
+        public void FastParseDecimalDataValueDangerousNotAskedSymbolReturnsNotAskedValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '"'];
@@ -418,7 +418,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseDecimalDataValueDangerous_EmptySymbol_ReturnsEmptyValueType()
+        public void FastParseDecimalDataValueDangerousEmptySymbolReturnsEmptyValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '.', '"'];
@@ -443,7 +443,7 @@ namespace PxFileTests.DataTests
         private readonly double[] missingValueEncodings = [ 0, 1, 2, 3, 4, 5, 6 ];
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_ValidInteger_ReturnsDouble()
+        public void FastParseUnsafeDoubleDangerousValidIntegerReturnsDouble()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -457,7 +457,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_ValidZeroInteger_ReturnsDouble()
+        public void FastParseUnsafeDoubleDangerousValidZeroIntegerReturnsDouble()
         {
             // Arrange
             char[] buffer = ['0'];
@@ -471,7 +471,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_ValidNegativeInteger_ReturnsDouble()
+        public void FastParseUnsafeDoubleDangerousValidNegativeIntegerReturnsDouble()
         {
             // Arrange
             char[] buffer = ['-', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -485,7 +485,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_NillSymbol_ReturnsNillValue()
+        public void FastParseUnsafeDoubleDangerousNillSymbolReturnsNillValue()
         {
             // Arrange
             char[] buffer = ['"', '-', '"'];
@@ -499,7 +499,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_ValidWithDecimalPart_ReturnsDouble()
+        public void FastParseUnsafeDoubleDangerousValidWithDecimalPartReturnsDouble()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '.', '5', '6', '7', '8', '9'];
@@ -513,7 +513,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_ValidZeroWithDecimalPart_ReturnsDouble()
+        public void FastParseUnsafeDoubleDangerousValidZeroWithDecimalPartReturnsDouble()
         {
             // Arrange
             char[] buffer = ['0', '.', '0', '0'];
@@ -527,7 +527,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_ValidNegativeWithDecimalPart_ReturnsDouble()
+        public void FastParseUnsafeDoubleDangerousValidNegativeWithDecimalPartReturnsDouble()
         {
             // Arrange
             char[] buffer = ['-', '1', '2', '3', '4', '.', '5', '6', '7', '8', '9'];
@@ -541,7 +541,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_ValidWithDecimalPartAndTrailingZeroes_ReturnsDouble()
+        public void FastParseUnsafeDoubleDangerousValidWithDecimalPartAndTrailingZeroesReturnsDouble()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '.', '5', '6', '0', '0', '0'];
@@ -555,7 +555,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_MissingSymbol_ReturnsMissingValue()
+        public void FastParseUnsafeDoubleDangerousMissingSymbolReturnsMissingValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '"'];
@@ -569,7 +569,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_CanNotRepresentSymbol_ReturnsCanNotRepresentValue()
+        public void FastParseUnsafeDoubleDangerousCanNotRepresentSymbolReturnsCanNotRepresentValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '"'];
@@ -583,7 +583,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_ConfidentialSymbol_ReturnsConfidentialValue()
+        public void FastParseUnsafeDoubleDangerousConfidentialSymbolReturnsConfidentialValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '"'];
@@ -597,7 +597,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_NotAcquiredSymbol_ReturnsNotAcquiredValue()
+        public void FastParseUnsafeDoubleDangerousNotAcquiredSymbolReturnsNotAcquiredValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '"'];
@@ -611,7 +611,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_NotAskedSymbol_ReturnsNotAskedValue()
+        public void FastParseUnsafeDoubleDangerousNotAskedSymbolReturnsNotAskedValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '"'];
@@ -625,7 +625,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void FastParseUnsafeDoubleDangerous_EmptySymbol_ReturnsEmptyValue()
+        public void FastParseUnsafeDoubleDangerousEmptySymbolReturnsEmptyValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '.', '"'];
@@ -643,7 +643,7 @@ namespace PxFileTests.DataTests
         #region ParseDoubleDataValue
 
         [TestMethod]
-        public void ParseDoubleDataValue_ValidInteger_ReturnsDoubleDataValue()
+        public void ParseDoubleDataValueValidIntegerReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -658,7 +658,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_ValidZeroInteger_ReturnsDoubleDataValue()
+        public void ParseDoubleDataValueValidZeroIntegerReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['0'];
@@ -673,7 +673,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_ValidNegativeInteger_ReturnsDoubleDataValue()
+        public void ParseDoubleDataValueValidNegativeIntegerReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['-', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -688,7 +688,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_NillSymbol_ReturnsNillValueType()
+        public void ParseDoubleDataValueNillSymbolReturnsNillValueType()
         {
             // Arrange
             char[] buffer = ['"', '-', '"'];
@@ -703,7 +703,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_ValidWithDecimalPart_ReturnsDoubleDataValue()
+        public void ParseDoubleDataValueValidWithDecimalPartReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '.', '5', '6', '7', '8', '9'];
@@ -718,7 +718,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_ValidZeroWithDecimalPart_ReturnsDoubleDataValue()
+        public void ParseDoubleDataValueValidZeroWithDecimalPartReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['0', '.', '0', '0'];
@@ -733,7 +733,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_ValidNegativeWithDecimalPart_ReturnsDoubleDataValue()
+        public void ParseDoubleDataValueValidNegativeWithDecimalPartReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['-', '1', '2', '3', '4', '.', '5', '6', '7', '8', '9'];
@@ -748,7 +748,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_ValidWithDecimalPartAndTrailingZeroes_ReturnsDoubleDataValue()
+        public void ParseDoubleDataValueValidWithDecimalPartAndTrailingZeroesReturnsDoubleDataValue()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '.', '5', '6', '0', '0', '0'];
@@ -763,7 +763,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_MissingSymbol_ReturnsMissingValueType()
+        public void ParseDoubleDataValueMissingSymbolReturnsMissingValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '"'];
@@ -777,7 +777,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_CanNotRepresentSymbol_ReturnsCanNotRepresentValueType()
+        public void ParseDoubleDataValueCanNotRepresentSymbolReturnsCanNotRepresentValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '"'];
@@ -791,7 +791,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_ConfidentialSymbol_ReturnsConfidentialValueType()
+        public void ParseDoubleDataValueConfidentialSymbolReturnsConfidentialValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '"'];
@@ -805,7 +805,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_NotAcquiredSymbol_ReturnsNotAcquiredValueType()
+        public void ParseDoubleDataValueNotAcquiredSymbolReturnsNotAcquiredValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '"'];
@@ -819,7 +819,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_NotAskedSymbol_ReturnsNotAskedValueType()
+        public void ParseDoubleDataValueNotAskedSymbolReturnsNotAskedValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '"'];
@@ -833,7 +833,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_EmptySymbol_ReturnsEmptyValueType()
+        public void ParseDoubleDataValueEmptySymbolReturnsEmptyValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '.', '"'];
@@ -847,7 +847,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_MissingCodeWithoutQuotes_Throws()
+        public void ParseDoubleDataValueMissingCodeWithoutQuotesThrows()
         {
             // Arrange
             char[] buffer = ['.', '.', '.', '.',];
@@ -858,7 +858,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_MissingCodeWithoutEndQuote_Throws()
+        public void ParseDoubleDataValueMissingCodeWithoutEndQuoteThrows()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.',];
@@ -869,7 +869,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_TwoNegativeSigns_Throws()
+        public void ParseDoubleDataValueTwoNegativeSignsThrows()
         {
             // Arrange
             char[] buffer = ['-', '-', '3', '2',];
@@ -880,7 +880,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_TwoDecimalSeparators_Throws()
+        public void ParseDoubleDataValueTwoDecimalSeparatorsThrows()
         {
             // Arrange
             char[] buffer = ['3', '.', '.', '2',];
@@ -891,7 +891,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDoubleDataValue_InvalidCharacters_Throws()
+        public void ParseDoubleDataValueInvalidCharactersThrows()
         {
             // Arrange
             char[] buffer = ['3', 'r', 'z', '2',];
@@ -906,7 +906,7 @@ namespace PxFileTests.DataTests
         #region ParseDecimalDataValue
 
         [TestMethod]
-        public void ParseDecimalDataValue_ValidInteger_ReturnsDecimalDataValue()
+        public void ParseDecimalDataValueValidIntegerReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -921,7 +921,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_ValidZeroInteger_ReturnsDecimalDataValue()
+        public void ParseDecimalDataValueValidZeroIntegerReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['0'];
@@ -936,7 +936,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_ValidNegativeInteger_ReturnsDecimalDataValue()
+        public void ParseDecimalDataValueValidNegativeIntegerReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['-', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -951,7 +951,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_NillSymbol_ReturnsNillValueType()
+        public void ParseDecimalDataValueNillSymbolReturnsNillValueType()
         {
             // Arrange
             char[] buffer = ['"', '-', '"'];
@@ -966,7 +966,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_ValidWithDecimalPart_ReturnsDecimalDataValue()
+        public void ParseDecimalDataValueValidWithDecimalPartReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '.', '5', '6', '7', '8', '9'];
@@ -981,7 +981,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_ValidZeroWithDecimalPart_ReturnsDecimalDataValue()
+        public void ParseDecimalDataValueValidZeroWithDecimalPartReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['0', '.', '0', '0'];
@@ -996,7 +996,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_ValidNegativeWithDecimalPart_ReturnsDecimalDataValue()
+        public void ParseDecimalDataValueValidNegativeWithDecimalPartReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['-', '1', '2', '3', '4', '.', '5', '6', '7', '8', '9'];
@@ -1011,7 +1011,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_ValidWithDecimalPartAndTrailingZeroes_ReturnsDecimalDataValue()
+        public void ParseDecimalDataValueValidWithDecimalPartAndTrailingZeroesReturnsDecimalDataValue()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '.', '5', '6', '0', '0', '0'];
@@ -1026,7 +1026,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_MissingSymbol_ReturnsMissingValueType()
+        public void ParseDecimalDataValueMissingSymbolReturnsMissingValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '"'];
@@ -1040,7 +1040,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_CanNotRepresentSymbol_ReturnsCanNotRepresentValueType()
+        public void ParseDecimalDataValueCanNotRepresentSymbolReturnsCanNotRepresentValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '"'];
@@ -1054,7 +1054,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_ConfidentialSymbol_ReturnsConfidentialValueType()
+        public void ParseDecimalDataValueConfidentialSymbolReturnsConfidentialValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '"'];
@@ -1068,7 +1068,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_NotAcquiredSymbol_ReturnsNotAcquiredValueType()
+        public void ParseDecimalDataValueNotAcquiredSymbolReturnsNotAcquiredValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '"'];
@@ -1082,7 +1082,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_NotAskedSymbol_ReturnsNotAskedValueType()
+        public void ParseDecimalDataValueNotAskedSymbolReturnsNotAskedValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '"'];
@@ -1096,7 +1096,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_EmptySymbol_ReturnsEmptyValueType()
+        public void ParseDecimalDataValueEmptySymbolReturnsEmptyValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '.', '"'];
@@ -1110,7 +1110,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_MissingCodeWithoutQuotes_Throws()
+        public void ParseDecimalDataValueMissingCodeWithoutQuotesThrows()
         {
             // Arrange
             char[] buffer = ['.', '.', '.', '.',];
@@ -1121,7 +1121,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_MissingCodeWithoutEndQuote_Throws()
+        public void ParseDecimalDataValueMissingCodeWithoutEndQuoteThrows()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.',];
@@ -1132,7 +1132,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_TwoNegativeSigns_Throws()
+        public void ParseDecimalDataValueTwoNegativeSignsThrows()
         {
             // Arrange
             char[] buffer = ['-', '-', '3', '2',];
@@ -1143,7 +1143,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_TwoDecimalSeparators_Throws()
+        public void ParseDecimalDataValueTwoDecimalSeparatorsThrows()
         {
             // Arrange
             char[] buffer = ['3', '.', '.', '2',];
@@ -1154,7 +1154,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValue_InvalidCharacters_Throws()
+        public void ParseDecimalDataValueInvalidCharactersThrows()
         {
             // Arrange
             char[] buffer = ['3', 'r', 'z', '2',];
@@ -1169,7 +1169,7 @@ namespace PxFileTests.DataTests
         #region ParseUnsafeDouble
         
         [TestMethod]
-        public void ParseUnsafeDouble_ValidInteger_ReturnsDouble()
+        public void ParseUnsafeDoubleValidIntegerReturnsDouble()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -1183,7 +1183,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_ValidZeroInteger_ReturnsDouble()
+        public void ParseUnsafeDoubleValidZeroIntegerReturnsDouble()
         {
             // Arrange
             char[] buffer = ['0'];
@@ -1197,7 +1197,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_ValidNegativeInteger_ReturnsDouble()
+        public void ParseUnsafeDoubleValidNegativeIntegerReturnsDouble()
         {
             // Arrange
             char[] buffer = ['-', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -1211,7 +1211,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_NillSymbol_ReturnsNillValue()
+        public void ParseUnsafeDoubleNillSymbolReturnsNillValue()
         {
             // Arrange
             char[] buffer = ['"', '-', '"'];
@@ -1225,7 +1225,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_ValidWithDecimalPart_ReturnsDouble()
+        public void ParseUnsafeDoubleValidWithDecimalPartReturnsDouble()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '.', '5', '6', '7', '8', '9'];
@@ -1239,7 +1239,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_ValidZeroWithDecimalPart_ReturnsDouble()
+        public void ParseUnsafeDoubleValidZeroWithDecimalPartReturnsDouble()
         {
             // Arrange
             char[] buffer = ['0', '.', '0', '0'];
@@ -1253,7 +1253,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_ValidNegativeWithDecimalPart_ReturnsDouble()
+        public void ParseUnsafeDoubleValidNegativeWithDecimalPartReturnsDouble()
         {
             // Arrange
             char[] buffer = ['-', '1', '2', '3', '4', '.', '5', '6', '7', '8', '9'];
@@ -1267,7 +1267,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_ValidWithDecimalPartAndTrailingZeroes_ReturnsDouble()
+        public void ParseUnsafeDoubleValidWithDecimalPartAndTrailingZeroesReturnsDouble()
         {
             // Arrange
             char[] buffer = ['1', '2', '3', '4', '.', '5', '6', '0', '0', '0'];
@@ -1281,7 +1281,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_MissingSymbol_ReturnsMissingValue()
+        public void ParseUnsafeDoubleMissingSymbolReturnsMissingValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '"'];
@@ -1295,7 +1295,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_CanNotRepresentSymbol_ReturnsCanNotRepresentValue()
+        public void ParseUnsafeDoubleCanNotRepresentSymbolReturnsCanNotRepresentValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '"'];
@@ -1309,7 +1309,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_ConfidentialSymbol_ReturnsConfidentialValue()
+        public void ParseUnsafeDoubleConfidentialSymbolReturnsConfidentialValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '"'];
@@ -1323,7 +1323,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_NotAcquiredSymbol_ReturnsNotAcquiredValue()
+        public void ParseUnsafeDoubleNotAcquiredSymbolReturnsNotAcquiredValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '"'];
@@ -1337,7 +1337,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_NotAskedSymbol_ReturnsNotAskedValue()
+        public void ParseUnsafeDoubleNotAskedSymbolReturnsNotAskedValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '"'];
@@ -1351,7 +1351,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_EmptySymbol_ReturnsEmptyValue()
+        public void ParseUnsafeDoubleEmptySymbolReturnsEmptyValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '.', '"'];
@@ -1365,7 +1365,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_MissingCodeWithoutQuotes_Throws()
+        public void ParseUnsafeDoubleMissingCodeWithoutQuotesThrows()
         {
             // Arrange
             char[] buffer = ['.', '.', '.', '.',];
@@ -1376,7 +1376,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_MissingCodeWithoutEndQuote_Throws()
+        public void ParseUnsafeDoubleMissingCodeWithoutEndQuoteThrows()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.',];
@@ -1387,7 +1387,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_TwoNegativeSigns_Throws()
+        public void ParseUnsafeDoubleTwoNegativeSignsThrows()
         {
             // Arrange
             char[] buffer = ['-', '-', '3', '2',];
@@ -1398,7 +1398,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_TwoDecimalSeparators_Throws()
+        public void ParseUnsafeDoubleTwoDecimalSeparatorsThrows()
         {
             // Arrange
             char[] buffer = ['3', '.', '.', '2',];
@@ -1409,7 +1409,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDouble_InvalidCharacters_Throws()
+        public void ParseUnsafeDoubleInvalidCharactersThrows()
         {
             // Arrange
             char[] buffer = ['3', 'r', 'z', '2',];

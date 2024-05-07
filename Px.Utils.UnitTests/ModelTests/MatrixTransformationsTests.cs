@@ -8,7 +8,7 @@ namespace Px.Utils.UnitTests.ModelTests
     public class MatrixTransformationsTests
     {
         [TestMethod]
-        public void MatrixMetadataTransformationTest_Subset()
+        public void MatrixMetadataTransformationTestSubset()
         {
             int[] dimensionSizes = [3, 3, 2];
             MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata(dimensionSizes);

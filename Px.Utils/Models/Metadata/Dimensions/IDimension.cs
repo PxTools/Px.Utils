@@ -12,7 +12,7 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// <summary>
         /// Editable collection of properties of the dimension, excluding the required properties.
         /// </summary>
-        new Dictionary<string, Property> AdditionalProperties { get; }
+        new Dictionary<string, MetaProperty> AdditionalProperties { get; }
 
         /// <summary>
         /// Ordered list of editable dimension values that define the structure of the dimension.

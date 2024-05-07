@@ -11,31 +11,33 @@ namespace Px.Utils.TestingApp.Commands
         /// <summary>
         /// Represents one result of a benchmark run. Contains iteration times and metrics such as min, max, mean, median and standard deviation calculated from the iteration times.
         /// </summary>
-        internal class BenchmarkResult
+        internal sealed class BenchmarkResult
         {
             internal readonly string Name;
             internal bool Error { get; }
             internal IReadOnlyList<double> IterationTimesMs { get; }
-            internal double MinTimeMs => Math.Round(IterationTimesMs.Min(), 2);
-            internal double MaxTimeMs => Math.Round(IterationTimesMs.Max(), 2);
-            internal double MeanTimeMs => Math.Round(IterationTimesMs.Average(), 2);
+            internal double MinTimeMs => Math.Round(IterationTimesMs.Min(), decimalPlaces);
+            internal double MaxTimeMs => Math.Round(IterationTimesMs.Max(), decimalPlaces);
+            internal double MeanTimeMs => Math.Round(IterationTimesMs.Average(), decimalPlaces);
             internal double MedianTimeMs
             {
                 get
                 {
                     List<double> sortedTimes = [.. IterationTimesMs.OrderBy(x => x)];
-                    return Math.Round(sortedTimes[sortedTimes.Count / 2], 2);
+                    return Math.Round(sortedTimes[sortedTimes.Count / decimalPlaces], decimalPlaces);
                 }
             }
-
+            
             internal double StandardDeviation
             {
                 get
                 {
                     double sumOfSquaresOfDifferences = IterationTimesMs.Select(val => (val - MeanTimeMs) * (val - MeanTimeMs)).Sum();
-                    return Math.Round(Math.Sqrt(sumOfSquaresOfDifferences / IterationTimesMs.Count), 2);
+                    return Math.Round(Math.Sqrt(sumOfSquaresOfDifferences / IterationTimesMs.Count), decimalPlaces);
                 }
             }
+
+            private const int decimalPlaces = 2;
 
             internal BenchmarkResult(string name, IReadOnlyList<double> iterationTimesMs)
             {
@@ -80,19 +82,21 @@ namespace Px.Utils.TestingApp.Commands
         protected List<string[]> ParameterFlags { get; } = [fileFlags, iterFlags];
 
         internal List<BenchmarkResult> Results { get; } = [];
-        private int processesCompleted = 0;
+        private int processesCompleted;
+        private const int minResultsLongestNameLength = 4;
+        private const int resultsTableWidth = 79;
 
         internal void PrintResults()
         {
             int longestNameLength = Results.Max(x => x.Name.Length);
-            if (longestNameLength < 4) longestNameLength = 4;
+            if (longestNameLength < minResultsLongestNameLength) longestNameLength = minResultsLongestNameLength;
             string format = "| {0,-" + longestNameLength + "} | {1,12} | {2,12} | {3,12} | {4,12} | {5,12} |";
 
             Console.WriteLine($"Benchmark results for {Iterations} iterations:");
-            Console.WriteLine(new string('-', longestNameLength + 79));
+            Console.WriteLine(new string('-', longestNameLength + resultsTableWidth));
             Console.WriteLine(format, "Name", "Min (ms)", "Max (ms)", "Mean (ms)", "Median (ms)", "Std. dev.");
 
-            Console.WriteLine(new string('-', longestNameLength + 79));
+            Console.WriteLine(new string('-', longestNameLength + resultsTableWidth));
             foreach (BenchmarkResult result in Results)
             {
                 if(result.Error)
@@ -169,7 +173,7 @@ namespace Px.Utils.TestingApp.Commands
             Console.WriteLine("Enter the path to the PX file to benchmark");
             string file = Console.ReadLine() ?? "";
 
-            while (!Path.Exists(file) || !Path.GetFileName(file).EndsWith(".px"))
+            while (!Path.Exists(file) || !Path.GetFileName(file).EndsWith(".px", StringComparison.Ordinal))
             {
                 Console.WriteLine("File provided is not valid, please enter a path to a valid px file");
                 file = Console.ReadLine() ?? "";
@@ -270,20 +274,21 @@ namespace Px.Utils.TestingApp.Commands
             processesCompleted += increment;
             if (processesCompleted > 1)
             {
+                Console.Write(new string(' ', Console.WindowWidth));
                 Console.SetCursorPosition(0, Console.CursorTop - 1);
-                Console.Write(new string(' ', Console.WindowWidth * 2)); // Clear the line
+                Console.Write(new string(' ', Console.WindowWidth));
                 Console.SetCursorPosition(0, Console.CursorTop - 1);
             }
-            float progress = (float)processesCompleted / totalProcesses;
+            double progress = (double)processesCompleted / totalProcesses;
 
             // Progress bar
-            int progressBarLength = 100;
+            const int progressBarLength = 100;
             int progressBlocks = (int)(progress * progressBarLength);
             Console.Write(new string('█', progressBlocks));
             Console.Write(new string('░', progressBarLength - progressBlocks));
             Console.WriteLine();
-
-            Console.Write($"Progress: {Math.Round(progress * 100f)}% - {processesCompleted} operations completed out of total {totalProcesses}");
+            const double percentageMultiplier = 100f;
+            Console.Write($"Progress: {Math.Round(progress * percentageMultiplier)}% - {processesCompleted} operations completed out of total {totalProcesses}");
 
             if (processesCompleted == totalProcesses)
             {

@@ -19,7 +19,7 @@ namespace Px.Utils.UnitTests.ModelTests
         {
             string code = $"var{ordinal}";
             MultilanguageString name = new("en", $"name_en_var{ordinal}");
-            Dictionary<string, Property> additionalProperties = [];
+            Dictionary<string, MetaProperty> additionalProperties = [];
             List<ContentDimensionValue> values = [];
             for (int i = 0; i < numOfValues; i++)
             {
@@ -32,7 +32,7 @@ namespace Px.Utils.UnitTests.ModelTests
         {
             string code = $"var{ordinal}";
             MultilanguageString name = new("en", $"name_en_var{ordinal}");
-            Dictionary<string, Property> additionalProperties = [];
+            Dictionary<string, MetaProperty> additionalProperties = [];
             List<DimensionValue> values = [];
             for (int i = 0; i < numOfValues; i++)
             {
@@ -45,7 +45,7 @@ namespace Px.Utils.UnitTests.ModelTests
         {
             string code = $"var{ordinal}";
             MultilanguageString name = new("en", $"name_en_var{ordinal}");
-            Dictionary<string, Property> additionalProperties = [];
+            Dictionary<string, MetaProperty> additionalProperties = [];
             List<DimensionValue> values = [];
             for (int i = 0; i < numOfValues; i++)
             {

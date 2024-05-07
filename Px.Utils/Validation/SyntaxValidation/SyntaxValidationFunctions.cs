@@ -4,18 +4,18 @@ using System.Text.RegularExpressions;
 
 namespace PxUtils.Validation.SyntaxValidation
 {
-    public delegate ValidationFeedbackItem? EntryValidationFunctionDelegate(ValidationEntry validationObject, PxFileSyntaxConf syntaxConf);
-    public delegate ValidationFeedbackItem? KeyValuePairValidationFunctionDelegate(ValidationKeyValuePair validationObject, PxFileSyntaxConf syntaxConf);
-    public delegate ValidationFeedbackItem? StructuredValidationFunctionDelegate(ValidationStructuredEntry validationObject, PxFileSyntaxConf syntaxConf);
+    public delegate ValidationFeedbackItem? EntryValidationFunction(ValidationEntry validationObject, PxFileSyntaxConf syntaxConf);
+    public delegate ValidationFeedbackItem? KeyValuePairValidationFunction(ValidationKeyValuePair validationObject, PxFileSyntaxConf syntaxConf);
+    public delegate ValidationFeedbackItem? StructuredValidationFunction(ValidationStructuredEntry validationObject, PxFileSyntaxConf syntaxConf);
 
     /// <summary>
     /// Contains the default validation functions for syntax validation.
     /// </summary>
     public class SyntaxValidationFunctions
     {
-        public List<EntryValidationFunctionDelegate> DefaultStringValidationFunctions { get; }
-        public List<KeyValuePairValidationFunctionDelegate> DefaultKeyValueValidationFunctions { get; }
-        public List<StructuredValidationFunctionDelegate> DefaultStructuredValidationFunctions { get; }
+        public List<EntryValidationFunction> DefaultStringValidationFunctions { get; }
+        public List<KeyValuePairValidationFunction> DefaultKeyValueValidationFunctions { get; }
+        public List<StructuredValidationFunction> DefaultStructuredValidationFunctions { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyntaxValidationFunctions"/> class with default validation functions.
@@ -71,8 +71,8 @@ namespace PxUtils.Validation.SyntaxValidation
             // If the entry does not start with a line separator, it is not on its own line. For the first entry this is not relevant.
             if (
                 validationEntry.EntryIndex == 0 || 
-                validationEntry.EntryString.StartsWith(CharacterConstants.UnixNewLine) ||
-                validationEntry.EntryString.StartsWith(CharacterConstants.WindowsNewLine))
+                validationEntry.EntryString.StartsWith(CharacterConstants.UnixNewLine, StringComparison.Ordinal) ||
+                validationEntry.EntryString.StartsWith(CharacterConstants.WindowsNewLine, StringComparison.Ordinal))
             {
                 return null;
             }
@@ -680,8 +680,9 @@ namespace PxUtils.Validation.SyntaxValidation
         {
             // We only need to run this validation if the value is less than 150 characters long and it is a string or list
             ValueType? type = SyntaxValidationUtilityMethods.GetValueTypeFromString(validationKeyValuePair.KeyValuePair.Value, syntaxConf);
-            
-            if (validationKeyValuePair.KeyValuePair.Value.Length > 150 ||
+            const int oneLineValueLengthRecommendedLimit = 150;
+
+            if (validationKeyValuePair.KeyValuePair.Value.Length > oneLineValueLengthRecommendedLimit ||
                 (type != ValueType.String &&
                 type != ValueType.ListOfStrings))
             {
@@ -741,7 +742,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 {
                     KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                         validationStructuredEntry.KeyStartLineIndex,
-                        keyword.IndexOf(illegalSymbolsInKeyWord.First()),
+                        keyword.IndexOf(illegalSymbolsInKeyWord.First(), StringComparison.Ordinal),
                         validationStructuredEntry.LineChangeIndexes);
 
                     return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
@@ -824,9 +825,9 @@ namespace PxUtils.Validation.SyntaxValidation
                 syntaxConf.Symbols.EntrySeparator,
                 syntaxConf.Symbols.KeywordSeparator,
                 CharacterConstants.SPACE,
-                CharacterConstants.CARRIAGE_RETURN,
-                CharacterConstants.LINE_FEED,
-                CharacterConstants.HORIZONTAL_TAB
+                CharacterConstants.CARRIAGERETURN,
+                CharacterConstants.LINEFEED,
+                CharacterConstants.HORIZONTALTAB
             ];
 
             IEnumerable<char> foundIllegalCharacters = lang.Where(c => illegalCharacters.Contains(c));
@@ -1016,7 +1017,7 @@ namespace PxUtils.Validation.SyntaxValidation
         public static ValidationFeedbackItem? KeywordIsNotInUpperCase(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
             string keyword = validationStructuredEntry.Key.Keyword;
-            string uppercaseKeyword = keyword.ToUpper();
+            string uppercaseKeyword = keyword.ToUpper(CultureInfo.InvariantCulture);
 
             if (uppercaseKeyword != keyword)
             {
@@ -1045,9 +1046,10 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier is excessively long, otherwise null</returns>
         public static ValidationFeedbackItem? KeywordIsExcessivelyLong(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
+            const int keywordLengthRecommendedLimit = 20;
             string keyword = validationStructuredEntry.Key.Keyword;
 
-            if (keyword.Length > 20)
+            if (keyword.Length > keywordLengthRecommendedLimit)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     validationStructuredEntry.KeyStartLineIndex,

@@ -10,7 +10,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
     public class MultiPartReadingTests
     {
         [TestMethod]
-        public void ReadAddDoubleDataValues_OneRowAtTime_ReturnsCorrectDoubleDataValues()
+        public void ReadAddDoubleDataValuesOneRowAtTimeReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -47,7 +47,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadAddDoubleDataValues_OneRowAtTimeWithSmallBuffer_ReturnsCorrectDoubleDataValues()
+        public void ReadAddDoubleDataValuesOneRowAtTimeWithSmallBufferReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -84,7 +84,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadAddDoubleDataValues_HalfRowAtTime_ReturnsCorrectDoubleDataValues()
+        public void ReadAddDoubleDataValuesHalfRowAtTimeReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -142,7 +142,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
 
         [TestMethod]
-        public void ReadAddDoubleDataValues_OneColAtTime_ReturnsCorrectDoubleDataValues()
+        public void ReadAddDoubleDataValuesOneColAtTimeReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -184,7 +184,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadAddDoubleDataValuesAsync_OneRowAtTime_ReturnsCorrectDoubleDataValues()
+        public async Task ReadAddDoubleDataValuesAsnycOneRowAtTimeReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -221,7 +221,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public async Task ReadAddDoubleDataValuesAsync_HalfRowAtTime_ReturnsCorrectDoubleDataValues()
+        public async Task ReadAddDoubleDataValuesAsnycHalfRowAtTimeReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);
@@ -279,7 +279,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
 
         [TestMethod]
-        public async Task ReadAddDoubleDataValuesAsync_OneColAtTime_ReturnsCorrectDoubleDataValues()
+        public async Task ReadAddDoubleDataValuesAsnycOneColAtTimeReturnsCorrectDoubleDataValues()
         {
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES);

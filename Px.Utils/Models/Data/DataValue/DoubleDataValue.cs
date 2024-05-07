@@ -11,12 +11,12 @@ namespace PxUtils.Models.Data.DataValue
         /// Numeric value of the data point when the type is <see cref="DataValueType.Exists"/>.
         /// Otherwise the value is undefined and using it will cause undefined behavior.
         /// </summary>
-        public readonly double UnsafeValue;
+        public readonly double UnsafeValue { get; }
 
         /// <summary>
         /// Defines if the data point has a numeric value or if it is a missing value.
         /// </summary>
-        public readonly DataValueType Type;
+        public readonly DataValueType Type { get; }
 
         public DoubleDataValue(double value, DataValueType type)
         {
