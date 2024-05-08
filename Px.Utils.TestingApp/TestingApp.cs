@@ -16,13 +16,7 @@ namespace Px.Utils.TestingApp
 
         static void StartBatchMode()
         {
-            var b = new DataValidationBenchmark();
-            
-            b.Run(true, ["-f", "D:\\UD\\reen1\\work\\code\\Px.Utils2\\statfin_tyonv_pxt_12ts.px",
-            "-i", "2", "-r", "44712", "-c", "2821"] );
-
-            b.PrintResults();
-//            Console.WriteLine("Batch mode is not yet supported.");
+            Console.WriteLine("Batch mode is not yet supported.");
         }
     }
 }
