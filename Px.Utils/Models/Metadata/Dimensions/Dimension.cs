@@ -63,7 +63,7 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// <param name="additionalProperties">Properties of the dimension, excluding the required properties</param>
         /// <param name="values">Ordered list of dimension values that define the structure of the dimension</param>
         /// <param name="type">Type of the dimension. The dedicated classes must be used for time and content dimensions</param>
-        public Dimension(string code, MultilanguageString name, Dictionary<string, Property> additionalProperties,
+        public Dimension(string code, MultilanguageString name, Dictionary<string, MetaProperty> additionalProperties,
             ValueList values, DimensionType type)
         {
             Code = code;
@@ -78,7 +78,7 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// <param name="additionalProperties">Properties of the dimension, excluding the required properties</param>
         /// <param name="values">Ordered list of dimension values that define the structure of the dimension</param>
         /// <param name="type">Type of the dimension. The dedicated classes must be used for time and content dimensions</param>
-        public Dimension(string code, MultilanguageString name, Dictionary<string, Property> additionalProperties,
+        public Dimension(string code, MultilanguageString name, Dictionary<string, MetaProperty> additionalProperties,
             IReadOnlyList<DimensionValue> values, DimensionType type)
         {
             Code = code;

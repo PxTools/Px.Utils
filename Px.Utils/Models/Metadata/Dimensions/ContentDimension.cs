@@ -41,7 +41,7 @@ namespace PxUtils.Models.Metadata.Dimensions
         public ContentDimension(
             string code,
             MultilanguageString name,
-            Dictionary<string, Property> additionalProperties,
+            Dictionary<string, MetaProperty> additionalProperties,
             IReadOnlyList<ContentDimensionValue> values
         ) : base(code, name, additionalProperties, values, Type)
         {
