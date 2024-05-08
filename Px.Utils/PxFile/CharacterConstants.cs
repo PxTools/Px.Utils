@@ -18,5 +18,9 @@
         public const char CHARHORIZONTALTAB = (char)HORIZONTALTAB;
         public const char CHARCARRIAGERETURN = (char)CARRIAGERETURN;
         public const char CHARLINEFEED = (char)LINEFEED;
+
+        public readonly static byte[] BOMUTF8 = [0xEF, 0xBB, 0xBF];
+        public readonly static byte[] BOMUTF16 = [0xFE, 0xFF];
+        public readonly static byte[] BOMUTF32 = [0x00, 0x00, 0xFE];
     }
 }

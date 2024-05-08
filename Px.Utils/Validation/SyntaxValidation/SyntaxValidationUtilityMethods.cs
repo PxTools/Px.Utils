@@ -159,8 +159,8 @@ namespace PxUtils.Validation.SyntaxValidation
         /// <returns>Returns a boolean which is true if the line changes in the input string are compliant with the syntax configuration</returns>
         internal static bool ValueLineChangesAreCompliant(string input, PxFileSyntaxConf syntaxConf, bool isList)
         {
-            string trimmedInput = input.Replace(CharacterConstants.CARRIAGERETURN.ToString(), "");
-            int lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LINEFEED);
+            string trimmedInput = input.Replace(CharacterConstants.CARRIAGERETURN.ToString(CultureInfo.InvariantCulture), "");
+            int lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.CHARLINEFEED);
             while (lineChangeIndex != -1)
             {
                 char symbolBefore = isList ? syntaxConf.Symbols.Key.ListSeparator : syntaxConf.Symbols.Key.StringDelimeter;
@@ -168,7 +168,7 @@ namespace PxUtils.Validation.SyntaxValidation
                 {
                     return false;
                 }
-                lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.LINEFEED, lineChangeIndex + 1);
+                lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.CHARLINEFEED, lineChangeIndex + 1);
             }
             return true;
         }
@@ -221,7 +221,7 @@ namespace PxUtils.Validation.SyntaxValidation
         internal static string CleanString(string input, PxFileSyntaxConf syntaxConf)
         {
             char[] charactersToTrim = [
-                CharacterConstants.CARRIAGERETURN,
+                CharacterConstants.CHARCARRIAGERETURN,
                 syntaxConf.Symbols.Linebreak,
                 syntaxConf.Symbols.Key.StringDelimeter
             ];
@@ -476,9 +476,9 @@ namespace PxUtils.Validation.SyntaxValidation
         private static bool IsValidTimestampFormat(string input, string timeInterval, PxFileSyntaxConf syntaxConf)
         {
             input = input
-                .Replace(CharacterConstants.CARRIAGERETURN.ToString(), "")
+                .Replace(CharacterConstants.CHARCARRIAGERETURN.ToString(), "")
                 .Replace(syntaxConf.Symbols.Linebreak.ToString(), "")
-                .Replace(CharacterConstants.SPACE.ToString(), "");
+                .Replace(CharacterConstants.CHARSPACE.ToString(), "");
             
             input = CleanString(input, syntaxConf);
                 
