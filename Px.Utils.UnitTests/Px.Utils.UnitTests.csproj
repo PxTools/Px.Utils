@@ -19,5 +19,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Px.Utils\Px.Utils.csproj" />
   </ItemGroup>
-
+  
 </Project>

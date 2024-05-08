@@ -14,7 +14,7 @@
     /// </summary>
     public enum ValueType
     {
-        String,
+        StringValue,
         ListOfStrings,
         Number,
         Boolean,
@@ -72,5 +72,12 @@
         MultipleInstancesOfUniqueKey = 42,
         MissingStubAndHeading = 43,
         VariableValuesMissing = 44,
+        DataValidationFeedbackInvalidStructure = 45,
+        DataValidationFeedbackInvalidRowCount = 46,
+        DataValidationFeedbackInvalidRowLength = 47,
+        DataValidationFeedbackInconsistentSeparator = 48,
+        DataValidationFeedbackInvalidString = 49,
+        DataValidationFeedbackInvalidNumber = 50,
+        DataValidationFeedbackInvalidChar = 51
     }
 }

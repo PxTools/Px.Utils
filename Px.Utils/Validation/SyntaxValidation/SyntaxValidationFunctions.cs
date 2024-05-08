@@ -538,7 +538,7 @@ namespace PxUtils.Validation.SyntaxValidation
             }
 
             // If value is of type String or ListOfStrings, check if the line changes are compliant to the specification
-            if (type is ValueType.String || type is ValueType.ListOfStrings)
+            if (type is ValueType.StringValue || type is ValueType.ListOfStrings)
             {
                 int lineChangeValidityIndex = SyntaxValidationUtilityMethods.GetLineChangesValidity(value, syntaxConf, (ValueType)type);
                 if (lineChangeValidityIndex != -1)
@@ -582,7 +582,7 @@ namespace PxUtils.Validation.SyntaxValidation
             int firstExcessWhitespaceIndex = SyntaxValidationUtilityMethods.FirstSubstringIndexFromString(
                 value,
                 [
-                    $"{CharacterConstants.SPACE}{CharacterConstants.SPACE}",
+                    $"{CharacterConstants.CHARSPACE}{CharacterConstants.CHARSPACE}",
                 ],
                 syntaxConf.Symbols.Key.StringDelimeter);
 
@@ -683,7 +683,7 @@ namespace PxUtils.Validation.SyntaxValidation
             const int oneLineValueLengthRecommendedLimit = 150;
 
             if (validationKeyValuePair.KeyValuePair.Value.Length > oneLineValueLengthRecommendedLimit ||
-                (type != ValueType.String &&
+                (type != ValueType.StringValue &&
                 type != ValueType.ListOfStrings))
             {
                 return null;
@@ -824,10 +824,10 @@ namespace PxUtils.Validation.SyntaxValidation
                 syntaxConf.Symbols.Key.StringDelimeter,
                 syntaxConf.Symbols.EntrySeparator,
                 syntaxConf.Symbols.KeywordSeparator,
-                CharacterConstants.SPACE,
-                CharacterConstants.CARRIAGERETURN,
-                CharacterConstants.LINEFEED,
-                CharacterConstants.HORIZONTALTAB
+                CharacterConstants.CHARSPACE,
+                CharacterConstants.CHARCARRIAGERETURN,
+                CharacterConstants.CHARLINEFEED,
+                CharacterConstants.CHARHORIZONTALTAB
             ];
 
             IEnumerable<char> foundIllegalCharacters = lang.Where(c => illegalCharacters.Contains(c));

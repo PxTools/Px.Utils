@@ -831,7 +831,7 @@ namespace PxUtils.Validation.ContentValidation
                     validator.SyntaxConf.Tokens.KeyWords.TimeVal
                 ];
 
-            if ((stringTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.String) ||
+            if ((stringTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.StringValue) ||
                 (listOfStringTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.ListOfStrings) ||
                 (dateTimeTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.DateTime) ||
                 (numberTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.Number) ||

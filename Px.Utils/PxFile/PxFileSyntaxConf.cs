@@ -2,7 +2,7 @@
 {
     public class PxFileSyntaxConf
     {
-        public class SymbolCollection
+        public class SymbolDefinitions
         {
             public class KeySymbols
             {
@@ -59,16 +59,16 @@
             public KeySymbols Key { get; set; }
             public ValueSymbols Value { get; set; }
 
-            private SymbolCollection()
+            private SymbolDefinitions()
             {
                 Key = KeySymbols.DefaultKeySymbols;
                 Value = ValueSymbols.DefaultValueSymbols;
             }
 
-            public static SymbolCollection DefaultSymbols => new();
+            public static SymbolDefinitions DefaultSymbols => new();
         }
 
-        public class TokenCollection
+        public class TokenDefinitions
         {
             public class TimeValue
             {
@@ -193,6 +193,27 @@
 
                 public static BooleanTokens DefaultBooleanTokens => new();
             }
+            
+            public class DataValueTokens
+            {
+                private const string DATA_IS_MISSING = "\".\"";
+                private const string DATA_CATEGORY_NOT_APPLICABLE = "\"..\"";
+                private const string DATA_IS_CONFIDENTIAL = "\"...\"";
+                private const string DATA_IS_NOT_AVAILABLE = "\"....\"";
+                private const string DATA_HAS_NOT_BEEN_ASKED = "\".....\"";
+                private const string MISSING6 = "\"......\"";
+                private const string DATA_IS_NONE = "\"-\"";
+                
+                public string DataIsMissing { get; } = DATA_IS_MISSING;
+                public string DataCategoryNotApplicable { get; } = DATA_CATEGORY_NOT_APPLICABLE;
+                public string DataIsConfidential { get; } = DATA_IS_CONFIDENTIAL;
+                public string DataIsNotAvailable { get; } = DATA_IS_NOT_AVAILABLE;
+                public string DataHasNotBeenAsked { get; } = DATA_HAS_NOT_BEEN_ASKED;
+                public string Missing6 { get; } = MISSING6;
+                public string DataIsNone { get; } = DATA_IS_NONE;
+
+                public static DataValueTokens DefaultDataValueTokens=> new();
+            }
 
             public TimeValue Time { get; set; }
 
@@ -200,25 +221,28 @@
 
             public VariableTypeTokens VariableTypes { get; set; }
             public BooleanTokens Booleans { get; set; }
+            
+            public DataValueTokens DataValues { get; set; }
 
-            private TokenCollection()
+            private TokenDefinitions()
             {
                 Time = TimeValue.DefaultTimeValue;
                 KeyWords = KeyWordTokens.DefaultKeyWordTokens;
                 VariableTypes = VariableTypeTokens.DefaultVariableTypeTokens;
                 Booleans = BooleanTokens.DefaultBooleanTokens;
+                DataValues = DataValueTokens.DefaultDataValueTokens;
             }
 
-            public static TokenCollection DefaultTokens => new();
+            public static TokenDefinitions DefaultTokens => new();
         }
 
-        public SymbolCollection Symbols { get; set; }
-        public TokenCollection Tokens { get; set; }
+        public SymbolDefinitions Symbols { get; set; }
+        public TokenDefinitions Tokens { get; set; }
 
         private PxFileSyntaxConf()
         {
-            Symbols = SymbolCollection.DefaultSymbols;
-            Tokens = TokenCollection.DefaultTokens;
+            Symbols = SymbolDefinitions.DefaultSymbols;
+            Tokens = TokenDefinitions.DefaultTokens;
         }
 
         public static PxFileSyntaxConf Default => new();

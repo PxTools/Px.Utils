@@ -11,6 +11,7 @@
             _benchmarks.Add("metadata-builder", new MetadataBuilderBenchmark());
             _benchmarks.Add("metadata-syntaxvalidation", new MetadataSyntaxValidationBenchmark());
             _benchmarks.Add("metadata-contentvalidation", new MetadataContentValidationBenchmark());
+            _benchmarks.Add("data-validation", new DataValidationBenchmark());
         }
 
         internal override string Help
