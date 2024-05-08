@@ -162,7 +162,11 @@ namespace PxUtils.Validation.DataValidation
 
                 foreach (IDataValidator validator in validators)
                 {
-                    validator.Validate(_currentEntry, _currentEntryType, _streamEncoding, _lineNumber + _startRow, _charPosition, ref validationFeedbacks);
+                    ValidationFeedback? feedback = validator.Validate(_currentEntry, _currentEntryType, _streamEncoding, _lineNumber + _startRow, _charPosition);
+                    if (feedback is not null)
+                    {
+                        validationFeedbacks.Add((ValidationFeedback)feedback);
+                    }
                 }
             }
         }
@@ -177,7 +181,11 @@ namespace PxUtils.Validation.DataValidation
             {
                 if (_currentRowLength != _expectedRowLength)
                 {
-                    validationFeedbacks.Add(new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength, _lineNumber + _startRow, _charPosition));
+                    validationFeedbacks.Add(
+                        new ValidationFeedback(ValidationFeedbackLevel.Error, 
+                        ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength, 
+                        _lineNumber + _startRow,
+                        _charPosition));
                 }
                 _lineNumber++;
                 _currentRowLength = 0;
@@ -213,6 +221,6 @@ namespace PxUtils.Validation.DataValidation
 
     internal interface IDataValidator
     {
-        internal void Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, ref List<ValidationFeedback> feedbacks);
+        internal ValidationFeedback? Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos);
     }
 }
