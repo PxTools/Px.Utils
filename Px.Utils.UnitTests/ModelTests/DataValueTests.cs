@@ -9,7 +9,7 @@ namespace Px.Utils.UnitTests.ModelTests
         #region Sum
 
         [TestMethod]
-        public void DecimalDataValueSumTest_1_1_2()
+        public void DecimalDataValueSumTest1Plus1Equals2()
         {
             DecimalDataValue a = new(1, DataValueType.Exists);
             DecimalDataValue b = new(1, DataValueType.Exists);
@@ -19,7 +19,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueSumTest_1_0_1()
+        public void DecimalDataValueSumTest1Plus0Equals1()
         {
             DecimalDataValue a = new(1, DataValueType.Exists);
             DecimalDataValue b = new(0, DataValueType.Exists);
@@ -29,7 +29,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueSumTest_1_Missing_Missing()
+        public void DecimalDataValueSumTest1PlusMissingEqualsMissing()
         {
             DecimalDataValue a = new(1, DataValueType.Exists);
             DecimalDataValue b = new(0, DataValueType.Missing);
@@ -38,7 +38,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueSumTest_Missing_Missing_Missing()
+        public void DecimalDataValueSumTestMissingPlusMissingEqualsMissing()
         {
             DecimalDataValue a = new(1, DataValueType.Missing);
             DecimalDataValue b = new(0, DataValueType.Missing);
@@ -47,7 +47,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueSumTest_1_1_2()
+        public void DoubleDataValueSumTest1Plus1Equals2()
         {
             DoubleDataValue a = new(1, DataValueType.Exists);
             DoubleDataValue b = new(1, DataValueType.Exists);
@@ -57,7 +57,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueSumTest_1_0_1()
+        public void DoubleDataValueSumTest1Plus0Equals1()
         {
             DoubleDataValue a = new(1, DataValueType.Exists);
             DoubleDataValue b = new(0, DataValueType.Exists);
@@ -67,7 +67,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueSumTest_1_Missing_Missing()
+        public void DoubleDataValueSumTest1PlusMissingEqualsMissing()
         {
             DoubleDataValue a = new(1, DataValueType.Exists);
             DoubleDataValue b = new(0, DataValueType.Missing);
@@ -76,7 +76,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueSumTest_Missing_Missing_Missing()
+        public void DoubleDataValueSumTestMissingPlusMissingEqualsMissing()
         {
             DoubleDataValue a = new(1, DataValueType.Missing);
             DoubleDataValue b = new(0, DataValueType.Missing);
@@ -89,7 +89,7 @@ namespace Px.Utils.UnitTests.ModelTests
         #region Subtraction
 
         [TestMethod]
-        public void DecimalDataValueSubTest_1_1_0()
+        public void DecimalDataValueSubTest1Minus1Equals0()
         {
             DecimalDataValue a = new(1, DataValueType.Exists);
             DecimalDataValue b = new(1, DataValueType.Exists);
@@ -99,7 +99,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueSubTest_1_0_1()
+        public void DecimalDataValueSubTest1Minus0Equals1()
         {
             DecimalDataValue a = new(1, DataValueType.Exists);
             DecimalDataValue b = new(0, DataValueType.Exists);
@@ -109,7 +109,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueSubTest_1_Missing_Missing()
+        public void DecimalDataValueSubTest1MinusMissingEqualsMissing()
         {
             DecimalDataValue a = new(1, DataValueType.Exists);
             DecimalDataValue b = new(0, DataValueType.Missing);
@@ -118,7 +118,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueSubTest_Missing_Missing_Missing()
+        public void DecimalDataValueSubTestMissingMinusMissingEqualsMissing()
         {
             DecimalDataValue a = new(1, DataValueType.Missing);
             DecimalDataValue b = new(0, DataValueType.Missing);
@@ -127,7 +127,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueSubTest_1_1_0()
+        public void DoubleDataValueSubTest1Minus1Equals0()
         {
             DoubleDataValue a = new(1, DataValueType.Exists);
             DoubleDataValue b = new(1, DataValueType.Exists);
@@ -137,7 +137,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueSubTest_1_0_1()
+        public void DoubleDataValueSubTest1Minus0Equals1()
         {
             DoubleDataValue a = new(1, DataValueType.Exists);
             DoubleDataValue b = new(0, DataValueType.Exists);
@@ -147,7 +147,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueSubTest_1_Missing_Missing()
+        public void DoubleDataValueSubTest1MinusMissingEqualsMissing()
         {
             DoubleDataValue a = new(1, DataValueType.Exists);
             DoubleDataValue b = new(0, DataValueType.Missing);
@@ -156,7 +156,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueSubTest_Missing_Missing_Missing()
+        public void DoubleDataValueSubTestMissingMinusMissingEqualsMissing()
         {
             DoubleDataValue a = new(1, DataValueType.Missing);
             DoubleDataValue b = new(0, DataValueType.Missing);
@@ -169,7 +169,7 @@ namespace Px.Utils.UnitTests.ModelTests
         #region Multiplication
 
         [TestMethod]
-        public void DecimalDataValueMulTest_1_1_1()
+        public void DecimalDataValueMulTest1MultipliedBy1Equals1()
         {
             DecimalDataValue a = new(1, DataValueType.Exists);
             DecimalDataValue b = new(1, DataValueType.Exists);
@@ -179,7 +179,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueMulTest_1_0_0()
+        public void DecimalDataValueMulTest1MultipliedBy0Equals0()
         {
             DecimalDataValue a = new(1, DataValueType.Exists);
             DecimalDataValue b = new(0, DataValueType.Exists);
@@ -189,7 +189,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueMulTest_1_Missing_Missing()
+        public void DecimalDataValueMulTest1MultipliedByMissingEqualsMissing()
         {
             DecimalDataValue a = new(1, DataValueType.Exists);
             DecimalDataValue b = new(0, DataValueType.Missing);
@@ -198,7 +198,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueMulTest_Missing_Missing_Missing()
+        public void DecimalDataValueMulTestMissingMultipliedByMissingEqualsMissing()
         {
             DecimalDataValue a = new(1, DataValueType.Missing);
             DecimalDataValue b = new(0, DataValueType.Missing);
@@ -207,7 +207,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueMulTest_1_1_1()
+        public void DoubleDataValueMulTest1MultipliedBy1Equals1()
         {
             DoubleDataValue a = new(1, DataValueType.Exists);
             DoubleDataValue b = new(1, DataValueType.Exists);
@@ -217,7 +217,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueSumTest_1_0_0()
+        public void DoubleDataValueSumTest1MultipliedBy0Equals0()
         {
             DoubleDataValue a = new(1, DataValueType.Exists);
             DoubleDataValue b = new(0, DataValueType.Exists);
@@ -227,7 +227,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueMulTest_1_Missing_Missing()
+        public void DoubleDataValueMulTest1MultipliedByMissingEqualsMissing()
         {
             DoubleDataValue a = new(1, DataValueType.Exists);
             DoubleDataValue b = new(0, DataValueType.Missing);
@@ -236,7 +236,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueMulTest_Missing_Missing_Missing()
+        public void DoubleDataValueMulTestMissingMultipliedByMissingEqualsMissing()
         {
             DoubleDataValue a = new(0, DataValueType.Missing);
             DoubleDataValue b = new(0, DataValueType.Missing);
@@ -249,7 +249,7 @@ namespace Px.Utils.UnitTests.ModelTests
         #region Division
 
         [TestMethod]
-        public void DecimalDataValueDivTest_1_1_1()
+        public void DecimalDataValueDivTest1DividedBy1Equals1()
         {
             DecimalDataValue a = new(1, DataValueType.Exists);
             DecimalDataValue b = new(1, DataValueType.Exists);
@@ -259,7 +259,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueDivTest_1_0_0()
+        public void DecimalDataValueDivTest1DividedBy0Equals0()
         {
             DecimalDataValue a = new(0, DataValueType.Exists);
             DecimalDataValue b = new(1, DataValueType.Exists);
@@ -269,7 +269,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueDivTest_0_1_Throws()
+        public void DecimalDataValueDivTest0DividedBy1Throws()
         {
             DecimalDataValue a = new(1, DataValueType.Exists);
             DecimalDataValue b = new(0, DataValueType.Exists);
@@ -278,7 +278,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueDivTest_1_Missing_Missing()
+        public void DecimalDataValueDivTest1DividedByMissingDividedByMissing()
         {
             DecimalDataValue a = new(1, DataValueType.Exists);
             DecimalDataValue b = new(0, DataValueType.Missing);
@@ -287,7 +287,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueDivTest_Missing_Missing_Missing()
+        public void DecimalDataValueDivTestMissingDividedByMissingEqualsMissing()
         {
             DecimalDataValue a = new(1, DataValueType.Missing);
             DecimalDataValue b = new(0, DataValueType.Missing);
@@ -296,7 +296,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueDivTest_1_1_1()
+        public void DoubleDataValueDivTest1DividedBy1Equals1()
         {
             DoubleDataValue a = new(1, DataValueType.Exists);
             DoubleDataValue b = new(1, DataValueType.Exists);
@@ -306,7 +306,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueDivTest_0_1_0()
+        public void DoubleDataValueDivTest0DividedBy1Equals0()
         {
             DoubleDataValue a = new(0, DataValueType.Exists);
             DoubleDataValue b = new(1, DataValueType.Exists);
@@ -316,7 +316,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueDivTest_1_0_Throws()
+        public void DoubleDataValueDivTest1DividedBy0Throws()
         {
             DoubleDataValue a = new(1, DataValueType.Exists);
             DoubleDataValue b = new(0, DataValueType.Exists);
@@ -325,7 +325,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueDivTest_1_Missing_Missing()
+        public void DoubleDataValueDivTest1DividedByMissingEqualsMissing()
         {
             DoubleDataValue a = new(1, DataValueType.Exists);
             DoubleDataValue b = new(0, DataValueType.Missing);
@@ -334,7 +334,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueDivTest_Missing_Missing_Missing()
+        public void DoubleDataValueDivTestMissingDividedByMissingEqualsMissing()
         {
             DoubleDataValue a = new(1, DataValueType.Missing);
             DoubleDataValue b = new(0, DataValueType.Missing);
@@ -357,7 +357,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueUnaryPlusTest_Missing()
+        public void DecimalDataValueUnaryPlusTestMissing()
         {
             DecimalDataValue a = new(1, DataValueType.Missing);
             a = +a;
@@ -376,7 +376,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueUnaryPlusTest_Missing()
+        public void DoubleDataValueUnaryPlusTestMissing()
         {
             DoubleDataValue a = new(1, DataValueType.Missing);
             a = +a;
@@ -395,7 +395,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DecimalDataValueUnaryMinusTest_Missing()
+        public void DecimalDataValueUnaryMinusTestMissing()
         {
             DecimalDataValue a = new(1, DataValueType.Missing);
             a = -a;
@@ -414,7 +414,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void DoubleDataValueUnaryMinusTest_Missing()
+        public void DoubleDataValueUnaryMinusTestMissing()
         {
             DoubleDataValue a = new(1, DataValueType.Missing);
             a = -a;

@@ -8,7 +8,7 @@ namespace Px.Utils.UnitTests.ModelTests
     public class MatrixTransformationsTests
     {
         [TestMethod]
-        public void MatrixMetadataTransformationTestSubset()
+        public void Subset()
         {
             int[] dimensionSizes = [3, 3, 2];
             MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata(dimensionSizes);
@@ -33,7 +33,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void MatrixMetadataTransformationTest_SingleValue()
+        public void SingleValue()
         {
             int[] dimensionSizes = [3, 3, 2];
             MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata(dimensionSizes);
@@ -58,7 +58,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void MatrixMetadataTransformationTest_Reorder()
+        public void Reorder()
         {
             int[] dimensionSizes = [3, 3, 2];
             MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata(dimensionSizes);
@@ -86,7 +86,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void MatrixMetadataTransformationTest_SubsetAndReorder()
+        public void SubsetAndReorder()
         {
             int[] dimensionSizes = [3, 3, 2];
             MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata(dimensionSizes);
@@ -111,7 +111,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void MatrixMetadataTransformationTest_SubsetAndReorder_NoUniformDimensions()
+        public void SubsetAndReorderNoUniformDimensions()
         {
             int[] dimensionSizes = [2, 3, 4];
             MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata(dimensionSizes);
@@ -136,7 +136,7 @@ namespace Px.Utils.UnitTests.ModelTests
         }
 
         [TestMethod]
-        public void MatrixMetadataTransformationTest_Identity()
+        public void Identity()
         {
             int[] dimensionSizes = [3, 3, 2];
             MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata(dimensionSizes);

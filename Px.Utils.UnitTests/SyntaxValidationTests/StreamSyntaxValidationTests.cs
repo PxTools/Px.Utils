@@ -403,8 +403,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.InvalidValueFormat];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, new object[] { keyValuePairs, functions, syntaxConf }) as List<ValidationFeedbackItem> ?? [];
-            Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, new object[] { keyValuePairs[0].KeyValuePair.Value, PxFileSyntaxConf.Default }) as Validation.ValueType?;
+            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, syntaxConf]) as List<ValidationFeedbackItem> ?? [];
+            Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, [keyValuePairs[0].KeyValuePair.Value, PxFileSyntaxConf.Default]) as Validation.ValueType?;
 
             // Assert
             Assert.AreEqual(0, feedback.Count);
@@ -433,8 +433,8 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.InvalidValueFormat];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, new object[] { keyValuePairs, functions, syntaxConf }) as List<ValidationFeedbackItem> ?? [];
-            Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, new object[] { keyValuePairs[0].KeyValuePair.Value, PxFileSyntaxConf.Default }) as Validation.ValueType?;
+            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, syntaxConf]) as List<ValidationFeedbackItem> ?? [];
+            Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, [keyValuePairs[0].KeyValuePair.Value, PxFileSyntaxConf.Default]) as Validation.ValueType?;
 
             // Assert
             if (type is null)

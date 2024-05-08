@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal class DataValidationBenchmark : Benchmark
+    internal sealed class DataValidationBenchmark : Benchmark
     {
         private readonly string[] expectedRowsFlags = ["-r", "-rows"];
         private readonly string[] expectedColsFlags = ["-c", "-cols"];

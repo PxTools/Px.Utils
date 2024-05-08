@@ -10,7 +10,7 @@ namespace Px.Utils.UnitTests.OperationsTests
     public class SumMatrixFunctionTests
     {
         [TestMethod]
-        public void Apply_WhenCalledWithNonContentSumMap_ReturnsNewMatrixWithSummedValues()
+        public void ApplyWhenCalledWithNonContentSumMapReturnsNewMatrixWithSummedValues()
         {
             // Arrange
             MatrixMetadata meta = TestModelBuilder.BuildTestMetadata([2, 3, 2]);
@@ -41,7 +41,7 @@ namespace Px.Utils.UnitTests.OperationsTests
         }
 
         [TestMethod]
-        public void Apply_WhenCalledWithNonContentSumMapWithValueInsertion_ReturnsNewMatrixWithSummedValuesInserted()
+        public void ApplyWhenCalledWithNonContentSumMapWithValueInsertionReturnsNewMatrixWithSummedValuesInserted()
         {
             // Arrange
             MatrixMetadata meta = TestModelBuilder.BuildTestMetadata([2, 3, 2]);
@@ -72,7 +72,7 @@ namespace Px.Utils.UnitTests.OperationsTests
         }
 
         [TestMethod]
-        public void Apply_WhenCalledWithContentSumMap_ReturnsNewMatrixWithSummedValues()
+        public void ApplyWhenCalledWithContentSumMapReturnsNewMatrixWithSummedValues()
         {
             // Arrange
             MatrixMetadata meta = TestModelBuilder.BuildTestMetadata([2, 3, 2]);
@@ -104,7 +104,7 @@ namespace Px.Utils.UnitTests.OperationsTests
         }
 
         [TestMethod]
-        public void Apply_WhenCalledWithOneValueSumMap_ReturnsNewMatrixWithSummedValues()
+        public void ApplyWhenCalledWithOneValueSumMapReturnsNewMatrixWithSummedValues()
         {
             // Arrange
             MatrixMetadata meta = TestModelBuilder.BuildTestMetadata([2, 2, 1]);

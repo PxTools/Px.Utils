@@ -64,7 +64,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ThreeDimensions325NextTest()
+        public void ThreeDimensions3val2val5valNextTest()
         {
             var coordinates = new int[][]
             {
@@ -84,7 +84,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ThreeDimensions325ReorderingTest()
+        public void ThreeDimensions3val2val5valReorderingTest()
         {
             var coordinates = new int[][]
             {
@@ -104,7 +104,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ThreeDimensions325MultidimensionalReorderingTest()
+        public void ThreeDimensions3val2val5valMultidimensionalReorderingTest()
         {
             var coordinates = new int[][]
             {
@@ -124,7 +124,7 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ThreeDimensions_3_2_5_MultidimensionalReorderingTestWithDimOrderChange()
+        public void ThreeDimensions3val2val5valMultidimensionalReorderingTestWithDimOrderChange()
         {
             var coordinates = new int[][]
             {

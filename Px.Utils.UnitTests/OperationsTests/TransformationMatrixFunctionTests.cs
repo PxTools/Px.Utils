@@ -9,7 +9,7 @@ namespace Px.Utils.UnitTests.OperationsTests
     public class TransformationMatrixFunctionTests
     {
         [TestMethod]
-        public void Apply_WhenCalledWithIdentityMap_ReturnsIdenticalMatrix()
+        public void ApplyWhenCalledWithIdentityMapReturnsIdenticalMatrix()
         {
             // Arrange
             MatrixMetadata meta = TestModelBuilder.BuildTestMetadata([2, 3, 4]);
@@ -31,7 +31,7 @@ namespace Px.Utils.UnitTests.OperationsTests
         }
 
         [TestMethod]
-        public void Apply_WhenCalledWithTransformationMap_ReturnsReorderedSubset()
+        public void ApplyWhenCalledWithTransformationMapReturnsReorderedSubset()
         {
             // Arrange
             MatrixMetadata meta = TestModelBuilder.BuildTestMetadata([5, 5, 10]);
