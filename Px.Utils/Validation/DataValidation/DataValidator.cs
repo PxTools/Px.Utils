@@ -76,7 +76,7 @@ namespace PxUtils.Validation.DataValidation
             SetValidationParameters(streamEncoding, conf, numOfRows, rowLen, startRow);
 
             IEnumerable<ValidationFeedback> validationFeedbacks =  await Task.Factory.StartNew(() => 
-                ValidateDataStream(stream), cancellationToken);
+                ValidateDataStream(stream, cancellationToken), cancellationToken);
 
             ResetValidator();
 
@@ -100,7 +100,7 @@ namespace PxUtils.Validation.DataValidation
             _dataSeparatorValidators.Add(new DataSeparatorValidator());
         }
 
-        private List<ValidationFeedback> ValidateDataStream(Stream stream)
+        private List<ValidationFeedback> ValidateDataStream(Stream stream, CancellationToken cancellationToken = default)
         {
             List<ValidationFeedback> validationFeedbacks = [];
             byte endOfData = (byte)_conf.Symbols.EntrySeparator;
@@ -108,7 +108,7 @@ namespace PxUtils.Validation.DataValidation
             _currentEntry = new(_streamBufferSize);
             byte[] buffer = new byte[_streamBufferSize];
             int bytesRead;
-            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+            while (!cancellationToken.IsCancellationRequested && (bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
             {
                 for (int i = 0; i < bytesRead; i++)
                 {
