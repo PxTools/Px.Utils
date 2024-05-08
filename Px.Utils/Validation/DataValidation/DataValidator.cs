@@ -100,16 +100,18 @@ namespace PxUtils.Validation.DataValidation
             _dataSeparatorValidators.Add(new DataSeparatorValidator());
         }
 
-        private List<ValidationFeedback> ValidateDataStream(Stream stream, CancellationToken cancellationToken = default)
+        private List<ValidationFeedback> ValidateDataStream(Stream stream, CancellationToken? cancellationToken = null)
         {
             List<ValidationFeedback> validationFeedbacks = [];
             byte endOfData = (byte)_conf.Symbols.EntrySeparator;
             _stringDelimeter = (byte)_conf.Symbols.Value.StringDelimeter;
             _currentEntry = new(_streamBufferSize);
             byte[] buffer = new byte[_streamBufferSize];
-            int bytesRead;
-            while (!cancellationToken.IsCancellationRequested && (bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+            int bytesRead = 0;
+
+            do
             {
+                cancellationToken?.ThrowIfCancellationRequested();
                 for (int i = 0; i < bytesRead; i++)
                 {
                     byte currentByte = buffer[i];
@@ -136,6 +138,7 @@ namespace PxUtils.Validation.DataValidation
                     _charPosition++;
                 }
             }
+            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0);
 
             if (_expectedRows != _lineNumber - 1)
             {
