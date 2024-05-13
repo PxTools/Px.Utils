@@ -80,34 +80,6 @@ namespace Px.Utils.PxFile.Data
         }
 
         /// <summary>
-        /// Builds an indexer based on a set of coordinates and the sizes of the dimensions in the original set.
-        /// </summary>
-        /// <param name="coordinates">
-        /// Produces the indexes of the items in these coordinates.
-        /// Each sublist in the list represents a dimension and the values in the sublist are the indexes of the values in the original set.
-        /// The order of the dimensions must match the original set.
-        /// </param>
-        /// <param name="dimensionOrder">
-        /// This list is used to change the order of dimensions. The values in the list are the indexes of the dimensions in the original set.
-        /// [0] = 1 means that the second dimension in the original set is used as the first dimension.
-        /// [1] = 0 means that the first dimension in the original set is used as the second dimension.
-        /// </param>
-        /// <param name="dimensionSizes">
-        /// Sizes of the dimensions in the original set, the order must match the coordinates and the original set.
-        /// </param>
-        public DataIndexer(int[][] coordinates, int[] dimensionOrder, int[] dimensionSizes)
-        {
-            _coordinates = [.. coordinates];
-            _dimOrder = [.. dimensionOrder];
-            DataLength = _coordinates.Select(c => c.Length).Aggregate(1, (a, b) => a * b);
-            _indices = new int[_coordinates.Length];
-            _lastIndices = _coordinates.Select(d => d.Length - 1).ToArray();
-            _lastCoordinateIndex = _coordinates.Length - 1;
-            _ReverseCumulativeProducts = GenerateRCP(dimensionSizes);
-            SetCurrentIndex();
-        }
-
-        /// <summary>
         /// Moves the indexer to the next item in the target map if possible.
         /// </summary>
         /// <returns>True if the indexer was moved to the next item, false if the indexer is at the last item.</returns>

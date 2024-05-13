@@ -1,4 +1,7 @@
-﻿using Px.Utils.PxFile.Data;
+﻿using Px.Utils.Models.Metadata;
+using Px.Utils.PxFile.Data;
+using Px.Utils.UnitTests;
+using PxUtils.Models.Metadata;
 
 namespace PxFileTests.DataTests
 {
@@ -6,13 +9,12 @@ namespace PxFileTests.DataTests
     public class DataIndexerTests
     {
         [TestMethod]
-        public void OneDimension1NextTest()
+        public void OneDimension1ValueNextTest()
         {
-            var coordinates = new int[][]
-            {
-                [ 0 ]
-            };
-            DataIndexer generator = new(coordinates, [1]);
+            MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([1]);
+            MatrixMap matrixMap = new([new DimensionMap("var0", ["var0_val0"])]);
+
+            DataIndexer generator = new(testMeta, matrixMap);
             long[] expected = [0];
             int i = 0;
 
@@ -26,13 +28,11 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void OneDimension5NextTest()
+        public void OneDimension5ValuesNextTest()
         {
-            var coordinates = new int[][]
-            {
-                [ 2, 3, 4 ]
-            };
-            DataIndexer generator = new(coordinates, [5]);
+            MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([5]);
+            MatrixMap matrixMap = new([new DimensionMap("var0", ["var0_val2", "var0_val3", "var0_val4"])]);
+            DataIndexer generator = new(testMeta, matrixMap);
             long[] expected = [2, 3, 4];
             int i = 0;
 
@@ -46,13 +46,11 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void OneDimension5LastTest()
+        public void OneDimension5ValuesLastTest()
         {
-            var coordinates = new int[][]
-            {
-                [ 4 ]
-            };
-            DataIndexer generator = new(coordinates, [5]);
+            MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([5]);
+            MatrixMap matrixMap = new([new DimensionMap("var0", ["var0_val4"])]);
+            DataIndexer generator = new(testMeta, matrixMap);
             long[] expected = [4];
             int i = 0;
 
@@ -64,17 +62,19 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ThreeDimensions3val2val5valNextTest()
+        public void TwoDimensions3val5valNextTest()
         {
-            var coordinates = new int[][]
-            {
-                [ 1, 2 ],
-                [ 0, 1 ],
-                [ 2, 3, 4 ]
-            };
-            DataIndexer generator = new(coordinates, [3, 2, 5]);
-            long[] expected = [12, 13, 14, 17, 18, 19, 22, 23, 24, 27, 28, 29];
+            MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([3, 5]);
+            MatrixMap matrixMap = new(
+            [
+                new DimensionMap("var0", ["var0_val1", "var0_val2"]),
+                new DimensionMap("var1", ["var1_val2", "var1_val3", "var1_val4"])
+            ]);
+            DataIndexer generator = new(testMeta, matrixMap);
+            long[] expected = [7, 8, 9, 12, 13, 14];
             int i = 0;
+
+            Assert.AreEqual(6, generator.DataLength);
 
             do
             {
@@ -86,15 +86,19 @@ namespace PxFileTests.DataTests
         [TestMethod]
         public void ThreeDimensions3val2val5valReorderingTest()
         {
-            var coordinates = new int[][]
-            {
-                [ 2, 1 ],
-                [ 0, 1 ],
-                [ 2, 3, 4 ]
-            };
-            DataIndexer generator = new(coordinates, [3, 2, 5]);
+            MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([3, 2, 5]);
+            MatrixMap matrixMap = new(
+            [
+                new DimensionMap("var0", ["var0_val2", "var0_val1"]),
+                new DimensionMap("var1", ["var1_val0", "var1_val1"]),
+                new DimensionMap("var2", ["var2_val2", "var2_val3", "var2_val4"])
+            ]);
+            DataIndexer generator = new(testMeta, matrixMap);
+
             long[] expected = [22, 23, 24, 27, 28, 29, 12, 13, 14, 17, 18, 19];
             int i = 0;
+
+            Assert.AreEqual(12, generator.DataLength);
 
             do
             {
@@ -106,15 +110,42 @@ namespace PxFileTests.DataTests
         [TestMethod]
         public void ThreeDimensions3val2val5valMultidimensionalReorderingTest()
         {
-            var coordinates = new int[][]
-            {
-                [ 2, 1 ],
-                [ 0, 1 ],
-                [ 4, 3, 2 ]
-            };
-            DataIndexer generator = new(coordinates, [3, 2, 5]);
+            MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([3, 2, 5]);
+            MatrixMap matrixMap = new(
+            [
+                new DimensionMap("var0", ["var0_val2", "var0_val1"]),
+                new DimensionMap("var1", ["var1_val0", "var1_val1"]),
+                new DimensionMap("var2", ["var2_val4", "var2_val3", "var2_val2"])
+            ]);
+            DataIndexer generator = new(testMeta, matrixMap);
+
             long[] expected = [24, 23, 22, 29, 28, 27, 14, 13, 12, 19, 18, 17];
             int i = 0;
+
+            Assert.AreEqual(12, generator.DataLength);
+
+            do
+            {
+                Assert.AreEqual(expected[i++], generator.CurrentIndex);
+            }
+            while (generator.Next());
+        }
+
+        [TestMethod]
+        public void TwoDimensionsWithSingleValueDimOrderChange()
+        {
+            MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([1, 1]);
+            MatrixMap matrixMap = new(
+            [
+                new DimensionMap("var1", ["var1_val0"]),
+                new DimensionMap("var0", ["var0_val0"])
+            ]);
+            DataIndexer generator = new(testMeta, matrixMap);
+
+            long[] expected = [0];
+            int i = 0;
+
+            Assert.AreEqual(1, generator.DataLength);
 
             do
             {
@@ -126,15 +157,15 @@ namespace PxFileTests.DataTests
         [TestMethod]
         public void ThreeDimensions3val2val5valMultidimensionalReorderingTestWithDimOrderChange()
         {
-            var coordinates = new int[][]
-            {
-                [ 2, 1 ],
-                [ 0, 1 ],
-                [ 4, 3, 2 ]
-            };
-            int[] dimOrder = [1, 0, 2];
-            int[] dimSizes = [3, 2, 5];
-            DataIndexer generator = new(coordinates, dimOrder, dimSizes);
+            MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([3, 2, 5]);
+            MatrixMap matrixMap = new(
+            [
+                new DimensionMap("var1", ["var1_val0", "var1_val1"]),
+                new DimensionMap("var0", ["var0_val2", "var0_val1"]),
+                new DimensionMap("var2", ["var2_val4", "var2_val3", "var2_val2"])
+            ]);
+            DataIndexer generator = new(testMeta, matrixMap);
+
             long[] expected = [24, 23, 22, 14, 13, 12, 29, 28, 27, 19, 18, 17];
             int i = 0;
 
