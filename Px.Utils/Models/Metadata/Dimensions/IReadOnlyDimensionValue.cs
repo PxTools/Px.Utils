@@ -21,5 +21,10 @@ namespace PxUtils.Models.Metadata.Dimensions
         /// Additional properties of the dimension value.
         /// </summary>
         IReadOnlyDictionary<string, MetaProperty> AdditionalProperties { get; }
+
+        /// <summary>
+        /// True if the value is not from the original data but was created by computing or aggregating other values.
+        /// </summary>
+        public bool Virtual { get; }
     }
 }

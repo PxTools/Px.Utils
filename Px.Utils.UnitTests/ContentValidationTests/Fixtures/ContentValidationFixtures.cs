@@ -322,8 +322,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 Validation.ValueType.StringValue);
 
         internal static ValidationStructuredEntry[] MINIMAL_STRUCTURED_ENTRY_ARRAY =>
-        new[]
-        {
+        [
             charsetEntry,
             axisVersionEntry,
             codepageEntry,
@@ -359,12 +358,12 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
             codesBarTimeEnEntry,
             variableCodeBarTimeEntry,
             variableCodeBarTimeEnEntry
-        };
+        ];
 
         internal static ValidationStructuredEntry[] EMPTY_STRUCTURED_ENTRY_ARRAY => [];
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_DEFAULT_LANGUAGE =>
-            new[] {
+            [
                 new ValidationStructuredEntry(
                     languageEntry.File,
                     languageEntry.Key,
@@ -373,42 +372,36 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                     languageEntry.LineChangeIndexes,
                     languageEntry.ValueStartIndex,
                     languageEntry.ValueType),
-            };
+            ];
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_MISSING_CONTVARIABLE =>
-            new[]
-            {
+            [
                 contVariableEntry,
-            };
+            ];
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_STUB =>
-            new[]
-            {
+            [
                 stubEntry,
-            };
+            ];
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_DESCRIPTION =>
-            new[]
-            {
+            [
                 descriptionEntry,
-            };
+            ];
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_DIMENSIONVALUES =>
-            new[]
-            {
+            [
                 valuesBarEntry,
-            };
+            ];
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_INVALID_CONTENT_VALUE_KEY_ENTRIES =>
-            new[]
-            {
+            [
                 unitsBarFooEntry,
                 precisionBarFooEntry,
-            };
+            ];
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_INCOMPLETE_VARIABLE_RECOMMENDED_KEYS =>
-            new[]
-            {
+            [
                 timevalEntry,
                 variableCodeBarEntry,
                 variableCodeBarEnEntry,
@@ -417,7 +410,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 codesBarEnEntry,
                 codesBarTimeEnEntry,
                 variableTypeBarEntry,
-            };
+            ];
 
         internal static ValidationStructuredEntry StructuredEntryWithIllegalSpecifiers =>
             new(filename,
@@ -465,8 +458,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                 Validation.ValueType.StringValue);
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_INVALID_VALUE_TYPES =>
-            new[]
-            {
+            [
                 new ValidationStructuredEntry(filename,
                     charsetEntry.Key,
                     "1",
@@ -502,11 +494,10 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                     timevalEntry.LineChangeIndexes,
                     timevalEntry.ValueStartIndex,
                     Validation.ValueType.DateTime)
-            };
+            ];
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_WRONG_VALUES =>
-            new[]
-            {
+            [
                 new ValidationStructuredEntry(filename,
                     charsetEntry.Key,
                     "foo",
@@ -528,7 +519,7 @@ namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
                     variableTypeBarEntry.LineChangeIndexes,
                     variableTypeBarEntry.ValueStartIndex,
                     Validation.ValueType.StringValue),
-            };
+            ];
 
         internal static ValidationStructuredEntry StructuredEntryWithUnmatchingAmountOfElements =>
             new(filename,

@@ -16,6 +16,8 @@ namespace ModelBuilderTests
         private MatrixMetadata Actual_1Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_1_Language.Entries);
         private MatrixMetadata Actual_Recommended_3Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Recommended_3_Langs.Entries);
 
+        private const char _stringDelimeter = '"';
+
         [TestMethod]
         public void MultiLangTableLevelMetaLanguageTests()
         {
@@ -130,7 +132,7 @@ namespace ModelBuilderTests
         [TestMethod]
         public void MultiLangContentDimensionBuildTest()
         {
-            IDimension? contentDimension = Actual_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            Dimension? contentDimension = Actual_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
             Assert.IsInstanceOfType<ContentDimension>(contentDimension);
             Assert.IsNotNull(contentDimension);
             Assert.AreEqual(3, contentDimension.Values.Count);
@@ -141,7 +143,7 @@ namespace ModelBuilderTests
         [TestMethod]
         public void SingleLangContentDimensionBuildTest()
         {
-            IDimension? contentDimension = (ContentDimension?)Actual_1Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            Dimension? contentDimension = (ContentDimension?)Actual_1Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
             Assert.IsInstanceOfType<ContentDimension>(contentDimension);
             Assert.IsNotNull(contentDimension);
             Assert.AreEqual(3, contentDimension.Values.Count);
@@ -222,7 +224,7 @@ namespace ModelBuilderTests
         [TestMethod]
         public void MultiLangContentDimensionBuildTestFromRecommendedFixture()
         {
-            IDimension? contentDimension = Actual_Recommended_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            Dimension? contentDimension = Actual_Recommended_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
             Assert.IsInstanceOfType<ContentDimension>(contentDimension);
             Assert.IsNotNull(contentDimension);
             Assert.AreEqual(3, contentDimension.Values.Count);
@@ -298,79 +300,77 @@ namespace ModelBuilderTests
         [TestMethod]
         public void MultiLangDefaultDimensionValueTest()
         {
-            IDimension? building_type_dim = Actual_3Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
+            Dimension? building_type_dim = Actual_3Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
             Assert.IsNotNull(building_type_dim);
-            IReadOnlyDimensionValue? defaultValue = building_type_dim.DefaultValue;
+            MultilanguageString defaultValue = building_type_dim.AdditionalProperties["ELIMINATION"].ValueAsMultilanguageString(_stringDelimeter, "fi");
             Assert.IsNotNull(defaultValue);
-            Assert.AreEqual("0", defaultValue.Code);
             MultilanguageString expected = new([new("fi", "Talotyypit yhteensä"), new("sv", "Hustyp totalt"), new("en", "Building types total")]);
-            Assert.AreEqual(expected, defaultValue.Name);
+            Assert.AreEqual(expected, defaultValue);
         }
 
         [TestMethod]
         public void SingleLangDefaultDimensionValueTest()
         {
-            IDimension? building_type_dim = Actual_1Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
+            Dimension? building_type_dim = Actual_1Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
             Assert.IsNotNull(building_type_dim);
-            IReadOnlyDimensionValue? defaultValue = building_type_dim.DefaultValue;
+            string defaultValue = building_type_dim.AdditionalProperties["ELIMINATION"].ValueAsString(_stringDelimeter);
             Assert.IsNotNull(defaultValue);
-            Assert.AreEqual("0", defaultValue.Code);
-            MultilanguageString expected = new("fi", "Talotyypit yhteensä");
-            Assert.AreEqual(expected, defaultValue.Name);
+            string expected = "Talotyypit yhteensä";
+            Assert.AreEqual(expected, defaultValue);
         }
 
         [TestMethod]
         public void MultiLangDimensionValuesTest()
         {
-            IDimension dim0 = Actual_3Lang.Dimensions[0];
+            Dimension dim0 = Actual_3Lang.Dimensions[0];
             Assert.AreEqual(8, dim0.Values.Count);
             List<string> expected0 = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"];
-            CollectionAssert.AreEqual(expected0, dim0.Values.Select(v => v.Code).ToList());
+            CollectionAssert.AreEqual(expected0, dim0.Values.Codes.ToList());
 
-            IDimension dim1 = Actual_3Lang.Dimensions[1];
+            Dimension dim1 = Actual_3Lang.Dimensions[1];
             Assert.AreEqual(7, dim1.Values.Count);
             List<string> expected1 = ["ksu", "pks", "msu", "091", "049", "092", "853"];
-            CollectionAssert.AreEqual(expected1, dim1.Values.Select(v => v.Code).ToList());
+            CollectionAssert.AreEqual(expected1, dim1.Values.Codes.ToList());
 
-            IDimension dim2 = Actual_3Lang.Dimensions[2];
+            Dimension dim2 = Actual_3Lang.Dimensions[2];
             Assert.AreEqual(3, dim2.Values.Count);
             List<string> expected2 = ["0", "1", "3"];
-            CollectionAssert.AreEqual(expected2, dim2.Values.Select(v => v.Code).ToList());
+            CollectionAssert.AreEqual(expected2, dim2.Values.Codes.ToList());
 
-            IDimension dim3 = Actual_3Lang.Dimensions[3];
+            Dimension dim3 = Actual_3Lang.Dimensions[3];
             Assert.AreEqual(3, dim3.Values.Count);
             List<string> expected3 = ["ketjutettu_lv", "vmuutos_lv", "lkm_julk_uudet"];
-            CollectionAssert.AreEqual(expected3, dim3.Values.Select(v => v.Code).ToList());
+            CollectionAssert.AreEqual(expected3, dim3.Values.Codes.ToList());
         }
 
         [TestMethod]
         public void SingleLangDimensionValuesTest()
         {
-            IDimension dim0 = Actual_1Lang.Dimensions[0];
+            Dimension dim0 = Actual_1Lang.Dimensions[0];
             Assert.AreEqual(8, dim0.Values.Count);
             List<string> expected0 = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"];
-            CollectionAssert.AreEqual(expected0, dim0.Values.Select(v => v.Code).ToList());
+            CollectionAssert.AreEqual(expected0, dim0.Values.Codes.ToList());
 
-            IDimension dim1 = Actual_1Lang.Dimensions[1];
+            Dimension dim1 = Actual_1Lang.Dimensions[1];
             Assert.AreEqual(7, dim1.Values.Count);
             List<string> expected1 = ["ksu", "pks", "msu", "091", "049", "092", "853"];
-            CollectionAssert.AreEqual(expected1, dim1.Values.Select(v => v.Code).ToList());
+            CollectionAssert.AreEqual(expected1, dim1.Values.Codes.ToList());
 
-            IDimension dim2 = Actual_1Lang.Dimensions[2];
+            Dimension dim2 = Actual_1Lang.Dimensions[2];
             Assert.AreEqual(3, dim2.Values.Count);
             List<string> expected2 = ["0", "1", "3"];
-            CollectionAssert.AreEqual(expected2, dim2.Values.Select(v => v.Code).ToList());
+            CollectionAssert.AreEqual(expected2, dim2.Values.Codes.ToList());
 
-            IDimension dim3 = Actual_1Lang.Dimensions[3];
+            Dimension dim3 = Actual_1Lang.Dimensions[3];
             Assert.AreEqual(3, dim3.Values.Count);
             List<string> expected3 = ["ketjutettu_lv", "vmuutos_lv", "lkm_julk_uudet"];
-            CollectionAssert.AreEqual(expected3, dim3.Values.Select(v => v.Code).ToList());
+            CollectionAssert.AreEqual(expected3, dim3.Values.Codes.ToList());
         }
 
         [TestMethod]
         public void MultiLangMapTestFromRecommendedFixture()
         {
-            IDimension? area_dim = Actual_Recommended_3Lang.Dimensions.Find(d => d.Code == "area");
+            Dimension? area_dim = Actual_Recommended_3Lang.Dimensions.Find(d => d.Code == "area");
             Assert.IsNotNull(area_dim);
             Assert.AreEqual(DimensionType.Geographical, area_dim.Type);
         }
@@ -378,7 +378,7 @@ namespace ModelBuilderTests
         [TestMethod]
         public void SingleLangMapTest()
         {
-            IDimension? area_dim = Actual_1Lang.Dimensions.Find(d => d.Code == "Alue");
+            Dimension? area_dim = Actual_1Lang.Dimensions.Find(d => d.Code == "Alue");
             Assert.IsNotNull(area_dim);
             Assert.AreEqual(DimensionType.Geographical, area_dim.Type);
         }

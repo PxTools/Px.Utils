@@ -159,11 +159,12 @@ namespace Px.Utils.TestingApp.Commands
                 size = sortedDimensions.Aggregate(1, (acc, x) => acc * x.ValueCodes.Count);
             }
 
-            List<DimensionMap> dimList = map.DimensionMaps
+            List<IDimensionMap> dimList = map.DimensionMaps
                 .Select(dim => dim.Code)
                 .Select(dimCode => new DimensionMap(
                     dimCode,
                     [.. sortedDimensions.First(dim => dim.Code == dimCode).ValueCodes]))
+                .Cast<IDimensionMap>()
                 .ToList();
 
             return new DataIndexer(map, new MatrixMap(dimList));

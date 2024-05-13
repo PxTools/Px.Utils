@@ -3,15 +3,15 @@ using PxUtils.Models.Metadata;
 using PxUtils.Models.Metadata.Dimensions;
 using PxUtils.Models.Metadata.Enums;
 
-namespace Px.Utils.UnitTests.ModelTests
+namespace Px.Utils.UnitTests
 {
     internal static class TestModelBuilder
     {
         internal static MatrixMetadata BuildTestMetadata(int[] dimensionSizes)
         {
-            List<IDimension> dimensions = [BuildTestContentDimension(0, dimensionSizes[0])];
-            if(dimensionSizes.Length > 1) dimensions.Add(BuildTestTimeDimension(1, dimensionSizes[1]));
-            if(dimensionSizes.Length > 2) dimensions.AddRange(dimensionSizes.Skip(2).Select((size, i) => BuildTestDimension(i + 2, size)));
+            List<Dimension> dimensions = [BuildTestContentDimension(0, dimensionSizes[0])];
+            if (dimensionSizes.Length > 1) dimensions.Add(BuildTestTimeDimension(1, dimensionSizes[1]));
+            if (dimensionSizes.Length > 2) dimensions.AddRange(dimensionSizes.Skip(2).Select((size, i) => BuildTestDimension(i + 2, size)));
             return new MatrixMetadata("en", ["en"], dimensions, []);
         }
 
@@ -38,7 +38,7 @@ namespace Px.Utils.UnitTests.ModelTests
             {
                 values.Add(BuildTestDimensionValue(code, i));
             }
-            return new TimeDimension(code, name, additionalProperties, values, null, TimeDimensionInterval.Year);
+            return new TimeDimension(code, name, additionalProperties, values, TimeDimensionInterval.Year);
         }
 
         internal static Dimension BuildTestDimension(int ordinal, int numOfValues)
@@ -51,7 +51,7 @@ namespace Px.Utils.UnitTests.ModelTests
             {
                 values.Add(BuildTestDimensionValue(code, i));
             }
-            return new Dimension(code, name, additionalProperties, values, null, DimensionType.Other);
+            return new Dimension(code, name, additionalProperties, values, DimensionType.Other);
         }
 
         internal static ContentDimensionValue BuildTestContentDimensionValue(string parentCode, int ordinal)

@@ -25,9 +25,9 @@ namespace Px.Utils.UnitTests.ModelTests
             List<string> var1ExpectedVars = ["var1_val0", "var1_val1"];
             List<string> var2ExpectedVars = ["var2_val0", "var2_val1"];
 
-            CollectionAssert.AreEqual(var0ExpectedVars, newMeta.Dimensions[0].Values.Select(v => v.Code).ToList());
-            CollectionAssert.AreEqual(var1ExpectedVars, newMeta.Dimensions[1].Values.Select(v => v.Code).ToList());
-            CollectionAssert.AreEqual(var2ExpectedVars, newMeta.Dimensions[2].Values.Select(v => v.Code).ToList());
+            CollectionAssert.AreEqual(var0ExpectedVars, newMeta.Dimensions[0].Values.Codes.ToList());
+            CollectionAssert.AreEqual(var1ExpectedVars, newMeta.Dimensions[1].Values.Codes.ToList());
+            CollectionAssert.AreEqual(var2ExpectedVars, newMeta.Dimensions[2].Values.Codes.ToList());
         }
 
         [TestMethod]
@@ -49,9 +49,9 @@ namespace Px.Utils.UnitTests.ModelTests
             List<string> var1ExpectedVars = ["var0_val0", "var0_val1"];
             List<string> var2ExpectedVars = ["var2_val1", "var2_val0"];
 
-            CollectionAssert.AreEqual(var0ExpectedVars, newMeta.Dimensions[0].Values.Select(v => v.Code).ToList());
-            CollectionAssert.AreEqual(var1ExpectedVars, newMeta.Dimensions[1].Values.Select(v => v.Code).ToList());
-            CollectionAssert.AreEqual(var2ExpectedVars, newMeta.Dimensions[2].Values.Select(v => v.Code).ToList());
+            CollectionAssert.AreEqual(var0ExpectedVars, newMeta.Dimensions[0].Values.Codes.ToList());
+            CollectionAssert.AreEqual(var1ExpectedVars, newMeta.Dimensions[1].Values.Codes.ToList());
+            CollectionAssert.AreEqual(var2ExpectedVars, newMeta.Dimensions[2].Values.Codes.ToList());
         }
     }
 }
