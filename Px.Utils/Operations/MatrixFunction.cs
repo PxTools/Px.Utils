@@ -14,6 +14,11 @@ namespace Px.Utils.Operations
     /// <typeparam name="TData">Type of the data values in the matrix</typeparam>
     public abstract class MatrixFunction<TData>
     {
+        /// <summary>
+        /// Applies the function to the input matrix, returning a new matrix with the result
+        /// </summary>
+        /// <param name="input">inoput matrix</param>
+        /// <returns>a new matrix with the result of the operation</returns>
         public abstract Matrix<TData> Apply(Matrix<TData> input);
 
         protected static MatrixMetadata CopyMetaAndAddValue(IReadOnlyMatrixMetadata meta, string dimCode, DimensionValue valueToAdd)
@@ -54,12 +59,21 @@ namespace Px.Utils.Operations
         }
     }
 
+    /// <summary>
+    /// A function adds a new value to a dimension which is a sum of values defined by a map
+    /// </summary>
+    /// <typeparam name="TData"></typeparam>
     public class SumMatrixFunction<TData> : MatrixFunction<TData> where TData : IAdditionOperators<TData, TData, TData>
     {
         private readonly DimensionValue _newValue;
         private readonly DimensionMap _sumMap;
         readonly int _valueIndex;
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="newValue">Dimension value that will represent the sum of the values</param>
+        /// <param name="sumMap">Defines which values will be summed</param>
         public SumMatrixFunction(DimensionValue newValue, DimensionMap sumMap)
         {
             _newValue = newValue;
@@ -67,6 +81,12 @@ namespace Px.Utils.Operations
             _valueIndex = -1;
         }
 
+        /// <summary>
+        /// Constructor that allows to specify the index where the new value will be inserted in the dimension
+        /// </summary>
+        /// <param name="newValue">Dimension value that will represent the sum of the values</param>
+        /// <param name="sumMap">Defines which values will be summed</param>
+        /// <param name="insertIndex">Zero based index where the new value will be inserted in the dimension</param>
         public SumMatrixFunction(DimensionValue newValue, DimensionMap sumMap, int insertIndex)
         {
             _newValue = newValue;
@@ -74,6 +94,11 @@ namespace Px.Utils.Operations
             _valueIndex = insertIndex;
         }
 
+        /// <summary>
+        /// Applies the sum operation to the input matrix, returning a new matrix with the result
+        /// </summary>
+        /// <param name="input">The input matrix</param>
+        /// <returns>New matrix with the result of the sum operation</returns>
         public override Matrix<TData> Apply(Matrix<TData> input)
         {
             MatrixMetadata newMeta = _valueIndex == -1 
