@@ -1,5 +1,5 @@
 ﻿using Px.Utils.TestingApp.Commands;
-using PxUtils.TestingApp;
+using Px.Utils.TestingApp;
 
 namespace Px.Utils.TestingApp
 {

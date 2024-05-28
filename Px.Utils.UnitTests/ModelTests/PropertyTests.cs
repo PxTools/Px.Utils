@@ -1,5 +1,5 @@
-﻿using PxUtils.Language;
-using PxUtils.Models.Metadata;
+﻿using Px.Utils.Language;
+using Px.Utils.Models.Metadata;
 
 namespace ModelTests
 {

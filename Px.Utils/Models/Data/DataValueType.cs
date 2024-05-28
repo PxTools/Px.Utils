@@ -1,4 +1,4 @@
-﻿namespace PxUtils.Models.Data
+﻿namespace Px.Utils.Models.Data
 {
     /// <summary>
     /// Type of a singular data value in a px file.

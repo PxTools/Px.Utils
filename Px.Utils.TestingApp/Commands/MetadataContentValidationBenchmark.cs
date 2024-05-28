@@ -1,6 +1,7 @@
-﻿using PxUtils.PxFile.Metadata;
-using PxUtils.Validation.ContentValidation;
-using PxUtils.Validation.SyntaxValidation;
+﻿using Px.Utils.PxFile;
+using Px.Utils.PxFile.Metadata;
+using Px.Utils.Validation.ContentValidation;
+using Px.Utils.Validation.SyntaxValidation;
 using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
@@ -12,16 +13,16 @@ namespace Px.Utils.TestingApp.Commands
         "\t-f, -file: The path to the px file to read." + Environment.NewLine +
         "\t-i, -iter: The number of iterations to run.";
 
-        internal override string Description => "Benchmarks the metadata content validation of Px.Utils/Validation/SyntaxValidation.";
-        ContentValidator validator;
-        ValidationStructuredEntry[] entries;
+        internal override string Description => "Benchmarks the metadata content validation of Px.Utils/Validation/SyntaxValidator.";
+        private readonly ContentValidator validator;
+        private ValidationStructuredEntry[] entries;
 
         internal MetadataContentValidationBenchmark()
         {             
             BenchmarkFunctions = [ValidateContentBenchmark];
             BenchmarkFunctionsAsync = [ValidateContentBenchmarkAsync];
             entries = [];
-            validator = new("", Encoding.Default);
+            validator = new(TestFilePath, Encoding.Default, entries);
         }
 
         protected override void OneTimeBenchmarkSetup()
@@ -31,19 +32,19 @@ namespace Px.Utils.TestingApp.Commands
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            entries = [.. SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, TestFilePath).Result];
-
-            validator = new(TestFilePath, encoding);
+            SyntaxValidator syntaxValidator = new(stream, Encoding.Default, TestFilePath);
+            SyntaxValidationResult validatorResult = (SyntaxValidationResult)syntaxValidator.Validate();
+            entries = [.. validatorResult.Result];
         }
 
         private void ValidateContentBenchmark()
         {
-            validator.Validate(entries);
+            validator.Validate();
         }
 
         private async Task ValidateContentBenchmarkAsync()
         {
-            await validator.ValidateAsync(entries);
+            await validator.ValidateAsync();
         }
     }
 }

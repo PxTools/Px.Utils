@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace PxUtils.Validation.SyntaxValidation
+namespace Px.Utils.Validation.SyntaxValidation
 {
     /// <summary>
     /// Provides a list of BCP-47 language codes. BCP-47 is a standard for the identification of human languages.

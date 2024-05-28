@@ -1,7 +1,7 @@
 ﻿using Px.Utils.TestingApp;
 using Px.Utils.TestingApp.Commands;
 
-namespace PxUtils.TestingApp
+namespace Px.Utils.TestingApp
 {
     /// <summary>
     /// Runs the interactive flow of the application.

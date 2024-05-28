@@ -1,4 +1,4 @@
-﻿using PxUtils.Validation.DataValidation;
+﻿using Px.Utils.Validation.DataValidation;
 
 namespace Px.Utils.UnitTests.Validation.Fixtures
 {

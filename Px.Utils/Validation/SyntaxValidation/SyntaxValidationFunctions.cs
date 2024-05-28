@@ -1,8 +1,8 @@
-﻿using PxUtils.PxFile;
+﻿using Px.Utils.PxFile;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace PxUtils.Validation.SyntaxValidation
+namespace Px.Utils.Validation.SyntaxValidation
 {
     public delegate ValidationFeedbackItem? EntryValidationFunction(ValidationEntry validationObject, PxFileSyntaxConf syntaxConf);
     public delegate ValidationFeedbackItem? KeyValuePairValidationFunction(ValidationKeyValuePair validationObject, PxFileSyntaxConf syntaxConf);

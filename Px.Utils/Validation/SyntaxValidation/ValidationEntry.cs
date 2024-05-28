@@ -1,6 +1,6 @@
-﻿using PxUtils.PxFile;
+﻿using Px.Utils.PxFile;
 
-namespace PxUtils.Validation.SyntaxValidation
+namespace Px.Utils.Validation.SyntaxValidation
 {
     /// <summary>
     /// Represents one entry in PX file metadata. Used for validation functions and building key-value-pair entries. This class implements the <see cref="ValidationObject"/> interface.

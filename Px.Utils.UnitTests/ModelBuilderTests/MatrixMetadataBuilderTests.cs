@@ -1,10 +1,10 @@
 ﻿using ModelBuilderTests.Fixtures;
-using PxUtils.Language;
-using PxUtils.ModelBuilders;
-using PxUtils.Models.Metadata;
-using PxUtils.Models.Metadata.Dimensions;
-using PxUtils.Models.Metadata.Enums;
-using PxUtils.Models.Metadata.ExtensionMethods;
+using Px.Utils.Language;
+using Px.Utils.ModelBuilders;
+using Px.Utils.Models.Metadata;
+using Px.Utils.Models.Metadata.Dimensions;
+using Px.Utils.Models.Metadata.Enums;
+using Px.Utils.Models.Metadata.ExtensionMethods;
 using System.Globalization;
 
 namespace ModelBuilderTests

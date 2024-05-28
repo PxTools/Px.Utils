@@ -1,8 +1,8 @@
-﻿using PxUtils.Exceptions;
+﻿using Px.Utils.Exceptions;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace PxUtils.PxFile.Metadata
+namespace Px.Utils.PxFile.Metadata
 {
     /// <summary>
     /// Provides methods to read metadata and get the encoding from a stream of a Px file.

@@ -1,5 +1,5 @@
-﻿using PxUtils.ModelBuilders;
-using PxUtils.Models.Metadata.Enums;
+﻿using Px.Utils.ModelBuilders;
+using Px.Utils.Models.Metadata.Enums;
 
 namespace ModelBuilderTests.ValueParserUtilitiesTests
 {

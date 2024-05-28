@@ -1,9 +1,9 @@
-﻿using PxUtils.PxFile;
-using PxUtils.Validation.SyntaxValidation;
-using System.Collections.Generic;
+﻿using Px.Utils.PxFile;
+using Px.Utils.Validation;
+using Px.Utils.Validation.SyntaxValidation;
 using System.Text;
 
-namespace PxUtils.Validation.ContentValidation
+namespace Px.Utils.Validation.ContentValidation
 {
     /// <summary>
     /// Provides methods for validating the content of Px file metadata
@@ -11,7 +11,12 @@ namespace PxUtils.Validation.ContentValidation
     /// <param name="encoding"> encoding of the Px file</param>
     /// <param name="syntaxConf">Object that stores syntax specific symbols and tokens for the Px file</param>
     /// </summary>
-    public sealed partial class ContentValidator(string filename, Encoding encoding, PxFileSyntaxConf? syntaxConf = null)
+    public sealed partial class ContentValidator(
+        string filename,
+        Encoding encoding,
+        ValidationStructuredEntry[] entries,
+        CustomContentValidationFunctions? customContentValidationFunctions = null,
+        PxFileSyntaxConf? syntaxConf = null) : IPxFileValidator
     {
         private readonly string _filename = filename;
         private readonly Encoding _encoding = encoding;
@@ -49,10 +54,7 @@ namespace PxUtils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
         /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
-        public ValidationFeedbackItem[] Validate(
-            ValidationStructuredEntry[] entries,
-            CustomContentValidationFunctions? customContentValidationFunctions = null
-            )
+        public IValidationResult Validate()
         {
 
             IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
@@ -88,7 +90,7 @@ namespace PxUtils.Validation.ContentValidation
 
             ResetFields();
 
-            return [.. feedbackItems];
+            return new ContentValidationResult([.. feedbackItems]);
         }
 
         /// <summary>
@@ -98,11 +100,7 @@ namespace PxUtils.Validation.ContentValidation
         /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
         /// <param name="cancellationToken">Cancellation token for cancelling the validation process</param>
         /// <returns>Array of <see cref="ValidationFeedbackItem"/> objects. Any issues found during validation will be listed here</returns>
-        public async Task<ValidationFeedbackItem[]> ValidateAsync(
-            ValidationStructuredEntry[] entries,
-            CustomContentValidationFunctions? customContentValidationFunctions = null,
-            CancellationToken cancellationToken = default
-            )
+        public async Task<IValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
             IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
             IEnumerable<ContentValidationFindKeywordValidator> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
@@ -137,7 +135,7 @@ namespace PxUtils.Validation.ContentValidation
 
             ResetFields();
 
-            return [.. feedbackItems];
+            return new ContentValidationResult([.. feedbackItems]);
         }
 
         private void ResetFields()

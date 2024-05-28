@@ -1,14 +1,13 @@
 ﻿using Px.Utils.Models.Metadata.Dimensions;
-using PxUtils.Language;
-using PxUtils.Models.Metadata;
-using PxUtils.Models.Metadata.Dimensions;
-using PxUtils.Models.Metadata.Enums;
-using PxUtils.Models.Metadata.ExtensionMethods;
-using PxUtils.PxFile;
+using Px.Utils.Language;
+using Px.Utils.Models.Metadata;
+using Px.Utils.Models.Metadata.Enums;
+using Px.Utils.Models.Metadata.ExtensionMethods;
+using Px.Utils.PxFile;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-namespace PxUtils.ModelBuilders
+namespace Px.Utils.ModelBuilders
 {
     /// <summary>
     /// Class for building <see cref="MatrixMetadata"/> objects from metadata input.

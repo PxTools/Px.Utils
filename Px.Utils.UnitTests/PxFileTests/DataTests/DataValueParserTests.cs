@@ -1,6 +1,6 @@
-﻿using PxUtils.Models.Data;
-using PxUtils.Models.Data.DataValue;
-using PxUtils.PxFile.Data;
+﻿using Px.Utils.Models.Data;
+using Px.Utils.Models.Data.DataValue;
+using Px.Utils.PxFile.Data;
 
 namespace PxFileTests.DataTests
 {

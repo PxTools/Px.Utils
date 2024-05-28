@@ -1,4 +1,4 @@
-﻿using PxUtils.Models.Metadata.Dimensions;
+﻿using Px.Utils.Models.Metadata.Dimensions;
 using System.Collections;
 
 namespace Px.Utils.Models.Metadata.Dimensions

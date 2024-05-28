@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
 using Px.Utils.UnitTests.Validation.Fixtures;
-using PxUtils.PxFile;
-using PxUtils.Validation;
-using PxUtils.Validation.DataValidation;
+using Px.Utils.PxFile;
+using Px.Utils.Validation;
+using Px.Utils.Validation.DataValidation;
 
 namespace Px.Utils.UnitTests.Validation.DataValidationTests
 {

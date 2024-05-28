@@ -1,6 +1,5 @@
 ﻿using Px.Utils.Models.Metadata;
 using Px.Utils.PxFile.Data;
-using PxUtils.Models.Metadata;
 
 namespace Px.Utils.Models
 {

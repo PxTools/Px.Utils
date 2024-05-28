@@ -1,4 +1,4 @@
-﻿namespace PxUtils.Validation
+﻿namespace Px.Utils.Validation
 {
     /// <summary>
     /// Validation feedback represents the result of a validation operation.

@@ -1,9 +1,9 @@
-﻿using PxUtils.Models.Metadata.Enums;
-using PxUtils.Language;
+﻿using Px.Utils.Models.Metadata.Enums;
+using Px.Utils.Language;
 using Px.Utils.Models.Metadata;
 using Px.Utils.Models.Metadata.Dimensions;
 
-namespace PxUtils.Models.Metadata.Dimensions
+namespace Px.Utils.Models.Metadata.Dimensions
 {
     /// <summary>
     /// Class representing a time dimension

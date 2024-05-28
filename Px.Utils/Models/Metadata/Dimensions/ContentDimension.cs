@@ -1,9 +1,9 @@
 ﻿using Px.Utils.Models.Metadata;
 using Px.Utils.Models.Metadata.Dimensions;
-using PxUtils.Language;
-using PxUtils.Models.Metadata.Enums;
+using Px.Utils.Language;
+using Px.Utils.Models.Metadata.Enums;
 
-namespace PxUtils.Models.Metadata.Dimensions
+namespace Px.Utils.Models.Metadata.Dimensions
 {
     /// <summary>
     /// Class representing a content dimension.

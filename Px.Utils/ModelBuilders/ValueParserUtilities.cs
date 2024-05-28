@@ -1,7 +1,7 @@
-﻿using PxUtils.Models.Metadata.Enums;
-using PxUtils.PxFile;
+﻿using Px.Utils.Models.Metadata.Enums;
+using Px.Utils.PxFile;
 
-namespace PxUtils.ModelBuilders
+namespace Px.Utils.ModelBuilders
 {
     /// <summary>
     /// Class containing utility methods for parsing various types of values from Px-style metadata value string.

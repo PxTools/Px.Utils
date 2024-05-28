@@ -1,4 +1,4 @@
-﻿using PxUtils.Language;
+﻿using Px.Utils.Language;
 
 namespace LanguageTests
 {

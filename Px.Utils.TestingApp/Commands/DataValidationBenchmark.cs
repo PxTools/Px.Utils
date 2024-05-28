@@ -1,7 +1,7 @@
-﻿using PxUtils.PxFile;
-using PxUtils.PxFile.Data;
-using PxUtils.Validation.DataValidation;
-using PxUtils.PxFile.Metadata;
+﻿using Px.Utils.PxFile;
+using Px.Utils.PxFile.Data;
+using Px.Utils.Validation.DataValidation;
+using Px.Utils.PxFile.Metadata;
 using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
@@ -30,8 +30,6 @@ namespace Px.Utils.TestingApp.Commands
 
         private const int readStartOffset = 3;
 
-        private readonly DataValidator validator;
-
         internal DataValidationBenchmark()
         {
             BenchmarkFunctions = [ValidateDataBenchmarks];
@@ -39,7 +37,6 @@ namespace Px.Utils.TestingApp.Commands
             ParameterFlags.Add(expectedRowsFlags);
             ParameterFlags.Add(expectedColsFlags);
             encoding = Encoding.UTF8;
-            validator = new();
         }
 
         protected override void OneTimeBenchmarkSetup()
@@ -57,15 +54,17 @@ namespace Px.Utils.TestingApp.Commands
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             stream.Position = start + dataKeyword.Length + readStartOffset; // skip the '=' and linechange
-            validator.Validate(stream, expectedCols, expectedRows, 0, encoding);
+            DataValidator validator = new(stream, expectedCols, expectedRows, TestFilePath, 0, encoding);
+            validator.Validate();
         }
         
         private async Task ValidateDataBenchmarksAsync()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             stream.Position = start + dataKeyword.Length + readStartOffset; // skip the '=' and linechange
+            DataValidator validator = new(stream, expectedCols, expectedRows, TestFilePath, 0, encoding);
 
-            await validator.ValidateAsync(stream, expectedCols, expectedRows, 0, encoding);
+            await validator.ValidateAsync();
         }
 
         protected override void SetRunParameters()

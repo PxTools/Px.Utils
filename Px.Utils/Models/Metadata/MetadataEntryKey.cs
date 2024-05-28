@@ -1,4 +1,4 @@
-﻿namespace PxUtils.Models.Metadata
+﻿namespace Px.Utils.Models.Metadata
 {
     /// <summary>
     /// The MetadataEntryKey struct represents a unique identifier for a metadata entry in a Px-file.

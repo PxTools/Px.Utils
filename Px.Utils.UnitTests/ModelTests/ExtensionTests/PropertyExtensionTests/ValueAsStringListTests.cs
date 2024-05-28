@@ -1,5 +1,5 @@
-﻿using PxUtils.Models.Metadata;
-using PxUtils.Models.Metadata.ExtensionMethods;
+﻿using Px.Utils.Models.Metadata;
+using Px.Utils.Models.Metadata.ExtensionMethods;
 
 namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
 {

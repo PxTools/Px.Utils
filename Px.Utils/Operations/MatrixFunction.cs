@@ -2,8 +2,7 @@
 using Px.Utils.Models.Metadata;
 using Px.Utils.Models.Metadata.ExtensionMethods;
 using Px.Utils.PxFile.Data;
-using PxUtils.Models.Metadata;
-using PxUtils.Models.Metadata.Dimensions;
+using Px.Utils.Models.Metadata.Dimensions;
 using System.Numerics;
 
 namespace Px.Utils.Operations

@@ -1,11 +1,11 @@
 ﻿using Px.Utils.Models.Metadata;
 using Px.Utils.Models.Metadata.ExtensionMethods;
 using Px.Utils.PxFile.Data;
-using PxUtils.ModelBuilders;
-using PxUtils.Models.Data.DataValue;
-using PxUtils.Models.Metadata;
-using PxUtils.PxFile.Data;
-using PxUtils.PxFile.Metadata;
+using Px.Utils.ModelBuilders;
+using Px.Utils.Models.Data.DataValue;
+using Px.Utils.Models.Metadata;
+using Px.Utils.PxFile.Data;
+using Px.Utils.PxFile.Metadata;
 using System.Text;
 
 namespace Px.Utils.TestingApp.Commands

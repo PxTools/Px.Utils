@@ -1,6 +1,6 @@
-﻿using PxUtils.Validation.SyntaxValidation;
+﻿using Px.Utils.Validation.SyntaxValidation;
 
-namespace PxUtils.UnitTests.ContentValidationTests.Fixtures
+namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
 {
     internal static class ContentValidationFixtures
     {

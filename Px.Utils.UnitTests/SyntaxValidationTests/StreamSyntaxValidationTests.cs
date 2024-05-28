@@ -1,12 +1,12 @@
-﻿using PxUtils.Validation.SyntaxValidation;
-using PxUtils.UnitTests.SyntaxValidationTests.Fixtures;
+﻿using Px.Utils.Validation.SyntaxValidation;
+using Px.Utils.UnitTests.SyntaxValidationTests.Fixtures;
 using System.Text;
 using System.Reflection;
-using PxUtils.Validation;
-using PxUtils.PxFile;
-using PxUtils.PxFile.Metadata;
+using Px.Utils.Validation;
+using Px.Utils.PxFile;
+using Px.Utils.PxFile.Metadata;
 
-namespace PxUtils.UnitTests.SyntaxValidationTests
+namespace Px.Utils.UnitTests.SyntaxValidationTests
 {
     [TestClass]
     public class StreamSyntaxValidationTests
@@ -22,11 +22,11 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         [TestInitialize]
         public void Initialize()
         {
-            entryValidationMethod = typeof(SyntaxValidation)
+            entryValidationMethod = typeof(SyntaxValidator)
                 .GetMethod("ValidateEntries", BindingFlags.NonPublic | BindingFlags.Static);
-            kvpValidationMethod = typeof(SyntaxValidation)
+            kvpValidationMethod = typeof(SyntaxValidator)
                 .GetMethod("ValidateKeyValuePairs", BindingFlags.NonPublic | BindingFlags.Static);
-            structuredValidationMethod = typeof(SyntaxValidation)
+            structuredValidationMethod = typeof(SyntaxValidator)
                 .GetMethod("ValidateStructs", BindingFlags.NonPublic | BindingFlags.Static);
             getValueTypeFromStringMethod = typeof(SyntaxValidationUtilityMethods)
                 .GetMethod("GetValueTypeFromString", BindingFlags.NonPublic | BindingFlags.Static);
@@ -40,12 +40,13 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             using Stream stream = new MemoryStream(data);
             Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
+            SyntaxValidator validator = new(stream, encoding, filename);
 
             // Assert
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename);
+            SyntaxValidationResult result = (SyntaxValidationResult)validator.Validate();
             Assert.AreEqual(8, result.Result.Count);
             Assert.AreEqual(0, feedback.Count);
         }
@@ -73,12 +74,13 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             using Stream stream = new MemoryStream(data);
             Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
+            SyntaxValidator validator = new(stream, encoding, filename);
 
             // Assert
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename);
+            SyntaxValidationResult result = (SyntaxValidationResult)validator.Validate();
             Assert.AreEqual(10, result.Result.Count);
             Assert.AreEqual("YES", result.Result[8].Value);
             Assert.AreEqual("NO", result.Result[9].Value);
@@ -97,13 +99,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             using Stream stream = new MemoryStream(data);
             Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
+            SyntaxValidator validator = new(stream, encoding, filename);
 
             // Assert
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename);
-            Assert.AreEqual(2, result.FeedbackItems.Count);
+            SyntaxValidationResult result = (SyntaxValidationResult)validator.Validate();
+            Assert.AreEqual(2, result.FeedbackItems.Length);
             Assert.AreEqual(9, result.FeedbackItems[0].Feedback.Line);
             Assert.AreEqual(18, result.FeedbackItems[0].Feedback.Character);
             Assert.AreEqual(12, result.FeedbackItems[1].Feedback.Line);
@@ -382,21 +385,21 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
-        [DataRow("TLIST(A1),\"2000\",\"2001\",\"2003\"", Validation.ValueType.TimeValSeries)]
-        [DataRow("TLIST(H1),\"20001\", \"20002\", \"20011\", \"20012\"", Validation.ValueType.TimeValSeries)] // Has spaces between values
-        [DataRow("TLIST(T1),\"20001\",\"20002\",\"20003\"", Validation.ValueType.TimeValSeries)]
-        [DataRow("TLIST(Q1),\"20001\",\"20002\",\"20003\",\"20004\"", Validation.ValueType.TimeValSeries)]
-        [DataRow("TLIST(M1),\"200001\",\"200002\",\n\"200003\"", Validation.ValueType.TimeValSeries)] // Has newline between values
-        [DataRow("TLIST(W1),\"200050\",\"200051\",\"200052\"", Validation.ValueType.TimeValSeries)]
-        [DataRow("TLIST(D1),\"20001010\",\"20001011\",\"20001012\"", Validation.ValueType.TimeValSeries)]
-        [DataRow("TLIST(A1, \"2000-2003\")", Validation.ValueType.TimeValRange)]
-        [DataRow("TLIST(H1, \"20001-20012\")", Validation.ValueType.TimeValRange)]
-        [DataRow("TLIST(T1, \"20001-20003\")", Validation.ValueType.TimeValRange)]
-        [DataRow("TLIST(Q1, \"20001-20004\")", Validation.ValueType.TimeValRange)]
-        [DataRow("TLIST(M1, \"200001-200003\")", Validation.ValueType.TimeValRange)]
-        [DataRow("TLIST(W1, \"200050-200052\")", Validation.ValueType.TimeValRange)]
-        [DataRow("TLIST(D1, \"20001010-20001012\")", Validation.ValueType.TimeValRange)]
-        public void CorrectlyDefinedRangeAndSeriesTimeValuesReturnCorrectValueType(string timeval, Validation.ValueType type)
+        [DataRow("TLIST(A1),\"2000\",\"2001\",\"2003\"", Utils.Validation.ValueType.TimeValSeries)]
+        [DataRow("TLIST(H1),\"20001\", \"20002\", \"20011\", \"20012\"", Utils.Validation.ValueType.TimeValSeries)] // Has spaces between values
+        [DataRow("TLIST(T1),\"20001\",\"20002\",\"20003\"", Utils.Validation.ValueType.TimeValSeries)]
+        [DataRow("TLIST(Q1),\"20001\",\"20002\",\"20003\",\"20004\"", Utils.Validation.ValueType.TimeValSeries)]
+        [DataRow("TLIST(M1),\"200001\",\"200002\",\n\"200003\"", Utils.Validation.ValueType.TimeValSeries)] // Has newline between values
+        [DataRow("TLIST(W1),\"200050\",\"200051\",\"200052\"", Utils.Validation.ValueType.TimeValSeries)]
+        [DataRow("TLIST(D1),\"20001010\",\"20001011\",\"20001012\"", Utils.Validation.ValueType.TimeValSeries)]
+        [DataRow("TLIST(A1, \"2000-2003\")", Utils.Validation.ValueType.TimeValRange)]
+        [DataRow("TLIST(H1, \"20001-20012\")", Utils.Validation.ValueType.TimeValRange)]
+        [DataRow("TLIST(T1, \"20001-20003\")", Utils.Validation.ValueType.TimeValRange)]
+        [DataRow("TLIST(Q1, \"20001-20004\")", Utils.Validation.ValueType.TimeValRange)]
+        [DataRow("TLIST(M1, \"200001-200003\")", Utils.Validation.ValueType.TimeValRange)]
+        [DataRow("TLIST(W1, \"200050-200052\")", Utils.Validation.ValueType.TimeValRange)]
+        [DataRow("TLIST(D1, \"20001010-20001012\")", Utils.Validation.ValueType.TimeValRange)]
+        public void CorrectlyDefinedRangeAndSeriesTimeValuesReturnCorrectValueType(string timeval, Utils.Validation.ValueType type)
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = [ new("foo", new KeyValuePair<string, string>("foo-key", timeval), 0, [], 0) ];
@@ -404,7 +407,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
 
             // Act
             feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, syntaxConf]) as List<ValidationFeedbackItem> ?? [];
-            Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, [keyValuePairs[0].KeyValuePair.Value, PxFileSyntaxConf.Default]) as Validation.ValueType?;
+            Utils.Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, [keyValuePairs[0].KeyValuePair.Value, PxFileSyntaxConf.Default]) as Utils.Validation.ValueType?;
 
             // Assert
             Assert.AreEqual(0, feedback.Count);
@@ -413,7 +416,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
 
         [TestMethod]
         [DataRow("TLIST(A1),2000,2001,2003", null)]
-        [DataRow("\"TLIST(H1)\",\"20001\", \"20002\", \"20011\", \"20012\"", Validation.ValueType.ListOfStrings)]
+        [DataRow("\"TLIST(H1)\",\"20001\", \"20002\", \"20011\", \"20012\"", Utils.Validation.ValueType.ListOfStrings)]
         [DataRow("TLIST(T1)=\"20001\",\"20002\",\"20003\"", null)]
         [DataRow("TLIST(Q1):\"20001\",\"20002\",\"20003\",\"20004\"", null)]
         [DataRow("TLIST(M1),\"20001\",\"20002\",\"20003\"", null)]
@@ -426,7 +429,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
         [DataRow("TLIST(M1, \"2000/01-2000/03\")", null)]
         [DataRow("TLIST(W1, \"2000.50-2000.52\")", null)]
         [DataRow("TLIST(D1, \"10/10/2000-10/11/2000\")", null)]
-        public void IncorrectlyDefinedRangeAndSeriesTimeValuesReturnWithErrors(string timeval, Validation.ValueType? type)
+        public void IncorrectlyDefinedRangeAndSeriesTimeValuesReturnWithErrors(string timeval, Utils.Validation.ValueType? type)
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = [new("foo", new KeyValuePair<string, string>("foo-key", timeval), 0, [], 0)];
@@ -434,7 +437,7 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
 
             // Act
             feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, syntaxConf]) as List<ValidationFeedbackItem> ?? [];
-            Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, [keyValuePairs[0].KeyValuePair.Value, PxFileSyntaxConf.Default]) as Validation.ValueType?;
+            Utils.Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, [keyValuePairs[0].KeyValuePair.Value, PxFileSyntaxConf.Default]) as Utils.Validation.ValueType?;
 
             // Assert
             if (type is null)
@@ -453,13 +456,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             using Stream stream = new MemoryStream(data);
             Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
+            SyntaxValidator validator = new(stream, encoding, filename);
 
             // Assert
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename);
-            Assert.AreEqual(0, result.FeedbackItems.Count);
+            SyntaxValidationResult result = (SyntaxValidationResult)validator.Validate();
+            Assert.AreEqual(0, result.FeedbackItems.Length);
         }
 
         [TestMethod]
@@ -470,13 +474,14 @@ namespace PxUtils.UnitTests.SyntaxValidationTests
             using Stream stream = new MemoryStream(data);
             Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
+            SyntaxValidator validator = new(stream, encoding, filename);
 
             // Assert
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, filename);
-            Assert.AreEqual(2, result.FeedbackItems.Count);
+            SyntaxValidationResult result = (SyntaxValidationResult)validator.Validate();
+            Assert.AreEqual(2, result.FeedbackItems.Length);
             Assert.AreEqual(9, result.FeedbackItems[0].Feedback.Line);
             Assert.AreEqual(16, result.FeedbackItems[0].Feedback.Character);
             Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, result.FeedbackItems[0].Feedback.Rule);

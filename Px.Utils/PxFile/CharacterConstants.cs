@@ -1,4 +1,4 @@
-﻿namespace PxUtils.PxFile
+﻿namespace Px.Utils.PxFile
 {
     public static class CharacterConstants
     {

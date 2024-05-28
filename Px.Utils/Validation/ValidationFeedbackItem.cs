@@ -1,4 +1,4 @@
-﻿namespace PxUtils.Validation
+﻿namespace Px.Utils.Validation
 {
     /// <summary>
     /// A validation feedback item associates a <see cref="Validation.ValidationObject"/> with the feedback from validating that object.

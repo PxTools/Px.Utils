@@ -1,6 +1,6 @@
-﻿using PxUtils.Language;
+﻿using Px.Utils.Language;
 
-namespace PxUtils.Models.Metadata.Dimensions
+namespace Px.Utils.Models.Metadata.Dimensions
 {
     /// <summary>
     /// Class representing a generic dimension value.

@@ -1,14 +1,21 @@
-﻿using PxUtils.PxFile;
+﻿using Px.Utils.PxFile;
 using System.Runtime.CompilerServices;
 using System.Text;
+using static Px.Utils.Validation.SyntaxValidation.SyntaxValidator;
 
-namespace PxUtils.Validation.SyntaxValidation
+namespace Px.Utils.Validation.SyntaxValidation
 {
     /// <summary>
     /// Provides methods for validating the syntax of a PX file. Validation can be done using both synchronous and asynchronous methods.
     /// Additionally custom validation functions can be provided to be used during validation.
     /// </summary>
-    public static class SyntaxValidation
+    public class SyntaxValidator(
+            Stream stream,
+            Encoding encoding,
+            string filename,
+            PxFileSyntaxConf? syntaxConf = null,
+            int bufferSize = DEFAULT_BUFFER_SIZE,
+            CustomValidationFunctions? customValidationFunctions = null) : IPxFileValidator
     {
         /// <summary>
         /// Collection of custom validation functions to be used during validation.
@@ -28,23 +35,9 @@ namespace PxUtils.Validation.SyntaxValidation
         ///<summary>
         /// Validates the syntax of a PX file's metadata.
         ///</summary>
-        /// <param name="stream">The stream of the PX file to be validated.</param>
-        /// <param name="encoding">The encoding format to use for the PX file reading</param>
-        /// <param name="filename">The name of the file to be validated.</param>
-        /// <param name="syntaxConf">An optional <see cref="PxFileSyntaxConf"/> parameter that specifies the syntax configuration for the PX file. 
-        /// If not provided, the default syntax configuration is used.</param>
-        /// <param name="bufferSize">An optional parameter that specifies the buffer size for reading the file. If not provided, a default buffer size of 4096 is used.</param>
-        /// <param name="customValidationFunctions">An optional <see cref="CustomValidationFunctions"/> parameter that specifies custom validation functions to be used during validation. 
-        /// If not provided, the default validation functions are used.</param>
         /// <returns>A <see cref="SyntaxValidationResult"/> entry which contains a list of <see cref="ValidationStructuredEntry"/> entries 
         /// and a list of <see cref="ValidationFeedbackItem"/> entries accumulated during the validation.</returns>
-        public static SyntaxValidationResult ValidatePxFileMetadataSyntax(
-            Stream stream,
-            Encoding encoding,
-            string filename,
-            PxFileSyntaxConf? syntaxConf = null,
-            int bufferSize = DEFAULT_BUFFER_SIZE,
-            CustomValidationFunctions? customValidationFunctions = null)
+        public IValidationResult Validate()
         {
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
@@ -68,31 +61,16 @@ namespace PxUtils.Validation.SyntaxValidation
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
             validationFeedback.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, syntaxConf));
 
-            return new([.. validationFeedback], structuredEntries);
+            return new SyntaxValidationResult([.. validationFeedback], structuredEntries);
         }
 
         /// <summary>
         /// Asynchronously validates the syntax of a PX file's metadata.
         /// </summary>
-        /// <param name="stream">The stream of the PX file to be validated.</param>
-        /// <param name="encoding">The encoding format to use for the PX file reading</param>
-        /// <param name="filename">The name of the file to be validated.</param>
-        /// <param name="syntaxConf">An optional <see cref="PxFileSyntaxConf"/> parameter that specifies the syntax configuration for the PX file. 
-        /// If not provided, the default syntax configuration is used.</param>
-        /// <param name="bufferSize">An optional parameter that specifies the buffer size for reading the file. If not provided, a default buffer size of 4096 is used.</param>
-        /// <param name="customValidationFunctions">An optional <see cref="CustomValidationFunctions"/> parameter that specifies custom validation functions to be used during validation. 
-        /// If not provided, the default validation functions are used.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> parameter that can be used to cancel the operation.</param>
         /// <returns>A task that contains a <see cref="SyntaxValidationResult"/> entry, which contains the structured validation entries 
         /// and a list of <see cref="ValidationStructuredEntry"/> entries accumulated during the validation.</returns>
-        public static async Task<SyntaxValidationResult> ValidatePxFileMetadataSyntaxAsync(
-            Stream stream,
-            Encoding encoding,
-            string filename,
-            PxFileSyntaxConf? syntaxConf = null,
-            int bufferSize = DEFAULT_BUFFER_SIZE,
-            CustomValidationFunctions? customValidationFunctions = null,
-            CancellationToken cancellationToken = default)
+        public async Task<IValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
@@ -115,7 +93,7 @@ namespace PxUtils.Validation.SyntaxValidation
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
             validationFeedback.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, syntaxConf));
 
-            return new([.. validationFeedback], structuredEntries);
+            return new SyntaxValidationResult([.. validationFeedback], structuredEntries);
         }
 
         private static List<ValidationFeedbackItem> ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunction> validationFunctions, PxFileSyntaxConf syntaxConf)

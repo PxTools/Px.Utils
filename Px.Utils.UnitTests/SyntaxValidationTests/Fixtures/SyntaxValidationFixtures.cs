@@ -1,7 +1,7 @@
-﻿using PxUtils.Validation.SyntaxValidation;
-using PxUtils.Validation;
+﻿using Px.Utils.Validation.SyntaxValidation;
+using Px.Utils.Validation;
 
-namespace PxUtils.UnitTests.SyntaxValidationTests.Fixtures
+namespace Px.Utils.UnitTests.SyntaxValidationTests.Fixtures
 {
     internal static class SyntaxValidationFixtures
     {
