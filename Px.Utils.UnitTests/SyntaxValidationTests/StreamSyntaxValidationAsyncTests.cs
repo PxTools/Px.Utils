@@ -20,12 +20,13 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             using Stream stream = new MemoryStream(data);
             Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
+            SyntaxValidator validator = new(stream, encoding, filename);
 
             // Assert
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = await SyntaxValidator.ValidateAsync(stream, encoding, filename);
+            SyntaxValidationResult result = (SyntaxValidationResult)await validator.ValidateAsync();
             Assert.AreEqual(8, result.Result.Count);
             Assert.AreEqual(0, feedback.Count);
         }
@@ -38,12 +39,13 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             using Stream stream = new MemoryStream(data);
             Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
+            SyntaxValidator validator = new(stream, encoding, filename);
 
             // Assert
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = await SyntaxValidator.ValidateAsync(stream, encoding, filename);
+            SyntaxValidationResult result = (SyntaxValidationResult)await validator.ValidateAsync();
             Assert.AreEqual(10, result.Result.Count);
             Assert.AreEqual("YES", result.Result[8].Value);
             Assert.AreEqual("NO", result.Result[9].Value);

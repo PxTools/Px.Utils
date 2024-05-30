@@ -3,8 +3,6 @@ using Px.Utils.PxFile.Data;
 using Px.Utils.UnitTests;
 using PxFileTests.Fixtures;
 using Px.Utils.Models.Data.DataValue;
-using Px.Utils.Models.Metadata;
-using Px.Utils.PxFile.Data;
 using System.Text;
 
 namespace PxFileTests.DataTests.PxFileStreamDataReaderTests

@@ -1,5 +1,4 @@
 ﻿using Px.Utils.Models.Metadata;
-using Px.Utils.Models.Metadata;
 
 namespace Px.Utils.UnitTests.ModelTests
 {

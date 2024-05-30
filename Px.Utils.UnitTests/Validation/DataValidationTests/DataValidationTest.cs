@@ -10,23 +10,21 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
     [TestClass]
     public class DataValidationTest
     {
-        private readonly DataValidator validator = new();
-
         [TestMethod]
         public void TestValidateWithoutErrors()
         {
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_VALID_DATA));
             stream.Seek(6, 0);
+            DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
 
-            IEnumerable<ValidationFeedback> validationFeedbacks =
-                validator.Validate(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
+            ValidationFeedbackItem[] validationFeedbacks = validator.Validate().FeedbackItems;
 
-            foreach (ValidationFeedback validationFeedback in validationFeedbacks)
+            foreach (ValidationFeedbackItem validationFeedback in validationFeedbacks)
             {
-                Logger.LogMessage($"Line {validationFeedback.Line}, Char {validationFeedback.Character}: " 
-                                  + $"{validationFeedback.Rule} {validationFeedback.AdditionalInfo}");
+                Logger.LogMessage($"Line {validationFeedback.Feedback.Line}, Char {validationFeedback.Feedback.Character}: " 
+                                  + $"{validationFeedback.Feedback.Rule} {validationFeedback.Feedback.AdditionalInfo}");
             }
-            Assert.AreEqual(0, validationFeedbacks.Count());
+            Assert.AreEqual(0, validationFeedbacks.Length);
         }
 
         [TestMethod]
@@ -34,16 +32,17 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_VALID_DATA));
             stream.Seek(6, 0);
+            DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
 
-            IEnumerable<ValidationFeedback> validationFeedbacks =
-                await validator.ValidateAsync(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
+            IValidationResult result = await validator.ValidateAsync();
+            ValidationFeedbackItem[] validationFeedbacks = result.FeedbackItems;
 
-            foreach (ValidationFeedback validationFeedback in validationFeedbacks)
+            foreach (ValidationFeedbackItem validationFeedback in validationFeedbacks)
             {
-                Logger.LogMessage($"Line {validationFeedback.Line}, Char {validationFeedback.Character}: " 
-                                  + $"{validationFeedback.Rule} {validationFeedback.AdditionalInfo}");
+                Logger.LogMessage($"Line {validationFeedback.Feedback.Line}, Char {validationFeedback.Feedback.Character}: "
+                                  + $"{validationFeedback.Feedback.Rule} {validationFeedback.Feedback.AdditionalInfo}");
             }
-            Assert.AreEqual(0, validationFeedbacks.Count());
+            Assert.AreEqual(0, validationFeedbacks.Length);
 
         }
 
@@ -51,17 +50,17 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         public void TestValidateWithErrors()
         {
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_INVALID_DATA));
-            stream.Seek(6, 0);
+            stream.Seek(6, 0); 
+            DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
 
-            IEnumerable<ValidationFeedback> validationFeedbacks =
-                validator.Validate(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
+            ValidationFeedbackItem[] validationFeedbacks = validator.Validate().FeedbackItems;
 
-            foreach (ValidationFeedback validationFeedback in validationFeedbacks)
+            foreach (ValidationFeedbackItem validationFeedback in validationFeedbacks)
             {
-                Logger.LogMessage($"Line {validationFeedback.Line}, Char {validationFeedback.Character}: " 
-                                  + $"{validationFeedback.Rule} {validationFeedback.AdditionalInfo}");
+                Logger.LogMessage($"Line {validationFeedback.Feedback.Line}, Char {validationFeedback.Feedback.Character}: "
+                                  + $"{validationFeedback.Feedback.Rule} {validationFeedback.Feedback.AdditionalInfo}");
             }
-            Assert.AreEqual(10, validationFeedbacks.Count());
+            Assert.AreEqual(10, validationFeedbacks.Length);
         }
 
         [TestMethod]
@@ -69,17 +68,17 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_INVALID_DATA));
             stream.Seek(6, 0);
+            DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
 
-            IEnumerable<ValidationFeedback> validationFeedbacks =
-                await validator.ValidateAsync(stream, 5, 4, 1, Encoding.UTF8, PxFileSyntaxConf.Default);
+            IValidationResult result = await validator.ValidateAsync();
+            ValidationFeedbackItem[] validationFeedbacks = result.FeedbackItems;
 
-            foreach (ValidationFeedback validationFeedback in validationFeedbacks)
+            foreach (ValidationFeedbackItem validationFeedback in validationFeedbacks)
             {
-                Logger.LogMessage($"Line {validationFeedback.Line}, Char {validationFeedback.Character}: " 
-                                  + $"{validationFeedback.Rule} {validationFeedback.AdditionalInfo}");
+                Logger.LogMessage($"Line {validationFeedback.Feedback.Line}, Char {validationFeedback.Feedback.Character}: "
+                                  + $"{validationFeedback.Feedback.Rule} {validationFeedback.Feedback.AdditionalInfo}");
             }
-
-            Assert.AreEqual(10, validationFeedbacks.Count());
+            Assert.AreEqual(10, validationFeedbacks.Length);
         }
     }
 }
