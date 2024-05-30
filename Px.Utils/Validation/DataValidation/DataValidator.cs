@@ -4,7 +4,14 @@ using Px.Utils.PxFile;
 namespace Px.Utils.Validation.DataValidation
 {
     /// <summary>
-    /// The DataValidator class is used to validate the data section of a PX file.
+    /// The DataValidator class is used to validate the data section of a Px file.
+    /// <param name="stream">Px file stream to be validated</param>
+    /// <param name="rowLen">Length of one row of Px file data</param>
+    /// <param name="numOfRows">Amount of rows of Px file data</param>
+    /// <param name="filename">Name of the file being validated</param>
+    /// <param name="startRow">The row number where the data section starts</param>
+    /// <param name="streamEncoding">Encoding of the stream</param>
+    /// <param name="conf">Syntax configuration for the Px file</param>
     /// </summary>
     public class DataValidator(Stream stream, int rowLen, int numOfRows, string filename,
         int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null) : IPxFileValidator
@@ -32,7 +39,8 @@ namespace Px.Utils.Validation.DataValidation
         /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
         /// </summary>
         /// <returns>
-        /// A collection of ValidationFeedbackItem objects representing the feedback for the data validation.
+        /// <see cref="DataValidationResult"/> object that contains a collection of 
+        /// ValidationFeedbackItem objects representing the feedback for the data validation.
         /// </returns>
         public IValidationResult Validate()
         {
@@ -48,9 +56,10 @@ namespace Px.Utils.Validation.DataValidation
         /// <summary>
         /// Validates the data in the specified stream asynchronously.
         /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
-        /// </summary>
-        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
-        /// <returns>A collection of validation feedback for the data.</returns>
+        /// <returns>
+        /// <see cref="DataValidationResult"/> object that contains a collection of 
+        /// ValidationFeedbackItem objects representing the feedback for the data validation.
+        /// </returns>
         public async Task<IValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
             SetValidationParameters();

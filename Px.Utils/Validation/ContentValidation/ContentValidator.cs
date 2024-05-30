@@ -9,6 +9,8 @@ namespace Px.Utils.Validation.ContentValidation
     /// Provides methods for validating the content of Px file metadata
     /// <param name="filename">Name of the Px file</param>
     /// <param name="encoding"> encoding of the Px file</param>
+    /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent key-value entries of the Px file metadata</param>"
+    /// <param name="customContentValidationFunctions">Object that contains any optional additional validation functions</param>
     /// <param name="syntaxConf">Object that stores syntax specific symbols and tokens for the Px file</param>
     /// </summary>
     public sealed partial class ContentValidator(
@@ -52,8 +54,7 @@ namespace Px.Utils.Validation.ContentValidation
         /// <summary>
         /// Validates contents of Px file metadata. Metadata syntax must be valid for this method to work properly.
         /// </summary>
-        /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
-        /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
+        /// <returns><see cref="ContentValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
         public IValidationResult Validate()
         {
 
@@ -88,18 +89,19 @@ namespace Px.Utils.Validation.ContentValidation
                 }
             }
 
+            int lengthOfDataRows = _headingDimensionNames is not null ? GetProductOfDimensionValues(_headingDimensionNames) : 0;
+            int amountOfDataRows = _stubDimensionNames is not null ? GetProductOfDimensionValues(_stubDimensionNames) : 0;
+
             ResetFields();
 
-            return new ContentValidationResult([.. feedbackItems]);
+            return new ContentValidationResult([.. feedbackItems], lengthOfDataRows, amountOfDataRows);
         }
 
         /// <summary>
         /// Validates contents of Px file metadata asynchronously. Metadata syntax must be valid for this method to work properly.
         /// </summary>
-        /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
-        /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
         /// <param name="cancellationToken">Cancellation token for cancelling the validation process</param>
-        /// <returns>Array of <see cref="ValidationFeedbackItem"/> objects. Any issues found during validation will be listed here</returns>
+        /// <returns><see cref="ContentValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
         public async Task<IValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
             IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
@@ -133,9 +135,30 @@ namespace Px.Utils.Validation.ContentValidation
             entryTasks.Select(task => task.Result).ToList().ForEach(feedback =>
                 feedbackItems.AddRange(feedback is not null ? feedback : []));
 
+            int lengthOfDataRows = _headingDimensionNames is not null ? GetProductOfDimensionValues(_headingDimensionNames) : 0;
+            int amountOfDataRows = _stubDimensionNames is not null ? GetProductOfDimensionValues(_stubDimensionNames) : 0;
+
             ResetFields();
 
-            return new ContentValidationResult([.. feedbackItems]);
+            return new ContentValidationResult([.. feedbackItems], lengthOfDataRows, amountOfDataRows);
+        }
+
+        private int GetProductOfDimensionValues(Dictionary<string, string[]> dimensions)
+        {
+            string? lang = _defaultLanguage ?? _availableLanguages?[0];
+            if (lang is null)
+            {
+                return 0;
+            }
+            string[] headingDimensionNames = dimensions[lang];
+            if (headingDimensionNames is null || headingDimensionNames.Length == 0 || _dimensionValueNames is null)
+            {
+                return 0;
+            }
+            return _dimensionValueNames
+                .Where(kvp => headingDimensionNames
+                .Contains(kvp.Key.Value)).Select(kvp => kvp.Value.Length)
+                .Aggregate((a, b) => a * b);
         }
 
         private void ResetFields()
