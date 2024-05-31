@@ -15,9 +15,7 @@ namespace Px.Utils.TestingApp.Commands
         private int expectedCols;
 
         internal override string Help =>
-        "Reads the defined dataset from the target px file the given amount of times." + Environment.NewLine +
-        "\t-f, -file: The path to the px file to read." + Environment.NewLine +
-        "\t-i, -iter: The number of iterations to run." + Environment.NewLine +
+        "Validates the px file data." + Environment.NewLine +
         "\t-r, -rows: How many data rows the validator should expect." + Environment.NewLine +
         "\t-c, -cols: How many data colums the validator should expect.";
 
