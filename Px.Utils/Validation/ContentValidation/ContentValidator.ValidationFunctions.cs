@@ -832,7 +832,7 @@ namespace Px.Utils.Validation.ContentValidation
                 ];
 
             if ((stringTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.StringValue) ||
-                (listOfStringTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.ListOfStrings) ||
+                (listOfStringTypes.Contains(entry.Key.Keyword) && (entry.ValueType != ValueType.ListOfStrings && entry.ValueType != ValueType.StringValue)) ||
                 (dateTimeTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.DateTime) ||
                 (numberTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.Number) ||
                 (timeval.Contains(entry.Key.Keyword) && (entry.ValueType != ValueType.TimeValRange && entry.ValueType != ValueType.TimeValSeries)))

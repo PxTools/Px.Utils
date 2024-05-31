@@ -1,12 +1,12 @@
 ﻿using Px.Utils.PxFile;
-using Px.Utils.UnitTests.ContentValidationTests.Fixtures;
+using Px.Utils.UnitTests.Validation.Fixtures;
 using Px.Utils.Validation;
 using Px.Utils.Validation.ContentValidation;
 using Px.Utils.Validation.SyntaxValidation;
 using System.Text;
 using System.Reflection;
 
-namespace Px.Utils.UnitTests.ContentValidationTests
+namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 {
     [TestClass]
     public class ContentValidationTests

@@ -1,7 +1,6 @@
 ﻿using Px.Utils.PxFile;
 using System.Runtime.CompilerServices;
 using System.Text;
-using static Px.Utils.Validation.SyntaxValidation.SyntaxValidator;
 
 namespace Px.Utils.Validation.SyntaxValidation
 {
@@ -12,32 +11,20 @@ namespace Px.Utils.Validation.SyntaxValidation
     /// <param name="encoding">Encoding of the PX file</param>
     /// <param name="filename">Name of the PX file</param>
     /// <param name="syntaxConf">Object that stores syntax specific symbols and tokens for the PX file</param>
-    /// <param name="bufferSize">Size of the buffer used for reading the stream</param>
     /// <param name="customValidationFunctions">Object that contains any optional additional validation functions</param>
+    /// TODO: Leave stream open
     /// </summary>
     public class SyntaxValidator(
             Stream stream,
             Encoding encoding,
             string filename,
             PxFileSyntaxConf? syntaxConf = null,
-            int bufferSize = DEFAULT_BUFFER_SIZE,
-            CustomValidationFunctions? customValidationFunctions = null) : IPxFileValidator
+            CustomSyntaxValidationFunctions? customValidationFunctions = null,
+            bool leaveStreamOpen = false) : IPxFileValidator
     {
-        /// <summary>
-        /// Collection of custom validation functions to be used during validation.
-        /// </summary>
-        public class CustomValidationFunctions(
-            List<EntryValidationFunction> stringValidationFunctions,
-            List<KeyValuePairValidationFunction> keyValueValidationFunctions,
-            List<StructuredValidationFunction> structuredValidationFunctions)
-        {
-            public List<EntryValidationFunction> CustomStringValidationFunctions { get; } = stringValidationFunctions;
-            public List<KeyValuePairValidationFunction> CustomKeyValueValidationFunctions { get; } = keyValueValidationFunctions;
-            public List<StructuredValidationFunction> CustomStructuredValidationFunctions { get; } = structuredValidationFunctions;
-        }
-
-        private const int DEFAULT_BUFFER_SIZE = 4096;
+        private const int _bufferSize = 4096;
         private int _dataSectionStartRow = -1;
+        private int _dataSectionStartStreamPosition = -1;
 
         ///<summary>
         /// Validates the syntax of a PX file's metadata.
@@ -61,14 +48,14 @@ namespace Px.Utils.Validation.SyntaxValidation
             syntaxConf ??= PxFileSyntaxConf.Default;
 
             List<ValidationFeedbackItem> validationFeedback = [];
-            List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, syntaxConf, filename, bufferSize);
+            List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, syntaxConf, filename, _bufferSize);
             validationFeedback.AddRange(ValidateEntries(stringEntries, stringValidationFunctions, syntaxConf));
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(stringEntries, syntaxConf);
             validationFeedback.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, syntaxConf));
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
             validationFeedback.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, syntaxConf));
 
-            return new SyntaxValidationResult([.. validationFeedback], structuredEntries, _dataSectionStartRow);
+            return new SyntaxValidationResult([.. validationFeedback], structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
         }
 
         /// <summary>
@@ -93,14 +80,14 @@ namespace Px.Utils.Validation.SyntaxValidation
 
             syntaxConf ??= PxFileSyntaxConf.Default;
             List<ValidationFeedbackItem> validationFeedback = [];
-            List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, syntaxConf, filename, bufferSize, cancellationToken);
+            List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, syntaxConf, filename, _bufferSize, cancellationToken);
             validationFeedback.AddRange(ValidateEntries(entries, stringValidationFunctions, syntaxConf));
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, syntaxConf);
             validationFeedback.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, syntaxConf));
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
             validationFeedback.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, syntaxConf));
 
-            return new SyntaxValidationResult([.. validationFeedback], structuredEntries, _dataSectionStartRow);
+            return new SyntaxValidationResult([.. validationFeedback], structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
         }
 
         private static List<ValidationFeedbackItem> ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunction> validationFunctions, PxFileSyntaxConf syntaxConf)
@@ -197,7 +184,7 @@ namespace Px.Utils.Validation.SyntaxValidation
             int entryStartIndex = 0;
             int entryStartLineIndex = 0;
 
-            using StreamReader reader = new(stream, encoding);
+            using StreamReader reader = new(stream, encoding, leaveOpen: leaveStreamOpen);
             List<ValidationEntry> entries = [];
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
@@ -209,6 +196,8 @@ namespace Px.Utils.Validation.SyntaxValidation
                     if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
                     {
                         _dataSectionStartRow = lineChangeIndexes.Count;
+                        // This here should find the actual start of the data section, after line changes, spaces and whatnot.
+                        _dataSectionStartStreamPosition = characterIndex + 1;
                         return entries;
                     }
                     UpdateLineAndCharacter(buffer[i], syntaxConf, ref characterIndex, ref lineChangeIndexes, ref isProcessingString);
@@ -253,8 +242,8 @@ namespace Px.Utils.Validation.SyntaxValidation
             List<int> lineChangeIndexes = [];
             int entryStartIndex = 0;
             int entryStartLineIndex = 0;
-
-            using StreamReader reader = new(stream, encoding);
+            
+            using StreamReader reader = new(stream, encoding, leaveOpen: leaveStreamOpen);
             List<ValidationEntry> entries = [];
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
@@ -267,6 +256,7 @@ namespace Px.Utils.Validation.SyntaxValidation
                     if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
                     {
                         _dataSectionStartRow = lineChangeIndexes.Count;
+                        _dataSectionStartStreamPosition = characterIndex + 1;
                         return entries;
                     }
                     UpdateLineAndCharacter(buffer[i], syntaxConf, ref characterIndex, ref lineChangeIndexes, ref isProcessingString);

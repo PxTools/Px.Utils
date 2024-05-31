@@ -1,6 +1,6 @@
 ﻿using Px.Utils.Validation.SyntaxValidation;
 
-namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
+namespace Px.Utils.UnitTests.Validation.Fixtures
 {
     internal static class ContentValidationFixtures
     {
@@ -81,7 +81,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
         private static readonly ValidationStructuredEntry stubEntry =
             new(filename,
                 new ValidationStructuredEntryKey("STUB"),
-                "bar,bar-time",
+                "bar",
                 8,
                 [],
                 5,
@@ -90,17 +90,35 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
         private static readonly ValidationStructuredEntry stubEnEntry =
             new(filename,
                 new ValidationStructuredEntryKey("STUB", "en"),
-                "bar-en,bar-time-en",
+                "bar-en",
                 9,
                 [],
                 9,
+                Utils.Validation.ValueType.ListOfStrings);
+
+        private static readonly ValidationStructuredEntry headingEntry = 
+            new(filename,
+                new ValidationStructuredEntryKey("HEADING"),
+                "bar-time",
+                10,
+                [],
+                5,
+                Utils.Validation.ValueType.ListOfStrings);
+
+        private static readonly ValidationStructuredEntry headingEnEntry =
+            new(filename,
+                new ValidationStructuredEntryKey("HEADING", "en"),
+                "bar-time-en",
+                11,
+                [],
+                5,
                 Utils.Validation.ValueType.ListOfStrings);
 
         private static readonly ValidationStructuredEntry contVariableEntry =
             new(filename,
                 new ValidationStructuredEntryKey("CONTVARIABLE"),
                 "bar",
-                10,
+                12,
                 [],
                 8,
                 Utils.Validation.ValueType.StringValue);
@@ -109,7 +127,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("CONTVARIABLE", "en"),
                 "bar-en",
-                11,
+                13,
                 [],
                 12,
                 Utils.Validation.ValueType.StringValue);
@@ -118,7 +136,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("TABLEID"),
                 "baz",
-                12,
+                14,
                 [],
                 9,
                 Utils.Validation.ValueType.StringValue);
@@ -127,7 +145,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("DESCRIPTION"),
                 "foobar",
-                13,
+                15,
                 [],
                 12,
                 Utils.Validation.ValueType.StringValue);
@@ -136,7 +154,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("DESCRIPTION", "en"),
                 "foobar-en",
-                14,
+                16,
                 [],
                 16,
                 Utils.Validation.ValueType.StringValue);
@@ -145,7 +163,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("VALUES", null, "bar"),
                 "foo",
-                15,
+                17,
                 [],
                 7,
                 Utils.Validation.ValueType.ListOfStrings);
@@ -154,7 +172,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("VALUES", "en", "bar-en"),
                 "foo-en",
-                16,
+                18,
                 [],
                 11,
                 Utils.Validation.ValueType.ListOfStrings);
@@ -163,7 +181,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("LAST-UPDATED", null, "bar", "foo"),
                 "20230131 08:00",
-                17,
+                19,
                 [],
                 13,
                 Utils.Validation.ValueType.DateTime);
@@ -172,7 +190,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("UNITS", null, "bar", "foo"),
                 "unit",
-                19,
+                20,
                 [],
                 13,
                 Utils.Validation.ValueType.StringValue);
@@ -181,7 +199,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("UNITS", "en", "bar-en", "foo-en"),
                 "unit-en",
-                20,
+                21,
                 [],
                 17,
                 Utils.Validation.ValueType.StringValue);
@@ -190,7 +208,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("PRECISION", null, "bar", "foo"),
                 "0",
-                21,
+                22,
                 [],
                 13,
                 Utils.Validation.ValueType.Number);
@@ -199,7 +217,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("VARIABLE-TYPE", null, "bar"),
                 "Content",
-                22,
+                23,
                 [],
                 13,
                 Utils.Validation.ValueType.StringValue);
@@ -208,7 +226,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("TIMEVAL", null, "bar-time"),
                 "TLIST(A1),2000,2001,2002,2003",
-                23,
+                24,
                 [],
                 17,
                 Utils.Validation.ValueType.TimeValSeries);
@@ -217,7 +235,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("TIMEVAL", "en", "bar-time-en"),
                 "TLIST(A1),2000,2001,2002,2003",
-                24,
+                25,
                 [],
                 17,
                 Utils.Validation.ValueType.TimeValSeries);
@@ -226,7 +244,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("VALUES", null, "bar-time"),
                 "2000,2001,2002,2003",
-                25,
+                26,
                 [],
                 17,
                 Utils.Validation.ValueType.ListOfStrings);
@@ -235,7 +253,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("VALUES", "en", "bar-time-en"),
                 "2000,2001,2002,2003",
-                26,
+                27,
                 [],
                 17,
                 Utils.Validation.ValueType.ListOfStrings);
@@ -244,7 +262,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("VARIABLECODE", null, "bar"),
                 "bar-code",
-                27,
+                28,
                 [],
                 5,
                 Utils.Validation.ValueType.StringValue);
@@ -253,7 +271,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("VARIABLECODE", "en", "bar-en"),
                 "bar-en-code",
-                28,
+                29,
                 [],
                 9,
                 Utils.Validation.ValueType.StringValue);
@@ -262,7 +280,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("VARIABLE-TYPE", null, "bar-time"),
                 "Time",
-                29,
+                30,
                 [],
                 13,
                 Utils.Validation.ValueType.StringValue);
@@ -271,7 +289,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("CODES", null, "bar"),
                 "code-foo",
-                30,
+                31,
                 [],
                 13,
                 Utils.Validation.ValueType.ListOfStrings);
@@ -280,7 +298,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("CODES", "en", "bar-en"),
                 "code-en-foo",
-                31,
+                32,
                 [],
                 13,
                 Utils.Validation.ValueType.ListOfStrings);
@@ -289,7 +307,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("CODES", null, "bar-time"),
                 "2000,2001,2002,2003",
-                32,
+                33,
                 [],
                 17,
                 Utils.Validation.ValueType.ListOfStrings);
@@ -298,7 +316,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("CODES", "en", "bar-time-en"),
                 "2000,2001,2002,2003",
-                33,
+                34,
                 [],
                 17,
                 Utils.Validation.ValueType.ListOfStrings);
@@ -307,7 +325,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("VARIABLECODE", null, "bar-time"),
                 "bar-time-code",
-                34,
+                35,
                 [],
                 17,
                 Utils.Validation.ValueType.StringValue);
@@ -316,7 +334,7 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             new(filename,
                 new ValidationStructuredEntryKey("VARIABLECODE", "en", "bar-time-en"),
                 "bar-time-en-code",
-                35,
+                36,
                 [],
                 17,
                 Utils.Validation.ValueType.StringValue);
@@ -333,6 +351,8 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
             copyrightEntry,
             stubEntry,
             stubEnEntry,
+            headingEntry,
+            headingEnEntry,
             contVariableEntry,
             contVariableEnEntry,
             tableIdEntry,
@@ -466,13 +486,6 @@ namespace Px.Utils.UnitTests.ContentValidationTests.Fixtures
                     charsetEntry.LineChangeIndexes,
                     charsetEntry.ValueStartIndex,
                     Utils.Validation.ValueType.Number),
-                new ValidationStructuredEntry(filename,
-                    languagesEntry.Key,
-                    "fi",
-                    languagesEntry.ValueStartIndex,
-                    languagesEntry.LineChangeIndexes,
-                    languagesEntry.ValueStartIndex,
-                    Utils.Validation.ValueType.StringValue),
                 new ValidationStructuredEntry(filename,
                     lastUpdatedBarFooEntry.Key,
                     "1/1/2023",

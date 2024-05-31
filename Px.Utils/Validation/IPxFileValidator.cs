@@ -1,12 +1,12 @@
 ﻿namespace Px.Utils.Validation
 {
     /// <summary>
-    /// TODO: Summary
+    /// Represents a validator for a Px file.
     /// </summary>
-    internal interface IPxFileValidator
+    public interface IPxFileValidator
     {
-        internal IValidationResult Validate();
+        public IValidationResult Validate();
 
-        internal Task<IValidationResult> ValidateAsync(CancellationToken cancellationToken = default);
+        public Task<IValidationResult> ValidateAsync(CancellationToken cancellationToken = default);
     }
 }

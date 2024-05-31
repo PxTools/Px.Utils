@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using Px.Utils.PxFile;
 
 namespace Px.Utils.Validation.DataValidation
@@ -46,11 +47,14 @@ namespace Px.Utils.Validation.DataValidation
         {
             SetValidationParameters();
 
-            ValidationFeedbackItem[] validationFeedbacks = ValidateDataStream(stream);
+            List<ValidationFeedbackItem> validationFeedbacks = [];
+            stream.Position = GetStreamIndexOfFirstDataValue(ref validationFeedbacks);
+            ValidationFeedbackItem[] dataStreamFeedbacks = ValidateDataStream(stream);
+            validationFeedbacks.AddRange(dataStreamFeedbacks);
 
             ResetValidator();
 
-            return new DataValidationResult(validationFeedbacks);
+            return new DataValidationResult([..validationFeedbacks]);
         }
 
         /// <summary>
@@ -64,12 +68,15 @@ namespace Px.Utils.Validation.DataValidation
         {
             SetValidationParameters();
 
-            ValidationFeedbackItem[] validationFeedbacks =  await Task.Factory.StartNew(() => 
+            List<ValidationFeedbackItem> validationFeedbacks = [];
+            stream.Position = GetStreamIndexOfFirstDataValue(ref validationFeedbacks);
+            ValidationFeedbackItem[] dataStreamFeedbacks =  await Task.Factory.StartNew(() => 
                 ValidateDataStream(stream, cancellationToken), cancellationToken);
+            validationFeedbacks.AddRange(dataStreamFeedbacks);
 
             ResetValidator();
 
-            return new DataValidationResult(validationFeedbacks);
+            return new DataValidationResult([.. validationFeedbacks]);
         }
 
         private void SetValidationParameters()
@@ -127,7 +134,13 @@ namespace Px.Utils.Validation.DataValidation
             {
                 validationFeedbacks.Add(new(
                     new(filename, _lineNumber + startRow, []),
-                    new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidRowCount, _lineNumber + startRow, _charPosition)));
+                    new(
+                        ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.DataValidationFeedbackInvalidRowCount, 
+                        _lineNumber + startRow,
+                        _charPosition, 
+                        $" Expected {numOfRows} rows, got {_lineNumber - 1} rows."
+                        )));
             }
 
             return [..validationFeedbacks];
@@ -197,6 +210,35 @@ namespace Px.Utils.Validation.DataValidation
             _lineNumber = 1;
             _charPosition = 0;
             _currentRowLength = 0;
+        }
+
+        private int GetStreamIndexOfFirstDataValue(ref List<ValidationFeedbackItem> feedbacks)
+        {
+            byte[] buffer = new byte[_streamBufferSize];
+            int bytesRead;
+            do
+            {
+                bytesRead = stream.Read(buffer, 0, buffer.Length);
+                for (int i = 0; i < bytesRead; i++)
+                {
+                    char test = (char)buffer[i];
+                    if (buffer[i] >= CharacterConstants.Zero && buffer[i] <= CharacterConstants.Nine)
+                    {
+                        return (int)stream.Position - bytesRead + i;
+                    }
+                    else if (!CharacterConstants.WhitespaceCharacters.Contains((char)buffer[i]))
+                    {
+                        feedbacks.Add(new ValidationFeedbackItem(
+                            new(filename, _lineNumber + startRow, []),
+                            new(ValidationFeedbackLevel.Error,
+                            ValidationFeedbackRule.DataValidationFeedbackInvalidChar, 
+                            _lineNumber + startRow, 
+                            _charPosition)));
+                    }
+                }
+            } while (bytesRead > 0);
+
+            return -1;
         }
     }
 

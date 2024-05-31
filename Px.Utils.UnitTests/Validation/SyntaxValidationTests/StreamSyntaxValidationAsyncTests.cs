@@ -1,5 +1,5 @@
 ﻿using Px.Utils.Validation.SyntaxValidation;
-using Px.Utils.UnitTests.SyntaxValidationTests.Fixtures;
+using Px.Utils.UnitTests.Validation.Fixtures;
 using System.Text;
 using Px.Utils.Validation;
 using Px.Utils.PxFile.Metadata;
