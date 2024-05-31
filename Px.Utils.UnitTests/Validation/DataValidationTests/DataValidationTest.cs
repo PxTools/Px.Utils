@@ -60,7 +60,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                 Logger.LogMessage($"Line {validationFeedback.Feedback.Line}, Char {validationFeedback.Feedback.Character}: "
                                   + $"{validationFeedback.Feedback.Rule} {validationFeedback.Feedback.AdditionalInfo}");
             }
-            Assert.AreEqual(10, validationFeedbacks.Length);
+            Assert.AreEqual(13, validationFeedbacks.Length);
         }
 
         [TestMethod]
@@ -78,7 +78,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                 Logger.LogMessage($"Line {validationFeedback.Feedback.Line}, Char {validationFeedback.Feedback.Character}: "
                                   + $"{validationFeedback.Feedback.Rule} {validationFeedback.Feedback.AdditionalInfo}");
             }
-            Assert.AreEqual(10, validationFeedbacks.Length);
+            Assert.AreEqual(13, validationFeedbacks.Length);
         }
     }
 }

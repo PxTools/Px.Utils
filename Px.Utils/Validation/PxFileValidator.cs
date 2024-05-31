@@ -69,6 +69,7 @@ namespace Px.Utils.Validation
             ContentValidationResult contentValidationResult = (ContentValidationResult)await contentValidator.ValidateAsync(cancellationToken);
             feedbacks.AddRange(contentValidationResult.FeedbackItems);
 
+            stream.Position = syntaxValidationResult.DataStartStreamPosition;
             DataValidator dataValidator = new(
                 stream,
                 contentValidationResult.DataRowLength,
