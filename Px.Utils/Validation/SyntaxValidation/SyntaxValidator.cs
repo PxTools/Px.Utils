@@ -12,7 +12,8 @@ namespace Px.Utils.Validation.SyntaxValidation
     /// <param name="filename">Name of the PX file</param>
     /// <param name="syntaxConf">Object that stores syntax specific symbols and tokens for the PX file</param>
     /// <param name="customValidationFunctions">Object that contains any optional additional validation functions</param>
-    /// TODO: Leave stream open
+    /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
+    /// his is required if multiple validations are executed for the same stream.</param>
     /// </summary>
     public class SyntaxValidator(
             Stream stream,

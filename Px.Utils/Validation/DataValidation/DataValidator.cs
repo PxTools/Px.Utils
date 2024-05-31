@@ -221,7 +221,6 @@ namespace Px.Utils.Validation.DataValidation
                 bytesRead = stream.Read(buffer, 0, buffer.Length);
                 for (int i = 0; i < bytesRead; i++)
                 {
-                    char test = (char)buffer[i];
                     if (buffer[i] >= CharacterConstants.Zero && buffer[i] <= CharacterConstants.Nine)
                     {
                         return (int)stream.Position - bytesRead + i;
