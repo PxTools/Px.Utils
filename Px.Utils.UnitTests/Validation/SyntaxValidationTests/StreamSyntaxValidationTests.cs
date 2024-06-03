@@ -5,6 +5,7 @@ using System.Reflection;
 using Px.Utils.Validation;
 using Px.Utils.PxFile;
 using Px.Utils.PxFile.Metadata;
+using Px.Utils.UnitTests.Validation.SyntaxValidationTests;
 
 namespace Px.Utils.UnitTests.SyntaxValidationTests
 {
@@ -488,6 +489,40 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Assert.AreEqual(10, result.FeedbackItems[1].Feedback.Line);
             Assert.AreEqual(16, result.FeedbackItems[1].Feedback.Character);
             Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, result.FeedbackItems[1].Feedback.Rule);
+        }
+
+        [TestMethod]
+        public void TestWithCustomSyntaxValidationFunctions()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N);
+            using Stream stream = new MemoryStream(data);
+            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+
+            // Act
+            SyntaxValidator validator = new(stream, encoding, filename, PxFileSyntaxConf.Default, new MockCustomSyntaxValidationFunctions());
+            validator.Validate();
+
+            // Assert
+            Assert.AreEqual(0, feedback.Count);
+        }
+
+        [TestMethod]
+        public async Task TestWithCustomSyntaxValidationFunctionsAsync()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N);
+            using Stream stream = new MemoryStream(data);
+            Encoding? encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+
+            // Act
+            SyntaxValidator validator = new(stream, encoding, filename, PxFileSyntaxConf.Default, new MockCustomSyntaxValidationFunctions());
+            await validator.ValidateAsync();
+
+            // Assert
+            Assert.AreEqual(0, feedback.Count);
         }
     }
 }
