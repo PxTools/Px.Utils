@@ -43,7 +43,7 @@ namespace Px.Utils.Validation.DataValidation
         /// <see cref="DataValidationResult"/> object that contains a collection of 
         /// ValidationFeedbackItem objects representing the feedback for the data validation.
         /// </returns>
-        public IValidationResult Validate()
+        public DataValidationResult Validate()
         {
             SetValidationParameters();
 
@@ -64,7 +64,7 @@ namespace Px.Utils.Validation.DataValidation
         /// <see cref="DataValidationResult"/> object that contains a collection of 
         /// ValidationFeedbackItem objects representing the feedback for the data validation.
         /// </returns>
-        public async Task<IValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
+        public async Task<DataValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
             SetValidationParameters();
 
@@ -89,6 +89,16 @@ namespace Px.Utils.Validation.DataValidation
             _dataSeparatorValidators.AddRange(_commonValidators);
             _dataSeparatorValidators.Add(new DataSeparatorValidator());
         }
+
+        #region Interface implementation
+
+        IValidationResult IPxFileValidator.Validate() 
+            => Validate();
+
+        async Task<IValidationResult> IPxFileValidator.ValidateAsync(CancellationToken cancellationToken)
+            =>  await ValidateAsync(cancellationToken);
+
+        #endregion
 
         private ValidationFeedbackItem[] ValidateDataStream(Stream stream, CancellationToken? cancellationToken = null)
         {

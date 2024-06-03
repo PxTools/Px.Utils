@@ -33,7 +33,7 @@ namespace Px.Utils.TestingApp.Commands
             Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
             SyntaxValidator syntaxValidator = new(stream, Encoding.Default, TestFilePath);
-            SyntaxValidationResult validatorResult = (SyntaxValidationResult)syntaxValidator.Validate();
+            SyntaxValidationResult validatorResult = syntaxValidator.Validate();
             entries = [.. validatorResult.Result];
         }
 

@@ -24,11 +24,11 @@ namespace Px.Utils.Validation
 
             List<ValidationFeedbackItem> feedbacks = [];
             SyntaxValidator syntaxValidator = new(stream, encoding, filename, syntaxConf, customSyntaxValidationFunctions, true);
-            SyntaxValidationResult syntaxValidationResult = (SyntaxValidationResult)syntaxValidator.Validate();
+            SyntaxValidationResult syntaxValidationResult = syntaxValidator.Validate();
             feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
 
             ContentValidator contentValidator = new(filename, encoding, [..syntaxValidationResult.Result], customContentValidationFunctions, syntaxConf);
-            ContentValidationResult contentValidationResult = (ContentValidationResult)contentValidator.Validate();
+            ContentValidationResult contentValidationResult = contentValidator.Validate();
             feedbacks.AddRange(contentValidationResult.FeedbackItems);
 
             stream.Position = syntaxValidationResult.DataStartStreamPosition;
@@ -40,7 +40,7 @@ namespace Px.Utils.Validation
                 syntaxValidationResult.DataStartRow, 
                 encoding,
                 syntaxConf);
-            DataValidationResult dataValidationResult = (DataValidationResult)dataValidator.Validate();
+            DataValidationResult dataValidationResult = dataValidator.Validate();
             feedbacks.AddRange(dataValidationResult.FeedbackItems);
 
             if (customValidators is not null)
@@ -62,11 +62,11 @@ namespace Px.Utils.Validation
 
             List<ValidationFeedbackItem> feedbacks = [];
             SyntaxValidator syntaxValidator = new(stream, encoding, filename, syntaxConf, customSyntaxValidationFunctions, true);
-            SyntaxValidationResult syntaxValidationResult = (SyntaxValidationResult)await syntaxValidator.ValidateAsync(cancellationToken);
+            SyntaxValidationResult syntaxValidationResult = await syntaxValidator.ValidateAsync(cancellationToken);
             feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
 
             ContentValidator contentValidator = new(filename, encoding, [..syntaxValidationResult.Result], customContentValidationFunctions, syntaxConf);
-            ContentValidationResult contentValidationResult = (ContentValidationResult)await contentValidator.ValidateAsync(cancellationToken);
+            ContentValidationResult contentValidationResult = await contentValidator.ValidateAsync(cancellationToken);
             feedbacks.AddRange(contentValidationResult.FeedbackItems);
 
             stream.Position = syntaxValidationResult.DataStartStreamPosition;
@@ -79,7 +79,7 @@ namespace Px.Utils.Validation
                 encoding,
                 syntaxConf);
 
-            DataValidationResult dataValidationResult = (DataValidationResult)await dataValidator.ValidateAsync(cancellationToken);
+            DataValidationResult dataValidationResult = await dataValidator.ValidateAsync(cancellationToken);
             feedbacks.AddRange(dataValidationResult.FeedbackItems);
 
             if (customValidators is not null)

@@ -46,7 +46,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = (SyntaxValidationResult)validator.Validate();
+            SyntaxValidationResult result = validator.Validate();
             Assert.AreEqual(8, result.Result.Count);
             Assert.AreEqual(0, feedback.Count);
         }
@@ -80,7 +80,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = (SyntaxValidationResult)validator.Validate();
+            SyntaxValidationResult result = validator.Validate();
             Assert.AreEqual(10, result.Result.Count);
             Assert.AreEqual("YES", result.Result[8].Value);
             Assert.AreEqual("NO", result.Result[9].Value);
@@ -105,7 +105,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = (SyntaxValidationResult)validator.Validate();
+            SyntaxValidationResult result = validator.Validate();
             Assert.AreEqual(2, result.FeedbackItems.Length);
             Assert.AreEqual(9, result.FeedbackItems[0].Feedback.Line);
             Assert.AreEqual(18, result.FeedbackItems[0].Feedback.Character);
@@ -462,7 +462,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = (SyntaxValidationResult)validator.Validate();
+            SyntaxValidationResult result = validator.Validate();
             Assert.AreEqual(0, result.FeedbackItems.Length);
         }
 
@@ -480,7 +480,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = (SyntaxValidationResult)validator.Validate();
+            SyntaxValidationResult result = validator.Validate();
             Assert.AreEqual(2, result.FeedbackItems.Length);
             Assert.AreEqual(9, result.FeedbackItems[0].Feedback.Line);
             Assert.AreEqual(16, result.FeedbackItems[0].Feedback.Character);

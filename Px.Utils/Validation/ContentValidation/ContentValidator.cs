@@ -55,7 +55,7 @@ namespace Px.Utils.Validation.ContentValidation
         /// Validates contents of Px file metadata. Metadata syntax must be valid for this method to work properly.
         /// </summary>
         /// <returns><see cref="ContentValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
-        public IValidationResult Validate()
+        public ContentValidationResult Validate()
         {
 
             IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
@@ -102,7 +102,7 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="cancellationToken">Cancellation token for cancelling the validation process</param>
         /// <returns><see cref="ContentValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
-        public async Task<IValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
+        public async Task<ContentValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
             IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
             IEnumerable<ContentValidationFindKeywordValidator> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
@@ -142,6 +142,16 @@ namespace Px.Utils.Validation.ContentValidation
 
             return new ContentValidationResult([.. feedbackItems], lengthOfDataRows, amountOfDataRows);
         }
+
+        #region Interface implementation
+
+        IValidationResult IPxFileValidator.Validate()
+            => Validate();
+
+        async Task<IValidationResult> IPxFileValidator.ValidateAsync(CancellationToken cancellationToken) 
+            => await ValidateAsync(cancellationToken);
+
+        #endregion
 
         private int GetProductOfDimensionValues(Dictionary<string, string[]> dimensions)
         {

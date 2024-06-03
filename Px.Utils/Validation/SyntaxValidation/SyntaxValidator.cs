@@ -32,7 +32,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         ///</summary>
         /// <returns>A <see cref="SyntaxValidationResult"/> entry which contains a list of <see cref="ValidationStructuredEntry"/> entries 
         /// and a list of <see cref="ValidationFeedbackItem"/> entries accumulated during the validation.</returns>
-        public IValidationResult Validate()
+        public SyntaxValidationResult Validate()
         {
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
@@ -65,7 +65,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> parameter that can be used to cancel the operation.</param>
         /// <returns>A task that contains a <see cref="SyntaxValidationResult"/> entry, which contains the structured validation entries 
         /// and a list of <see cref="ValidationStructuredEntry"/> entries accumulated during the validation.</returns>
-        public async Task<IValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
+        public async Task<SyntaxValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
@@ -90,6 +90,16 @@ namespace Px.Utils.Validation.SyntaxValidation
 
             return new SyntaxValidationResult([.. validationFeedback], structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
         }
+
+        #region Interface implementation
+
+        IValidationResult IPxFileValidator.Validate()
+            => Validate();
+
+        async Task<IValidationResult> IPxFileValidator.ValidateAsync(CancellationToken cancellationToken) 
+            => await ValidateAsync(cancellationToken);
+
+        #endregion
 
         private static List<ValidationFeedbackItem> ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunction> validationFunctions, PxFileSyntaxConf syntaxConf)
         {
