@@ -4,7 +4,7 @@ using Px.Utils.Validation.SyntaxValidation;
 
 namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 {
-    internal class MockCustomContentValidationFunctions : CustomContentValidationFunctions
+    internal sealed class MockCustomContentValidationFunctions : CustomContentValidationFunctions
     {
         internal static ValidationFeedbackItem[]? MockFindKeywordFunction(ValidationStructuredEntry[] entries, ContentValidator validator)
         {

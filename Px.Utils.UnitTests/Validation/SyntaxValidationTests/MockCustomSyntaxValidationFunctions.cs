@@ -4,7 +4,7 @@ using Px.Utils.PxFile;
 
 namespace Px.Utils.UnitTests.Validation.SyntaxValidationTests
 {
-    internal class MockCustomSyntaxValidationFunctions : CustomSyntaxValidationFunctions
+    internal sealed class MockCustomSyntaxValidationFunctions : CustomSyntaxValidationFunctions
     {
         internal static ValidationFeedbackItem? MockEntryValidationFunction(ValidationEntry validationEntry, PxFileSyntaxConf syntaxConf)
         {

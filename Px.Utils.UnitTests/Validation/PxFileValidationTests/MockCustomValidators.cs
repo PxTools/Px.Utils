@@ -2,7 +2,7 @@
 
 namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 {
-    internal class MockCustomValidators : IPxFileValidator, IPxFileValidatorAsync
+    internal sealed class MockCustomValidators : IPxFileValidator, IPxFileValidatorAsync
     {
         public ValidationResult Validate()
         {
