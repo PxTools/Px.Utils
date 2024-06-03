@@ -465,6 +465,20 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             Assert.AreEqual(ValidationFeedbackRule.ValueIsNotInUpperCase, result[0].Feedback.Rule);
         }
 
+        [TestMethod]
+        public void ValidateContentWithCustomFunctionsReturnsValidResult()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = ContentValidationFixtures.MINIMAL_STRUCTURED_ENTRY_ARRAY;
+            ContentValidator validator = new(filename, encoding, entries, new MockCustomContentValidationFunctions());
+
+            // Act
+            ValidationFeedbackItem[] feedback = validator.Validate().FeedbackItems;
+
+            // Assert
+            Assert.AreEqual(0, feedback.Length);
+        }
+
         private static void SetValidatorField(ContentValidator validator, string fieldName, object value)
         {
             var propertyInfo = validator.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
