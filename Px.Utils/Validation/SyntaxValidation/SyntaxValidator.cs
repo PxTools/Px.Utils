@@ -21,7 +21,7 @@ namespace Px.Utils.Validation.SyntaxValidation
             string filename,
             PxFileSyntaxConf? syntaxConf = null,
             CustomSyntaxValidationFunctions? customValidationFunctions = null,
-            bool leaveStreamOpen = false) : IPxFileValidator
+            bool leaveStreamOpen = false) : IPxFileValidator, IPxFileValidatorAsync
     {
         private const int _bufferSize = 4096;
         private int _dataSectionStartRow = -1;
@@ -93,10 +93,10 @@ namespace Px.Utils.Validation.SyntaxValidation
 
         #region Interface implementation
 
-        IValidationResult IPxFileValidator.Validate()
+        ValidationResult IPxFileValidator.Validate()
             => Validate();
 
-        async Task<IValidationResult> IPxFileValidator.ValidateAsync(CancellationToken cancellationToken) 
+        async Task<ValidationResult> IPxFileValidatorAsync.ValidateAsync(CancellationToken cancellationToken) 
             => await ValidateAsync(cancellationToken);
 
         #endregion

@@ -34,7 +34,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             stream.Seek(6, 0);
             DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
 
-            IValidationResult result = await validator.ValidateAsync();
+            ValidationResult result = await validator.ValidateAsync();
             ValidationFeedbackItem[] validationFeedbacks = result.FeedbackItems;
 
             foreach (ValidationFeedbackItem validationFeedback in validationFeedbacks)
@@ -70,7 +70,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             stream.Seek(6, 0);
             DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
 
-            IValidationResult result = await validator.ValidateAsync();
+            ValidationResult result = await validator.ValidateAsync();
             ValidationFeedbackItem[] validationFeedbacks = result.FeedbackItems;
 
             foreach (ValidationFeedbackItem validationFeedback in validationFeedbacks)

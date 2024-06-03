@@ -15,7 +15,7 @@ namespace Px.Utils.Validation.DataValidation
     /// <param name="conf">Syntax configuration for the Px file</param>
     /// </summary>
     public class DataValidator(Stream stream, int rowLen, int numOfRows, string filename,
-        int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null) : IPxFileValidator
+        int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null) : IPxFileValidator, IPxFileValidatorAsync
     {
         private const int _streamBufferSize = 4096;
 
@@ -40,10 +40,10 @@ namespace Px.Utils.Validation.DataValidation
         /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
         /// </summary>
         /// <returns>
-        /// <see cref="DataValidationResult"/> object that contains a collection of 
+        /// <see cref="ValidationResult"/> object that contains a collection of 
         /// ValidationFeedbackItem objects representing the feedback for the data validation.
         /// </returns>
-        public DataValidationResult Validate()
+        public ValidationResult Validate()
         {
             SetValidationParameters();
 
@@ -54,17 +54,17 @@ namespace Px.Utils.Validation.DataValidation
 
             ResetValidator();
 
-            return new DataValidationResult([..validationFeedbacks]);
+            return new ValidationResult([..validationFeedbacks]);
         }
 
         /// <summary>
         /// Validates the data in the specified stream asynchronously.
         /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
         /// <returns>
-        /// <see cref="DataValidationResult"/> object that contains a collection of 
+        /// <see cref="ValidationResult"/> object that contains a collection of 
         /// ValidationFeedbackItem objects representing the feedback for the data validation.
         /// </returns>
-        public async Task<DataValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
+        public async Task<ValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
             SetValidationParameters();
 
@@ -76,7 +76,7 @@ namespace Px.Utils.Validation.DataValidation
 
             ResetValidator();
 
-            return new DataValidationResult([.. validationFeedbacks]);
+            return new ValidationResult([.. validationFeedbacks]);
         }
 
         private void SetValidationParameters()
@@ -92,10 +92,10 @@ namespace Px.Utils.Validation.DataValidation
 
         #region Interface implementation
 
-        IValidationResult IPxFileValidator.Validate() 
+        ValidationResult IPxFileValidator.Validate() 
             => Validate();
 
-        async Task<IValidationResult> IPxFileValidator.ValidateAsync(CancellationToken cancellationToken)
+        async Task<ValidationResult> IPxFileValidatorAsync.ValidateAsync(CancellationToken cancellationToken)
             =>  await ValidateAsync(cancellationToken);
 
         #endregion

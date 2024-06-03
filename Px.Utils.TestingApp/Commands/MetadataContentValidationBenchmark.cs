@@ -20,7 +20,6 @@ namespace Px.Utils.TestingApp.Commands
         internal MetadataContentValidationBenchmark()
         {             
             BenchmarkFunctions = [ValidateContentBenchmark];
-            BenchmarkFunctionsAsync = [ValidateContentBenchmarkAsync];
             entries = [];
             validator = new(TestFilePath, Encoding.Default, entries);
         }
@@ -30,7 +29,6 @@ namespace Px.Utils.TestingApp.Commands
             base.OneTimeBenchmarkSetup();
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
             SyntaxValidator syntaxValidator = new(stream, Encoding.Default, TestFilePath);
             SyntaxValidationResult validatorResult = syntaxValidator.Validate();
@@ -40,11 +38,6 @@ namespace Px.Utils.TestingApp.Commands
         private void ValidateContentBenchmark()
         {
             validator.Validate();
-        }
-
-        private async Task ValidateContentBenchmarkAsync()
-        {
-            await validator.ValidateAsync();
         }
     }
 }

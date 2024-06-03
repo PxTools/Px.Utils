@@ -48,21 +48,6 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
-        public async Task ValidatePxFileContentAsyncCalledWithMinimalStructuredEntryReturnsValidResult()
-        {
-            // Arrange
-            ValidationStructuredEntry[] entries = ContentValidationFixtures.MINIMAL_STRUCTURED_ENTRY_ARRAY;
-            ContentValidator validator = new(filename, encoding, entries);
-
-            // Act
-            IValidationResult result = await validator.ValidateAsync();
-            ValidationFeedbackItem[] feedback = result.FeedbackItems;
-
-            // Assert
-            Assert.AreEqual(0, feedback.Length);
-        }
-
-        [TestMethod]
         public void ValidateFindDefaultLanguageWithEmptyStructuredEntryArrayReturnsWithError()
         {
             // Arrange

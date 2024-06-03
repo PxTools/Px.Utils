@@ -15,7 +15,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             PxFileValidator validator = new (stream, "foo", Encoding.UTF8);
 
             // Act
-            IValidationResult result = validator.Validate();
+            ValidationResult result = validator.Validate();
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -30,7 +30,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             PxFileValidator validator = new(stream, "foo", Encoding.UTF8);
 
             // Act
-            IValidationResult result = await validator.ValidateAsync();
+            ValidationResult result = await validator.ValidateAsync();
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -45,7 +45,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             PxFileValidator validator = new(stream, "foo", Encoding.UTF8);
 
             // Act
-            IValidationResult result = await validator.ValidateAsync();
+            ValidationResult result = await validator.ValidateAsync();
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");

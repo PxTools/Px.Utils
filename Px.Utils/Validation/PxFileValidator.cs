@@ -2,7 +2,6 @@
 using Px.Utils.Validation.ContentValidation;
 using Px.Utils.Validation.DataValidation;
 using Px.Utils.Validation.SyntaxValidation;
-using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Px.Utils.Validation
@@ -14,10 +13,11 @@ namespace Px.Utils.Validation
         PxFileSyntaxConf? syntaxConf = null,
         CustomSyntaxValidationFunctions? customSyntaxValidationFunctions = null,
         CustomContentValidationFunctions? customContentValidationFunctions = null,
-        IPxFileValidator[]? customValidators = null
-        ) : IPxFileValidator
+        IPxFileValidator[]? customValidators = null,
+        IPxFileValidatorAsync[]? customAsyncValidators = null
+        ) : IPxFileValidator, IPxFileValidatorAsync
     {
-        public IValidationResult Validate()
+        public ValidationResult Validate()
         {
             encoding ??= Encoding.Default;
             syntaxConf ??= PxFileSyntaxConf.Default;
@@ -40,22 +40,22 @@ namespace Px.Utils.Validation
                 syntaxValidationResult.DataStartRow, 
                 encoding,
                 syntaxConf);
-            DataValidationResult dataValidationResult = dataValidator.Validate();
+            ValidationResult dataValidationResult = dataValidator.Validate();
             feedbacks.AddRange(dataValidationResult.FeedbackItems);
 
             if (customValidators is not null)
             {
                 foreach (IPxFileValidator customValidator in customValidators)
                 {
-                    IValidationResult customValidationResult = customValidator.Validate();
+                    ValidationResult customValidationResult = customValidator.Validate();
                     feedbacks.AddRange(customValidationResult.FeedbackItems);
                 }
             }
 
-            return new PxFileValidationResult([..feedbacks]);
+            return new ValidationResult([..feedbacks]);
         }
 
-        public async Task<IValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
+        public async Task<ValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
             encoding ??= Encoding.Default;
             syntaxConf ??= PxFileSyntaxConf.Default;
@@ -66,7 +66,7 @@ namespace Px.Utils.Validation
             feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
 
             ContentValidator contentValidator = new(filename, encoding, [..syntaxValidationResult.Result], customContentValidationFunctions, syntaxConf);
-            ContentValidationResult contentValidationResult = await contentValidator.ValidateAsync(cancellationToken);
+            ContentValidationResult contentValidationResult = contentValidator.Validate();
             feedbacks.AddRange(contentValidationResult.FeedbackItems);
 
             stream.Position = syntaxValidationResult.DataStartStreamPosition;
@@ -79,19 +79,19 @@ namespace Px.Utils.Validation
                 encoding,
                 syntaxConf);
 
-            DataValidationResult dataValidationResult = await dataValidator.ValidateAsync(cancellationToken);
+            ValidationResult dataValidationResult = await dataValidator.ValidateAsync(cancellationToken);
             feedbacks.AddRange(dataValidationResult.FeedbackItems);
 
-            if (customValidators is not null)
+            if (customAsyncValidators is not null)
             {
-                foreach (IPxFileValidator customValidator in customValidators)
+                foreach (IPxFileValidatorAsync customValidator in customAsyncValidators)
                 {
-                    IValidationResult customValidationResult = await customValidator.ValidateAsync(cancellationToken);
+                    ValidationResult customValidationResult = await customValidator.ValidateAsync(cancellationToken);
                     feedbacks.AddRange(customValidationResult.FeedbackItems);
                 }
             }
 
-            return new PxFileValidationResult([..feedbacks]);
+            return new ValidationResult([..feedbacks]);
         }
     }
 }

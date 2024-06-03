@@ -1,5 +1,4 @@
 ﻿using Px.Utils.PxFile;
-using Px.Utils.Validation;
 using Px.Utils.Validation.SyntaxValidation;
 using System.Text;
 
@@ -97,59 +96,10 @@ namespace Px.Utils.Validation.ContentValidation
             return new ContentValidationResult([.. feedbackItems], lengthOfDataRows, amountOfDataRows);
         }
 
-        /// <summary>
-        /// Validates contents of Px file metadata asynchronously. Metadata syntax must be valid for this method to work properly.
-        /// </summary>
-        /// <param name="cancellationToken">Cancellation token for cancelling the validation process</param>
-        /// <returns><see cref="ContentValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
-        public async Task<ContentValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
-        {
-            IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
-            IEnumerable<ContentValidationFindKeywordValidator> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
-
-            if (customContentValidationFunctions is not null)
-            {
-                contentValidationEntryFunctions = [.. contentValidationEntryFunctions, .. customContentValidationFunctions.CustomContentValidationEntryFunctions];
-                contentValidationFindKeywordFunctions = [.. contentValidationFindKeywordFunctions, .. customContentValidationFunctions.CustomContentValidationFindKeywordFunctions];
-            }
-
-            List<ValidationFeedbackItem> feedbackItems = [];
-
-            // Some "find keyword" type content validation functions are dependent on the results of other content validation functions
-            foreach (var findFunction in contentValidationFindKeywordFunctions)
-            {
-                ValidationFeedbackItem[]? feedback = await Task.Run(() => findFunction(entries, this));
-                if (feedback is not null)
-                {
-                    feedbackItems.AddRange(feedback);
-                }
-            }
-
-            // Entry tasks can be run asynchronously without worrying about dependencies
-            IEnumerable<Task<ValidationFeedbackItem[]?>> entryTasks = contentValidationEntryFunctions
-                .SelectMany(entryFunction => entries
-                    .Select(entry => Task.Run(() => entryFunction(entry, this))));
-
-            await Task.WhenAll(entryTasks);
-
-            entryTasks.Select(task => task.Result).ToList().ForEach(feedback =>
-                feedbackItems.AddRange(feedback is not null ? feedback : []));
-
-            int lengthOfDataRows = _headingDimensionNames is not null ? GetProductOfDimensionValues(_headingDimensionNames) : 0;
-            int amountOfDataRows = _stubDimensionNames is not null ? GetProductOfDimensionValues(_stubDimensionNames) : 0;
-
-            ResetFields();
-
-            return new ContentValidationResult([.. feedbackItems], lengthOfDataRows, amountOfDataRows);
-        }
-
         #region Interface implementation
 
-        IValidationResult IPxFileValidator.Validate()
+        ValidationResult IPxFileValidator.Validate()
             => Validate();
-
-        async Task<IValidationResult> IPxFileValidator.ValidateAsync(CancellationToken cancellationToken) 
-            => await ValidateAsync(cancellationToken);
 
         #endregion
 
