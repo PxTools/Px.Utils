@@ -57,7 +57,8 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
         {
             // Arrange
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.MINIMAL_PX_FILE));
-            PxFileValidator validator = new(stream, "foo", Encoding.UTF8, null, null, null, [new MockCustomValidators()]);
+            PxFileValidator validator = new(stream, "foo", Encoding.UTF8);
+            validator.SetCustomValidators([new MockCustomValidators()]);
 
             // Act
             ValidationResult result = validator.Validate();
@@ -72,7 +73,8 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
         {
             // Arrange
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.MINIMAL_PX_FILE));
-            PxFileValidator validator = new(stream, "foo", Encoding.UTF8, null, null, null, [new MockCustomValidators()]);
+            PxFileValidator validator = new(stream, "foo", Encoding.UTF8);
+            validator.SetCustomValidators([new MockCustomValidators()]);
 
             // Act
             ValidationResult result = await validator.ValidateAsync();
