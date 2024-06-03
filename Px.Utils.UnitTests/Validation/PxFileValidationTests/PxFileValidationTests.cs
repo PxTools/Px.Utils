@@ -51,5 +51,35 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             Assert.IsNotNull(result, "Validation result should not be null");
             Assert.AreEqual(14, result.FeedbackItems.Length);
         }
+
+        [TestMethod]
+        public void ValidatePxFileWithCustomValidatorsReturnsValidResult()
+        {
+            // Arrange
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.MINIMAL_PX_FILE));
+            PxFileValidator validator = new(stream, "foo", Encoding.UTF8, null, null, null, [new MockCustomValidators()]);
+
+            // Act
+            ValidationResult result = validator.Validate();
+
+            // Assert
+            Assert.IsNotNull(result, "Validation result should not be null");
+            Assert.AreEqual(0, result.FeedbackItems.Length);
+        }
+
+        [TestMethod]
+        public async Task ValidatePxFileAsyncWithCustomValidatorsReturnsValidResult()
+        {
+            // Arrange
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.MINIMAL_PX_FILE));
+            PxFileValidator validator = new(stream, "foo", Encoding.UTF8, null, null, null, [new MockCustomValidators()]);
+
+            // Act
+            ValidationResult result = await validator.ValidateAsync();
+
+            // Assert
+            Assert.IsNotNull(result, "Validation result should not be null");
+            Assert.AreEqual(0, result.FeedbackItems.Length);
+        }
     }
 }
