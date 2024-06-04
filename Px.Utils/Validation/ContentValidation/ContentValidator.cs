@@ -1,17 +1,23 @@
-﻿using PxUtils.PxFile;
-using PxUtils.Validation.SyntaxValidation;
-using System.Collections.Generic;
+﻿using Px.Utils.PxFile;
+using Px.Utils.Validation.SyntaxValidation;
 using System.Text;
 
-namespace PxUtils.Validation.ContentValidation
+namespace Px.Utils.Validation.ContentValidation
 {
     /// <summary>
     /// Provides methods for validating the content of Px file metadata
     /// <param name="filename">Name of the Px file</param>
     /// <param name="encoding"> encoding of the Px file</param>
+    /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent key-value entries of the Px file metadata</param>"
+    /// <param name="customContentValidationFunctions">Object that contains any optional additional validation functions</param>
     /// <param name="syntaxConf">Object that stores syntax specific symbols and tokens for the Px file</param>
     /// </summary>
-    public sealed partial class ContentValidator(string filename, Encoding encoding, PxFileSyntaxConf? syntaxConf = null)
+    public sealed partial class ContentValidator(
+        string filename,
+        Encoding encoding,
+        ValidationStructuredEntry[] entries,
+        CustomContentValidationFunctions? customContentValidationFunctions = null,
+        PxFileSyntaxConf? syntaxConf = null) : IPxFileValidator
     {
         private readonly string _filename = filename;
         private readonly Encoding _encoding = encoding;
@@ -47,12 +53,8 @@ namespace PxUtils.Validation.ContentValidation
         /// <summary>
         /// Validates contents of Px file metadata. Metadata syntax must be valid for this method to work properly.
         /// </summary>
-        /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
-        /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
-        public ValidationFeedbackItem[] Validate(
-            ValidationStructuredEntry[] entries,
-            CustomContentValidationFunctions? customContentValidationFunctions = null
-            )
+        /// <returns><see cref="ContentValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
+        public ContentValidationResult Validate()
         {
 
             IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
@@ -86,58 +88,37 @@ namespace PxUtils.Validation.ContentValidation
                 }
             }
 
+            int lengthOfDataRows = _headingDimensionNames is not null ? GetProductOfDimensionValues(_headingDimensionNames) : 0;
+            int amountOfDataRows = _stubDimensionNames is not null ? GetProductOfDimensionValues(_stubDimensionNames) : 0;
+
             ResetFields();
 
-            return [.. feedbackItems];
+            return new ContentValidationResult([.. feedbackItems], lengthOfDataRows, amountOfDataRows);
         }
 
-        /// <summary>
-        /// Validates contents of Px file metadata asynchronously. Metadata syntax must be valid for this method to work properly.
-        /// </summary>
-        /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent entries of the Px file metadata</param>
-        /// <param name="customContentValidationFunctions"><see cref="ContentValidationFunctions"/> object that contains any optional additional validation functions</param>
-        /// <param name="cancellationToken">Cancellation token for cancelling the validation process</param>
-        /// <returns>Array of <see cref="ValidationFeedbackItem"/> objects. Any issues found during validation will be listed here</returns>
-        public async Task<ValidationFeedbackItem[]> ValidateAsync(
-            ValidationStructuredEntry[] entries,
-            CustomContentValidationFunctions? customContentValidationFunctions = null,
-            CancellationToken cancellationToken = default
-            )
+        #region Interface implementation
+
+        ValidationResult IPxFileValidator.Validate()
+            => Validate();
+
+        #endregion
+
+        private int GetProductOfDimensionValues(Dictionary<string, string[]> dimensions)
         {
-            IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
-            IEnumerable<ContentValidationFindKeywordValidator> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
-
-            if (customContentValidationFunctions is not null)
+            string? lang = _defaultLanguage ?? _availableLanguages?[0];
+            if (lang is null)
             {
-                contentValidationEntryFunctions = [.. contentValidationEntryFunctions, .. customContentValidationFunctions.CustomContentValidationEntryFunctions];
-                contentValidationFindKeywordFunctions = [.. contentValidationFindKeywordFunctions, .. customContentValidationFunctions.CustomContentValidationFindKeywordFunctions];
+                return 0;
             }
-
-            List<ValidationFeedbackItem> feedbackItems = [];
-
-            // Some "find keyword" type content validation functions are dependent on the results of other content validation functions
-            foreach (var findFunction in contentValidationFindKeywordFunctions)
+            string[] headingDimensionNames = dimensions[lang];
+            if (headingDimensionNames is null || headingDimensionNames.Length == 0 || _dimensionValueNames is null)
             {
-                ValidationFeedbackItem[]? feedback = await Task.Run(() => findFunction(entries, this));
-                if (feedback is not null)
-                {
-                    feedbackItems.AddRange(feedback);
-                }
+                return 0;
             }
-
-            // Entry tasks can be run asynchronously without worrying about dependencies
-            IEnumerable<Task<ValidationFeedbackItem[]?>> entryTasks = contentValidationEntryFunctions
-                .SelectMany(entryFunction => entries
-                    .Select(entry => Task.Run(() => entryFunction(entry, this))));
-
-            await Task.WhenAll(entryTasks);
-
-            entryTasks.Select(task => task.Result).ToList().ForEach(feedback =>
-                feedbackItems.AddRange(feedback is not null ? feedback : []));
-
-            ResetFields();
-
-            return [.. feedbackItems];
+            return _dimensionValueNames
+                .Where(kvp => headingDimensionNames
+                .Contains(kvp.Key.Value)).Select(kvp => kvp.Value.Length)
+                .Aggregate((a, b) => a * b);
         }
 
         private void ResetFields()

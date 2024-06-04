@@ -1,4 +1,4 @@
-﻿namespace PxUtils.Exceptions
+﻿namespace Px.Utils.Exceptions
 {
     public class TranslationAlreadyDefinedException(string language) : Exception()
     {

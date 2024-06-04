@@ -1,7 +1,7 @@
-﻿using PxUtils.Language;
+﻿using Px.Utils.Language;
 using System.Globalization;
 
-namespace PxUtils.Models.Metadata.ExtensionMethods
+namespace Px.Utils.Models.Metadata.ExtensionMethods
 {
     public static class PropertyExtensions
     {

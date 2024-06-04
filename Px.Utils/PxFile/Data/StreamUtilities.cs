@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace PxUtils.PxFile.Data
+namespace Px.Utils.PxFile.Data
 {
     /// <summary>
     /// Utility class for working with px file <see cref="Stream"/> instances.

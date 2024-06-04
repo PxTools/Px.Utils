@@ -1,5 +1,5 @@
-﻿using PxUtils.Exceptions;
-using PxUtils.Language;
+﻿using Px.Utils.Exceptions;
+using Px.Utils.Language;
 
 namespace LanguageTests
 {

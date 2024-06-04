@@ -1,7 +1,7 @@
-﻿using PxUtils.Exceptions;
+﻿using Px.Utils.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 
-namespace PxUtils.Language
+namespace Px.Utils.Language
 {
     /// <summary>
     /// Class representing a string that has translations in multiple languages

@@ -1,4 +1,4 @@
-﻿namespace PxUtils.Language
+﻿namespace Px.Utils.Language
 {
     public static class MultilanguageStringExtensions
     {

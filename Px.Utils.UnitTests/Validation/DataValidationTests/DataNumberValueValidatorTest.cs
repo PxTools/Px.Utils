@@ -1,5 +1,5 @@
-﻿using PxUtils.Validation;
-using PxUtils.Validation.DataValidation;
+﻿using Px.Utils.Validation;
+using Px.Utils.Validation.DataValidation;
 using System.Text;
 
 namespace Px.Utils.UnitTests.Validation.DataValidationTests

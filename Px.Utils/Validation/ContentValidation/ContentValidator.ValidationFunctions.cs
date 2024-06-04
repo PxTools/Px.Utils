@@ -1,8 +1,8 @@
-﻿using PxUtils.PxFile;
-using PxUtils.Validation.SyntaxValidation;
+﻿using Px.Utils.PxFile;
+using Px.Utils.Validation.SyntaxValidation;
 using System.Globalization;
 
-namespace PxUtils.Validation.ContentValidation
+namespace Px.Utils.Validation.ContentValidation
 {
     public delegate ValidationFeedbackItem[]? ContentValidationEntryValidator(ValidationStructuredEntry entry, ContentValidator validator);
     public delegate ValidationFeedbackItem[]? ContentValidationFindKeywordValidator(ValidationStructuredEntry[] entries, ContentValidator validator); 
@@ -80,7 +80,7 @@ namespace PxUtils.Validation.ContentValidation
 
                 return [
                     new ValidationFeedbackItem(
-                    new ContentValidationObject(validator._filename, 0, []),
+                    new ValidationObject(validator._filename, 0, []),
                     feedback
                     ),
                 ];
@@ -143,7 +143,7 @@ namespace PxUtils.Validation.ContentValidation
 
                 return [
                     new ValidationFeedbackItem(
-                    new ContentValidationObject(validator._filename, 0, []),
+                    new ValidationObject(validator._filename, 0, []),
                     feedback
                     )
                ];
@@ -221,7 +221,7 @@ namespace PxUtils.Validation.ContentValidation
 
                     feedbackItems.Add(
                         new ValidationFeedbackItem(
-                        new ContentValidationObject(validator._filename, 0, []),
+                        new ValidationObject(validator._filename, 0, []),
                         feedback
                         ));
                 }
@@ -264,7 +264,7 @@ namespace PxUtils.Validation.ContentValidation
 
                     feedbackItems.Add(
                         new ValidationFeedbackItem(
-                            new ContentValidationObject(validator._filename, 0, []),
+                            new ValidationObject(validator._filename, 0, []),
                             feedback
                             )
                     );
@@ -296,7 +296,7 @@ namespace PxUtils.Validation.ContentValidation
 
                 return [
                     new(
-                    new ContentValidationObject(validator._filename, 0, []),
+                    new ValidationObject(validator._filename, 0, []),
                     feedback
                     )
                 ];
@@ -332,7 +332,7 @@ namespace PxUtils.Validation.ContentValidation
 
                     feedbackItems.Add(
                         new ValidationFeedbackItem(
-                            new ContentValidationObject(validator._filename, 0, []),
+                            new ValidationObject(validator._filename, 0, []),
                             feedback
                             )
                         );
@@ -375,7 +375,7 @@ namespace PxUtils.Validation.ContentValidation
 
                     feedbackItems.Add(
                         new ValidationFeedbackItem(
-                            new ContentValidationObject(validator._filename, 0, []),
+                            new ValidationObject(validator._filename, 0, []),
                             feedback
                             )
                         );
@@ -402,7 +402,7 @@ namespace PxUtils.Validation.ContentValidation
 
                         feedbackItems.Add(
                             new ValidationFeedbackItem(
-                                new ContentValidationObject(validator._filename, 0, []),
+                                new ValidationObject(validator._filename, 0, []),
                                 feedback
                                 )
                             );
@@ -832,7 +832,7 @@ namespace PxUtils.Validation.ContentValidation
                 ];
 
             if ((stringTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.StringValue) ||
-                (listOfStringTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.ListOfStrings) ||
+                (listOfStringTypes.Contains(entry.Key.Keyword) && (entry.ValueType != ValueType.ListOfStrings && entry.ValueType != ValueType.StringValue)) ||
                 (dateTimeTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.DateTime) ||
                 (numberTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.Number) ||
                 (timeval.Contains(entry.Key.Keyword) && (entry.ValueType != ValueType.TimeValRange && entry.ValueType != ValueType.TimeValSeries)))

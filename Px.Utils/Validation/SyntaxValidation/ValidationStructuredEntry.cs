@@ -1,4 +1,4 @@
-﻿namespace PxUtils.Validation.SyntaxValidation
+﻿namespace Px.Utils.Validation.SyntaxValidation
 {
     /// <summary>
     /// Represents a key for a <see cref="ValidationStructuredEntry"/>. A key consists of a keyword and two optional language and specifier strings.

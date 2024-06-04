@@ -1,8 +1,8 @@
 ﻿using Px.Utils.Models.Metadata;
-using PxUtils.Language;
-using PxUtils.Models.Metadata.Enums;
+using Px.Utils.Language;
+using Px.Utils.Models.Metadata.Enums;
 
-namespace PxUtils.Models.Metadata.Dimensions
+namespace Px.Utils.Models.Metadata.Dimensions
 {
     /// <summary>
     /// Readonly interface for a dimension object in a structured format.

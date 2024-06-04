@@ -1,27 +1,30 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using System.Text;
-using PxUtils.PxFile;
+﻿using System.Text;
+using Px.Utils.PxFile;
 
-namespace PxUtils.Validation.DataValidation
+namespace Px.Utils.Validation.DataValidation
 {
     /// <summary>
-    /// The DataValidator class is used to validate the data section of a PX file.
+    /// The DataValidator class is used to validate the data section of a Px file.
+    /// <param name="stream">Px file stream to be validated</param>
+    /// <param name="rowLen">Length of one row of Px file data</param>
+    /// <param name="numOfRows">Amount of rows of Px file data</param>
+    /// <param name="filename">Name of the file being validated</param>
+    /// <param name="startRow">The row number where the data section starts</param>
+    /// <param name="streamEncoding">Encoding of the stream</param>
+    /// <param name="conf">Syntax configuration for the Px file</param>
     /// </summary>
-    public class DataValidator
+    public class DataValidator(Stream stream, int rowLen, int numOfRows, string filename,
+        int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null) : IPxFileValidator, IPxFileValidatorAsync
     {
         private const int _streamBufferSize = 4096;
+
+        private readonly Encoding _encoding = streamEncoding ?? Encoding.Default;
+        private readonly PxFileSyntaxConf _conf = conf ?? PxFileSyntaxConf.Default;
 
         private readonly List<IDataValidator> _commonValidators = [];
         private readonly List<IDataValidator> _dataNumValidators = [];
         private readonly List<IDataValidator> _dataStringValidators = [];
         private readonly List<IDataValidator> _dataSeparatorValidators = [];
-
-        private int _expectedRows;
-        private int _expectedRowLength;
-        private int _startRow;
-        private Encoding _streamEncoding = Encoding.Default;
-        private PxFileSyntaxConf _conf = PxFileSyntaxConf.Default;
 
         private EntryType _currentEntryType = EntryType.Unknown;
         private byte _stringDelimeter;
@@ -35,62 +38,48 @@ namespace PxUtils.Validation.DataValidation
         /// Validates the data in the stream according to the specified parameters and returns a collection of validation feedback items.
         /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
         /// </summary>
-        /// <param name="stream">The stream containing the data to be validated.</param>
-        /// <param name="rowLen">The expected length of each row in the data.</param>
-        /// <param name="numOfRows">The expected number of rows in the data.</param>
-        /// <param name="startRow">The starting row number.</param>
-        /// <param name="streamEncoding">The encoding of the stream. Set to null if the default encoding should be used.</param>
-        /// <param name="conf">The syntax configuration for the PX file. Set to null to use the default configuration.</param>
         /// <returns>
-        /// A collection of ValidationFeedbackItem objects representing the feedback for the data validation.
+        /// <see cref="ValidationResult"/> object that contains a collection of 
+        /// ValidationFeedbackItem objects representing the feedback for the data validation.
         /// </returns>
-        public IEnumerable<ValidationFeedback> Validate(Stream stream, int rowLen, int numOfRows,
-            int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null)
+        public ValidationResult Validate()
         {
-            SetValidationParameters(streamEncoding, conf, numOfRows, rowLen, startRow);
+            SetValidationParameters();
 
-            IEnumerable<ValidationFeedback> validationFeedbacks = ValidateDataStream(stream);
+            List<ValidationFeedbackItem> validationFeedbacks = [];
+            stream.Position = GetStreamIndexOfFirstDataValue(ref validationFeedbacks);
+            ValidationFeedbackItem[] dataStreamFeedbacks = ValidateDataStream(stream);
+            validationFeedbacks.AddRange(dataStreamFeedbacks);
 
             ResetValidator();
 
-            return validationFeedbacks;
+            return new ValidationResult([..validationFeedbacks]);
         }
 
         /// <summary>
         /// Validates the data in the specified stream asynchronously.
         /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
-        /// </summary>
-        /// <param name="stream">The stream containing the data to validate.</param>
-        /// <param name="rowLen">The expected length of each row in the data.</param>
-        /// <param name="numOfRows">The expected number of rows in the data.</param>
-        /// <param name="startRow">The starting row number.</param>
-        /// <param name="streamEncoding">The encoding of the stream. Can be null, in which case the default encoding is used.</param>
-        /// <param name="conf">The configuration for validating the data file syntax. Can be null, in which case the default configuration is used.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
-        /// <returns>A collection of validation feedback for the data.</returns>
-        public async Task<IEnumerable<ValidationFeedback>> ValidateAsync(Stream stream, int rowLen,
-            int numOfRows,
-            int startRow, Encoding? streamEncoding, PxFileSyntaxConf? conf = null,
-            CancellationToken cancellationToken = default)
+        /// <returns>
+        /// <see cref="ValidationResult"/> object that contains a collection of 
+        /// ValidationFeedbackItem objects representing the feedback for the data validation.
+        /// </returns>
+        public async Task<ValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
-            SetValidationParameters(streamEncoding, conf, numOfRows, rowLen, startRow);
+            SetValidationParameters();
 
-            IEnumerable<ValidationFeedback> validationFeedbacks =  await Task.Factory.StartNew(() => 
+            List<ValidationFeedbackItem> validationFeedbacks = [];
+            stream.Position = GetStreamIndexOfFirstDataValue(ref validationFeedbacks);
+            ValidationFeedbackItem[] dataStreamFeedbacks =  await Task.Factory.StartNew(() => 
                 ValidateDataStream(stream, cancellationToken), cancellationToken);
+            validationFeedbacks.AddRange(dataStreamFeedbacks);
 
             ResetValidator();
 
-            return validationFeedbacks;
+            return new ValidationResult([.. validationFeedbacks]);
         }
 
-        private void SetValidationParameters(Encoding? _streamEncoding, PxFileSyntaxConf? _conf, int _numOfRows, int _rowLen, int _startRow)
+        private void SetValidationParameters()
         {
-            this._streamEncoding = _streamEncoding ?? Encoding.Default;
-            this._conf  = _conf ?? PxFileSyntaxConf.Default;
-            _expectedRows = _numOfRows;
-            _expectedRowLength = _rowLen;
-            this._startRow = _startRow;
-
             _commonValidators.Add(new DataStructureValidator());
             _dataNumValidators.AddRange(_commonValidators);
             _dataNumValidators.Add(new DataNumberValidator());
@@ -100,9 +89,19 @@ namespace PxUtils.Validation.DataValidation
             _dataSeparatorValidators.Add(new DataSeparatorValidator());
         }
 
-        private List<ValidationFeedback> ValidateDataStream(Stream stream, CancellationToken? cancellationToken = null)
+        #region Interface implementation
+
+        ValidationResult IPxFileValidator.Validate() 
+            => Validate();
+
+        async Task<ValidationResult> IPxFileValidatorAsync.ValidateAsync(CancellationToken cancellationToken)
+            =>  await ValidateAsync(cancellationToken);
+
+        #endregion
+
+        private ValidationFeedbackItem[] ValidateDataStream(Stream stream, CancellationToken? cancellationToken = null)
         {
-            List<ValidationFeedback> validationFeedbacks = [];
+            List<ValidationFeedbackItem> validationFeedbacks = [];
             byte endOfData = (byte)_conf.Symbols.EntrySeparator;
             _stringDelimeter = (byte)_conf.Symbols.Value.StringDelimeter;
             _currentEntry = new(_streamBufferSize);
@@ -140,19 +139,29 @@ namespace PxUtils.Validation.DataValidation
             }
             while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0);
 
-            if (_expectedRows != _lineNumber - 1)
+            if (numOfRows != _lineNumber - 1)
             {
-                validationFeedbacks.Add(new ValidationFeedback(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidRowCount, _lineNumber + _startRow, _charPosition));
+                validationFeedbacks.Add(new(
+                    new(filename, _lineNumber + startRow, []),
+                    new(
+                        ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.DataValidationFeedbackInvalidRowCount, 
+                        _lineNumber + startRow,
+                        _charPosition, 
+                        $" Expected {numOfRows} rows, got {_lineNumber - 1} rows."
+                        )));
             }
 
-            return validationFeedbacks;
+            return [..validationFeedbacks];
         }
 
-        private void HandleEntryTypeChange(ref List<ValidationFeedback> validationFeedbacks)
+        private void HandleEntryTypeChange(ref List<ValidationFeedbackItem> validationFeedbacks)
         {
             if (_currentEntryType == EntryType.Unknown && (_lineNumber > 1 || _charPosition > 0))
             {
-                validationFeedbacks.Add(new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidChar, _lineNumber + _startRow, _charPosition));
+                validationFeedbacks.Add(new(
+                    new(filename, _lineNumber + startRow, []),
+                    new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidChar, _lineNumber + startRow, _charPosition)));
             }
             else
             {
@@ -165,16 +174,18 @@ namespace PxUtils.Validation.DataValidation
 
                 foreach (IDataValidator validator in validators)
                 {
-                    ValidationFeedback? feedback = validator.Validate(_currentEntry, _currentEntryType, _streamEncoding, _lineNumber + _startRow, _charPosition);
+                    ValidationFeedback? feedback = validator.Validate(_currentEntry, _currentEntryType, _encoding, _lineNumber + startRow, _charPosition);
                     if (feedback is not null)
                     {
-                        validationFeedbacks.Add((ValidationFeedback)feedback);
+                        validationFeedbacks.Add(new
+                            (new(filename, _lineNumber + startRow, []),
+                            (ValidationFeedback)feedback));
                     }
                 }
             }
         }
 
-        private void HandleNonSeparatorType(ref List<ValidationFeedback> validationFeedbacks)
+        private void HandleNonSeparatorType(ref List<ValidationFeedbackItem> validationFeedbacks)
         {
             if (_currentCharacterType == EntryType.DataItem)
             {
@@ -182,13 +193,14 @@ namespace PxUtils.Validation.DataValidation
             }
             else if (_currentCharacterType == EntryType.LineSeparator)
             {
-                if (_currentRowLength != _expectedRowLength)
+                if (_currentRowLength != rowLen)
                 {
-                    validationFeedbacks.Add(
+                    validationFeedbacks.Add(new(
+                        new(filename, _lineNumber + startRow, []),
                         new ValidationFeedback(ValidationFeedbackLevel.Error, 
                         ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength, 
-                        _lineNumber + _startRow,
-                        _charPosition));
+                        _lineNumber + startRow,
+                        _charPosition)));
                 }
                 _lineNumber++;
                 _currentRowLength = 0;
@@ -207,6 +219,34 @@ namespace PxUtils.Validation.DataValidation
             _lineNumber = 1;
             _charPosition = 0;
             _currentRowLength = 0;
+        }
+
+        private int GetStreamIndexOfFirstDataValue(ref List<ValidationFeedbackItem> feedbacks)
+        {
+            byte[] buffer = new byte[_streamBufferSize];
+            int bytesRead;
+            do
+            {
+                bytesRead = stream.Read(buffer, 0, buffer.Length);
+                for (int i = 0; i < bytesRead; i++)
+                {
+                    if (buffer[i] >= CharacterConstants.Zero && buffer[i] <= CharacterConstants.Nine)
+                    {
+                        return (int)stream.Position - bytesRead + i;
+                    }
+                    else if (!CharacterConstants.WhitespaceCharacters.Contains((char)buffer[i]))
+                    {
+                        feedbacks.Add(new ValidationFeedbackItem(
+                            new(filename, _lineNumber + startRow, []),
+                            new(ValidationFeedbackLevel.Error,
+                            ValidationFeedbackRule.DataValidationFeedbackInvalidChar, 
+                            _lineNumber + startRow, 
+                            _charPosition)));
+                    }
+                }
+            } while (bytesRead > 0);
+
+            return -1;
         }
     }
 

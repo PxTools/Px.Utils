@@ -1,7 +1,6 @@
 ﻿using Px.Utils.Models;
 using Px.Utils.Models.Metadata;
 using Px.Utils.Operations;
-using PxUtils.Models.Metadata;
 
 namespace Px.Utils.UnitTests.OperationsTests
 {

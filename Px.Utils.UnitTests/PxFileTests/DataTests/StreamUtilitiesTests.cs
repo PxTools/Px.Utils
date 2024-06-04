@@ -1,6 +1,6 @@
 ﻿using PxFileTests.Fixtures;
-using PxUtils.PxFile;
-using PxUtils.PxFile.Data;
+using Px.Utils.PxFile;
+using Px.Utils.PxFile.Data;
 using System.Text;
 
 namespace PxFileTests.DataTests

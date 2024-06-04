@@ -1,7 +1,7 @@
 ﻿using Px.Utils.PxFile.Data;
-using PxUtils.Models.Data.DataValue;
+using Px.Utils.Models.Data.DataValue;
 
-namespace PxUtils.PxFile.Data
+namespace Px.Utils.PxFile.Data
 {
     public interface IPxFileStreamDataReader
     {

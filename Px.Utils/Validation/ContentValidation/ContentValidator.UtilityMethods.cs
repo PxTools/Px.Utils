@@ -1,7 +1,7 @@
-﻿using PxUtils.PxFile;
-using PxUtils.Validation.SyntaxValidation;
+﻿using Px.Utils.PxFile;
+using Px.Utils.Validation.SyntaxValidation;
 
-namespace PxUtils.Validation.ContentValidation
+namespace Px.Utils.Validation.ContentValidation
 {
     /// <summary>
     /// Contains a collection of utility methods used in content validation.
@@ -62,7 +62,7 @@ namespace PxUtils.Validation.ContentValidation
                                 );
 
                         feedbackItems.Add(new ValidationFeedbackItem(
-                            new ContentValidationObject(filename, 0, []),
+                            new ValidationObject(filename, 0, []),
                             feedback
                             ));
                     }
@@ -110,7 +110,7 @@ namespace PxUtils.Validation.ContentValidation
                             );
                 return
                     new ValidationFeedbackItem(
-                        new ContentValidationObject(validator._filename, 0, []),
+                        new ValidationObject(validator._filename, 0, []),
                         feedback
                         );
             }
@@ -169,7 +169,7 @@ namespace PxUtils.Validation.ContentValidation
                             $"{language}, {keyword}, {dimensionName}");
 
                 return new ValidationFeedbackItem(
-                        new ContentValidationObject(validator._filename, 0, []),
+                        new ValidationObject(validator._filename, 0, []),
                         feedback
                         );
             }

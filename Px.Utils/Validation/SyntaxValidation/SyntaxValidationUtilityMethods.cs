@@ -1,9 +1,9 @@
-using PxUtils.PxFile;
+using Px.Utils.PxFile;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Globalization;
 
-namespace PxUtils.Validation.SyntaxValidation
+namespace Px.Utils.Validation.SyntaxValidation
 {
     /// <summary>
     /// Represents the result of extracting sections from a string. This struct contains an array of the extracted sections and the input of the string after extraction.

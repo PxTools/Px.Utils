@@ -1,6 +1,6 @@
-﻿using PxUtils.Language;
+﻿using Px.Utils.Language;
 
-namespace PxUtils.Models.Metadata
+namespace Px.Utils.Models.Metadata
 {
     /// <summary>
     /// Represents a meta property in a Px-file. A meta property can have a single string value or a multilanguage string value.

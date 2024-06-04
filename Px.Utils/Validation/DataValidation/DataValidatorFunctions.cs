@@ -1,8 +1,8 @@
-﻿using PxUtils.PxFile;
+﻿using Px.Utils.PxFile;
 using System.Globalization;
 using System.Text;
 
-namespace PxUtils.Validation.DataValidation
+namespace Px.Utils.Validation.DataValidation
 {
     public class DataStringValidator : IDataValidator
     {

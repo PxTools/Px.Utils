@@ -1,6 +1,6 @@
 ﻿using Px.Utils.Models.Data;
 
-namespace PxUtils.Models.Data.DataValue
+namespace Px.Utils.Models.Data.DataValue
 {
     /// <summary>
     /// Structure representing one data point from a px file as a <see cref="decimal"/> value and its type.

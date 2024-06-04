@@ -1,7 +1,7 @@
 ﻿using Px.Utils.Models.Metadata;
-using PxUtils.Models.Metadata.Dimensions;
+using Px.Utils.Models.Metadata.Dimensions;
 
-namespace PxUtils.Models.Metadata
+namespace Px.Utils.Models.Metadata
 {
     /// <summary>
     /// Readonly metadata interface for a matrix object in a strucured format.

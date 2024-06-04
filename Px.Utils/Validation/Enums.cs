@@ -1,4 +1,4 @@
-﻿namespace PxUtils.Validation
+﻿namespace Px.Utils.Validation
 {
     /// <summary>
     /// Defines the levels of validation feedback. These levels can be used to categorize feedback items by severity.

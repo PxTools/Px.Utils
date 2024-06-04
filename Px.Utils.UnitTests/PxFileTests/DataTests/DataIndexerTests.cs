@@ -1,7 +1,6 @@
 ﻿using Px.Utils.Models.Metadata;
 using Px.Utils.PxFile.Data;
 using Px.Utils.UnitTests;
-using PxUtils.Models.Metadata;
 
 namespace PxFileTests.DataTests
 {

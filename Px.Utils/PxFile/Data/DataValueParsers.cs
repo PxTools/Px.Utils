@@ -1,9 +1,9 @@
-﻿using PxUtils.Models.Data;
-using PxUtils.Models.Data.DataValue;
+﻿using Px.Utils.Models.Data;
+using Px.Utils.Models.Data.DataValue;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
-namespace PxUtils.PxFile.Data
+namespace Px.Utils.PxFile.Data
 {
     public static class DataValueParsers
     {

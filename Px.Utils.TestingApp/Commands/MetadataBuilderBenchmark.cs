@@ -1,6 +1,6 @@
 ﻿
-using PxUtils.ModelBuilders;
-using PxUtils.PxFile.Metadata;
+using Px.Utils.ModelBuilders;
+using Px.Utils.PxFile.Metadata;
 using System.Text;
 
 namespace Px.Utils.TestingApp.Commands

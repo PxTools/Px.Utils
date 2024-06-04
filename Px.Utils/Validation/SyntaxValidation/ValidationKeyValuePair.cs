@@ -1,6 +1,6 @@
-﻿using PxUtils.PxFile;
+﻿using Px.Utils.PxFile;
 
-namespace PxUtils.Validation.SyntaxValidation
+namespace Px.Utils.Validation.SyntaxValidation
 {
     /// <summary>
     /// Represents a key-value pair built from a PX file metadata entry. Key consists of the keyword and parameter sections separated by = by default.

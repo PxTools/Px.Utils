@@ -1,9 +1,9 @@
-﻿namespace PxUtils.Validation
+﻿namespace Px.Utils.Validation
 {
     /// <summary>
-    /// Abstract class for validation objects. A validation object represents an entry in a PX file that is subject to validation.
+    /// Class for validation objects. A validation object represents an entry in a PX file that is subject to validation.
     /// </summary>
-    public abstract class ValidationObject(string file, int keyStartLineIndex, int[] lineChangeIndexes)
+    public class ValidationObject(string file, int keyStartLineIndex, int[] lineChangeIndexes)
     {
         /// <summary>
         /// Name of the file where the entry is located.

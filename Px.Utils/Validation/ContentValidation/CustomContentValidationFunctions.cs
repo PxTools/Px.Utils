@@ -1,4 +1,4 @@
-﻿namespace PxUtils.Validation.ContentValidation
+﻿namespace Px.Utils.Validation.ContentValidation
 {
     /// <summary>
     /// Object storing optional custom content validation functions

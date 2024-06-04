@@ -1,5 +1,5 @@
-﻿using PxUtils.PxFile.Metadata;
-using PxUtils.Validation.SyntaxValidation;
+﻿using Px.Utils.PxFile.Metadata;
+using Px.Utils.Validation.SyntaxValidation;
 using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
@@ -11,15 +11,15 @@ namespace Px.Utils.TestingApp.Commands
         "\t-f, -file: The path to the px file to read." + Environment.NewLine +
         "\t-i, -iter: The number of iterations to run.";
 
-        internal override string Description => "Benchmarks the metadata syntax validation of Px.Utils/Validation/SyntaxValidation.";
+        internal override string Description => "Benchmarks the metadata syntax validation of Px.Utils/Validation/SyntaxValidator.";
 
         private Encoding encoding;
+        private SyntaxValidator validator;
 
         internal MetadataSyntaxValidationBenchmark()
         {             
             BenchmarkFunctions = [SyntaxValidationBenchmark];
             BenchmarkFunctionsAsync = [SyntaxValidationBenchmarkAsync];
-            encoding = Encoding.Default;
         }
 
         protected override void OneTimeBenchmarkSetup()
@@ -29,6 +29,7 @@ namespace Px.Utils.TestingApp.Commands
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             encoding = PxFileMetadataReader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
+            validator = new(stream, encoding, TestFilePath);
         }
 
         private void SyntaxValidationBenchmark()
@@ -36,7 +37,7 @@ namespace Px.Utils.TestingApp.Commands
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             stream.Seek(0, SeekOrigin.Begin);
 
-            SyntaxValidation.ValidatePxFileMetadataSyntax(stream, encoding, TestFilePath);
+            validator.Validate();
         }
 
         private async Task SyntaxValidationBenchmarkAsync()
@@ -44,7 +45,7 @@ namespace Px.Utils.TestingApp.Commands
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             stream.Seek(0, SeekOrigin.Begin);
 
-            await SyntaxValidation.ValidatePxFileMetadataSyntaxAsync(stream, encoding, TestFilePath);
+            await validator.ValidateAsync();
         }
     }
 }

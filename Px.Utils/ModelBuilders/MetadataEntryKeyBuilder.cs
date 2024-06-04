@@ -1,7 +1,7 @@
-﻿using PxUtils.Models.Metadata;
-using PxUtils.PxFile;
+﻿using Px.Utils.Models.Metadata;
+using Px.Utils.PxFile;
 
-namespace PxUtils.ModelBuilders
+namespace Px.Utils.ModelBuilders
 {
     /// <summary>
     /// Class for building <see cref="MetadataEntryKey"/> records from strings.
