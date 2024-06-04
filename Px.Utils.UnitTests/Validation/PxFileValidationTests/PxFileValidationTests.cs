@@ -1,5 +1,8 @@
-﻿using Px.Utils.UnitTests.Validation.Fixtures;
+﻿using Px.Utils.UnitTests.Validation.ContentValidationTests;
+using Px.Utils.UnitTests.Validation.Fixtures;
+using Px.Utils.UnitTests.Validation.SyntaxValidationTests;
 using Px.Utils.Validation;
+using Px.Utils.Validation.SyntaxValidation;
 using System.Text;
 
 namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
@@ -38,7 +41,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
         }
 
         [TestMethod]
-        public async Task ValidatePxFileWithINvalidPxFileReturnsFeedbacks()
+        public async Task ValidatePxFileWithInvalidPxFileReturnsFeedbacks()
         {
             // Arrange
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.INVALID_PX_FILE));
@@ -74,10 +77,26 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             // Arrange
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.MINIMAL_PX_FILE));
             PxFileValidator validator = new(stream, "foo", Encoding.UTF8);
-            validator.SetCustomValidators([new MockCustomValidators()]);
+            validator.SetCustomValidators(null, [new MockCustomValidators()]);
 
             // Act
             ValidationResult result = await validator.ValidateAsync();
+
+            // Assert
+            Assert.IsNotNull(result, "Validation result should not be null");
+            Assert.AreEqual(0, result.FeedbackItems.Length);
+        }
+
+        [TestMethod]
+        public void ValidatePxFileWithCustomValidationFunctionsReturnsValidResult()
+        {
+            // Arrange
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.MINIMAL_PX_FILE));
+            PxFileValidator validator = new(stream, "foo", Encoding.UTF8);
+            validator.SetCustomValidatorFunctions(new MockCustomSyntaxValidationFunctions(), new MockCustomContentValidationFunctions());
+
+            // Act
+            ValidationResult result = validator.Validate();
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
