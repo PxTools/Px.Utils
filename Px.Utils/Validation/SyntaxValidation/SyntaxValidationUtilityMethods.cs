@@ -150,30 +150,6 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// Determines whether the line changes in a string are compliant with the syntax configuration.
-        /// </summary>
-        /// <param name="input">The input string to check</param>
-        /// <param name="syntaxConf">Object that contains the symbols and tokens for structuring the file syntax. 
-        /// The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
-        /// <param name="isList">A boolean that is true if the input string is a list</param>
-        /// <returns>Returns a boolean which is true if the line changes in the input string are compliant with the syntax configuration</returns>
-        internal static bool ValueLineChangesAreCompliant(string input, PxFileSyntaxConf syntaxConf, bool isList)
-        {
-            string trimmedInput = input.Replace(CharacterConstants.CARRIAGERETURN.ToString(CultureInfo.InvariantCulture), "");
-            int lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.CHARLINEFEED);
-            while (lineChangeIndex != -1)
-            {
-                char symbolBefore = isList ? syntaxConf.Symbols.Key.ListSeparator : syntaxConf.Symbols.Key.StringDelimeter;
-                if (trimmedInput[lineChangeIndex - 1] != symbolBefore || trimmedInput[lineChangeIndex + 1] != syntaxConf.Symbols.Key.StringDelimeter)
-                {
-                    return false;
-                }
-                lineChangeIndex = trimmedInput.IndexOf(CharacterConstants.CHARLINEFEED, lineChangeIndex + 1);
-            }
-            return true;
-        }
-
-        /// <summary>
         /// Determines the type of a value from a string.
         /// </summary>
         /// <param name="input">The input string to check</param>
