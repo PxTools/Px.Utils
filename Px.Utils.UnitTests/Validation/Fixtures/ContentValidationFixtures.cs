@@ -15,6 +15,15 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
                 11,
                 Utils.Validation.ValueType.ListOfStrings);
 
+        private static readonly ValidationStructuredEntry altLanguagesEntry = 
+            new(filename,
+                new ValidationStructuredEntryKey("LANGUAGES"),
+                "sv,no",
+                5,
+                [],
+                11,
+                Utils.Validation.ValueType.ListOfStrings);
+
         private static readonly ValidationStructuredEntry charsetEntry =
             new(filename,
                 new ValidationStructuredEntryKey("CHARSET"),
@@ -49,6 +58,15 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
                 3,
                 [],
                 8,
+                Utils.Validation.ValueType.StringValue);
+
+        private static readonly ValidationStructuredEntry altLanguageEntry = 
+            new(filename,
+                new ValidationStructuredEntryKey("LANGUAGE"),
+                "en",
+                4,
+                [],
+                12,
                 Utils.Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry nextUpdateEntry =
@@ -430,6 +448,18 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
                 codesBarEnEntry,
                 codesBarTimeEnEntry,
                 variableTypeBarEntry,
+            ];
+
+        internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_TWO_DEFAULT_LANGUAGES =>
+            [
+                languageEntry,
+                altLanguageEntry
+            ];
+
+        internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_TWO_AVAILABLE_LANGUAGES_ENTRIES =>
+            [
+                languagesEntry,
+                altLanguagesEntry
             ];
 
         internal static ValidationStructuredEntry StructuredEntryWithIllegalSpecifiers =>
