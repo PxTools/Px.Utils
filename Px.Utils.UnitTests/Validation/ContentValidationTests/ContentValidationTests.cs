@@ -517,6 +517,25 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             Assert.AreEqual(ValidationFeedbackRule.MultipleInstancesOfUniqueKey, result[0].Feedback.Rule);
         }
 
+        [TestMethod]
+        public void ValidateFindStubAndHeadingWithMissingStubAndHeadingReturnsError()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries =  [];
+            ContentValidator validator = new(filename, encoding, entries);
+
+            // Act
+            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindStubAndHeading(
+                entries,
+                validator
+                );
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(1, result.Length);
+            Assert.AreEqual(ValidationFeedbackRule.MissingStubAndHeading, result[0].Feedback.Rule);
+        }
+
         private static void SetValidatorField(ContentValidator validator, string fieldName, object value)
         {
             var propertyInfo = validator.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
