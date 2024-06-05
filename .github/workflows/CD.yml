@@ -7,7 +7,7 @@ on:
     branches:
       - 'main'
   workflow_dispatch:
-  pull_request:
+  pull_request: # Remove this after initial publish
 
 jobs:
   publish:
@@ -23,21 +23,8 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - uses: nuget/setup-nuget@v2
-        with:
-          nuget-api-key: ${{ secrets.NUGET_API_KEY }}
-          nuget-version: latest
-
-      - name: Restore NuGet packages
-        run: nuget restore
-
       - name: Pack NuGet package
         run: dotnet pack Px.Utils/Px.Utils.csproj -c Release
 
       - name: Publish NuGet package
-        run: nuget push Px.Utils/bin/Release/*.nupkg $env:nuget_api_key -src https://nuget.org
-        env:
-          nuget_api_key: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push Px.Utils/bin/Release/*.nupkg --api-key  ${{ secrets.NUGET_API_KEY }} --source https://nuget.org --skip-duplicate
