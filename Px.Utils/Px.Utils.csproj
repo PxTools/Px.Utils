@@ -11,7 +11,6 @@
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<RepositoryUrl>https://github.com/PxTools/Px.Utils</RepositoryUrl>
 	<PackageTags>px, px files, validation, aggregation, operations, data, metadata, statistics</PackageTags>
-	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 	<Authors>pc-axis</Authors>
 	<Description>Library for reading, processing and validating px file data and metadata.</Description>
 	<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
@@ -19,11 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\pxgraf-github\docs\LICENSE.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\..\pxgraf-github\docs\README.md">
+    <None Include="..\docs\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
