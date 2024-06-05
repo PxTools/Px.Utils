@@ -8,6 +8,10 @@ on:
       # - 'main' revert to this after test publish from feature branch
       - 'feature/**' # Remove this after initial publish
   workflow_dispatch:
+  # Remove pull request trigger after initial publish
+  pull_request:
+    branches:
+      - 'feature/**'
 
 jobs:
   publish:
