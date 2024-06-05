@@ -7,6 +7,8 @@ on:
     branches:
       # - 'main' revert to this after test publish from feature branch
       - 'feature/**' # Remove this after initial publish
+  workflow_dispatch:
+
 jobs:
   publish:
     runs-on: ubuntu-latest
