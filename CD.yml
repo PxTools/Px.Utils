@@ -3,7 +3,6 @@ name: Px.Utils CD
 run-name: CD for ${{ github.event.pull_request.number }}
 
 on:
-  pull_request:
   push:
     branches:
       - 'main'
