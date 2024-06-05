@@ -1,0 +1,30 @@
+name: Px.Utils CD
+
+run-name: CD for ${{ github.event.pull_request.number }}
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'dev' # Remove this after initial publish from dev
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
+      - name: Pack NuGet package
+        run: dotnet pack Px.Utils/Px.Utils.csproj -c Release
+
+      - name: Publish NuGet package
+        run: dotnet nuget push Px.Utils/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
