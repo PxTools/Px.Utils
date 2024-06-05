@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+	<PackageId>Px.Utils</PackageId>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -13,8 +14,6 @@
 	<PackageTags>px, px files, validation, aggregation, operations, data, metadata, statistics</PackageTags>
 	<Authors>pc-axis</Authors>
 	<Description>Library for reading, processing and validating px file data and metadata.</Description>
-	<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
-	<FileVersion>$(VersionPrefix)</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
