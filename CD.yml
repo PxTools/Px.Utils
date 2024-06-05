@@ -4,11 +4,10 @@ run-name: CD for ${{ github.event.pull_request.number }}
 
 on:
   pull_request:
-    branches:
-      - 'dev'
   push:
     branches:
       - 'main'
+      - 'dev' # Remove this after initial publish from dev
   workflow_dispatch:
 
 jobs:
