@@ -5,7 +5,29 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
+	<IsPackable>true</IsPackable>
+	<Title>Px.Utils</Title>
+	<Company>Statistics Finland</Company>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<RepositoryUrl>https://github.com/PxTools/Px.Utils</RepositoryUrl>
+	<PackageTags>px, px files, validation, aggregation, operations, data, metadata, statistics</PackageTags>
+	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+	<Authors>pc-axis</Authors>
+	<Description>Library for reading, processing and validating px file data and metadata.</Description>
+	<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
+	<FileVersion>$(VersionPrefix)</FileVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\pxgraf-github\docs\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\pxgraf-github\docs\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
