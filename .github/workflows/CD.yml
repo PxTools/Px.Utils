@@ -27,4 +27,4 @@ jobs:
         run: dotnet pack Px.Utils/Px.Utils.csproj -c Release
 
       - name: Publish NuGet package
-        run: dotnet nuget push Px.Utils/bin/Release/*.nupkg --api-key  ${{ secrets.NUGET_API_KEY }} --source https://nuget.org --skip-duplicate
+        run: dotnet nuget push Px.Utils/bin/Release/*.nupkg --api-key  ${{ secrets.NUGET_API_KEY }} --source https://int.nugettest.org/
