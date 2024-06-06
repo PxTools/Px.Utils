@@ -17,9 +17,14 @@
 	<Description>Library for reading, processing and validating px file data and metadata.</Description>
 	<IncludeSymbols>true</IncludeSymbols>
 	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\docs\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\docs\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
