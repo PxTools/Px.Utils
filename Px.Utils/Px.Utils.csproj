@@ -10,10 +10,13 @@
 	<Title>Px.Utils</Title>
 	<Company>Statistics Finland</Company>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
-	<RepositoryUrl>https://github.com/PxTools/Px.Utils</RepositoryUrl>
-	<PackageTags>px, px files, validation, aggregation, operations, data, metadata, statistics</PackageTags>
-	<Authors>pc-axis</Authors>
+	<PackageProjectUrl>https://github.com/PxTools/Px.Utils</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/PxTools/Px.Utils.git</RepositoryUrl>
+	<RepositoryType>git</RepositoryType>
+	<PackageTags>px files validation aggregation operations data metadata statistics</PackageTags>
 	<Description>Library for reading, processing and validating px file data and metadata.</Description>
+	<IncludeSymbols>true</IncludeSymbols>
+	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
