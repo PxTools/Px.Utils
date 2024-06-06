@@ -26,5 +26,11 @@ jobs:
       - name: Pack NuGet package
         run: dotnet pack Px.Utils/Px.Utils.csproj -c Release
 
+      - name: Install NuGet validator
+        run: dotnet tool update Meziantou.Framework.NuGetPackageValidation.Tool --global
+
+      - name: Validate NuGet package
+        run: meziantou.validate-nuget-package Px.Utils/bin/Release/*.nupkg
+
       - name: Publish NuGet package
         run: dotnet nuget push Px.Utils/bin/Release/*.nupkg --api-key  ${{ secrets.NUGET_API_KEY }} --source https://nuget.org --skip-duplicate
