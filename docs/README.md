@@ -92,6 +92,3 @@ TBA
 
 ### Computing
 TBA
-
-## Installing
-TBA when published to NuGet
