@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - 'main'
-      - 'dev' # Remove this after initial publish from dev
   workflow_dispatch:
 
 jobs:
@@ -27,4 +26,4 @@ jobs:
         run: dotnet pack Px.Utils/Px.Utils.csproj -c Release
 
       - name: Publish NuGet package
-        run: dotnet nuget push Px.Utils/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push Px.Utils/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://nuget.org --skip-duplicate
