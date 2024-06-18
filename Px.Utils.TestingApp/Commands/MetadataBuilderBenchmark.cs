@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal sealed class MetadataBuilderBenchmark : Benchmark
+    internal sealed class MetadataBuilderBenchmark : FileBenchmark
     {
         internal override string Help => "Tests the performance of the metadata building.";
 

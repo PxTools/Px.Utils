@@ -1,9 +1,8 @@
 ﻿using Px.Utils.Models;
 using Px.Utils.Models.Metadata;
+using Px.Utils.Models.Metadata.Dimensions;
 using Px.Utils.Models.Metadata.ExtensionMethods;
 using Px.Utils.PxFile.Data;
-using Px.Utils.Models.Metadata.Dimensions;
-using System.Numerics;
 
 namespace Px.Utils.Operations
 {
@@ -11,14 +10,93 @@ namespace Px.Utils.Operations
     /// Base class for matrix functions, defines some operation that can be applied to a matrix, such as a transformation or a sum
     /// </summary>
     /// <typeparam name="TData">Type of the data values in the matrix</typeparam>
-    public abstract class MatrixFunction<TData>
+    public class MatrixFunction<TData> : IMatrixFunction<TData>
     {
+        private readonly Func<Matrix<TData>, Matrix<TData>> _apply;
+
+        public MatrixFunction(DimensionValue newValue, IDimensionMap sourceMap, Func<TData, TData, TData> func, TData functionIdentity, int insertIndex = -1)
+        {
+            _apply = (input) => ApplyOverDimension(input, newValue, sourceMap, func, functionIdentity, insertIndex);
+        }
+        
+        public MatrixFunction(IMatrixMap targetMap, Func<TData, TData> func)
+        {
+            _apply = (input) => ApplyToSubMap(input, targetMap, func);
+        }
+
+        public virtual Matrix<TData> Apply(Matrix<TData> input) => _apply(input);
+
         /// <summary>
         /// Applies the function to the input matrix, returning a new matrix with the result
         /// </summary>
         /// <param name="input">inoput matrix</param>
         /// <returns>a new matrix with the result of the operation</returns>
-        public abstract Matrix<TData> Apply(Matrix<TData> input);
+        public virtual Matrix<TData> ApplyOverDimension(
+            Matrix<TData> input, DimensionValue newValue, IDimensionMap sourceMap, Func<TData, TData, TData> func, TData functionIdentity, int valueIndex){
+            MatrixMetadata newMeta = valueIndex == -1
+                ? CopyMetaAndAddValue(input.Metadata, sourceMap.Code, newValue)
+                : CopyMetaAndInsertValue(input.Metadata, sourceMap.Code, newValue, valueIndex);
+
+            // Compute sum values to the output matrix
+
+            IMatrixMap sumOnlyMap = newMeta.CollapseDimension(sourceMap.Code, newValue.Code);
+            TData[] outData = new TData[input.Metadata.GetSize() + sumOnlyMap.GetSize()];
+            
+            // Initialize the output matrix with the identity value
+            for (int i = 0; i < outData.Length; i++) outData[i] = functionIdentity; 
+
+            for (int i = 0; i < sourceMap.ValueCodes.Count; i++)
+            {
+                IMatrixMap sumSubMap = input.Metadata.CollapseDimension(sourceMap.Code, sourceMap.ValueCodes[i]);
+                DataIndexer source = new(input.Metadata, sumSubMap);
+                DataIndexer target = new(newMeta, sumOnlyMap);
+
+                do outData[target.CurrentIndex] = func(outData[target.CurrentIndex], input.Data[source.CurrentIndex]);
+                while (source.Next() && target.Next());
+            }
+
+            // Copy the original data to the output matrix
+
+            DataIndexer original = new(newMeta, input.Metadata);
+            int ogIndex = 0;
+            do outData[original.CurrentIndex] = input.Data[ogIndex++];
+            while (original.Next());
+
+            return new Matrix<TData>(newMeta, outData);
+        }
+
+        public virtual Matrix<TData> ApplyToSubMap(Matrix<TData> input, IMatrixMap subMap, Func<TData, TData> func)
+        {
+            MatrixMetadata metaCopy = input.Metadata.GetTransform(input.Metadata);
+            TData[] dataCopy = [.. input.Data];
+
+            DataIndexer indexer = new(input.Metadata, subMap);
+
+            do dataCopy[indexer.CurrentIndex] = func(input.Data[indexer.CurrentIndex]);
+            while (indexer.Next());
+
+            return new Matrix<TData>(metaCopy, dataCopy);
+        }
+
+        public virtual Matrix<TData> ApplyRelative(Matrix<TData> input, Func<TData, TData, TData> func, IDimensionMap sourceMap, string baseValueCode)
+        {
+            IMatrixMap baseValueMap = input.Metadata.CollapseDimension(sourceMap.Code, baseValueCode);
+            TData[] resultData = [.. input.Data];
+            foreach(string valueCode in sourceMap.ValueCodes)
+            {
+                DataIndexer baseValueIndexer = new(input.Metadata, baseValueMap);
+                DataIndexer targetIndexer = new(input.Metadata, input.Metadata.CollapseDimension(sourceMap.Code, valueCode));
+
+                do
+                {
+                    TData sourceValue = input.Data[targetIndexer.CurrentIndex];
+                    TData baseValue = input.Data[baseValueIndexer.CurrentIndex];
+                    resultData[targetIndexer.CurrentIndex] = func(sourceValue, baseValue);
+                }
+                while (targetIndexer.Next() && baseValueIndexer.Next());     
+            }
+            return new Matrix<TData>(input.Metadata.GetTransform(input.Metadata), resultData);
+        }
 
         protected static MatrixMetadata CopyMetaAndAddValue(IReadOnlyMatrixMetadata meta, string dimCode, DimensionValue valueToAdd)
         {
@@ -42,91 +120,6 @@ namespace Px.Utils.Operations
             int dimIndex = metaCopy.Dimensions.FindIndex(d => d.Code == dimCode);
             metaCopy.Dimensions[dimIndex] = dimCopy;
             return metaCopy;
-        }
-    }
-
-    /// <summary>
-    /// Function that applies a transformation map to a matrix
-    /// </summary>
-    /// <typeparam name="TData">Type of the data values in the matrix</typeparam>
-    /// <param name="map">The resulting matrix will have this structure</param>
-    public class TransformationMatrixFunction<TData>(IMatrixMap map) : MatrixFunction<TData>
-    {
-        public override Matrix<TData> Apply(Matrix<TData> input)
-        {
-            return input.GetTransform(map);
-        }
-    }
-
-    /// <summary>
-    /// A function adds a new value to a dimension which is a sum of values defined by a map
-    /// </summary>
-    /// <typeparam name="TData"></typeparam>
-    public class SumMatrixFunction<TData> : MatrixFunction<TData> where TData : IAdditionOperators<TData, TData, TData>
-    {
-        private readonly DimensionValue _newValue;
-        private readonly DimensionMap _sumMap;
-        readonly int _valueIndex;
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        /// <param name="newValue">Dimension value that will represent the sum of the values</param>
-        /// <param name="sumMap">Defines which values will be summed</param>
-        public SumMatrixFunction(DimensionValue newValue, DimensionMap sumMap)
-        {
-            _newValue = newValue;
-            _sumMap = sumMap;
-            _valueIndex = -1;
-        }
-
-        /// <summary>
-        /// Constructor that allows to specify the index where the new value will be inserted in the dimension
-        /// </summary>
-        /// <param name="newValue">Dimension value that will represent the sum of the values</param>
-        /// <param name="sumMap">Defines which values will be summed</param>
-        /// <param name="insertIndex">Zero based index where the new value will be inserted in the dimension</param>
-        public SumMatrixFunction(DimensionValue newValue, DimensionMap sumMap, int insertIndex)
-        {
-            _newValue = newValue;
-            _sumMap = sumMap;
-            _valueIndex = insertIndex;
-        }
-
-        /// <summary>
-        /// Applies the sum operation to the input matrix, returning a new matrix with the result
-        /// </summary>
-        /// <param name="input">The input matrix</param>
-        /// <returns>New matrix with the result of the sum operation</returns>
-        public override Matrix<TData> Apply(Matrix<TData> input)
-        {
-            MatrixMetadata newMeta = _valueIndex == -1 
-                ? CopyMetaAndAddValue(input.Metadata, _sumMap.Code, _newValue)
-                : CopyMetaAndInsertValue(input.Metadata, _sumMap.Code, _newValue, _valueIndex);
-
-            // Compute sum values to the output matrix
-
-            IMatrixMap sumOnlyMap = newMeta.CollapseDimension(_sumMap.Code, _newValue.Code);
-            TData[] outData = new TData[input.Metadata.GetSize() + sumOnlyMap.GetSize()];
-
-            for(int i = 0; i < _sumMap.ValueCodes.Count; i++)
-            {
-                IMatrixMap sumSubMap = input.Metadata.CollapseDimension(_sumMap.Code, _sumMap.ValueCodes[i]);
-                DataIndexer source = new(input.Metadata, sumSubMap);
-                DataIndexer target = new(newMeta, sumOnlyMap);
-
-                do outData[target.CurrentIndex] = outData[target.CurrentIndex] + input.Data[source.CurrentIndex];
-                while (source.Next() && target.Next());
-            }
-
-            // Copy the original data to the output matrix
-
-            DataIndexer original = new(newMeta, input.Metadata);
-            int ogIndex = 0;
-            do outData[original.CurrentIndex] = input.Data[ogIndex++];
-            while (original.Next());
-
-            return new Matrix<TData>(newMeta, outData);
         }
     }
 }
