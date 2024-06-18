@@ -24,6 +24,11 @@ namespace Px.Utils.Operations
             _apply = (input) => ApplyToSubMap(input, targetMap, func);
         }
 
+        public MatrixFunction(Func<TData, TData, TData> func, IDimensionMap sourceMap, string baseValueCode) 
+        {
+            _apply = (input) => ApplyRelative(input, func, sourceMap, baseValueCode);
+        }
+
         public virtual Matrix<TData> Apply(Matrix<TData> input) => _apply(input);
 
         /// <summary>

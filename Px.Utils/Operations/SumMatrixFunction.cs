@@ -26,6 +26,13 @@ namespace Px.Utils.Operations
         /// <param name="insertIndex">Zero based index where the new value will be inserted in the dimension</param>
         public SumMatrixFunction(DimensionValue newValue, IDimensionMap sumMap, int insertIndex) : base(newValue, sumMap, Sum, TData.AdditiveIdentity, insertIndex) { }
 
+        /// <summary>
+        /// Constructor for a sum function that adds a constant value to the values specified by the target map.
+        /// </summary>
+        /// <param name="targetMap">Determined the set of target values</param>
+        /// <param name="valueToAdd">The constant to add to to the target values</param>
+        public SumMatrixFunction(IMatrixMap targetMap, TData valueToAdd) : base(targetMap, (input) => input + valueToAdd) { }
+
         private static TData Sum(TData a, TData b) => a + b; 
     }
 }
