@@ -8,7 +8,7 @@ using Px.Utils.TestingApp.TestDataGenerator;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal class ComputationBenchmark : Benchmark
+    internal sealed class ComputationBenchmark : Benchmark
     {
         internal override string Help => "Test the performance of the computations";
 
@@ -38,15 +38,13 @@ namespace Px.Utils.TestingApp.Commands
         private void ComputeSumBenchmarkDecimalDataValue()
         {
             DimensionValue valueToAdd = new("new", new("foo", "new"));
-            SumMatrixFunction<DecimalDataValue> func = new(valueToAdd, DecimalDataValueMatrix.Metadata.Dimensions[2]);
-            func.Apply(DecimalDataValueMatrix);
+            DecimalDataValueMatrix.SumToNewValue(valueToAdd, DecimalDataValueMatrix.Metadata.Dimensions[2]);
         }
 
         private void ComputeSumBenchmarkDouble()
         {
             DimensionValue valueToAdd = new("new", new("foo", "new"));
-            SumMatrixFunction<double> func = new(valueToAdd, DoubleMatrix.Metadata.Dimensions[2]);
-            func.Apply(DoubleMatrix);
+            DoubleMatrix.SumToNewValue(valueToAdd, DoubleMatrix.Metadata.Dimensions[2]);
         }
     }
 }

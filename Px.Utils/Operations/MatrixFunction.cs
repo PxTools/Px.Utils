@@ -10,34 +10,15 @@ namespace Px.Utils.Operations
     /// Base class for matrix functions, defines some operation that can be applied to a matrix, such as a transformation or a sum
     /// </summary>
     /// <typeparam name="TData">Type of the data values in the matrix</typeparam>
-    public class MatrixFunction<TData> : IMatrixFunction<TData>
+    public static class MatrixFunctionExtensions
     {
-        private readonly Func<Matrix<TData>, Matrix<TData>> _apply;
-
-        public MatrixFunction(DimensionValue newValue, IDimensionMap sourceMap, Func<TData, TData, TData> func, TData functionIdentity, int insertIndex = -1)
-        {
-            _apply = (input) => ApplyOverDimension(input, newValue, sourceMap, func, functionIdentity, insertIndex);
-        }
-        
-        public MatrixFunction(IMatrixMap targetMap, Func<TData, TData> func)
-        {
-            _apply = (input) => ApplyToSubMap(input, targetMap, func);
-        }
-
-        public MatrixFunction(Func<TData, TData, TData> func, IDimensionMap sourceMap, string baseValueCode) 
-        {
-            _apply = (input) => ApplyRelative(input, func, sourceMap, baseValueCode);
-        }
-
-        public virtual Matrix<TData> Apply(Matrix<TData> input) => _apply(input);
-
         /// <summary>
         /// Applies the function to the input matrix, returning a new matrix with the result
         /// </summary>
         /// <param name="input">inoput matrix</param>
         /// <returns>a new matrix with the result of the operation</returns>
-        public virtual Matrix<TData> ApplyOverDimension(
-            Matrix<TData> input, DimensionValue newValue, IDimensionMap sourceMap, Func<TData, TData, TData> func, TData functionIdentity, int valueIndex){
+        public static Matrix<TData> ApplyOverDimension<TData>(
+            this Matrix<TData> input, DimensionValue newValue, IDimensionMap sourceMap, Func<TData, TData, TData> func, TData functionIdentity, int valueIndex = -1){
             MatrixMetadata newMeta = valueIndex == -1
                 ? CopyMetaAndAddValue(input.Metadata, sourceMap.Code, newValue)
                 : CopyMetaAndInsertValue(input.Metadata, sourceMap.Code, newValue, valueIndex);
@@ -70,7 +51,7 @@ namespace Px.Utils.Operations
             return new Matrix<TData>(newMeta, outData);
         }
 
-        public virtual Matrix<TData> ApplyToSubMap(Matrix<TData> input, IMatrixMap subMap, Func<TData, TData> func)
+        public static Matrix<TData> ApplyToSubMap<TData>(this Matrix<TData> input, IMatrixMap subMap, Func<TData, TData> func)
         {
             MatrixMetadata metaCopy = input.Metadata.GetTransform(input.Metadata);
             TData[] dataCopy = [.. input.Data];
@@ -83,7 +64,7 @@ namespace Px.Utils.Operations
             return new Matrix<TData>(metaCopy, dataCopy);
         }
 
-        public virtual Matrix<TData> ApplyRelative(Matrix<TData> input, Func<TData, TData, TData> func, IDimensionMap sourceMap, string baseValueCode)
+        public static Matrix<TData> ApplyRelative<TData>(this Matrix<TData> input, Func<TData, TData, TData> func, IDimensionMap sourceMap, string baseValueCode)
         {
             IMatrixMap baseValueMap = input.Metadata.CollapseDimension(sourceMap.Code, baseValueCode);
             TData[] resultData = [.. input.Data];
@@ -103,7 +84,7 @@ namespace Px.Utils.Operations
             return new Matrix<TData>(input.Metadata.GetTransform(input.Metadata), resultData);
         }
 
-        protected static MatrixMetadata CopyMetaAndAddValue(IReadOnlyMatrixMetadata meta, string dimCode, DimensionValue valueToAdd)
+        private static MatrixMetadata CopyMetaAndAddValue(IReadOnlyMatrixMetadata meta, string dimCode, DimensionValue valueToAdd)
         {
             IReadOnlyDimension dimension = meta.Dimensions.First(d => d.Code == dimCode);
             Dimension dimCopy = dimension.GetTransform(dimension);
@@ -115,7 +96,7 @@ namespace Px.Utils.Operations
             return metaCopy;
         }
 
-        protected static MatrixMetadata CopyMetaAndInsertValue(IReadOnlyMatrixMetadata meta, string dimCode, DimensionValue valueToAdd, int index)
+        private static MatrixMetadata CopyMetaAndInsertValue(IReadOnlyMatrixMetadata meta, string dimCode, DimensionValue valueToAdd, int index)
         {
             IReadOnlyDimension dimension = meta.Dimensions.First(d => d.Code == dimCode);
             Dimension dimCopy = dimension.GetTransform(dimension);

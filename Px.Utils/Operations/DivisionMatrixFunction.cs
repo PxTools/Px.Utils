@@ -1,20 +1,47 @@
-﻿using Px.Utils.Models.Metadata;
-using Px.Utils.Models.Metadata.Dimensions;
+﻿using Px.Utils.Models;
+using Px.Utils.Models.Metadata;
 using System.Numerics;
 
 namespace Px.Utils.Operations
 {
-    internal class DivisionMatrixFunction<TData> : MatrixFunction<TData> where TData : IDivisionOperators<TData, TData, TData>, IMultiplicativeIdentity<TData, TData>
+    public static class DivisionMatrixFunctionExtensions
     {
-        /// <summary>
-        /// Constructor for multiplying all values defined by the target map with a given value.
-        /// </summary>
-        /// <param name="targetMap">Defines which values will be multiplied</param>
-        /// <param name="multiplier">Multiply by this constant</param>
-        public DivisionMatrixFunction(IMatrixMap targetMap, TData multiplier) : base(targetMap, (input) => input / multiplier) { }
+        public static Matrix<TData> DivideSubsetByConstant<TData>(this Matrix<TData> input, IMatrixMap targetMap, TData divider)
+            where TData : IDivisionOperators<TData, TData, TData>, IMultiplicativeIdentity<TData, TData>
+        {
+            return input.ApplyToSubMap(targetMap, (v) => v / divider);
+        }
 
-        public DivisionMatrixFunction(IDimensionMap sourceMap, string baseValueCode) : base(Divide, sourceMap, baseValueCode) { }
+        public static async Task<Matrix<TData>> DivideSubsetByConstantAsync<TData>(this Matrix<TData> input, IMatrixMap targetMap, TData divider)
+            where TData : IDivisionOperators<TData, TData, TData>, IMultiplicativeIdentity<TData, TData>
+        {
+            return await Task.Factory.StartNew(() => DivideSubsetByConstant(input, targetMap, divider));
+        }
 
-        private static TData Divide(TData a, TData b) => a / b;
+        public static async Task<Matrix<TData>> DivideSubsetByConstantAsync<TData>(this Task<Matrix<TData>> input, IMatrixMap targetMap, TData divider)
+            where TData : IDivisionOperators<TData, TData, TData>, IMultiplicativeIdentity<TData, TData>
+        {
+            return await DivideSubsetByConstantAsync(await input, targetMap, divider);
+        }
+
+        public static Matrix<TData> DivideSubsetBySelectedValue<TData>(this Matrix<TData> input, IDimensionMap targetMap, string baseValueCode)
+            where TData : IDivisionOperators<TData, TData, TData>, IMultiplicativeIdentity<TData, TData>
+        { 
+            return input.ApplyRelative(Divide, targetMap, baseValueCode);
+        }
+
+        public static async Task<Matrix<TData>> DivideSubsetBySelectedValueAsync<TData>(this Matrix<TData> input, IDimensionMap targetMap, string baseValueCode)
+            where TData : IDivisionOperators<TData, TData, TData>, IMultiplicativeIdentity<TData, TData>
+        { 
+            return await Task.Factory.StartNew(() => DivideSubsetBySelectedValue(input, targetMap, baseValueCode));
+        }
+        public static async Task<Matrix<TData>> DivideSubsetBySelectedValueAsync<TData>(this Task<Matrix<TData>> input, IDimensionMap targetMap, string baseValueCode)
+            where TData : IDivisionOperators<TData, TData, TData>, IMultiplicativeIdentity<TData, TData>
+        { 
+            return await DivideSubsetBySelectedValueAsync(await input, targetMap, baseValueCode);
+        }
+
+        private static TData Divide<TData>(TData a, TData b) where TData : IDivisionOperators<TData, TData, TData>, IMultiplicativeIdentity<TData, TData>
+            => a / b;
     }
 }
