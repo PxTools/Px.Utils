@@ -67,7 +67,39 @@ TBA
 TBA
 
 ### Computing
-TBA
+
+```Matrix<TData>``` class has a set of extension methods for performing basic computations for the datapoints.
+
+#### Sum
+```SumToNewValue<TData>``` computes sums of datapoints defined by a subset of values from a given dimension.
+The method takes a new dimension value as a parameter that will define the resulting values.
+The method also has an asyncronous variant ```SumToNewValueAsync<TData>```.  
+
+```AddConstantToSubset<TData>``` adds a constant to a subset of datapoints. Also has an asynchronous variant ```AddConstantToSubsetAsync<TData>```.
+
+#### Multiplication
+```MultiplyToNewValue<TData>``` computes products of datapoints defined by a subset of values from a given dimension.
+The method takes a new dimension value as a parameter that will define the resulting values.
+The method also has an asyncronous variant ```MultiplyToNewValueAsync<TData>```.  
+
+```MultiplySubsetByConstant<TData>``` Multiply a subset of datapoints by a constant. Also has an asynchronous variant ```MultiplySubsetByConstantAsync<TData>```.
+
+#### Division
+```DivideSubsetBySelectedValue``` divides a subset of datapoints defined by values from one dimension with datapoints defined by a value from the same dimension.
+Also has an asyncronous variant ```DivideSubsetBySelectedValueAsync```
+
+```DivideSubsetByConstant<TData>``` Divide a subset of datapoints by a constant. Also has an asynchronous variant ```DivideSubsetByConstantAsync<TData>```.
+
+#### General
+
+```ApplyOverDimension``` Generatas a new set datapoints by applying a function to datapoints defined by a subset of values from one dimension.
+The method takes a new dimension value as a parameter that will define the resulting values.
+
+```ApplyToSubMap``` Applies a function to a set of datapoints.
+
+```ApplyRelative``` Applies a function to a set of datapoints defined by a subset of values from one dimension.
+The method also takes a code of a value from the same dimension as a parameter which is used to define additional datapoints to be used as
+an input for the function.
 
 ## Installing
 TBA when published to NuGet
