@@ -5,6 +5,9 @@ using System.Numerics;
 
 namespace Px.Utils.Operations
 {
+    /// <summary>
+    /// A collection of extension methods for <see cref="Matrix{TData}"/> for multiplying the datapoints in various ways.
+    /// </summary>
     public static class MultiplicationMatrixFunctionExtensions
     {
         /// <summary>
