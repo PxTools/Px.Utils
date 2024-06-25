@@ -20,7 +20,8 @@ namespace Px.Utils.TestingApp.Commands
 
         internal ComputationBenchmark()
         {
-            BenchmarkFunctions = [ComputeSumBenchmarkDecimalDataValue, ComputeSumBenchmarkDouble];
+            BenchmarkFunctions = [ComputeSumDecimalDataValue, ComputeSumDouble,
+                ComputeDivisionDecimalDataValue, ComputeDivisionDouble];
 
             List<MetaGenerator.DimensionDefinition> definitions = [
                 new(DimensionType.Content, 1),
@@ -35,16 +36,29 @@ namespace Px.Utils.TestingApp.Commands
             DoubleMatrix = new(meta, DataGenerator.GenerateDoubles(1000000));
         }
 
-        private void ComputeSumBenchmarkDecimalDataValue()
+        private void ComputeSumDecimalDataValue()
         {
             DimensionValue valueToAdd = new("new", new("foo", "new"));
             DecimalDataValueMatrix.SumToNewValue(valueToAdd, DecimalDataValueMatrix.Metadata.Dimensions[2]);
         }
 
-        private void ComputeSumBenchmarkDouble()
+        private void ComputeSumDouble()
         {
             DimensionValue valueToAdd = new("new", new("foo", "new"));
             DoubleMatrix.SumToNewValue(valueToAdd, DoubleMatrix.Metadata.Dimensions[2]);
+        }
+        private void ComputeDivisionDecimalDataValue()
+        {
+            IReadOnlyDimension map = DecimalDataValueMatrix.Metadata.Dimensions[2];
+            string code = map.Values[0].Code;
+            DecimalDataValueMatrix.DivideSubsetBySelectedValue(map, code);
+        }
+
+        private void ComputeDivisionDouble()
+        {
+            IReadOnlyDimension map = DoubleMatrix.Metadata.Dimensions[2];
+            string code = map.Values[0].Code;
+            DecimalDataValueMatrix.DivideSubsetBySelectedValue(map, code);
         }
     }
 }
