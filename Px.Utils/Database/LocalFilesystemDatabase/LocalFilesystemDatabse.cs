@@ -1,4 +1,5 @@
 ﻿using Px.Utils.Language;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Px.Utils.Database.FilesystemDatabase
 {
@@ -8,6 +9,7 @@ namespace Px.Utils.Database.FilesystemDatabase
     /// <param name="id">Unique identifier for the database.</param>
     /// <param name="name">Translated names of the database.</param>
     /// <param name="databaseFilePath">Path to the root of the database.</param>
+    [ExcludeFromCodeCoverage] // All of the methods in this class call IO and contain very litle logic
     public class LocalFilesystemDatabse(string id, MultilanguageString name, string databaseFilePath) : IDatabase
     {
         /// <summary>
