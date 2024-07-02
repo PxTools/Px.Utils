@@ -1,9 +1,12 @@
 ﻿
+using System.Diagnostics.CodeAnalysis;
+
 namespace Px.Utils.Database
 {
     /// <summary>
     /// Reference to a px-file that contains a unique identifier of the file and the last write time.
     /// </summary>
+    [ExcludeFromCodeCoverage] // No implementation logic
     public readonly record struct PxTableReference
     {
         /// <summary>

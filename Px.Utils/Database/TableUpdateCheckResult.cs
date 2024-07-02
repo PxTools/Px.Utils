@@ -1,4 +1,6 @@
 ﻿
+using System.Diagnostics.CodeAnalysis;
+
 namespace Px.Utils.Database
 {
     /// <summary>
@@ -6,6 +8,7 @@ namespace Px.Utils.Database
     /// </summary>
     /// <param name="hasBeenUpdated">True if the last write time of the table has been changed.</param>
     /// <param name="newReference">If the table has been updated the new reference needs to be provided.</param>
+    [ExcludeFromCodeCoverage] // No implementation logic
     public readonly struct TableUpdateCheckResult(bool hasBeenUpdated, PxTableReference? newReference)
     {
         /// <summary>
