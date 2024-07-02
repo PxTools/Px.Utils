@@ -37,7 +37,7 @@ namespace Px.Utils.Database.FilesystemDatabase
             DateTime updateTime = Directory.GetLastWriteTime(tableToCheck.Identifier);
             if (updateTime > tableToCheck.TableLastUpdated)
             {
-                PxTableReference newReference = new(tableToCheck.Identifier, updateTime, DateTime.Now);
+                PxTableReference newReference = new(tableToCheck.Identifier, updateTime);
                 return new TableUpdateCheckResult(true, newReference); 
             }
             else
@@ -80,7 +80,7 @@ namespace Px.Utils.Database.FilesystemDatabase
                 foreach (string file in Directory.EnumerateFiles(currentDir))
                 {
                     DateTime lastUpdated = Directory.GetLastWriteTime(file);
-                    files.Add(new PxTableReference(file, lastUpdated, DateTime.Now));
+                    files.Add(new PxTableReference(file, lastUpdated));
                 }
             }
             return files;
