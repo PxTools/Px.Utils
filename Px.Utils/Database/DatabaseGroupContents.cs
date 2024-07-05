@@ -1,4 +1,6 @@
 ﻿
+using System.Diagnostics.CodeAnalysis;
+
 namespace Px.Utils.Database
 {
     /// <summary>
@@ -6,6 +8,7 @@ namespace Px.Utils.Database
     /// </summary>
     /// <param name="groups">Subgroups in the group.</param>
     /// <param name="tables">Tables directly in the group.</param>
+    [ExcludeFromCodeCoverage] // No functionality
     public class DatabaseGroupContents(IReadOnlyList<DatabaseGroupHeader> groups, IReadOnlyList<PxTableReference> tables)
     {
         /// <summary>

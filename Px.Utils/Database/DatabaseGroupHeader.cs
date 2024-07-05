@@ -1,4 +1,5 @@
 ﻿using Px.Utils.Language;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Px.Utils.Database
 {
@@ -7,6 +8,7 @@ namespace Px.Utils.Database
     /// </summary>
     /// <param name="code">Unique identifier of the group.</param>
     /// <param name="name">Translated names of the group.</param>
+    [ExcludeFromCodeCoverage] // No functionality
     public class DatabaseGroupHeader(string code, MultilanguageString name)
     {
         /// <summary>
