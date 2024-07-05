@@ -30,6 +30,20 @@ namespace Px.Utils.Database
         Task<List<PxTableReference>> GetTablesAsync();
 
         /// <summary>
+        /// Gets the tables and groups in the specified group.
+        /// </summary>
+        /// <param name="groupHierarcy">Hierarchical path from the base level using group codes.</param>
+        /// <returns>Contains all tables and subgroups in the group.</returns>
+        DatabaseGroupContents GetGroupContents(IReadOnlyList<string> groupHierarcy);        
+
+        /// <summary>
+        /// Asynchronously gets the tables and groups in the specified group.
+        /// </summary>
+        /// <param name="groupHierarcy">Hierarchical path from the base level using group codes.</param>
+        /// <returns>Contains all tables and subgroups in the group.</returns>
+        Task<DatabaseGroupContents> GetGroupContentsAsync(IReadOnlyList<string> groupHierarcy);        
+
+        /// <summary>
         /// Checks if the last write time of the file matches the timestamp stored in the reference.
         /// </summary>
         /// <param name="tableToCheck">Checks the last write time against this reference.</param>

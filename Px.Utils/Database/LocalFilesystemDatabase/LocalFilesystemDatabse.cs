@@ -1,5 +1,6 @@
 ﻿using Px.Utils.Language;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace Px.Utils.Database.FilesystemDatabase
 {
@@ -9,8 +10,9 @@ namespace Px.Utils.Database.FilesystemDatabase
     /// <param name="id">Unique identifier for the database.</param>
     /// <param name="name">Translated names of the database.</param>
     /// <param name="databaseFilePath">Path to the root of the database.</param>
+    /// <param name="defaultEncoding">Default encoding for all files in the database.</param>
     [ExcludeFromCodeCoverage] // All of the methods in this class call IO and contain very litle logic
-    public class LocalFilesystemDatabse(string id, MultilanguageString name, string databaseFilePath) : IDatabase
+    public class LocalFilesystemDatabse(string id, MultilanguageString name, string databaseFilePath, Encoding defaultEncoding) : IDatabase
     {
         /// <summary>
         /// Unique identifier of the database.
@@ -22,7 +24,12 @@ namespace Px.Utils.Database.FilesystemDatabase
         /// </summary>
         public MultilanguageString Name { get; } = name;
 
-        private readonly string _databaseFilePath = databaseFilePath; 
+        private readonly string _databaseFilePath = databaseFilePath;
+
+        private readonly Encoding _defaultEncoding = defaultEncoding;
+
+        private const string PX_FILE_EXTENSION = "px";
+        private const string ALIAS_FILE_EXTENSION = "txt";
 
         /// <summary>
         /// Checks if the last writetime of the referenced file has been changed.
@@ -58,6 +65,42 @@ namespace Px.Utils.Database.FilesystemDatabase
             await Task.Factory.StartNew(() => CheckForUpdates(tableToCheck));
 
         /// <summary>
+        /// Gets all tables and sub groups directly containded in the target group.
+        /// </summary>
+        /// <param name="groupHierarcy">Hierarchical path from the base level using group codes.</param>
+        /// <returns>Contains all tables and subgroups in the group.</returns>
+        public DatabaseGroupContents GetGroupContents(IReadOnlyList<string> groupHierarcy)
+        {
+            List<DatabaseGroupHeader> headers = [];
+            List<PxTableReference> tables = [];
+
+            string path = Path.Combine(_databaseFilePath, string.Join(Path.PathSeparator, groupHierarcy));
+            string[] directories = Directory.GetDirectories(path);
+            foreach (string directory in directories)
+            {
+                string code = new DirectoryInfo(directory).Name; 
+                MultilanguageString alias = GetGroupName(directory);
+                headers.Add(new DatabaseGroupHeader(code, alias));
+            }
+
+            string[] pxFiles = Directory.GetFiles(path, $"*.{PX_FILE_EXTENSION}");
+            foreach (string pxFile in pxFiles)
+            {
+                DateTime lastUpdated = Directory.GetLastWriteTime(pxFile);
+                tables.Add(new PxTableReference(pxFile, lastUpdated));
+            }
+
+            return new DatabaseGroupContents(headers, tables);
+        }
+
+        /// <summary>
+        /// Asynchronously gets all tables and sub groups directly containded in the target group.
+        /// </summary>
+        /// <param name="groupHierarcy">Hierarchical path from the base level using group codes.</param>
+        /// <returns>Contains all tables and subgroups in the group.</returns>// <returns></returns>
+        public async Task<DatabaseGroupContents> GetGroupContentsAsync(IReadOnlyList<string> groupHierarcy) =>
+            await Task.Factory.StartNew(() =>  GetGroupContents(groupHierarcy));
+        /// <summary>
         /// Lists all of the files in the database.
         /// </summary>
         /// <returns>
@@ -77,14 +120,14 @@ namespace Px.Utils.Database.FilesystemDatabase
                     directories.Enqueue(subDirectory);
                 }
 
-                foreach (string file in Directory.EnumerateFiles(currentDir))
+                foreach (string file in Directory.EnumerateFiles(currentDir, $"*.{PX_FILE_EXTENSION}"))
                 {
                     DateTime lastUpdated = Directory.GetLastWriteTime(file);
                     files.Add(new PxTableReference(file, lastUpdated));
                 }
             }
             return files;
-        }
+    }
 
         /// <summary>
         /// Asynchronously lists all of the files in the database.
@@ -104,6 +147,20 @@ namespace Px.Utils.Database.FilesystemDatabase
         public Stream OpenStream(PxTableReference targetTable)
         {
             return File.OpenRead(targetTable.Identifier);
+        }
+        
+        private MultilanguageString GetGroupName(string path)
+        {
+            Dictionary<string, string> translatedNames = [];
+            IEnumerable<string> aliasFiles = Directory.GetFiles(path, $"*.{ALIAS_FILE_EXTENSION}")
+                .Where(p => Path.GetFileName(p).StartsWith("alias", StringComparison.OrdinalIgnoreCase));
+            foreach (string aliasFile in aliasFiles)
+            {
+                string lang = new([.. Path.GetFileName(aliasFile).Skip(6).TakeWhile(c => c != '.')]);
+                string alias = File.ReadAllText(aliasFile, _defaultEncoding);
+                translatedNames.Add(lang, alias.Trim());
+            }
+            return new MultilanguageString(translatedNames);
         }
     }
 }
