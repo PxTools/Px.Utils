@@ -12,7 +12,7 @@ namespace Px.Utils.ModelBuilders
     /// <summary>
     /// Class for building <see cref="MatrixMetadata"/> objects from metadata input.
     /// </summary>
-    public class MatrixMetadataBuilder
+    public class MatrixMetadataBuilder : IMatrixMetadataBuilder
     {
         private readonly PxFileSyntaxConf _pxFileSyntaxConf;
         private readonly char _listSeparator;
@@ -31,21 +31,61 @@ namespace Px.Utils.ModelBuilders
         }
 
         /// <summary>
-        /// Builds a MatrixMetadata object from a given set of metadata entries.
+        /// Builds a <see cref="MatrixMetadata"/> object from a given set of metadata entries.
         /// </summary>
         /// <param name="metadataInput">An IEnumerable of key-value pairs representing the metadata entries in the Px-File format.</param>
         /// <returns>A MatrixMetadata object constructed from the input metadata.</returns>
         public MatrixMetadata Build(IEnumerable<KeyValuePair<string, string>> metadataInput)
         {
             MetadataEntryKeyBuilder entryKeyBuilder = new();
-            IEnumerable<KeyValuePair<MetadataEntryKey, string>> entryIterator =
-                metadataInput.Select(kvp =>
-                {
-                    var entryKey = entryKeyBuilder.Parse(kvp.Key);
-                    return new KeyValuePair<MetadataEntryKey, string>(entryKey, kvp.Value);
-                });
-            Dictionary<MetadataEntryKey, string> entries = new(entryIterator);
+            Dictionary<MetadataEntryKey, string> entries = [];
+            foreach (KeyValuePair<string, string> entry in metadataInput)
+            {
+                MetadataEntryKey entryKey = entryKeyBuilder.Parse(entry.Key);
+                entries[entryKey] = entry.Value;
+            }
+            return BuildFromentries(entries);
+        }
+ 
+        /// <summary>
+        /// Builds a <see cref="MatrixMetadata"/> object from a given set of metadata entries.
+        /// </summary>
+        /// <param name="metadataInput">A <see cref="IReadOnlyDictionary{string, string}"/> of key-value pairs representing the metadata entries in the Px-File format.</param>
+        /// <returns>A <see cref="MatrixMetadata"/> object constructed from the input metadata entries.</returns>
+        public MatrixMetadata Build(IReadOnlyDictionary<string, string> metadataInput)
+        {
+            MetadataEntryKeyBuilder entryKeyBuilder = new();
+            Dictionary<MetadataEntryKey, string> entries = [];
+            foreach (KeyValuePair<string, string> entry in metadataInput)
+            {
+                MetadataEntryKey entryKey = entryKeyBuilder.Parse(entry.Key);
+                entries[entryKey] = entry.Value;
+            }
+            return BuildFromentries(entries);
+        }
 
+        /// <summary>
+        /// Builds a <see cref="MatrixMetadata"/> object from a given set of metadata entries.
+        /// </summary>
+        /// <param name="metadataInput">An IEnumerable of key-value pairs representing the metadata entries in the Px-File format.</param>
+        /// <returns>A MatrixMetadata object constructed from the input metadata.</returns>
+        public async Task<MatrixMetadata> BuildAsync(IAsyncEnumerable<KeyValuePair<string, string>> metadataInput)
+        {
+            MetadataEntryKeyBuilder entryKeyBuilder = new();
+            Dictionary<MetadataEntryKey, string> entries = [];
+            await foreach (KeyValuePair<string, string> entry in metadataInput)
+            {
+                MetadataEntryKey entryKey = entryKeyBuilder.Parse(entry.Key);
+                entries[entryKey] = entry.Value;
+            }
+            return BuildFromentries(entries);
+        }
+
+        /// <summary>
+        /// The metadata is constructed using a dictionary because the order they are required doesn't necessarily match the order thay are in the file.
+        /// </summary>
+        private MatrixMetadata BuildFromentries(Dictionary<MetadataEntryKey, string> entries)
+        {
             PxFileLanguages langs = GetLanguages(entries);
 
             string stubKey = _pxFileSyntaxConf.Tokens.KeyWords.StubDimensions;
@@ -64,13 +104,13 @@ namespace Px.Utils.ModelBuilders
                 .Select(name =>
                 {
                     if (maybeCd is not null && name.Equals(maybeCd.Name)) return maybeCd;
-                    else if(TestIfTimeAndBuild(entries, langs, name, out TimeDimension? timeDim)) return timeDim;
+                    else if (TestIfTimeAndBuild(entries, langs, name, out TimeDimension? timeDim)) return timeDim;
                     else return BuildDimension(entries, langs, name);
                 });
 
             MatrixMetadata meta = new(langs.DefaultLanguage, langs.AvailableLanguages, dimensions.ToList(), []);
             AddAdditionalPropertiesToMatrixMetadata(meta, entries, langs);
-            return meta;
+            return meta; 
         }
 
         #region Dimension building
@@ -79,7 +119,7 @@ namespace Px.Utils.ModelBuilders
         private ContentDimension? GetContentDimensionIfAvailable(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs)
         {
             string contentKey = _pxFileSyntaxConf.Tokens.KeyWords.ContentVariableIdentifier;
-            if(TryGetAndRemoveProperty(entries, contentKey, langs, out MetaProperty? contVarNameProp))
+            if (TryGetAndRemoveProperty(entries, contentKey, langs, out MetaProperty? contVarNameProp))
             {
                 MultilanguageString name = contVarNameProp.ValueAsMultilanguageString(_stringDelimeter, langs.DefaultLanguage);
                 return BuildContentDimension(entries, langs, name);
@@ -96,7 +136,7 @@ namespace Px.Utils.ModelBuilders
         {
             string timeValIdentifierKey = _pxFileSyntaxConf.Tokens.KeyWords.TimeVal;
             string dimensionTypeKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionType;
-            if(TryGetAndRemoveProperty(entries, timeValIdentifierKey, langs, out MetaProperty? timeVal, dimensionNameToTest))
+            if (TryGetAndRemoveProperty(entries, timeValIdentifierKey, langs, out MetaProperty? timeVal, dimensionNameToTest))
             {
                 string code = GetDimensionCode(entries, langs, dimensionNameToTest);
                 ValueList values = GetDimensionValues(entries, langs, dimensionNameToTest);
@@ -125,7 +165,7 @@ namespace Px.Utils.ModelBuilders
         {
             string code = GetDimensionCode(entries, langs, dimensionName);
             ValueList values = GetDimensionValues(entries, langs, dimensionName);
-            
+
             DimensionType type = GetDimensionType(entries, langs, dimensionName);
             return new Dimension(code, dimensionName, [], values, type);
         }
@@ -137,10 +177,10 @@ namespace Px.Utils.ModelBuilders
                 ? ValueParserUtilities.StringToDimensionType(dimTypeContent.GetRawValueString(), _pxFileSyntaxConf)
                 : DimensionType.Unknown;
 
-            if(type is DimensionType.Other or DimensionType.Unknown)
+            if (type is DimensionType.Other or DimensionType.Unknown)
             {
                 string mapKey = _pxFileSyntaxConf.Tokens.KeyWords.Map;
-                if(TryGetProperty(entries, mapKey, langs, out MetaProperty? _, dimensionName))
+                if (TryGetProperty(entries, mapKey, langs, out MetaProperty? _, dimensionName))
                 {
                     return DimensionType.Geographical;
                 }
@@ -253,7 +293,7 @@ namespace Px.Utils.ModelBuilders
         private ContentValueList BuildContentDimensionValues(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName)
         {
             List<ContentDimensionValue> values = [];
-            foreach(DimensionValue value in GetDimensionValues(entries, langs, dimensionName))
+            foreach (DimensionValue value in GetDimensionValues(entries, langs, dimensionName))
             {
                 MultilanguageString unit = GetUnit(entries, langs, dimensionName, value.Name);
                 DateTime lastUpdated = GetLastUpdated(entries, langs, dimensionName, value.Name);
@@ -473,8 +513,8 @@ namespace Px.Utils.ModelBuilders
                 else throw new ArgumentException($"Can not build property from provided key: {key.KeyWord}. Key not found in metadata.");
             }
 
-            if(keys.Count == 1) return new MetaProperty(keys[0].KeyWord, read[keys[0]]);
-            else return new(keys[0].KeyWord, new MultilanguageString(read.Select(kvp => 
+            if (keys.Count == 1) return new MetaProperty(keys[0].KeyWord, read[keys[0]]);
+            else return new(keys[0].KeyWord, new MultilanguageString(read.Select(kvp =>
                 new KeyValuePair<string, string>(kvp.Key.Language ?? langs.DefaultLanguage, kvp.Value))));
         }
 
@@ -508,7 +548,7 @@ namespace Px.Utils.ModelBuilders
                 if (entries.ContainsKey(langKey)) otherLanguageKeys.Add(langKey);
                 else return keys;
             }
-            
+
             keys.AddRange(otherLanguageKeys);
             return keys;
         }

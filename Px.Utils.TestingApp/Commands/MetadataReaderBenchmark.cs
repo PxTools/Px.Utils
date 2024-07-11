@@ -18,19 +18,21 @@ namespace Px.Utils.TestingApp.Commands
         private void BuildMetadata()
         {
             using FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
-            Encoding encoding = PxFileMetadataReader.GetEncoding(fileStream);
+            PxFileMetadataReader reader = new();
+            Encoding encoding = reader.GetEncoding(fileStream);
             fileStream.Seek(0, SeekOrigin.Begin);
 
-            _ = PxFileMetadataReader.ReadMetadata(fileStream, encoding).ToList();
+            _ = reader.ReadMetadata(fileStream, encoding).ToList();
         }
 
         private async Task BuildMetadataAsync()
         {
             using FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
-            Encoding encoding = PxFileMetadataReader.GetEncoding(fileStream);
+            PxFileMetadataReader reader = new();
+            Encoding encoding = reader.GetEncoding(fileStream);
             fileStream.Seek(0, SeekOrigin.Begin);
 
-            _ = await PxFileMetadataReader.ReadMetadataAsync(fileStream, encoding).ToListAsync();
+            _ = await reader.ReadMetadataAsync(fileStream, encoding).ToListAsync();
         }
     }
 }
