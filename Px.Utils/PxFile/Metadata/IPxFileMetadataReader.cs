@@ -43,7 +43,13 @@ namespace Px.Utils.PxFile.Metadata
         /// <param name="syntaxConf">The syntax configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="readBufferSize">The size of the buffer to use when reading the stream. If not specified, the default buffer size is used.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> of key-value pairs representing the metadata entries in the file.</returns>
-        IAsyncEnumerable<KeyValuePair<string, string>> ReadMetadataAsync(Stream stream, Encoding encoding, PxFileSyntaxConf? syntaxConf = null, int readBufferSize = 4096, CancellationToken cancellationToken = default);
+        IAsyncEnumerable<KeyValuePair<string, string>> ReadMetadataAsync(
+            Stream stream,
+            Encoding encoding,
+            PxFileSyntaxConf? syntaxConf = null,
+            int readBufferSize = 4096,
+            CancellationToken cancellationToken = default
+            );
 
         /// <summary>
         /// Reads the metadata from the provided stream and returns it as a dictionary of key-value pairs.
@@ -65,6 +71,12 @@ namespace Px.Utils.PxFile.Metadata
         /// <param name="syntaxConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="readBufferSize">The size of the buffer to use when reading the stream. If not specified, the default buffer size is used.</param>
         /// <returns>A dictionary containing the metadata entries in the file.</returns>
-        Task<Dictionary<string, string>> ReadMetadataToDictionaryAsync(Stream stream, Encoding encoding, PxFileSyntaxConf? syntaxConf = null, int readBufferSize = 4096, CancellationToken cancellationToken = default);
+        Task<Dictionary<string, string>> ReadMetadataToDictionaryAsync(
+            Stream stream,
+            Encoding encoding,
+            PxFileSyntaxConf? syntaxConf = null,
+            int readBufferSize = 4096,
+            CancellationToken cancellationToken = default
+            );
     }
 }
