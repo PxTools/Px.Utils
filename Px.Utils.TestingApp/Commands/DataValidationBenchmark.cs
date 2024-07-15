@@ -40,7 +40,8 @@ namespace Px.Utils.TestingApp.Commands
         protected override void OneTimeBenchmarkSetup()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            encoding = PxFileMetadataReader.GetEncoding(stream);
+            PxFileMetadataReader reader = new();
+            encoding = reader.GetEncoding(stream);
             start = StreamUtilities.FindKeywordPosition(stream, dataKeyword, PxFileSyntaxConf.Default);
             if (start == -1)
             {

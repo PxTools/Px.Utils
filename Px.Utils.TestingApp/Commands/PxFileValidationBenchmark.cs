@@ -25,7 +25,8 @@ namespace Px.Utils.TestingApp.Commands
             base.OneTimeBenchmarkSetup();
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            encoding = PxFileMetadataReader.GetEncoding(stream);
+            PxFileMetadataReader reader = new();
+            encoding = reader.GetEncoding(stream);
         }
 
         private void ValidatePxFileBenchmarks()

@@ -3,7 +3,7 @@ using PxFileTests.Fixtures;
 using Px.Utils.Exceptions;
 using Px.Utils.PxFile.Metadata;
 
-namespace PxFileTests.PxFileMetadataReaderTests
+namespace PxFileTests.reader.ests
 {
     [TestClass]
     public class ReadMetadataAsyncTests
@@ -14,11 +14,12 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IAsyncEnumerable<KeyValuePair<string, string>> metadata = PxFileMetadataReader.ReadMetadataAsync(stream, encoding);
+            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding);
             IList<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
 
             // Assert
@@ -55,11 +56,12 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_RN);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IAsyncEnumerable<KeyValuePair<string, string>> metadata = PxFileMetadataReader.ReadMetadataAsync(stream, encoding);
+            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding);
             IList<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
 
             // Assert
@@ -97,11 +99,12 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_WITH_DELIMETERS_IN_VALUESTRING);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IAsyncEnumerable<KeyValuePair<string, string>> metadata = PxFileMetadataReader.ReadMetadataAsync(stream, encoding);
+            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding);
             IList<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
 
             // Assert
@@ -138,11 +141,12 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_WITH_DELIMETERS_IN_VALUESTRING);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IAsyncEnumerable<KeyValuePair<string, string>> metadata = PxFileMetadataReader.ReadMetadataAsync(stream, encoding, null, 28);
+            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding, null, 28);
             IList<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
 
             // Assert
@@ -179,12 +183,13 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.BROKEN_UTF8_N);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act + Assert
             stream.Seek(0, SeekOrigin.Begin);
             await Assert.ThrowsExceptionAsync<InvalidPxFileMetadataException>(async () =>
             {
-                IAsyncEnumerable<KeyValuePair<string, string>> iterator = PxFileMetadataReader.ReadMetadataAsync(stream, Encoding.UTF8);
+                IAsyncEnumerable<KeyValuePair<string, string>> iterator = reader.ReadMetadataAsync(stream, Encoding.UTF8);
                 await iterator.ForEachAsync(_ => { });
             });
         }
@@ -195,11 +200,12 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_WITH_MULTILINE_VALUES);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IAsyncEnumerable<KeyValuePair<string, string>> metadata = PxFileMetadataReader.ReadMetadataAsync(stream, encoding);
+            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding);
             IList<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
 
             // Assert
