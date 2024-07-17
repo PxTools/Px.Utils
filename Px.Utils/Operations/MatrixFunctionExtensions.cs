@@ -29,26 +29,23 @@ namespace Px.Utils.Operations
                 ? CopyMetaAndAddValue(input.Metadata, sourceMap.Code, newValue)
                 : CopyMetaAndInsertValue(input.Metadata, sourceMap.Code, newValue, valueIndex);
 
-            // Compute sum values to the output matrix
-
-            IMatrixMap sumOnlyMap = newMeta.CollapseDimension(sourceMap.Code, newValue.Code);
-            TData[] outData = new TData[input.Metadata.GetSize() + sumOnlyMap.GetSize()];
+            IMatrixMap resultOnlyMap = newMeta.CollapseDimension(sourceMap.Code, newValue.Code);
+            TData[] outData = new TData[input.Metadata.GetSize() + resultOnlyMap.GetSize()];
             
             // Initialize the output matrix with the identity value
             for (int i = 0; i < outData.Length; i++) outData[i] = functionIdentity; 
 
             for (int i = 0; i < sourceMap.ValueCodes.Count; i++)
             {
-                IMatrixMap sumSubMap = input.Metadata.CollapseDimension(sourceMap.Code, sourceMap.ValueCodes[i]);
-                DataIndexer source = new(input.Metadata, sumSubMap);
-                DataIndexer target = new(newMeta, sumOnlyMap);
+                IMatrixMap resultSubMap = input.Metadata.CollapseDimension(sourceMap.Code, sourceMap.ValueCodes[i]);
+                DataIndexer source = new(input.Metadata, resultSubMap);
+                DataIndexer target = new(newMeta, resultOnlyMap);
 
                 do outData[target.CurrentIndex] = func(outData[target.CurrentIndex], input.Data[source.CurrentIndex]);
                 while (source.Next() && target.Next());
             }
 
             // Copy the original data to the output matrix
-
             DataIndexer original = new(newMeta, input.Metadata);
             int ogIndex = 0;
             do outData[original.CurrentIndex] = input.Data[ogIndex++];
