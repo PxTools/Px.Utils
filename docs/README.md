@@ -9,6 +9,30 @@ We do not want to limit the user if not absolutely necessary. There are variatio
 ### High modularity
 Extending the library with a new features should be as easy as possible and every module should be useable on its own.
 
+## Installation
+Px.Utils can be installed using .NET CLI or NuGet Package Manager.
+
+### .NET CL
+#### Latest
+```bash
+dotnet add package Px.Utils
+```
+#### Specific version
+```bash
+dotnet add package Px.Utils --version 1.0.0
+```
+
+
+### NuGet Package Manager
+#### Latest
+```bash
+nuget install Px.Utils
+```
+#### Specific version
+```bash
+nuget install Px.Utils -Version 1.0.0
+```
+
 ## Features
 
 ### Reading the px files
@@ -100,6 +124,3 @@ The method takes a new dimension value as a parameter that will define the resul
 ```ApplyRelative``` Applies a function to a set of datapoints defined by a subset of values from one dimension.
 The method also takes a code of a value from the same dimension as a parameter which is used to define additional datapoints to be used as
 an input for the function.
-
-## Installing
-TBA when published to NuGet

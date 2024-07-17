@@ -41,10 +41,11 @@ namespace Px.Utils.TestingApp.Commands
             base.OneTimeBenchmarkSetup();
 
             using FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
-            Encoding encoding = PxFileMetadataReader.GetEncoding(fileStream);
+            PxFileMetadataReader reader = new();
+            Encoding encoding = reader.GetEncoding(fileStream);
             fileStream.Seek(0, SeekOrigin.Begin);
 
-            List<KeyValuePair<string, string>> entries = PxFileMetadataReader.ReadMetadata(fileStream, encoding).ToList();
+            List<KeyValuePair<string, string>> entries = reader.ReadMetadata(fileStream, encoding).ToList();
             MatrixMetadataBuilder builder = new();
             MetaData = builder.Build(entries);
         }

@@ -1,11 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+	<PackageId>Px.Utils</PackageId>
+	<Version>1.0.1</Version>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
+	<IsPackable>true</IsPackable>
+	<Title>Px.Utils</Title>
+	<Company>Statistics Finland</Company>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<PackageProjectUrl>https://github.com/PxTools/Px.Utils</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/PxTools/Px.Utils.git</RepositoryUrl>
+	<RepositoryType>git</RepositoryType>
+	<PackageTags>px files validation aggregation operations data metadata statistics</PackageTags>
+	<Description>Library for reading, processing and validating px file data and metadata.</Description>
+	<IncludeSymbols>true</IncludeSymbols>
+	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\docs\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\docs\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />

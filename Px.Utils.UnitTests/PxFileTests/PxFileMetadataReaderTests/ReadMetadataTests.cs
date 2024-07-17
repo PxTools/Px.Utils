@@ -3,7 +3,7 @@ using PxFileTests.Fixtures;
 using Px.Utils.Exceptions;
 using Px.Utils.PxFile.Metadata;
 
-namespace PxFileTests.PxFileMetadataReaderTests
+namespace PxFileTests.reader.ests
 {
     [TestClass]
     public class ReadMetadataTests
@@ -14,11 +14,12 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
+            Encoding encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IList<KeyValuePair<string, string>> metadata = PxFileMetadataReader.ReadMetadata(stream, encoding).ToList();
+            IList<KeyValuePair<string, string>> metadata = reader.ReadMetadata(stream, encoding).ToList();
 
             // Assert
             Assert.AreEqual(8, metadata.Count);
@@ -54,11 +55,12 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_RN);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
+            Encoding encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IList<KeyValuePair<string, string>> metadata = PxFileMetadataReader.ReadMetadata(stream, encoding).ToList();
+            IList<KeyValuePair<string, string>> metadata = reader.ReadMetadata(stream, encoding).ToList();
 
             // Assert
             Assert.AreEqual(8, metadata.Count);
@@ -95,11 +97,12 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_WITH_DELIMETERS_IN_VALUESTRING);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
+            Encoding encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IList<KeyValuePair<string, string>> metadata = PxFileMetadataReader.ReadMetadata(stream, encoding).ToList();
+            IList<KeyValuePair<string, string>> metadata = reader.ReadMetadata(stream, encoding).ToList();
 
             // Assert
             Assert.AreEqual(8, metadata.Count);
@@ -135,11 +138,12 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_WITH_DELIMETERS_IN_VALUESTRING);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
+            Encoding encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IList<KeyValuePair<string, string>> metadata = PxFileMetadataReader.ReadMetadata(stream, encoding, null, 28).ToList();
+            IList<KeyValuePair<string, string>> metadata = reader.ReadMetadata(stream, encoding, null, 28).ToList();
 
             // Assert
             Assert.AreEqual(8, metadata.Count);
@@ -175,10 +179,11 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.BROKEN_UTF8_N);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act + Assert
             stream.Seek(0, SeekOrigin.Begin);
-            Assert.ThrowsException<InvalidPxFileMetadataException>(() => PxFileMetadataReader.ReadMetadata(stream, Encoding.UTF8).ToList());
+            Assert.ThrowsException<InvalidPxFileMetadataException>(() => reader.ReadMetadata(stream, Encoding.UTF8).ToList());
         }
 
         [TestMethod]
@@ -187,11 +192,12 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_WITH_MULTILINE_VALUES);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
+            Encoding encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IList<KeyValuePair<string, string>> metadata = PxFileMetadataReader.ReadMetadata(stream, encoding).ToList();
+            IList<KeyValuePair<string, string>> metadata = reader.ReadMetadata(stream, encoding).ToList();
 
             // Assert
             Assert.AreEqual(8, metadata.Count);

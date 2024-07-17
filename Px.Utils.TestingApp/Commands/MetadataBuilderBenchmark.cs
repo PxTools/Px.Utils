@@ -24,10 +24,11 @@ namespace Px.Utils.TestingApp.Commands
         {
             base.OneTimeBenchmarkSetup();
             FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
-            Encoding encoding = PxFileMetadataReader.GetEncoding(fileStream);
+            PxFileMetadataReader reader = new();
+            Encoding encoding = reader.GetEncoding(fileStream);
             fileStream.Seek(0, SeekOrigin.Begin);
 
-            _metaEntries = PxFileMetadataReader.ReadMetadata(fileStream, encoding).ToList();
+            _metaEntries = reader.ReadMetadata(fileStream, encoding).ToList();
         }
 
         private void BuildMetadata()

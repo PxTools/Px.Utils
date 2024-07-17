@@ -39,7 +39,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
+            PxFileMetadataReader reader = new();
+            Encoding? encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
             SyntaxValidator validator = new(stream, encoding, filename);
 
@@ -73,7 +74,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_SPECIFIERS);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
+            PxFileMetadataReader reader = new();
+            Encoding? encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
             SyntaxValidator validator = new(stream, encoding, filename);
 
@@ -98,7 +100,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_FEEDBACKS);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
+            PxFileMetadataReader reader = new();
+            Encoding? encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
             SyntaxValidator validator = new(stream, encoding, filename);
 
@@ -455,7 +458,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_TIMEVALS);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
+            PxFileMetadataReader reader = new();
+            Encoding? encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
             SyntaxValidator validator = new(stream, encoding, filename);
 
@@ -473,7 +477,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.UTF8_N_WITH_BAD_TIMEVALS);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
+            PxFileMetadataReader reader = new();
+            Encoding? encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
             SyntaxValidator validator = new(stream, encoding, filename);
 
@@ -497,7 +502,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = PxFileMetadataReader.GetEncoding(stream);
+            PxFileMetadataReader reader = new();
+            Encoding? encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
 
             // Act
@@ -514,7 +520,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(SyntaxValidationFixtures.MINIMAL_UTF8_N);
             using Stream stream = new MemoryStream(data);
-            Encoding? encoding = await PxFileMetadataReader.GetEncodingAsync(stream);
+            PxFileMetadataReader reader = new();
+            Encoding? encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
 
             // Act
