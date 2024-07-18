@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal sealed class DataReadBenchmark : Benchmark
+    internal sealed class DataReadBenchmark : FileBenchmark
     {
         private IReadOnlyMatrixMetadata? MetaData { get; set; }
 
@@ -41,10 +41,11 @@ namespace Px.Utils.TestingApp.Commands
             base.OneTimeBenchmarkSetup();
 
             using FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
-            Encoding encoding = PxFileMetadataReader.GetEncoding(fileStream);
+            PxFileMetadataReader reader = new();
+            Encoding encoding = reader.GetEncoding(fileStream);
             fileStream.Seek(0, SeekOrigin.Begin);
 
-            List<KeyValuePair<string, string>> entries = PxFileMetadataReader.ReadMetadata(fileStream, encoding).ToList();
+            List<KeyValuePair<string, string>> entries = reader.ReadMetadata(fileStream, encoding).ToList();
             MatrixMetadataBuilder builder = new();
             MetaData = builder.Build(entries);
         }
@@ -133,12 +134,11 @@ namespace Px.Utils.TestingApp.Commands
         {
             base.SetRunParameters();
 
-            Dictionary<string, List<string>> parameters = GroupParameters(Inputs ?? [], ParameterFlags.SelectMany(x => x).ToList());
-            foreach (string key in parameters.Keys)
+            foreach (string key in Parameters.Keys)
             {
-                if (cellFlags.Contains(key) && !int.TryParse(parameters[key][0], out _numberOfCells))
+                if (cellFlags.Contains(key) && !int.TryParse(Parameters[key][0], out _numberOfCells))
                 {
-                    throw new ArgumentException($"Invalid argument {key} {string.Join(' ', parameters[key])}");
+                    throw new ArgumentException($"Invalid argument {key} {string.Join(' ', Parameters[key])}");
                 }
             }
         }

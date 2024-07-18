@@ -51,35 +51,38 @@ namespace Px.Utils.TestingApp.Commands
         /// Path to the PX file subject to benchmark.
         /// </summary>
         internal string TestFilePath { get; set; } = "";
+
         /// <summary>
         /// How many times to run each benchmark.
         /// </summary>
         internal int Iterations { get; set; } = 10;
+
         /// <summary>
         /// Whether the user provided all benchmark parameters in one go.
         /// </summary>
         internal bool BatchMode { get; }
+
         /// <summary>
-        /// List of inputs provided by the user.
+        /// Input parameters for the benchmark in flag-value pairs.
         /// </summary>
-        internal List<string>? Inputs { get; set; } = [];
+        protected Dictionary<string, List<string>> Parameters { get; set; } = [];
 
         /// <summary>
         /// Synchronous benchmark functions to benchmark.
         /// </summary>
         protected Action[] BenchmarkFunctions { get; set; } = [];
+
         /// <summary>
         /// Asynchronous benchmarks to benchmark.
         /// </summary>
         protected Func<Task>[] BenchmarkFunctionsAsync { get; set; } = [];
 
-        private static readonly string[] fileFlags = ["-f", "-file"];
         private static readonly string[] iterFlags = ["-i", "-iter"];
 
         /// <summary>
         /// List of flags that can be used to provide parameters to the benchmark command.
         /// </summary>
-        protected List<string[]> ParameterFlags { get; } = [fileFlags, iterFlags];
+        protected List<string[]> ParameterFlags { get; } = [iterFlags];
 
         internal List<BenchmarkResult> Results { get; } = [];
         private int processesCompleted;
@@ -113,15 +116,15 @@ namespace Px.Utils.TestingApp.Commands
 
         internal override void Run(bool batchMode, List<string>? inputs = null)
         {
-            Inputs = inputs;
             if (inputs?.Count == 1 && inputs[0] == "help")
             {
                 Console.Clear();
                 Console.WriteLine(Help);
                 Console.WriteLine();
-                Inputs = [];
+                inputs = [];
             }
 
+            Parameters = GroupParameters(inputs ?? [], ParameterFlags.SelectMany(x => x).ToList());
             SetRunParameters();
             OneTimeBenchmarkSetup();
 
@@ -134,27 +137,18 @@ namespace Px.Utils.TestingApp.Commands
 
         protected virtual void SetRunParameters()
         {
-            Dictionary<string, List<string>> parameters = GroupParameters(Inputs ?? [], ParameterFlags.SelectMany(x => x).ToList());
-            if (parameters.Keys.Count == ParameterFlags.Count)
+            if (Parameters.Keys.Count == ParameterFlags.Count)
             {
-                foreach (string key in parameters.Keys)
+                foreach (string key in Parameters.Keys)
                 {
-                    if (fileFlags.Contains(key) && parameters[key].Count == 1)
-                    {
-                        TestFilePath = parameters[key][0];
-                    }
-                    else if (iterFlags.Contains(key) && parameters[key].Count == 1 &&
-                        int.TryParse(parameters[key][0], out int iterations))
+                    if (iterFlags.Contains(key) && Parameters[key].Count == 1 &&
+                       int.TryParse(Parameters[key][0], out int iterations))
                     {
                         Iterations = iterations;
                     }
-                    else if (Array.Exists(ParameterFlags.ToArray(), flag => flag.Contains(key)))
+                    else if(!Array.Exists(ParameterFlags.ToArray(), flag => flag.Contains(key)))
                     {
-                        continue;
-                    }
-                    else
-                    {
-                        throw new ArgumentException($"Invalid argument {key} {string.Join(' ', parameters[key])}");
+                        throw new ArgumentException($"Invalid argument {key} {string.Join(' ', Parameters[key])}");
                     }
                 }
             }
@@ -170,17 +164,6 @@ namespace Px.Utils.TestingApp.Commands
 
         protected virtual void StartInteractiveMode()
         {
-            Console.WriteLine("Enter the path to the PX file to benchmark");
-            string file = Console.ReadLine() ?? "";
-
-            while (!Path.Exists(file) || !Path.GetFileName(file).EndsWith(".px", StringComparison.Ordinal))
-            {
-                Console.WriteLine("File provided is not valid, please enter a path to a valid px file");
-                file = Console.ReadLine() ?? "";
-            }
-
-            TestFilePath = file;
-
             Console.WriteLine("Enter the number of iterations to run");
             string iterations = Console.ReadLine() ?? "";
             int value;
@@ -295,5 +278,6 @@ namespace Px.Utils.TestingApp.Commands
                 Console.WriteLine();
             }
         }
+
     }
 }

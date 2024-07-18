@@ -19,6 +19,32 @@ namespace ModelBuilderTests
         private const char _stringDelimeter = '"';
 
         [TestMethod]
+        public void IEnumerableBuildTest()
+        {
+            MatrixMetadataBuilder builder = new();
+            MatrixMetadata meta = builder.Build(PxFileMetaEntries_Robust_3_Languages.Entries);
+            Assert.IsNotNull(meta);
+        }
+        
+        [TestMethod]
+        public void DictionaryBuildTest()
+        {
+            MatrixMetadataBuilder builder = new();
+            Dictionary<string, string> inputDict = new(PxFileMetaEntries_Robust_3_Languages.Entries);
+            MatrixMetadata meta = builder.Build(inputDict);
+            Assert.IsNotNull(meta);
+        }
+
+        [TestMethod]
+        public async Task IAsyncEnumerableBuildTest()
+        {
+            MatrixMetadataBuilder builder = new();
+            IAsyncEnumerable<KeyValuePair<string, string>> asyncEntries = PxFileMetaEntries_Robust_3_Languages.Entries.ToAsyncEnumerable();
+            MatrixMetadata meta = await builder.BuildAsync(asyncEntries);
+            Assert.IsNotNull(meta);
+        }
+
+        [TestMethod]
         public void MultiLangTableLevelMetaLanguageTests()
         {
             Assert.AreEqual("fi", Actual_3Lang.DefaultLanguage);

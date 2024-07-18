@@ -13,7 +13,7 @@
             _benchmarks.Add("metadata-contentvalidation", new MetadataContentValidationBenchmark());
             _benchmarks.Add("data-validation", new DataValidationBenchmark());
             _benchmarks.Add("file-validation", new PxFileValidationBenchmark());
-            _benchmarks.Add("database", new LocalFilesystemDatabaseBenchmark());
+            _benchmarks.Add("computation", new ComputationBenchmark());
         }
 
         internal override string Help

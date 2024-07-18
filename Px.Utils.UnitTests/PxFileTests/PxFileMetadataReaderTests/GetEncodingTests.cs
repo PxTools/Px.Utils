@@ -2,7 +2,7 @@
 using Px.Utils.PxFile.Metadata;
 using System.Text;
 
-namespace PxFileTests.PxFileMetadataReaderTests
+namespace PxFileTests.reader.ests
 {
     [TestClass]
     public class GetEncodingTests
@@ -13,9 +13,10 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
+            Encoding encoding = reader.GetEncoding(stream);
 
             // Assert
             Assert.AreEqual(Encoding.UTF8, encoding);
@@ -29,9 +30,10 @@ namespace PxFileTests.PxFileMetadataReaderTests
             byte[] bytes = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N.Replace("utf-8", "foo"));
 
             using Stream stream = new MemoryStream([.. bom, .. bytes]);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
+            Encoding encoding = reader.GetEncoding(stream);
 
             // Assert
             Assert.AreEqual(Encoding.UTF8, encoding);
@@ -45,9 +47,10 @@ namespace PxFileTests.PxFileMetadataReaderTests
             byte[] bytes = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N.Replace("utf-8", "foo"));
 
             using Stream stream = new MemoryStream([.. bom, .. bytes]);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
+            Encoding encoding = reader.GetEncoding(stream);
 
             // Assert
             Assert.AreEqual(Encoding.Unicode, encoding);
@@ -59,9 +62,10 @@ namespace PxFileTests.PxFileMetadataReaderTests
             // Arrange
             byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_RN);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = PxFileMetadataReader.GetEncoding(stream);
+            Encoding encoding = reader.GetEncoding(stream);
 
             // Assert
             Assert.AreEqual(Encoding.UTF8, encoding);
@@ -75,9 +79,10 @@ namespace PxFileTests.PxFileMetadataReaderTests
             Encoding encoding = Encoding.GetEncoding("iso-8859-15");
             byte[] data = encoding.GetBytes(MinimalPx.MINIMAL_ISO_8859_15_N);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding resutEncoding = PxFileMetadataReader.GetEncoding(stream);
+            Encoding resutEncoding = reader.GetEncoding(stream);
 
             // Assert
             Assert.AreEqual(encoding, resutEncoding);
@@ -91,9 +96,10 @@ namespace PxFileTests.PxFileMetadataReaderTests
             Encoding encoding = Encoding.GetEncoding("iso-8859-1");
             byte[] data = encoding.GetBytes(MinimalPx.MINIMAL_ISO_8859_1_RN);
             using Stream stream = new MemoryStream(data);
+            PxFileMetadataReader reader = new();
 
             // Act
-            Encoding resutEncoding = PxFileMetadataReader.GetEncoding(stream);
+            Encoding resutEncoding = reader.GetEncoding(stream);
 
             // Assert
             Assert.AreEqual(encoding, resutEncoding);
