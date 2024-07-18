@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal sealed class DataValidationBenchmark : Benchmark
+    internal sealed class DataValidationBenchmark : FileBenchmark
     {
         private readonly string[] expectedRowsFlags = ["-r", "-rows"];
         private readonly string[] expectedColsFlags = ["-c", "-cols"];
@@ -70,16 +70,15 @@ namespace Px.Utils.TestingApp.Commands
         {
             base.SetRunParameters();
 
-            Dictionary<string, List<string>> parameters = GroupParameters(Inputs ?? [], ParameterFlags.SelectMany(x => x).ToList());
-            foreach (string key in parameters.Keys)
+            foreach (string key in Parameters.Keys)
             {
-                if (expectedColsFlags.Contains(key) && !int.TryParse(parameters[key][0], out expectedCols))
+                if (expectedColsFlags.Contains(key) && !int.TryParse(Parameters[key][0], out expectedCols))
                 {
-                    throw new ArgumentException($"Invalid argument {key} {string.Join(' ', parameters[key])}");
+                    throw new ArgumentException($"Invalid argument {key} {string.Join(' ', Parameters[key])}");
                 }
-                if (expectedRowsFlags.Contains(key) && !int.TryParse(parameters[key][0], out expectedRows))
+                if (expectedRowsFlags.Contains(key) && !int.TryParse(Parameters[key][0], out expectedRows))
                 {
-                    throw new ArgumentException($"Invalid argument {key} {string.Join(' ', parameters[key])}");
+                    throw new ArgumentException($"Invalid argument {key} {string.Join(' ', Parameters[key])}");
                 }
             }
         }

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal sealed class DataReadBenchmark : Benchmark
+    internal sealed class DataReadBenchmark : FileBenchmark
     {
         private IReadOnlyMatrixMetadata? MetaData { get; set; }
 
@@ -134,12 +134,11 @@ namespace Px.Utils.TestingApp.Commands
         {
             base.SetRunParameters();
 
-            Dictionary<string, List<string>> parameters = GroupParameters(Inputs ?? [], ParameterFlags.SelectMany(x => x).ToList());
-            foreach (string key in parameters.Keys)
+            foreach (string key in Parameters.Keys)
             {
-                if (cellFlags.Contains(key) && !int.TryParse(parameters[key][0], out _numberOfCells))
+                if (cellFlags.Contains(key) && !int.TryParse(Parameters[key][0], out _numberOfCells))
                 {
-                    throw new ArgumentException($"Invalid argument {key} {string.Join(' ', parameters[key])}");
+                    throw new ArgumentException($"Invalid argument {key} {string.Join(' ', Parameters[key])}");
                 }
             }
         }
