@@ -1,7 +1,5 @@
 ﻿using Px.Utils.Models.Metadata.Enums;
 using Px.Utils.Language;
-using Px.Utils.Models.Metadata;
-using Px.Utils.Models.Metadata.Dimensions;
 
 namespace Px.Utils.Models.Metadata.Dimensions
 {
