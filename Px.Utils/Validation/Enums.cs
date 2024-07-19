@@ -78,6 +78,10 @@
         DataValidationFeedbackInconsistentSeparator = 48,
         DataValidationFeedbackInvalidString = 49,
         DataValidationFeedbackInvalidNumber = 50,
-        DataValidationFeedbackInvalidChar = 51
+        DataValidationFeedbackInvalidChar = 51,
+        FileLanguageDiffersFromDatabase = 52,
+        FileEncodingDiffersFromDatabase = 53,
+        AliasFileMissing = 54,
+        DuplicateFileNames = 55
     }
 }

@@ -91,6 +91,26 @@ namespace Px.Utils.Validation.SyntaxValidation
             return new SyntaxValidationResult([.. validationFeedback], structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
         }
 
+        /// <summary>
+        /// TODO: Summary
+        /// </summary>
+        /// <param name="currentCharacter"></param>
+        /// <param name="syntaxConf"></param>
+        /// <param name="entryBuilder"></param>
+        /// <param name="isProcessingString"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsEndOfMetadataSection(char currentCharacter, PxFileSyntaxConf syntaxConf, StringBuilder entryBuilder, bool isProcessingString)
+        {
+            if (!isProcessingString && currentCharacter == syntaxConf.Symbols.KeywordSeparator)
+            {
+                string stringEntry = entryBuilder.ToString();
+                // When DATA keyword is reached, metadata parsing is complete
+                return SyntaxValidationUtilityMethods.CleanString(stringEntry, syntaxConf).Equals(syntaxConf.Tokens.KeyWords.Data, StringComparison.Ordinal);
+            }
+            return false;
+        }
+
         #region Interface implementation
 
         ValidationResult IPxFileValidator.Validate()
@@ -289,18 +309,6 @@ namespace Px.Utils.Validation.SyntaxValidation
             while (read > 0);
 
             return entries;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsEndOfMetadataSection(char currentCharacter, PxFileSyntaxConf syntaxConf, StringBuilder entryBuilder, bool isProcessingString)
-        {
-            if (!isProcessingString && currentCharacter == syntaxConf.Symbols.KeywordSeparator)
-            {
-                string stringEntry = entryBuilder.ToString();
-                // When DATA keyword is reached, metadata parsing is complete
-                return SyntaxValidationUtilityMethods.CleanString(stringEntry, syntaxConf).Equals(syntaxConf.Tokens.KeyWords.Data, StringComparison.Ordinal);
-            }
-            return false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
