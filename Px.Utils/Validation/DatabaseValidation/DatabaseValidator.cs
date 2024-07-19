@@ -13,7 +13,8 @@ namespace Px.Utils.Validation.DatabaseValidation
         PxFileSyntaxConf? syntaxConf = null,
         IDatabaseValidator[]? customPxFileValidators = null,
         IDatabaseValidator[]? customAliasFileValidators = null,
-        IDatabaseValidator[]? customFolderValidators = null
+        IDatabaseValidator[]? customFolderValidators = null,
+        IFileSystem? fileSystem = null
         ) : IPxFileValidator, IPxFileValidatorAsync
     {
         private readonly string _folderPath = folderPath;
@@ -21,6 +22,7 @@ namespace Px.Utils.Validation.DatabaseValidation
         private readonly IDatabaseValidator[]? _customPxFileValidators = customPxFileValidators;
         private readonly IDatabaseValidator[]? _customAliasFileValidators = customAliasFileValidators;
         private readonly IDatabaseValidator[]? _customFolderValidators = customFolderValidators;
+        private readonly IFileSystem _fileSystem = fileSystem is not null ? fileSystem : new DefaultFileSystem();
 
         /// <summary>
         /// TODO: Add summary
@@ -31,29 +33,28 @@ namespace Px.Utils.Validation.DatabaseValidation
             List<DatabaseFileInfo> pxFiles = [];
             List<DatabaseFileInfo> aliasFiles = [];
 
-            IEnumerable<string> pxFilePaths = Directory.EnumerateFiles(_folderPath, "*.px", SearchOption.AllDirectories);
+            IEnumerable<string> pxFilePaths = _fileSystem.EnumerateFiles(_folderPath, "*.px");
 
             foreach (string fileName in pxFilePaths)
             {
-                using FileStream stream = new(fileName, FileMode.Open, FileAccess.Read);
+                Stream stream = _fileSystem.GetFileStream(fileName);
                 DatabaseFileInfo fileInfo = GetPxFileInfo(fileName, stream);
                 pxFiles.Add(fileInfo);
-
+                stream.Position = 0;
                 PxFileValidator validator = new (stream, fileName, fileInfo.Encoding, _syntaxConf);
                 ValidationResult result = validator.Validate();
                 feedbacks.AddRange(result.FeedbackItems);
             }
 
-            IEnumerable<string> aliasFilePaths = Directory.EnumerateFiles(_folderPath, "Alias_*.txt", SearchOption.AllDirectories);
+            IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_folderPath, "Alias_*.txt");
             foreach (string filenName in aliasFilePaths)
             {
-                using FileStream stream = new(filenName, FileMode.Open, FileAccess.Read);
+                Stream stream = _fileSystem.GetFileStream(filenName);
                 DatabaseFileInfo fileInfo = GetAliasFileInfo(filenName, stream);
                 aliasFiles.Add(fileInfo);
             }
 
             ValidateDatabaseContents(pxFiles, aliasFiles, ref feedbacks);
-
             return new ValidationResult([..feedbacks]);
         }
 
@@ -62,17 +63,18 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// </summary>
         public async Task<ValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
+            // TODO: Implement filesystem interface here
             List<ValidationFeedbackItem> feedbacks = [];
             List<DatabaseFileInfo> pxFiles = [];
             List<DatabaseFileInfo> aliasFiles = [];
 
-            IEnumerable<string> pxFilePaths = Directory.EnumerateFiles(_folderPath, "*.px", SearchOption.AllDirectories);
+            IEnumerable<string> pxFilePaths = _fileSystem.EnumerateFiles(_folderPath, "*.px");
             foreach (string fileName in pxFilePaths)
             {
-                using FileStream stream = new(fileName, FileMode.Open, FileAccess.Read);
+                Stream stream = _fileSystem.GetFileStream(fileName);
                 DatabaseFileInfo fileInfo = await GetPxFileInfoAsync(fileName, stream);
                 pxFiles.Add(fileInfo);
-
+                stream.Position = 0;
                 PxFileValidator validator = new(stream, fileName, fileInfo.Encoding, _syntaxConf);
                 ValidationResult result = await validator.ValidateAsync(cancellationToken);
                 feedbacks.AddRange(result.FeedbackItems);
@@ -83,10 +85,10 @@ namespace Px.Utils.Validation.DatabaseValidation
                 }
             }
 
-            IEnumerable<string> aliasFilePaths = Directory.EnumerateFiles(_folderPath, "Alias_*.txt", SearchOption.AllDirectories);
+            IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_folderPath, "Alias_*.txt");
             foreach (string filenName in aliasFilePaths)
             {
-                using FileStream stream = new(filenName, FileMode.Open, FileAccess.Read);
+                Stream stream = _fileSystem.GetFileStream(filenName);
                 DatabaseFileInfo fileInfo = GetAliasFileInfo(filenName, stream);
                 aliasFiles.Add(fileInfo);
 
@@ -97,7 +99,6 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
 
             ValidateDatabaseContents(pxFiles, aliasFiles, ref feedbacks);
-
             return new ValidationResult([..feedbacks]);
         }
 
@@ -177,9 +178,13 @@ namespace Px.Utils.Validation.DatabaseValidation
                 folderValidators = [.. folderValidators, .. _customFolderValidators];
             }
 
-            IEnumerable<string> allFolders = Directory.EnumerateDirectories(_folderPath, "*", SearchOption.AllDirectories);
+            IEnumerable<string> allFolders = _fileSystem.EnumerateDirectories(_folderPath);
             foreach (string folder in allFolders)
             {
+                string folderName = new DirectoryInfo(folder).Name;
+                // TODO: Tokenize?
+                if (folderName == "_INDEX") continue;
+
                 foreach (IDatabaseValidator validator in folderValidators)
                 {
                     ValidationFeedbackItem? feedback = validator.Validate(new DatabaseValidationItem(folder));
@@ -193,8 +198,8 @@ namespace Px.Utils.Validation.DatabaseValidation
 
         private DatabaseFileInfo GetPxFileInfo(string filename, Stream stream)
         {
-            string name = Path.GetFileName(filename);
-            string? path = Path.GetDirectoryName(filename);
+            string name = _fileSystem.GetFileName(filename);
+            string? path = _fileSystem.GetDirectoryName(filename);
             string location =  path is not null ? path : string.Empty;
             string[] languages = [];
             PxFileMetadataReader metadataReader = new ();
@@ -202,7 +207,7 @@ namespace Px.Utils.Validation.DatabaseValidation
 
             const int bufferSize = 1024;
             bool isProcessingString = false;
-            using StreamReader streamReader = new(stream, encoding);
+            using StreamReader streamReader = new(stream, encoding, leaveOpen: true);
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
             string defaultLanguage = string.Empty;
@@ -236,8 +241,8 @@ namespace Px.Utils.Validation.DatabaseValidation
 
         private async Task<DatabaseFileInfo> GetPxFileInfoAsync(string filename, Stream stream)
         {
-            string name = Path.GetFileName(filename);
-            string? path = Path.GetDirectoryName(filename);
+            string name = _fileSystem.GetFileName(filename);
+            string? path = _fileSystem.GetDirectoryName(filename);
             string location =  path is not null ? path : string.Empty;
             string[] languages = [];
             PxFileMetadataReader metadataReader = new ();
@@ -245,7 +250,7 @@ namespace Px.Utils.Validation.DatabaseValidation
 
             const int bufferSize = 1024;
             bool isProcessingString = false;
-            using StreamReader streamReader = new(stream, encoding);
+            using StreamReader streamReader = new(stream, encoding, leaveOpen: true);
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
             string defaultLanguage = string.Empty;
@@ -294,46 +299,32 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
         }
 
-        private static DatabaseFileInfo GetAliasFileInfo(string filename, Stream stream)
+        private DatabaseFileInfo GetAliasFileInfo(string filename, Stream stream)
         {
-            string name = Path.GetFileName(filename);
-            string? path = Path.GetDirectoryName(filename);
+            string name = _fileSystem.GetFileName(filename);
+            string? path = _fileSystem.GetDirectoryName(filename);
             string location =  path is not null ? path : string.Empty;
             string[] languages = [
                 name.Split('_')[1].Split('.')[0]
             ];
 
-            Encoding encoding = GetEncoding(stream);
+            Encoding encoding = _fileSystem.GetEncoding(stream);
             DatabaseFileInfo fileInfo = new (name, location, languages, encoding);
             return fileInfo;
-        }
-
-        private static Encoding GetEncoding(Stream stream)
-        {
-            const int bomLength = 3;
-            long position = stream.Position;
-
-            byte[] bom = new byte[bomLength];
-            stream.Read(bom);
-            stream.Position = position;
-
-            if (PxFileMetadataReader.GetEncodingFromBOM(bom) is Encoding utf) return utf;
-
-            return Encoding.ASCII;
         }
     }
 
     public class DatabaseValidationItem(string path)
     {
-        public readonly string Path = path;
+        public string Path { get; } = path;
     }
 
     public class DatabaseFileInfo(string name, string location, string[] languages, Encoding encoding) : DatabaseValidationItem(name)
     {
-        public readonly string Name = name;
-        public readonly string Location = location;
-        public readonly string[] Languages = languages;
-        public readonly Encoding Encoding = encoding;
+        public string Name { get; } = name;
+        public string Location { get; } = location;
+        public string[] Languages { get; } = languages;
+        public Encoding Encoding { get; } = encoding;
     }
 
 

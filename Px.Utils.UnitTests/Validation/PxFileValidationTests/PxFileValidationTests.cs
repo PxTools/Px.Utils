@@ -2,7 +2,6 @@
 using Px.Utils.UnitTests.Validation.Fixtures;
 using Px.Utils.UnitTests.Validation.SyntaxValidationTests;
 using Px.Utils.Validation;
-using Px.Utils.Validation.SyntaxValidation;
 using System.Text;
 
 namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
