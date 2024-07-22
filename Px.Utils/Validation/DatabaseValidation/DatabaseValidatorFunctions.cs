@@ -4,13 +4,18 @@ using System.Text;
 namespace Px.Utils.Validation.DatabaseValidation
 {
     /// <summary>
-    /// TODO: Summary
+    /// Validates that each px file within the database has a unique filename
     /// </summary>
     /// <param name="pxFiles"></param>
     public class DuplicatePxFileName(List<DatabaseFileInfo> pxFiles) : IDatabaseValidator
     {
         private readonly List<DatabaseFileInfo> _pxFiles = pxFiles;
 
+        /// <summary>
+        /// Validation function that checks if the filename of the given file is unique within the database
+        /// </summary>
+        /// <param name="item"><see cref="DatabaseValidationItem"/> object - in this case <see cref="DatabaseFileInfo"/> subject to validation</param>
+        /// <returns>Null if no issues are found, <see cref="ValidationFeedbackItem"/> in case there are multiple files with the same filename.</returns>
         public ValidationFeedbackItem? Validate(DatabaseValidationItem item)
         {
             if (item is DatabaseFileInfo fileInfo &&
@@ -33,12 +38,18 @@ namespace Px.Utils.Validation.DatabaseValidation
     }
 
     /// <summary>
-    /// TODO: Summary
+    /// Validates that each px file within the database contains the same languages
     /// </summary>
+    /// <param name="allLanguages">Codes of all languages that should be present in each px file</param>
     public class MissingPxFileLanguages(IEnumerable<string> allLanguages) : IDatabaseValidator
     {
         private readonly IEnumerable<string> _allLanguages = allLanguages;
 
+        /// <summary>
+        /// Validation function that checks if the given file contains all the languages that should be present in each px file
+        /// </summary>
+        /// <param name="item"><see cref="DatabaseValidationItem"/> object - in this case <see cref="DatabaseFileInfo"/> subject to validation</param>
+        /// <returns>Null if no issues are found, <see cref="ValidationFeedbackItem"/> in case some languages are missing</returns>
         public ValidationFeedbackItem? Validate(DatabaseValidationItem item)
         {
             if (item is DatabaseFileInfo fileInfo &&
@@ -60,12 +71,18 @@ namespace Px.Utils.Validation.DatabaseValidation
     }
 
     /// <summary>
-    /// TODO: SUmmary
+    /// Validates that the encoding of each px and alias file within the database is consistent
     /// </summary>
+    /// <param name="mostCommonEncoding">The most commonly used encoding within the database</param>
     public class MismatchingEncoding(Encoding mostCommonEncoding) : IDatabaseValidator
     {
         private readonly Encoding _mostCommonEncoding = mostCommonEncoding;
 
+        /// <summary>
+        /// Validation function that checks if the encoding of the given file is consistent with the most commonly used encoding
+        /// </summary>
+        /// <param name="item"><see cref="DatabaseValidationItem"/> object - in this case <see cref="DatabaseFileInfo"/> subject to validation</param>
+        /// <returns>Null if no issues are found, <see cref="ValidationFeedbackItem"/> in case the encoding is inconsistent</returns>
         public ValidationFeedbackItem? Validate(DatabaseValidationItem item)
         {
             if (item is DatabaseFileInfo fileInfo &&
@@ -88,13 +105,20 @@ namespace Px.Utils.Validation.DatabaseValidation
     }
 
     /// <summary>
-    /// TODO: SUmmary
+    /// Validates that each subdirectory within the database has an alias file for each language
     /// </summary>
+    /// <param name="aliasFiles">List of alias files within the database</param>
+    /// <param name="allLanguages">Codes of all languages that should be present in each alias file</param>
     public class MissingAliasFiles(List<DatabaseFileInfo> aliasFiles, IEnumerable<string> allLanguages) : IDatabaseValidator
     {
         private readonly List<DatabaseFileInfo> _aliasFiles = aliasFiles;
         private readonly IEnumerable<string> _allLanguages = allLanguages;
 
+        /// <summary>
+        /// Validation function that checks if the given subdirectory contains an alias file for each language
+        /// </summary>
+        /// <param name="item"><see cref="DatabaseValidationItem"/> object subject to validation</param>
+        /// <returns>Null if no issues are found, <see cref="ValidationFeedbackItem"/> in case some alias files are missing</returns>
         public ValidationFeedbackItem? Validate(DatabaseValidationItem item)
         {
             foreach (string language in _allLanguages)

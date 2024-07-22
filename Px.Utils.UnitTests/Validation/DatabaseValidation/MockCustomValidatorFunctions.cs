@@ -3,7 +3,7 @@ using Px.Utils.Validation.DatabaseValidation;
 
 namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 {
-    internal class MockCustomDatabaseValidator : IDatabaseValidator
+    internal sealed class MockCustomDatabaseValidator : IDatabaseValidator
     {
         public ValidationFeedbackItem? Validate(DatabaseValidationItem item)
         {
