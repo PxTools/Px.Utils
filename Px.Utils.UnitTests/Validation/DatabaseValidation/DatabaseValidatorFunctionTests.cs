@@ -118,10 +118,10 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             ];
             IEnumerable<string> allLanguages = ["fi", "en", "sv"];
             MissingAliasFiles validator = new (aliasFiles, allLanguages);
-            DatabaseValidationItem folderInfo = new(path);
+            DatabaseValidationItem directoryInfo = new(path);
 
             // Act
-            ValidationFeedbackItem? feedback = validator.Validate(folderInfo);
+            ValidationFeedbackItem? feedback = validator.Validate(directoryInfo);
 
             // Assert
             Assert.IsNull(feedback);
@@ -138,10 +138,10 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             ];
             IEnumerable<string> allLanguages = ["fi", "en", "sv"];
             MissingAliasFiles validator = new (aliasFiles, allLanguages);
-            DatabaseValidationItem folderInfo = new(path);
+            DatabaseValidationItem directoryInfo = new(path);
 
             // Act
-            ValidationFeedbackItem? feedback = validator.Validate(folderInfo);
+            ValidationFeedbackItem? feedback = validator.Validate(directoryInfo);
 
             // Assert
             Assert.IsNotNull(feedback);

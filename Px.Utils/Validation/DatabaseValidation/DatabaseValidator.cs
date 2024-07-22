@@ -9,26 +9,26 @@ namespace Px.Utils.Validation.DatabaseValidation
     /// <summary>
     /// Validates a whole px file database including all px files it contains.
     /// </summary>
-    /// <param name="folderPath">Path to the database root folder</param>
+    /// <param name="directoryPath">Path to the database root directory</param>
     /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that defines the tokens and symbols for px file syntax.</param>
     /// <param name="customPxFileValidators">Optional custom <see cref="IDatabaseValidator"/> validator functions ran for each px file within the database</param>
     /// <param name="customAliasFileValidators">Optional custom <see cref="IDatabaseValidator"/> validator functions that are ran for each alias file within the database</param>
-    /// <param name="customFolderValidators">Optional custom <see cref="IDatabaseValidator"/> validator functions for each subfolder within the database.</param>
+    /// <param name="customDirectoryValidators">Optional custom <see cref="IDatabaseValidator"/> validator functions for each subdirectory within the database.</param>
     /// <param name="fileSystem">Optional <see cref="IFileSystem"/> that defines the file system used for the validation process. Default file system is used if none provided.</param>
     public class DatabaseValidator(
-        string folderPath, 
+        string directoryPath, 
         PxFileSyntaxConf? syntaxConf = null,
         IDatabaseValidator[]? customPxFileValidators = null,
         IDatabaseValidator[]? customAliasFileValidators = null,
-        IDatabaseValidator[]? customFolderValidators = null,
+        IDatabaseValidator[]? customDirectoryValidators = null,
         IFileSystem? fileSystem = null
         ) : IPxFileValidator, IPxFileValidatorAsync
     {
-        private readonly string _folderPath = folderPath;
+        private readonly string _directoryPath = directoryPath;
         private readonly PxFileSyntaxConf _syntaxConf = syntaxConf is not null ? syntaxConf : PxFileSyntaxConf.Default;
         private readonly IDatabaseValidator[]? _customPxFileValidators = customPxFileValidators;
         private readonly IDatabaseValidator[]? _customAliasFileValidators = customAliasFileValidators;
-        private readonly IDatabaseValidator[]? _customFolderValidators = customFolderValidators;
+        private readonly IDatabaseValidator[]? _customDirectoryValidators = customDirectoryValidators;
         private readonly IFileSystem _fileSystem = fileSystem is not null ? fileSystem : new DefaultFileSystem();
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             List<DatabaseFileInfo> pxFiles = [];
             List<DatabaseFileInfo> aliasFiles = [];
 
-            IEnumerable<string> pxFilePaths = _fileSystem.EnumerateFiles(_folderPath, "*.px");
+            IEnumerable<string> pxFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "*.px");
 
             foreach (string fileName in pxFilePaths)
             {
@@ -54,7 +54,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 feedbacks.AddRange(result.FeedbackItems);
             }
 
-            IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_folderPath, "Alias_*.txt");
+            IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "Alias_*.txt");
             foreach (string filenName in aliasFilePaths)
             {
                 Stream stream = _fileSystem.GetFileStream(filenName);
@@ -77,7 +77,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             List<DatabaseFileInfo> pxFiles = [];
             List<DatabaseFileInfo> aliasFiles = [];
 
-            IEnumerable<string> pxFilePaths = _fileSystem.EnumerateFiles(_folderPath, "*.px");
+            IEnumerable<string> pxFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "*.px");
             foreach (string fileName in pxFilePaths)
             {
                 Stream stream = _fileSystem.GetFileStream(fileName);
@@ -94,7 +94,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 }
             }
 
-            IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_folderPath, "Alias_*.txt");
+            IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "Alias_*.txt");
             foreach (string filenName in aliasFilePaths)
             {
                 Stream stream = _fileSystem.GetFileStream(filenName);
@@ -123,7 +123,7 @@ namespace Px.Utils.Validation.DatabaseValidation
 
             ValidatePxFiles(pxFiles, databaseLanguages, mostCommonEncoding, ref feedbacks);
             ValidateAliasFiles(aliasFiles, mostCommonEncoding, ref feedbacks);
-            ValidateFolders(aliasFiles, databaseLanguages, ref feedbacks);
+            ValidateDirectories(aliasFiles, databaseLanguages, ref feedbacks);
         }
 
         private void ValidatePxFiles(List<DatabaseFileInfo> pxFiles, IEnumerable<string> databaseLanguages, Encoding mostCommonEncoding, ref List<ValidationFeedbackItem> feedbacks)
@@ -176,26 +176,26 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
         }
 
-        private void ValidateFolders(List<DatabaseFileInfo> aliasFiles, IEnumerable<string> databaseLanguages, ref List<ValidationFeedbackItem> feedbacks)
+        private void ValidateDirectories(List<DatabaseFileInfo> aliasFiles, IEnumerable<string> databaseLanguages, ref List<ValidationFeedbackItem> feedbacks)
         {
-            IDatabaseValidator[] folderValidators =
+            IDatabaseValidator[] directoryValidators =
             [
                 new MissingAliasFiles(aliasFiles, databaseLanguages),
             ];
-            if (_customFolderValidators is not null)
+            if (_customDirectoryValidators is not null)
             {
-                folderValidators = [.. folderValidators, .. _customFolderValidators];
+                directoryValidators = [.. directoryValidators, .. _customDirectoryValidators];
             }
 
-            IEnumerable<string> allFolders = _fileSystem.EnumerateDirectories(_folderPath);
-            foreach (string folder in allFolders)
+            IEnumerable<string> allDirectories = _fileSystem.EnumerateDirectories(_directoryPath);
+            foreach (string directory in allDirectories)
             {
-                string folderName = new DirectoryInfo(folder).Name;
-                if (folderName == _syntaxConf.Tokens.Database.Index) continue;
+                string directoryName = new DirectoryInfo(directory).Name;
+                if (directoryName == _syntaxConf.Tokens.Database.Index) continue;
 
-                foreach (IDatabaseValidator validator in folderValidators)
+                foreach (IDatabaseValidator validator in directoryValidators)
                 {
-                    ValidationFeedbackItem? feedback = validator.Validate(new DatabaseValidationItem(folder));
+                    ValidationFeedbackItem? feedback = validator.Validate(new DatabaseValidationItem(directory));
                     if (feedback is not null)
                     {
                         feedbacks.Add((ValidationFeedbackItem)feedback);
