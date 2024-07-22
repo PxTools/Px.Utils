@@ -79,7 +79,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
                 "database_invalid", 
                 customPxFileValidators: customValidators,
                 customAliasFileValidators: customValidators,
-                customFolderValidators: customValidators,
+                customDirectoryValidators: customValidators,
                 fileSystem: fileSystem);
 
             // Act
@@ -103,7 +103,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
                 "database_invalid", 
                 customPxFileValidators: customValidators,
                 customAliasFileValidators: customValidators,
-                customFolderValidators: customValidators,
+                customDirectoryValidators: customValidators,
                 fileSystem: fileSystem);
 
             // Act

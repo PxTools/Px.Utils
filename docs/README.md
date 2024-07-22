@@ -85,8 +85,16 @@ The class can be instantiated with the following parameters:
 - conf (PxFileSyntaxConf, optional): Syntax configuration for the Px file
 
 #### Database validation
-TBA
+Whole px file databases can be validated using DataValidator class. Validation can be done by using the blocking Validate or asynchronous ValidateAsync methods. DatabaseValidator class can be instantiated using the following parameters:
+- directoryPath (string): Path to the database root 
+- syntaxConf (PxFileSyntaxConf, optional): Syntax configuration for the Px file
+- customPxFileValidators (IDatabaseValidator, optional): Object containing validator functions ran for each px file within the database
+- customAliasFileValidators (IDatabaseValidator, optional): Object containing validator functions ran for each alias file within the database
+- customDirectoryValidators (IDatabaseValidator, optional): Object containing validator functions ran for each subdirectory within the database 
+- fileSystem (IFileSystem, optional): Object that defines the file system used for the validation process. Default file system is used if none provided
 
+Database validation process validates each px file within the database and also the required structure and consistency of the database languages and encoding formats. The return object is a ValidationResult object that contains ValidationFeedback objects gathered during the validation process.
+   
 ### Data models
 TBA
 
