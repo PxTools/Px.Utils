@@ -227,6 +227,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                     else if (buffer[i] == _syntaxConf.Symbols.EntrySeparator && !isProcessingString)
                     {
                         ProcessEntry(entryBuilder, ref defaultLanguage, ref languages);
+                        entryBuilder.Clear();
                     }
                     else
                     {
@@ -270,6 +271,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                     else if (buffer[i] == _syntaxConf.Symbols.EntrySeparator && !isProcessingString)
                     {
                         ProcessEntry(entryBuilder, ref defaultLanguage, ref languages);
+                        entryBuilder.Clear();
                     }
                     else
                     {
