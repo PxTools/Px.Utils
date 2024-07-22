@@ -72,7 +72,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             foreach (string fileName in pxFilePaths)
             {
                 Stream stream = _fileSystem.GetFileStream(fileName);
-                DatabaseFileInfo fileInfo = await GetPxFileInfoAsync(fileName, stream);
+                DatabaseFileInfo fileInfo = await GetPxFileInfoAsync(fileName, stream, cancellationToken);
                 pxFiles.Add(fileInfo);
                 stream.Position = 0;
                 PxFileValidator validator = new(stream, fileName, fileInfo.Encoding, _syntaxConf);
@@ -240,14 +240,14 @@ namespace Px.Utils.Validation.DatabaseValidation
             return fileInfo;
         }
 
-        private async Task<DatabaseFileInfo> GetPxFileInfoAsync(string filename, Stream stream)
+        private async Task<DatabaseFileInfo> GetPxFileInfoAsync(string filename, Stream stream, CancellationToken cancellationToken)
         {
             string name = _fileSystem.GetFileName(filename);
             string? path = _fileSystem.GetDirectoryName(filename);
             string location =  path is not null ? path : string.Empty;
             string[] languages = [];
             PxFileMetadataReader metadataReader = new ();
-            Encoding encoding = await metadataReader.GetEncodingAsync(stream, _syntaxConf);
+            Encoding encoding = await metadataReader.GetEncodingAsync(stream, _syntaxConf, cancellationToken);
             stream.Position = 0;
             const int bufferSize = 1024;
             bool isProcessingString = false;
@@ -255,9 +255,10 @@ namespace Px.Utils.Validation.DatabaseValidation
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
             string defaultLanguage = string.Empty;
-
-            while (languages.Length == 0 && (await streamReader.ReadAsync(buffer, 0, bufferSize) > 0))
+            int read = 0;
+            do
             {
+                read = await streamReader.ReadAsync(buffer.AsMemory(), cancellationToken);
                 for (int i = 0; i < buffer.Length; i++)
                 {
                     if (SyntaxValidator.IsEndOfMetadataSection(buffer[i], _syntaxConf, entryBuilder, isProcessingString) && defaultLanguage != string.Empty)
@@ -278,7 +279,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                         entryBuilder.Append(buffer[i]);
                     }
                 }
-            }
+            } while (languages.Length == 0 && read > 0);
 
             DatabaseFileInfo fileInfo = new (name, location, languages, encoding);
             return fileInfo;
