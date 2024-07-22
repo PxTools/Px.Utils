@@ -216,28 +216,33 @@ namespace Px.Utils.Validation.DatabaseValidation
             {
                 for (int i = 0; i < buffer.Length; i++)
                 {
-                    if (SyntaxValidator.IsEndOfMetadataSection(buffer[i], _syntaxConf, entryBuilder, isProcessingString) && defaultLanguage != string.Empty)
-                    {
-                        languages = [defaultLanguage.Trim(_syntaxConf.Symbols.Key.StringDelimeter)];
-                    }
-                    else if (buffer[i] == _syntaxConf.Symbols.Key.StringDelimeter)
-                    {
-                        isProcessingString = !isProcessingString;
-                    }
-                    else if (buffer[i] == _syntaxConf.Symbols.EntrySeparator && !isProcessingString)
-                    {
-                        ProcessEntry(entryBuilder, ref defaultLanguage, ref languages);
-                        entryBuilder.Clear();
-                    }
-                    else
-                    {
-                        entryBuilder.Append(buffer[i]);
-                    }
+                    ProcessBuffer(buffer[i], ref entryBuilder, ref isProcessingString, ref defaultLanguage, ref languages);
                 }
             }
 
             DatabaseFileInfo fileInfo = new (name, location, languages, encoding);
             return fileInfo;
+        }
+
+        private void ProcessBuffer(char character, ref StringBuilder entryBuilder, ref bool isProcessingString, ref string defaultLanguage, ref string[] languages)
+        {
+            if (SyntaxValidator.IsEndOfMetadataSection(character, _syntaxConf, entryBuilder, isProcessingString) && defaultLanguage != string.Empty)
+            {
+                languages = [defaultLanguage.Trim(_syntaxConf.Symbols.Key.StringDelimeter)];
+            }
+            else if (character == _syntaxConf.Symbols.Key.StringDelimeter)
+            {
+                isProcessingString = !isProcessingString;
+            }
+            else if (character == _syntaxConf.Symbols.EntrySeparator && !isProcessingString)
+            {
+                ProcessEntry(entryBuilder, ref defaultLanguage, ref languages);
+                entryBuilder.Clear();
+            }
+            else
+            {
+                entryBuilder.Append(character);
+            }
         }
 
         private async Task<DatabaseFileInfo> GetPxFileInfoAsync(string filename, Stream stream, CancellationToken cancellationToken)
@@ -258,26 +263,11 @@ namespace Px.Utils.Validation.DatabaseValidation
             int read = 0;
             do
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 read = await streamReader.ReadAsync(buffer.AsMemory(), cancellationToken);
                 for (int i = 0; i < buffer.Length; i++)
                 {
-                    if (SyntaxValidator.IsEndOfMetadataSection(buffer[i], _syntaxConf, entryBuilder, isProcessingString) && defaultLanguage != string.Empty)
-                    {
-                        languages = [defaultLanguage.Trim(_syntaxConf.Symbols.Key.StringDelimeter)];
-                    }
-                    else if (buffer[i] == _syntaxConf.Symbols.Key.StringDelimeter)
-                    {
-                        isProcessingString = !isProcessingString;
-                    }
-                    else if (buffer[i] == _syntaxConf.Symbols.EntrySeparator && !isProcessingString)
-                    {
-                        ProcessEntry(entryBuilder, ref defaultLanguage, ref languages);
-                        entryBuilder.Clear();
-                    }
-                    else
-                    {
-                        entryBuilder.Append(buffer[i]);
-                    }
+                    ProcessBuffer(buffer[i], ref entryBuilder, ref isProcessingString, ref defaultLanguage, ref languages);
                 }
             } while (languages.Length == 0 && read > 0);
 
