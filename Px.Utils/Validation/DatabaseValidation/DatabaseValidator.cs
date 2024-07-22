@@ -286,7 +286,7 @@ namespace Px.Utils.Validation.DatabaseValidation
 
         private void ProcessEntry(StringBuilder entryBuilder, ref string defaultLanguage, ref string[] languages)
         {
-            string[] entry = entryBuilder.ToString().Split(_syntaxConf.Symbols.KeywordSeparator);
+            string[] entry = entryBuilder.ToString().Trim().Split(_syntaxConf.Symbols.KeywordSeparator);
             if (entry[0] == _syntaxConf.Tokens.KeyWords.DefaultLanguage)
             {
                 defaultLanguage = entry[1];
