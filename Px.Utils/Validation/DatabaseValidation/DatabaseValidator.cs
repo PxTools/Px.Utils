@@ -204,7 +204,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             string[] languages = [];
             PxFileMetadataReader metadataReader = new ();
             Encoding encoding = metadataReader.GetEncoding(stream, _syntaxConf);
-
+            stream.Position = 0;
             const int bufferSize = 1024;
             bool isProcessingString = false;
             using StreamReader streamReader = new(stream, encoding, leaveOpen: true);
@@ -247,7 +247,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             string[] languages = [];
             PxFileMetadataReader metadataReader = new ();
             Encoding encoding = await metadataReader.GetEncodingAsync(stream, _syntaxConf);
-
+            stream.Position = 0;
             const int bufferSize = 1024;
             bool isProcessingString = false;
             using StreamReader streamReader = new(stream, encoding, leaveOpen: true);
