@@ -67,7 +67,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
         }
 
         [TestMethod]
-        public async Task ValidateDatabaseWithCustomFunctionsReturnsFeedback()
+        public void ValidateDatabaseWithCustomFunctionsReturnsFeedback()
         {
             // Arrange
             MockFileSystem fileSystem = new();
@@ -83,7 +83,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
                 fileSystem: fileSystem);
 
             // Act
-            ValidationResult result = await validator.ValidateAsync();
+            ValidationResult result = validator.Validate();
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -91,7 +91,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
         }
 
         [TestMethod]
-        public async Task ValidateDatabaseWithCustomFunctionsAndCustomValidatorsReturnsFeedback()
+        public async Task ValidateDatabasAsynceWithCustomFunctionsReturnsFeedback()
         {
             // Arrange
             MockFileSystem fileSystem = new();

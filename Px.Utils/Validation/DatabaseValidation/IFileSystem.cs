@@ -5,7 +5,7 @@ using System.Text;
 namespace Px.Utils.Validation.DatabaseValidation
 {
     /// <summary>
-    /// TODO: Summary
+    /// Interface for implementing custom file processing systems for database validation.
     /// </summary>
     public interface IFileSystem
     {
@@ -20,7 +20,8 @@ namespace Px.Utils.Validation.DatabaseValidation
     // Excluded from code coverage because it is a wrapper around the file system and testing IO operations is not feasible.
     [ExcludeFromCodeCoverage]
     /// <summary>
-    /// TODO: Summary
+    /// Default file system used for database validation process. Contains default implementations of numerous IO operations
+    /// and a function for determining a file's encoding format.
     /// </summary>
     public class DefaultFileSystem : IFileSystem
     {

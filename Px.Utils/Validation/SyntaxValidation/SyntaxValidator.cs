@@ -92,13 +92,13 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// TODO: Summary
+        /// Checks whether the end of the metadata section of a px file stream has been reached.
         /// </summary>
-        /// <param name="currentCharacter"></param>
-        /// <param name="syntaxConf"></param>
-        /// <param name="entryBuilder"></param>
-        /// <param name="isProcessingString"></param>
-        /// <returns></returns>
+        /// <param name="currentCharacter">Character currently being processed</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens used for px file syntax</param>
+        /// <param name="entryBuilder"><see cref="StringBuilder"/> object that contains the currently processed px file entry</param>
+        /// <param name="isProcessingString">Whether the character currently processed is enclosed between string delimiters</param>
+        /// <returns>True if the end of the metadata section has been reached, otherwise false.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEndOfMetadataSection(char currentCharacter, PxFileSyntaxConf syntaxConf, StringBuilder entryBuilder, bool isProcessingString)
         {

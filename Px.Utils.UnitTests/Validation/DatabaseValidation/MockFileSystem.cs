@@ -4,7 +4,7 @@ using System.Text;
 namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 {
     /// <summary>
-    /// TODO: Summary
+    /// Mock file system used for database validation tests.
     /// </summary>
     public class MockFileSystem : IFileSystem
     {
