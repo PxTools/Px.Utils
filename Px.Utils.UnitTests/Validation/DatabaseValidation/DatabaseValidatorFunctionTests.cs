@@ -33,7 +33,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
                 new("foo.px", "path/to/file", ["fi", "en", "sv"], Encoding.UTF8),
                 new("bar.px", "path/to/file", ["fi", "en", "sv"], Encoding.UTF8)
             ];
-            DuplicatePxFileName validator = new DuplicatePxFileName(pxFiles);
+            DuplicatePxFileName validator = new (pxFiles);
             DatabaseFileInfo fileInfo = new("bar.px", "path/to/file", ["fi", "en", "sv"], Encoding.UTF8);
 
             // Act

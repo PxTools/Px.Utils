@@ -215,6 +215,15 @@
                 public static DataValueTokens DefaultDataValueTokens=> new();
             }
 
+            public class DatabaseTokens
+            {
+                private const string INDEX = "_INDEX";
+
+                public string Index { get; } = INDEX;
+
+                public static DatabaseTokens DefaultDatabaseTokens => new();
+            }
+
             public TimeValue Time { get; set; }
 
             public KeyWordTokens KeyWords { get; set; }
@@ -223,6 +232,7 @@
             public BooleanTokens Booleans { get; set; }
             
             public DataValueTokens DataValues { get; set; }
+            public DatabaseTokens Database { get; set; }
 
             private TokenDefinitions()
             {
@@ -231,6 +241,7 @@
                 VariableTypes = VariableTypeTokens.DefaultVariableTypeTokens;
                 Booleans = BooleanTokens.DefaultBooleanTokens;
                 DataValues = DataValueTokens.DefaultDataValueTokens;
+                Database = DatabaseTokens.DefaultDatabaseTokens;
             }
 
             public static TokenDefinitions DefaultTokens => new();

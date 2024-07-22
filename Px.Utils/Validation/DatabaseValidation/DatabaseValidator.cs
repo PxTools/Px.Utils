@@ -1,13 +1,20 @@
 ﻿using Px.Utils.PxFile;
 using Px.Utils.PxFile.Metadata;
 using Px.Utils.Validation.SyntaxValidation;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Px.Utils.Validation.DatabaseValidation
 {
     /// <summary>
-    /// TODO: Add summary
+    /// Validates a whole px file database including all px files it contains.
     /// </summary>
+    /// <param name="folderPath">Path to the database root folder</param>
+    /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that defines the tokens and symbols for px file syntax.</param>
+    /// <param name="customPxFileValidators">Optional custom <see cref="IDatabaseValidator"/> validator functions ran for each px file within the database</param>
+    /// <param name="customAliasFileValidators">Optional custom <see cref="IDatabaseValidator"/> validator functions that are ran for each alias file within the database</param>
+    /// <param name="customFolderValidators">Optional custom <see cref="IDatabaseValidator"/> validator functions for each subfolder within the database.</param>
+    /// <param name="fileSystem">Optional <see cref="IFileSystem"/> that defines the file system used for the validation process. Default file system is used if none provided.</param>
     public class DatabaseValidator(
         string folderPath, 
         PxFileSyntaxConf? syntaxConf = null,
@@ -25,8 +32,9 @@ namespace Px.Utils.Validation.DatabaseValidation
         private readonly IFileSystem _fileSystem = fileSystem is not null ? fileSystem : new DefaultFileSystem();
 
         /// <summary>
-        /// TODO: Add summary
+        /// Blocking px file database validation process.
         /// </summary>
+        /// <returns><see cref="ValidationResult"/> object that contains feedback gathered during the validation process.</returns>
         public ValidationResult Validate()
         {
             List<ValidationFeedbackItem> feedbacks = [];
@@ -59,11 +67,12 @@ namespace Px.Utils.Validation.DatabaseValidation
         }
 
         /// <summary>
-        /// TODO: Add summary
+        /// Asynchronous process for validating a px file database.
         /// </summary>
+        /// <param name="cancellationToken">Optional cancellation token</param>
+        /// <returns><see cref="ValidationResult"/> object that contains feedback gathered during the validation process.</returns>
         public async Task<ValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
-            // TODO: Implement filesystem interface here
             List<ValidationFeedbackItem> feedbacks = [];
             List<DatabaseFileInfo> pxFiles = [];
             List<DatabaseFileInfo> aliasFiles = [];
@@ -182,8 +191,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             foreach (string folder in allFolders)
             {
                 string folderName = new DirectoryInfo(folder).Name;
-                // TODO: Tokenize?
-                if (folderName == "_INDEX") continue;
+                if (folderName == _syntaxConf.Tokens.Database.Index) continue;
 
                 foreach (IDatabaseValidator validator in folderValidators)
                 {
@@ -224,6 +232,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             return fileInfo;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ProcessBuffer(char character, ref StringBuilder entryBuilder, ref bool isProcessingString, ref string defaultLanguage, ref string[] languages)
         {
             if (SyntaxValidator.IsEndOfMetadataSection(character, _syntaxConf, entryBuilder, isProcessingString) && defaultLanguage != string.Empty)
@@ -275,6 +284,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             return fileInfo;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ProcessEntry(StringBuilder entryBuilder, ref string defaultLanguage, ref string[] languages)
         {
             string[] entry = entryBuilder.ToString().Trim().Split(_syntaxConf.Symbols.KeywordSeparator);
