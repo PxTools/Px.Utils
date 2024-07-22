@@ -28,6 +28,9 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             { "database/category/directory/foo.px", PxFileFixtures.MINIMAL_PX_FILE },
             { "database/category/directory/bar.px", PxFileFixtures.MINIMAL_PX_FILE },
             { "database/category/directory/baz.px", PxFileFixtures.MINIMAL_PX_FILE },
+            { "database/category/directory/foo_sl.px", PxFileFixtures.MINIMAL_SINGLE_LANGUAGE_PX_FILE },
+            { "database/category/directory/bar_sl.px", PxFileFixtures.MINIMAL_SINGLE_LANGUAGE_PX_FILE },
+            { "database/category/directory/baz_sl.px", PxFileFixtures.MINIMAL_SINGLE_LANGUAGE_PX_FILE },
             { "database/category/directory/invalid.px", PxFileFixtures.INVALID_PX_FILE }
         };
     }
