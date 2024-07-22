@@ -113,5 +113,37 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             Assert.IsNotNull(result, "Validation result should not be null");
             Assert.AreEqual(29, result.FeedbackItems.Length);
         }
+
+        [TestMethod]
+        public void ValidateDatabaseWithSingleLanguagePxFileReturnsValidResult()
+        {
+            // Arrange
+            MockFileSystem fileSystem = new();
+            DatabaseValidator validator = new("database_single_language", fileSystem: fileSystem);
+
+            // Act
+            ValidationResult result = validator.Validate();
+
+            // Assert
+            Assert.IsNotNull(result, "Validation result should not be null");
+            // LANGUAGES keyword is recommended, but not required, three warning level feedback items are expected
+            Assert.AreEqual(3, result.FeedbackItems.Length);
+        }
+
+        [TestMethod]
+        public async Task ValidateDatabaseAsyncWithSingleLanguagePxFileReturnsValidResult()
+        {
+            // Arrange
+            MockFileSystem fileSystem = new();
+            DatabaseValidator validator = new("database_single_language", fileSystem: fileSystem);
+
+            // Act
+            ValidationResult result = await validator.ValidateAsync();
+
+            // Assert
+            Assert.IsNotNull(result, "Validation result should not be null");
+            // LANGUAGES keyword is recommended, but not required, three warning level feedback items are expected
+            Assert.AreEqual(3, result.FeedbackItems.Length);
+        }
     }
 }
