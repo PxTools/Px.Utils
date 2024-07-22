@@ -1,4 +1,5 @@
 ﻿using Px.Utils.PxFile.Metadata;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Px.Utils.Validation.DatabaseValidation
@@ -16,6 +17,8 @@ namespace Px.Utils.Validation.DatabaseValidation
         public Encoding GetEncoding(Stream stream);
     }
 
+    // Excluded from code coverage because it is a wrapper around the file system and testing IO operations is not feasible.
+    [ExcludeFromCodeCoverage]
     /// <summary>
     /// TODO: Summary
     /// </summary>
