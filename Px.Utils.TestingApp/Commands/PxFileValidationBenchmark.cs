@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal class PxFileValidationBenchmark : Benchmark
+    internal class PxFileValidationBenchmark : FileBenchmark
     {
         internal override string Help =>
         "Runs through the whole px file validation process (metadata syntax- and contents-, data-) for the given file.";
@@ -26,7 +26,15 @@ namespace Px.Utils.TestingApp.Commands
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileMetadataReader reader = new();
-            encoding = reader.GetEncoding(stream);
+            try
+            {
+                encoding = reader.GetEncoding(stream);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while reading the encoding of the file: {e.Message}");
+                encoding = Encoding.Default;
+            }
         }
 
         private void ValidatePxFileBenchmarks()

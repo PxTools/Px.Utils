@@ -103,12 +103,12 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// <returns>Returns a boolean which is true if the input string is in a list format</returns>
         internal static bool IsStringListFormat(string input, char listDelimeter, char stringDelimeter)
         {
-            string[] list = input.Split(listDelimeter);
-            if (list.Length <= 1)
+            List<string> items = GetListItemsFromString(input, listDelimeter, stringDelimeter);
+            if (items.Count <= 1)
             {
                 return false;
             }
-            else if (Array.TrueForAll(list, x => x.TrimStart().StartsWith(stringDelimeter) && x.TrimEnd().EndsWith(stringDelimeter)))
+            else if (Array.TrueForAll([..items], x => x.TrimStart().StartsWith(stringDelimeter) && x.TrimEnd().EndsWith(stringDelimeter)))
             {                
                 return true;
             }
@@ -116,6 +116,43 @@ namespace Px.Utils.Validation.SyntaxValidation
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Splits a string into a list of items using a list delimeter and a string delimeter.
+        /// </summary>
+        /// <param name="input">Input string</param>
+        /// <param name="listDelimeter">Character used for separating list items</param>
+        /// <param name="stringDelimeter">Character used for starting and ending a string</param>
+        /// <returns>List of strings that represent the listed items</returns>
+        internal static List<string> GetListItemsFromString(string input, char listDelimeter, char stringDelimeter)
+        {
+            List<string> items = [];
+            StringBuilder itemBuilder = new();
+            bool insideString = false;
+            for (int i = 0; i < input.Length; i++)
+            {
+                char currentCharacter = input[i];
+                if (currentCharacter == stringDelimeter)
+                {
+                    insideString = !insideString;
+                }
+                if (currentCharacter == listDelimeter && !insideString)
+                {
+                    items.Add(itemBuilder.ToString());
+                    itemBuilder.Clear();
+                }
+                else
+                {
+                    itemBuilder.Append(currentCharacter);
+                }
+            }
+            if (itemBuilder.Length > 0)
+            {
+                items.Add(itemBuilder.ToString());
+            }
+
+            return items;
         }
 
         /// <summary>
@@ -358,7 +395,7 @@ namespace Px.Utils.Validation.SyntaxValidation
                 {
                     insideString = !insideString;
                 }
-                if (!insideString && currentCharacter == syntaxConf.Symbols.Linebreak)
+                if (!insideString && currentCharacter == syntaxConf.Symbols.Linebreak && i > 1)
                 {
                     char symbolBefore = type is ValueType.ListOfStrings ?
                         syntaxConf.Symbols.Key.ListSeparator :
@@ -374,16 +411,6 @@ namespace Px.Utils.Validation.SyntaxValidation
                 }
             }
             return -1;
-        }
-
-        internal static string CleanValue(string value, PxFileSyntaxConf syntaxConf, ValueType? type)
-        {
-            if (type == null || type == ValueType.Boolean || type == ValueType.Number)
-            {
-                return value;
-            }
-
-            return CleanString(value, syntaxConf).Replace(syntaxConf.Symbols.Key.StringDelimeter.ToString(), "");
         }
       
         private static bool GetTimeValueFormat(string input, out ValueType? valueFormat, PxFileSyntaxConf syntaxConf)

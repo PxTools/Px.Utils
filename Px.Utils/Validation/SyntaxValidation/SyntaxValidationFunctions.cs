@@ -373,10 +373,9 @@ namespace Px.Utils.Validation.SyntaxValidation
             {
                 return null;
             }
-
-            string[] specifiers = specifierParamSection.Split(syntaxConf.Symbols.Key.ListSeparator);
+            List<string> specifiers = SyntaxValidationUtilityMethods.GetListItemsFromString(specifierParamSection, syntaxConf.Symbols.Key.ListSeparator, syntaxConf.Symbols.Key.StringDelimeter);
             // Check if specifiers are enclosed in string delimeters
-            for (int i = 0; i < specifiers.Length; i++)
+            for (int i = 0; i < specifiers.Count; i++)
             {
                 string specifier = specifiers[i];
                 string trimmedSpecifier = specifier.Trim();

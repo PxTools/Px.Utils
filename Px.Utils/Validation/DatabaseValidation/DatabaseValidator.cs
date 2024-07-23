@@ -49,16 +49,16 @@ namespace Px.Utils.Validation.DatabaseValidation
                 DatabaseFileInfo fileInfo = GetPxFileInfo(fileName, stream);
                 pxFiles.Add(fileInfo);
                 stream.Position = 0;
-                PxFileValidator validator = new (stream, fileName, fileInfo.Encoding, _syntaxConf);
+                PxFileValidator validator = new(stream, fileName, fileInfo.Encoding, _syntaxConf);
                 ValidationResult result = validator.Validate();
                 feedbacks.AddRange(result.FeedbackItems);
             }
 
             IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "Alias_*.txt");
-            foreach (string filenName in aliasFilePaths)
+            foreach (string fileName in aliasFilePaths)
             {
-                Stream stream = _fileSystem.GetFileStream(filenName);
-                DatabaseFileInfo fileInfo = GetAliasFileInfo(filenName, stream);
+                Stream stream = _fileSystem.GetFileStream(fileName);
+                DatabaseFileInfo fileInfo = GetAliasFileInfo(fileName, stream);
                 aliasFiles.Add(fileInfo);
             }
 
@@ -211,7 +211,15 @@ namespace Px.Utils.Validation.DatabaseValidation
             string location =  path is not null ? path : string.Empty;
             string[] languages = [];
             PxFileMetadataReader metadataReader = new ();
-            Encoding encoding = metadataReader.GetEncoding(stream, _syntaxConf);
+            Encoding encoding = Encoding.Default;
+            try
+            {
+                encoding = metadataReader.GetEncoding(stream, _syntaxConf);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while reading the encoding of the file {filename}: {e.Message}");
+            }
             stream.Position = 0;
             const int bufferSize = 1024;
             bool isProcessingString = false;
@@ -261,7 +269,15 @@ namespace Px.Utils.Validation.DatabaseValidation
             string location =  path is not null ? path : string.Empty;
             string[] languages = [];
             PxFileMetadataReader metadataReader = new ();
-            Encoding encoding = await metadataReader.GetEncodingAsync(stream, _syntaxConf, cancellationToken);
+            Encoding encoding = Encoding.Default;
+            try
+            {
+                encoding = await metadataReader.GetEncodingAsync(stream, _syntaxConf, cancellationToken);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while reading the encoding of the file {filename}: {e.Message}");
+            }
             stream.Position = 0;
             const int bufferSize = 1024;
             bool isProcessingString = false;

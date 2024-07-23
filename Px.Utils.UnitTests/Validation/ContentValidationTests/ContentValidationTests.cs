@@ -149,6 +149,26 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
+        public void ValidateFindStubOrHeadingCalledWithListsOfNamesReturnWithNoErrors()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_MULTIPLE_DIMENSION_NAMES;
+            ContentValidator validator = new(filename, encoding, entries);
+            SetValidatorField(validator, "_defaultLanguage", defaultLanguage);
+            SetValidatorField(validator, "_availableLanguages", availableLanguages);
+
+            // Act
+            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindStubAndHeading(
+                entries,
+                validator
+                );
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Length);
+        }
+
+        [TestMethod]
         public void ValidateFindStubOrHeadingCalledWithWithMissingHeadingReturnsWithError()
         {
             // Arrange
