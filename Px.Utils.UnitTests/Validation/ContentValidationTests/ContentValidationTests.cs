@@ -241,7 +241,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateFindContentDimensionKeysCalledWithInvalidContentValueKeyEntriesSReturnsWithErrors()
+        public void ValidateFindContentDimensionKeysCalledWithMissingContentValueKeyEntriesReturnsWithErrors()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_INVALID_CONTENT_VALUE_KEY_ENTRIES;
@@ -266,6 +266,35 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result[0].Feedback.Rule);
             Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result[1].Feedback.Rule);
+        }
+
+        [TestMethod]
+        public void ValidateFindContentDimensionKeysCalledWithMissingRecommendedSpecifiersEntriesReturnsWithWarnings()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_MISSING_RECIMMENDED_SPECIFIERS;
+            ContentValidator validator = new(filename, encoding, entries);
+            SetValidatorField(validator, "_defaultLanguage", defaultLanguage);
+            SetValidatorField(validator, "_availableLanguages", availableLanguages);
+            SetValidatorField(validator, "_contentDimensionNames", contentDimensionNames);
+            SetValidatorField(validator, "_dimensionValueNames", new Dictionary<KeyValuePair<string, string>, string[]>
+                {
+                    { new KeyValuePair<string, string>( "fi", "bar" ), ["foo"] },
+                    { new KeyValuePair<string, string>( "en", "bar-en" ), ["foo-en"] },
+                });
+
+            // Act
+            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindContentDimensionKeys(
+                entries,
+                validator
+                );
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(3, result.Length);
+            Assert.AreEqual(ValidationFeedbackRule.RecommendedSpecifierDefinitionMissing, result[0].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result[1].Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.RecommendedSpecifierDefinitionMissing, result[2].Feedback.Rule);
         }
 
         [TestMethod]

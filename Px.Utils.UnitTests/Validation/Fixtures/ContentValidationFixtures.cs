@@ -240,6 +240,24 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
                 13,
                 Utils.Validation.ValueType.DateTime);
 
+        private static readonly ValidationStructuredEntry lastUpdatedBarFooEntryOneSpecifier =
+            new(filename,
+                new ValidationStructuredEntryKey("LAST-UPDATED", null, "bar"),
+                "20230131 08:00",
+                19,
+                [],
+                13,
+                Utils.Validation.ValueType.DateTime);
+
+        private static readonly ValidationStructuredEntry unitsBarFooEnEntryOneSpecifier =
+            new(filename,
+                new ValidationStructuredEntryKey("UNITS", "en", "foo-en"),
+                "unit",
+                20,
+                [],
+                13,
+                Utils.Validation.ValueType.StringValue);
+
         private static readonly ValidationStructuredEntry unitsBarFooEntry =
             new(filename,
                 new ValidationStructuredEntryKey("UNITS", null, "bar", "foo"),
@@ -480,6 +498,13 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
             [
                 unitsBarFooEntry,
                 precisionBarFooEntry,
+            ];
+
+        internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_MISSING_RECIMMENDED_SPECIFIERS =>
+            [
+                lastUpdatedBarFooEntryOneSpecifier,
+                unitsBarFooEntry,
+                unitsBarFooEnEntryOneSpecifier,
             ];
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_INCOMPLETE_VARIABLE_RECOMMENDED_KEYS =>
