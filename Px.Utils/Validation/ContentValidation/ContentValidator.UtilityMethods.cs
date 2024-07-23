@@ -127,7 +127,7 @@ namespace Px.Utils.Validation.ContentValidation
 
                 ValidationFeedback feedback = new (
                             ValidationFeedbackLevel.Warning,
-                            ValidationFeedbackRule.UnrecommendedSpecifierDefinitionFound,
+                            ValidationFeedbackRule.RecommendedSpecifierDefinitionMissing,
                             feedbackIndexes.Key,
                             0,
                             $"{keyword}, {language}, {dimensionName}, {dimensionValueName}"
@@ -281,29 +281,10 @@ namespace Px.Utils.Validation.ContentValidation
             foreach (ValidationStructuredEntry entry in entries)
             {
                 string language = entry.Key.Language ?? defaultLanguage;
-                List<string> names = [];
-                bool isProcessingListItem = false;
-                StringBuilder nameBuilder = new ();
-                for (int i = 0; i < entry.Value.Length; i++) 
+                List<string> names = SyntaxValidationUtilityMethods.GetListItemsFromString(entry.Value, syntaxConf.Symbols.Value.ListSeparator, syntaxConf.Symbols.Value.StringDelimeter);
+                for (int i = 0; i < names.Count; i++)
                 {
-                    if (entry.Value[i] == syntaxConf.Symbols.Value.StringDelimeter)
-                    {
-                        isProcessingListItem = !isProcessingListItem;
-                        if (!isProcessingListItem)
-                        {
-                            names.Add(nameBuilder.ToString());
-                            nameBuilder.Clear();
-                        }
-                    }
-                    else if (isProcessingListItem || entry.ValueType != ValueType.ListOfStrings)
-                    {
-                        nameBuilder.Append(entry.Value[i]);
-                    }
-                }
-                // If there's only one dimension, it is not a list separated by string delimeters.
-                if (names.Count == 0)
-                {
-                    names.Add(nameBuilder.ToString());
+                    names[i] = SyntaxValidationUtilityMethods.CleanString(names[i], syntaxConf);
                 }
                 dimensionNames.Add(language, [.. names]);
             }
