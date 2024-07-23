@@ -1,5 +1,6 @@
 ﻿using Px.Utils.PxFile;
 using Px.Utils.Validation.SyntaxValidation;
+using System.Text;
 
 namespace Px.Utils.Validation.ContentValidation
 {
@@ -40,15 +41,18 @@ namespace Px.Utils.Validation.ContentValidation
                         e.Key.FirstSpecifier.Equals(dimension, StringComparison.Ordinal));
                     if (valuesEntry is not null)
                     {
-                        string[] values = valuesEntry.Value.Split(syntaxConf.Symbols.Value.ListSeparator);
-                        for(int i = 0; i < values.Length; i++)
+                        List<string> values = SyntaxValidationUtilityMethods.GetListItemsFromString(
+                            valuesEntry.Value, 
+                            syntaxConf.Symbols.Value.ListSeparator, 
+                            syntaxConf.Symbols.Value.StringDelimeter);
+                        for(int i = 0; i < values.Count; i++)
                         {
                             values[i] = SyntaxValidationUtilityMethods.CleanString(values[i], syntaxConf);
                         }
 
                         variableValues.Add(
                             new KeyValuePair<string, string> ( language, dimension ),
-                            values
+                            [..values]
                             );
                     }
                     else
@@ -266,6 +270,44 @@ namespace Px.Utils.Validation.ContentValidation
                 }
             }
             return feedbackItems;
+        }
+
+        private static Dictionary<string, string[]> GetDimensionNames(
+            ValidationStructuredEntry[] entries,
+            string defaultLanguage,
+            PxFileSyntaxConf syntaxConf)
+        {
+            Dictionary<string, string[]> dimensionNames = []; 
+            foreach (ValidationStructuredEntry entry in entries)
+            {
+                string language = entry.Key.Language ?? defaultLanguage;
+                List<string> names = [];
+                bool isProcessingListItem = false;
+                StringBuilder nameBuilder = new ();
+                for (int i = 0; i < entry.Value.Length; i++) 
+                {
+                    if (entry.Value[i] == syntaxConf.Symbols.Value.StringDelimeter)
+                    {
+                        isProcessingListItem = !isProcessingListItem;
+                        if (!isProcessingListItem)
+                        {
+                            names.Add(nameBuilder.ToString());
+                            nameBuilder.Clear();
+                        }
+                    }
+                    else if (isProcessingListItem || entry.ValueType != ValueType.ListOfStrings)
+                    {
+                        nameBuilder.Append(entry.Value[i]);
+                    }
+                }
+                // If there's only one dimension, it is not a list separated by string delimeters.
+                if (names.Count == 0)
+                {
+                    names.Add(nameBuilder.ToString());
+                }
+                dimensionNames.Add(language, [.. names]);
+            }
+            return dimensionNames;
         }
     }
 }

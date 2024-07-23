@@ -202,8 +202,7 @@ namespace Px.Utils.Validation.SyntaxValidation
             {
                 ValueType? valueType = SyntaxValidationUtilityMethods.GetValueTypeFromString(entry.KeyValuePair.Value, syntaxConf);
                 ValidationStructuredEntryKey key = ParseStructuredValidationEntryKey(entry.KeyValuePair.Key, syntaxConf);
-                string value = SyntaxValidationUtilityMethods.CleanValue(entry.KeyValuePair.Value, syntaxConf, valueType);
-                return new ValidationStructuredEntry(entry.File, key, value, entry.KeyStartLineIndex, entry.LineChangeIndexes, entry.ValueStartIndex, valueType);
+                return new ValidationStructuredEntry(entry.File, key, entry.KeyValuePair.Value, entry.KeyStartLineIndex, entry.LineChangeIndexes, entry.ValueStartIndex, valueType);
             }).ToList();
         }
 
@@ -214,12 +213,10 @@ namespace Px.Utils.Validation.SyntaxValidation
             List<int> lineChangeIndexes = [];
             int entryStartIndex = 0;
             int entryStartLineIndex = 0;
-
             using StreamReader reader = new(stream, encoding, leaveOpen: leaveStreamOpen);
             List<ValidationEntry> entries = [];
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
-
             while (reader.Read(buffer, 0, bufferSize) > 0)
             {
                 for (int i = 0; i < buffer.Length; i++)

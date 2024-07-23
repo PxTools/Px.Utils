@@ -56,7 +56,6 @@ namespace Px.Utils.Validation.ContentValidation
         /// <returns><see cref="ContentValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
         public ContentValidationResult Validate()
         {
-
             IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
             IEnumerable<ContentValidationFindKeywordValidator> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
 
@@ -87,10 +86,8 @@ namespace Px.Utils.Validation.ContentValidation
                     }
                 }
             }
-
             int lengthOfDataRows = _headingDimensionNames is not null ? GetProductOfDimensionValues(_headingDimensionNames) : 0;
             int amountOfDataRows = _stubDimensionNames is not null ? GetProductOfDimensionValues(_stubDimensionNames) : 0;
-
             ResetFields();
 
             return new ContentValidationResult([.. feedbackItems], lengthOfDataRows, amountOfDataRows);
@@ -106,17 +103,17 @@ namespace Px.Utils.Validation.ContentValidation
         private int GetProductOfDimensionValues(Dictionary<string, string[]> dimensions)
         {
             string? lang = _defaultLanguage ?? _availableLanguages?[0];
-            if (lang is null)
+            if (lang is null || dimensions.Count == 0)
             {
                 return 0;
             }
-            string[] headingDimensionNames = dimensions[lang];
-            if (headingDimensionNames is null || headingDimensionNames.Length == 0 || _dimensionValueNames is null)
+            string[] dimensionNames = dimensions[lang];
+            if (dimensionNames is null || dimensionNames.Length == 0 || _dimensionValueNames is null)
             {
                 return 0;
             }
             return _dimensionValueNames
-                .Where(kvp => headingDimensionNames
+                .Where(kvp => dimensionNames
                 .Contains(kvp.Key.Value)).Select(kvp => kvp.Value.Length)
                 .Aggregate((a, b) => a * b);
         }

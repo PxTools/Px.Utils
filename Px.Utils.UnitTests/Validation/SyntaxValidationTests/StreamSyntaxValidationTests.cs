@@ -389,6 +389,27 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
+        [DataRow("\"Item1\", \"Item2\", \"Item3\"")]
+        [DataRow("\"Item 1\", \"Item 2\", \"Item 3\"")]
+        [DataRow("\"Item1\",\"Item2\",\"Item3\"")]
+        [DataRow("\"Item, 1\", \"Item, 2\", \"Item, 3\"")]
+        [DataRow("\"Item1\",\"Item2\"")]
+        public void GetValueTypeFromStringCalledWithValidListsValuesCorrectValueType(string list)
+        {
+            // Arrange
+            List<ValidationKeyValuePair> keyValuePairs = [new("foo", new KeyValuePair<string, string>("foo-key", list), 0, [], 0)];
+            List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.InvalidValueFormat];
+
+            // Act
+            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, syntaxConf]) as List<ValidationFeedbackItem> ?? [];
+            Utils.Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, [keyValuePairs[0].KeyValuePair.Value, PxFileSyntaxConf.Default]) as Utils.Validation.ValueType?;
+
+            // Assert
+            Assert.AreEqual(Utils.Validation.ValueType.ListOfStrings, valueType);
+            Assert.AreEqual(0, feedback.Count);
+        }
+
+        [TestMethod]
         [DataRow("TLIST(A1),\"2000\",\"2001\",\"2003\"", Utils.Validation.ValueType.TimeValSeries)]
         [DataRow("TLIST(H1),\"20001\", \"20002\", \"20011\", \"20012\"", Utils.Validation.ValueType.TimeValSeries)] // Has spaces between values
         [DataRow("TLIST(T1),\"20001\",\"20002\",\"20003\"", Utils.Validation.ValueType.TimeValSeries)]

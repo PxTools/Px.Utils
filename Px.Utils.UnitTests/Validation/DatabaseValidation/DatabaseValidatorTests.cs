@@ -48,7 +48,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(14, result.FeedbackItems.Length);
+            Assert.AreEqual(11, result.FeedbackItems.Length);
         }
 
         [TestMethod]
@@ -63,7 +63,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(14, result.FeedbackItems.Length);
+            Assert.AreEqual(11, result.FeedbackItems.Length);
         }
 
         [TestMethod]
@@ -87,7 +87,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(29, result.FeedbackItems.Length);
+            Assert.AreEqual(26, result.FeedbackItems.Length);
         }
 
         [TestMethod]
@@ -111,7 +111,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(29, result.FeedbackItems.Length);
+            Assert.AreEqual(26, result.FeedbackItems.Length);
         }
 
         [TestMethod]

@@ -99,8 +99,44 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         private static readonly ValidationStructuredEntry stubEntry =
             new(filename,
                 new ValidationStructuredEntryKey("STUB"),
-                "bar",
+                "\"bar\"",
                 8,
+                [],
+                5,
+                Utils.Validation.ValueType.ListOfStrings);
+
+        private static readonly ValidationStructuredEntry multipleStubNamesEntry = 
+            new(filename,
+                new ValidationStructuredEntryKey("STUB"),
+                "\"bar\", \"baz\"",
+                8,
+                [],
+                5,
+                Utils.Validation.ValueType.ListOfStrings);
+
+        private static readonly ValidationStructuredEntry multipleHeadingNamesEntry =
+            new(filename,
+                new ValidationStructuredEntryKey("HEADING"),
+                "\"bar, time\", \"baz, time\"",
+                10,
+                [],
+                5,
+                Utils.Validation.ValueType.ListOfStrings);
+
+        private static readonly ValidationStructuredEntry multipleEnStubNamesEntry =
+            new(filename,
+                new ValidationStructuredEntryKey("STUB", "en"),
+                "\"bar-en\", \"baz-en\"",
+                8,
+                [],
+                5,
+                Utils.Validation.ValueType.ListOfStrings);
+
+        private static readonly ValidationStructuredEntry multipleEnHeadingNamesEntry =
+            new(filename,
+                new ValidationStructuredEntryKey("HEADING", "en"),
+                "\"bar, time (en)\", \"baz, time (en)\"",
+                10,
                 [],
                 5,
                 Utils.Validation.ValueType.ListOfStrings);
@@ -108,7 +144,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         private static readonly ValidationStructuredEntry stubEnEntry =
             new(filename,
                 new ValidationStructuredEntryKey("STUB", "en"),
-                "bar-en",
+                "\"bar-en\"",
                 9,
                 [],
                 9,
@@ -117,7 +153,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         private static readonly ValidationStructuredEntry headingEntry = 
             new(filename,
                 new ValidationStructuredEntryKey("HEADING"),
-                "bar-time",
+                "\"bar-time\"",
                 10,
                 [],
                 5,
@@ -126,7 +162,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         private static readonly ValidationStructuredEntry headingEnEntry =
             new(filename,
                 new ValidationStructuredEntryKey("HEADING", "en"),
-                "bar-time-en",
+                "\"bar-time-en\"",
                 11,
                 [],
                 5,
@@ -420,6 +456,14 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_STUB =>
             [
                 stubEntry,
+            ];
+
+        internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_MULTIPLE_DIMENSION_NAMES =>
+            [
+                multipleStubNamesEntry,
+                multipleHeadingNamesEntry,
+                multipleEnStubNamesEntry,
+                multipleEnHeadingNamesEntry
             ];
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_DESCRIPTION =>
