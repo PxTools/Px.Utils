@@ -15,6 +15,7 @@ namespace Px.Utils.TestingApp.Commands
 
         private Encoding encoding;
         private SyntaxValidator validator;
+        private Stream stream;
 
         internal MetadataSyntaxValidationBenchmark()
         {             
@@ -26,10 +27,10 @@ namespace Px.Utils.TestingApp.Commands
         {
             base.OneTimeBenchmarkSetup();
 
-            using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
+            Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileMetadataReader reader = new();
             encoding = reader.GetEncoding(stream);
-            validator = new(stream, encoding, TestFilePath);
+            validator = new(stream, encoding, TestFilePath, leaveStreamOpen: true);
         }
 
         private void SyntaxValidationBenchmark()
