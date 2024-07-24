@@ -3,7 +3,6 @@ using Px.Utils.PxFile;
 using Px.Utils.PxFile.Metadata;
 using Px.Utils.Validation.SyntaxValidation;
 using System.Collections.Concurrent;
-using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -54,17 +53,15 @@ namespace Px.Utils.Validation.DatabaseValidation
             {
                 fileTasks.Add(Task.Run(() => ProcessPxFile(fileName)));
             }
-
+            
             IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "Alias_*.txt");
             foreach (string fileName in aliasFilePaths)
             {
                 fileTasks.Add(Task.Run(() => ProcessAliasFile(fileName)));
             }
 
-            Task.WaitAll([..fileTasks]);
-
+            Task.WaitAll([.. fileTasks]);
             ValidateDatabaseContents();
-
             return new ValidationResult([..feedbacks]);
         }
 
@@ -90,13 +87,11 @@ namespace Px.Utils.Validation.DatabaseValidation
             IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "Alias_*.txt");
             foreach (string fileName in aliasFilePaths)
             {
-                fileTasks.Add(Task.Run(() => ProcessAliasFile(fileName), cancellationToken));
+                fileTasks.Add(ProcessAliasFileAsync(fileName, cancellationToken));
             }
-
+            
             await Task.WhenAll(fileTasks);
-
             ValidateDatabaseContents();
-
             return new ValidationResult([.. feedbacks]);
         }
 
@@ -134,6 +129,13 @@ namespace Px.Utils.Validation.DatabaseValidation
                 feedbacks.Add(feedback);
             }
             cancellationToken.ThrowIfCancellationRequested();
+        }
+
+        private async Task ProcessAliasFileAsync(string fileName, CancellationToken cancellationToken)
+        {
+            using Stream stream = _fileSystem.GetFileStream(fileName);
+            DatabaseFileInfo fileInfo = await GetAliasFileInfoAsync(fileName, stream, cancellationToken);
+            aliasFiles.Add(fileInfo);
         }
 
         private void ValidateDatabaseContents()
@@ -365,6 +367,20 @@ namespace Px.Utils.Validation.DatabaseValidation
             ];
 
             Encoding encoding = _fileSystem.GetEncoding(stream);
+            DatabaseFileInfo fileInfo = new (name, location, languages, encoding);
+            return fileInfo;
+        }
+
+        private async Task<DatabaseFileInfo> GetAliasFileInfoAsync(string filename, Stream stream, CancellationToken cancellationToken)
+        {
+            string name = _fileSystem.GetFileName(filename);
+            string? path = _fileSystem.GetDirectoryName(filename);
+            string location =  path is not null ? path : string.Empty;
+            string[] languages = [
+                name.Split('_')[1].Split('.')[0]
+            ];
+
+            Encoding encoding = await _fileSystem.GetEncodingAsync(stream, cancellationToken);
             DatabaseFileInfo fileInfo = new (name, location, languages, encoding);
             return fileInfo;
         }

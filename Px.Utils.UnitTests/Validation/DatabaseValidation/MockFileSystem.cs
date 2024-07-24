@@ -95,5 +95,10 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
         {
             return Encoding.UTF8;
         }
+
+        public async Task<Encoding> GetEncodingAsync(Stream stream, CancellationToken cancellationToken)
+        {
+            return await Task.Run(() => GetEncoding(stream));
+        }
     }
 }
