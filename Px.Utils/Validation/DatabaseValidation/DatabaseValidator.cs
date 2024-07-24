@@ -90,7 +90,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "Alias_*.txt");
             foreach (string fileName in aliasFilePaths)
             {
-                fileTasks.Add(ProcessAliasFileAsync(fileName, cancellationToken));
+                fileTasks.Add(Task.Run(() => ProcessAliasFile(fileName), cancellationToken));
             }
 
             await Task.WhenAll(fileTasks);
@@ -134,17 +134,6 @@ namespace Px.Utils.Validation.DatabaseValidation
                 feedbacks.Add(feedback);
             }
             cancellationToken.ThrowIfCancellationRequested();
-        }
-
-        private async Task ProcessAliasFileAsync(string fileName, CancellationToken cancellationToken)
-        {
-            await Task.Run(() =>
-            {
-                using Stream stream = _fileSystem.GetFileStream(fileName);
-                DatabaseFileInfo fileInfo = GetAliasFileInfo(fileName, stream);
-                aliasFiles.Add(fileInfo);
-                cancellationToken.ThrowIfCancellationRequested();
-            }, cancellationToken);
         }
 
         private void ValidateDatabaseContents()
@@ -314,7 +303,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             Encoding encoding = Encoding.Default;
             try
             {
-                encoding = await metadataReader.GetEncodingAsync(stream, _syntaxConf);
+                encoding = await metadataReader.GetEncodingAsync(stream, _syntaxConf, cancellationToken);
             }
             catch (InvalidPxFileMetadataException e)
             {
