@@ -15,6 +15,7 @@ namespace Px.Utils.Validation.DatabaseValidation
         public string GetFileName(string path);
         public string GetDirectoryName(string path);
         public Encoding GetEncoding(Stream stream);
+        public Task<Encoding> GetEncodingAsync(Stream stream, CancellationToken cancellationToken);
     }
 
     // Excluded from code coverage because it is a wrapper around the file system and testing IO operations is not feasible.
@@ -58,6 +59,20 @@ namespace Px.Utils.Validation.DatabaseValidation
 
             byte[] bom = new byte[bomLength];
             stream.Read(bom);
+            stream.Position = position;
+
+            if (PxFileMetadataReader.GetEncodingFromBOM(bom) is Encoding utf) return utf;
+
+            return Encoding.ASCII;
+        }
+
+        public async Task<Encoding> GetEncodingAsync(Stream stream, CancellationToken cancellationToken)
+        {
+            const int bomLength = 3;
+            long position = stream.Position;
+
+            byte[] bom = new byte[bomLength];
+            await stream.ReadAsync(bom, cancellationToken);
             stream.Position = position;
 
             if (PxFileMetadataReader.GetEncodingFromBOM(bom) is Encoding utf) return utf;
