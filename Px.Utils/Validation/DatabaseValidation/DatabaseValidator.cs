@@ -33,9 +33,9 @@ namespace Px.Utils.Validation.DatabaseValidation
         private readonly IDatabaseValidator[]? _customDirectoryValidators = customDirectoryValidators;
         private readonly IFileSystem _fileSystem = fileSystem is not null ? fileSystem : new DefaultFileSystem();
 
-        ConcurrentBag<ValidationFeedbackItem> feedbacks = [];
-        ConcurrentBag<DatabaseFileInfo> pxFiles = [];
-        ConcurrentBag<DatabaseFileInfo> aliasFiles = [];
+        private readonly ConcurrentBag<ValidationFeedbackItem> feedbacks = [];
+        private readonly ConcurrentBag<DatabaseFileInfo> pxFiles = [];
+        private readonly ConcurrentBag<DatabaseFileInfo> aliasFiles = [];
 
         /// <summary>
         /// Blocking px file database validation process.
@@ -43,9 +43,7 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// <returns><see cref="ValidationResult"/> object that contains feedback gathered during the validation process.</returns>
         public ValidationResult Validate()
         {
-            feedbacks = [];
-            pxFiles = [];
-            aliasFiles = [];
+            ResetValidator();
             List<Task> fileTasks = [];
 
             IEnumerable<string> pxFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "*.px");
@@ -72,10 +70,7 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// <returns><see cref="ValidationResult"/> object that contains feedback gathered during the validation process.</returns>
         public async Task<ValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
-            feedbacks = [];
-            pxFiles = [];
-            aliasFiles = [];
-
+            ResetValidator();
             List<Task> fileTasks = [];
 
             IEnumerable<string> pxFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "*.px");
@@ -383,6 +378,13 @@ namespace Px.Utils.Validation.DatabaseValidation
             Encoding encoding = await _fileSystem.GetEncodingAsync(stream, cancellationToken);
             DatabaseFileInfo fileInfo = new (name, location, languages, encoding);
             return fileInfo;
+        }
+
+        private void ResetValidator()
+        {
+            feedbacks.Clear();
+            pxFiles.Clear();
+            aliasFiles.Clear();
         }
     }
 

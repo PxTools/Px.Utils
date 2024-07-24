@@ -2,6 +2,7 @@ using Px.Utils.PxFile;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Collections.Concurrent;
 
 namespace Px.Utils.Validation.SyntaxValidation
 {
@@ -35,7 +36,7 @@ namespace Px.Utils.Validation.SyntaxValidation
     /// </summary>
     public static class SyntaxValidationUtilityMethods
     {
-        private static readonly Dictionary<string, Regex> regexPatterns = [];
+        private static readonly ConcurrentDictionary<string, Regex> regexPatterns = [];
         private static readonly TimeSpan timeout = TimeSpan.FromMilliseconds(50);
 
         /// <summary>
