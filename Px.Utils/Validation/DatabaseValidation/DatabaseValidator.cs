@@ -1,6 +1,9 @@
-﻿using Px.Utils.PxFile;
+﻿using Px.Utils.Exceptions;
+using Px.Utils.PxFile;
 using Px.Utils.PxFile.Metadata;
 using Px.Utils.Validation.SyntaxValidation;
+using System.Collections.Concurrent;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -31,38 +34,37 @@ namespace Px.Utils.Validation.DatabaseValidation
         private readonly IDatabaseValidator[]? _customDirectoryValidators = customDirectoryValidators;
         private readonly IFileSystem _fileSystem = fileSystem is not null ? fileSystem : new DefaultFileSystem();
 
+        ConcurrentBag<ValidationFeedbackItem> feedbacks = [];
+        ConcurrentBag<DatabaseFileInfo> pxFiles = [];
+        ConcurrentBag<DatabaseFileInfo> aliasFiles = [];
+
         /// <summary>
         /// Blocking px file database validation process.
         /// </summary>
         /// <returns><see cref="ValidationResult"/> object that contains feedback gathered during the validation process.</returns>
         public ValidationResult Validate()
         {
-            List<ValidationFeedbackItem> feedbacks = [];
-            List<DatabaseFileInfo> pxFiles = [];
-            List<DatabaseFileInfo> aliasFiles = [];
+            feedbacks = [];
+            pxFiles = [];
+            aliasFiles = [];
+            List<Task> fileTasks = [];
 
             IEnumerable<string> pxFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "*.px");
-
             foreach (string fileName in pxFilePaths)
             {
-                Stream stream = _fileSystem.GetFileStream(fileName);
-                DatabaseFileInfo fileInfo = GetPxFileInfo(fileName, stream);
-                pxFiles.Add(fileInfo);
-                stream.Position = 0;
-                PxFileValidator validator = new(stream, fileName, fileInfo.Encoding, _syntaxConf);
-                ValidationResult result = validator.Validate();
-                feedbacks.AddRange(result.FeedbackItems);
+                fileTasks.Add(Task.Run(() => ProcessPxFile(fileName)));
             }
 
             IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "Alias_*.txt");
             foreach (string fileName in aliasFilePaths)
             {
-                Stream stream = _fileSystem.GetFileStream(fileName);
-                DatabaseFileInfo fileInfo = GetAliasFileInfo(fileName, stream);
-                aliasFiles.Add(fileInfo);
+                fileTasks.Add(Task.Run(() => ProcessAliasFile(fileName)));
             }
 
-            ValidateDatabaseContents(pxFiles, aliasFiles, ref feedbacks);
+            Task.WaitAll([..fileTasks]);
+
+            ValidateDatabaseContents();
+
             return new ValidationResult([..feedbacks]);
         }
 
@@ -73,45 +75,79 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// <returns><see cref="ValidationResult"/> object that contains feedback gathered during the validation process.</returns>
         public async Task<ValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
-            List<ValidationFeedbackItem> feedbacks = [];
-            List<DatabaseFileInfo> pxFiles = [];
-            List<DatabaseFileInfo> aliasFiles = [];
+            feedbacks = [];
+            pxFiles = [];
+            aliasFiles = [];
+
+            List<Task> fileTasks = [];
 
             IEnumerable<string> pxFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "*.px");
             foreach (string fileName in pxFilePaths)
             {
-                Stream stream = _fileSystem.GetFileStream(fileName);
-                DatabaseFileInfo fileInfo = await GetPxFileInfoAsync(fileName, stream, cancellationToken);
-                pxFiles.Add(fileInfo);
-                stream.Position = 0;
-                PxFileValidator validator = new(stream, fileName, fileInfo.Encoding, _syntaxConf);
-                ValidationResult result = await validator.ValidateAsync(cancellationToken);
-                feedbacks.AddRange(result.FeedbackItems);
-
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return new ValidationResult([..feedbacks]);
-                }
+                fileTasks.Add(ProcessPxFileAsync(fileName, cancellationToken));
             }
 
             IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "Alias_*.txt");
-            foreach (string filenName in aliasFilePaths)
+            foreach (string fileName in aliasFilePaths)
             {
-                Stream stream = _fileSystem.GetFileStream(filenName);
-                DatabaseFileInfo fileInfo = GetAliasFileInfo(filenName, stream);
-                aliasFiles.Add(fileInfo);
-
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return new ValidationResult([..feedbacks]);
-                }
+                fileTasks.Add(ProcessAliasFileAsync(fileName, cancellationToken));
             }
 
-            ValidateDatabaseContents(pxFiles, aliasFiles, ref feedbacks);
-            return new ValidationResult([..feedbacks]);
+            await Task.WhenAll(fileTasks);
+
+            ValidateDatabaseContents();
+
+            return new ValidationResult([.. feedbacks]);
         }
 
-        private void ValidateDatabaseContents(List<DatabaseFileInfo> pxFiles, List<DatabaseFileInfo> aliasFiles, ref List<ValidationFeedbackItem> feedbacks)
+        private void ProcessPxFile(string fileName)
+        {
+            using Stream stream = _fileSystem.GetFileStream(fileName);
+            DatabaseFileInfo fileInfo = GetPxFileInfo(fileName, stream);
+            pxFiles.Add(fileInfo);
+            stream.Position = 0;
+            PxFileValidator validator = new(stream, fileName, fileInfo.Encoding, _syntaxConf);
+            ValidationResult result = validator.Validate();
+            foreach (ValidationFeedbackItem feedback in result.FeedbackItems)
+            {
+                feedbacks.Add(feedback);
+            }
+        }
+
+        private void ProcessAliasFile(string fileName)
+        {
+            using Stream stream = _fileSystem.GetFileStream(fileName);
+            DatabaseFileInfo fileInfo = GetAliasFileInfo(fileName, stream);
+            aliasFiles.Add(fileInfo);
+        }
+
+        private async Task ProcessPxFileAsync(string fileName, CancellationToken cancellationToken)
+        {
+            using Stream stream = _fileSystem.GetFileStream(fileName);
+            DatabaseFileInfo fileInfo = await GetPxFileInfoAsync(fileName, stream, cancellationToken);
+            pxFiles.Add(fileInfo);
+            stream.Position = 0;
+            PxFileValidator validator = new(stream, fileName, fileInfo.Encoding, _syntaxConf);
+            ValidationResult result = await validator.ValidateAsync(cancellationToken);
+            foreach (ValidationFeedbackItem feedback in result.FeedbackItems)
+            {
+                feedbacks.Add(feedback);
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+        }
+
+        private async Task ProcessAliasFileAsync(string fileName, CancellationToken cancellationToken)
+        {
+            await Task.Run(() =>
+            {
+                using Stream stream = _fileSystem.GetFileStream(fileName);
+                DatabaseFileInfo fileInfo = GetAliasFileInfo(fileName, stream);
+                aliasFiles.Add(fileInfo);
+                cancellationToken.ThrowIfCancellationRequested();
+            }, cancellationToken);
+        }
+
+        private void ValidateDatabaseContents()
         {
             IEnumerable<DatabaseFileInfo> allFiles = pxFiles.Concat(aliasFiles);
             IEnumerable<string> databaseLanguages = pxFiles.SelectMany(file => file.Languages).Distinct();
@@ -121,16 +157,16 @@ namespace Px.Utils.Validation.DatabaseValidation
                 .First()
                 .Key;
 
-            ValidatePxFiles(pxFiles, databaseLanguages, mostCommonEncoding, ref feedbacks);
-            ValidateAliasFiles(aliasFiles, mostCommonEncoding, ref feedbacks);
-            ValidateDirectories(aliasFiles, databaseLanguages, ref feedbacks);
+            ValidatePxFiles(databaseLanguages, mostCommonEncoding);
+            ValidateAliasFiles(mostCommonEncoding);
+            ValidateDirectories(databaseLanguages);
         }
 
-        private void ValidatePxFiles(List<DatabaseFileInfo> pxFiles, IEnumerable<string> databaseLanguages, Encoding mostCommonEncoding, ref List<ValidationFeedbackItem> feedbacks)
+        private void ValidatePxFiles(IEnumerable<string> databaseLanguages, Encoding mostCommonEncoding)
         {
             IDatabaseValidator[] pxFileValidators =
             [
-                new DuplicatePxFileName(pxFiles),
+                new DuplicatePxFileName([.. pxFiles]),
                 new MissingPxFileLanguages(databaseLanguages),
                 new MismatchingEncoding(mostCommonEncoding),
             ];
@@ -152,7 +188,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
         }
 
-        private void ValidateAliasFiles(List<DatabaseFileInfo> aliasFiles, Encoding mostCommonEncoding, ref List<ValidationFeedbackItem> feedbacks)
+        private void ValidateAliasFiles(Encoding mostCommonEncoding)
         {
             IDatabaseValidator[] aliasFileValidators =
             [
@@ -176,11 +212,11 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
         }
 
-        private void ValidateDirectories(List<DatabaseFileInfo> aliasFiles, IEnumerable<string> databaseLanguages, ref List<ValidationFeedbackItem> feedbacks)
+        private void ValidateDirectories(IEnumerable<string> databaseLanguages)
         {
             IDatabaseValidator[] directoryValidators =
             [
-                new MissingAliasFiles(aliasFiles, databaseLanguages),
+                new MissingAliasFiles([..aliasFiles], databaseLanguages),
             ];
             if (_customDirectoryValidators is not null)
             {
@@ -216,9 +252,15 @@ namespace Px.Utils.Validation.DatabaseValidation
             {
                 encoding = metadataReader.GetEncoding(stream, _syntaxConf);
             }
-            catch (Exception e)
+            catch (InvalidPxFileMetadataException e)
             {
-                Console.WriteLine($"Error while reading the encoding of the file {filename}: {e.Message}");
+                feedbacks.Add(new ValidationFeedbackItem(
+                    new(filename, 0, []),
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.NoEncoding,
+                    0, 0,
+                    $"Error while reading the encoding of the file {filename}: {e.Message}"
+                    )));
             }
             stream.Position = 0;
             const int bufferSize = 1024;
@@ -272,11 +314,17 @@ namespace Px.Utils.Validation.DatabaseValidation
             Encoding encoding = Encoding.Default;
             try
             {
-                encoding = await metadataReader.GetEncodingAsync(stream, _syntaxConf, cancellationToken);
+                encoding = await metadataReader.GetEncodingAsync(stream, _syntaxConf);
             }
-            catch (Exception e)
+            catch (InvalidPxFileMetadataException e)
             {
-                Console.WriteLine($"Error while reading the encoding of the file {filename}: {e.Message}");
+                feedbacks.Add(new ValidationFeedbackItem(
+                    new(filename, 0, []),
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.NoEncoding,
+                    0, 0,
+                    $"Error while reading the encoding of the file {filename}: {e.Message}"
+                    )));
             }
             stream.Position = 0;
             const int bufferSize = 1024;
