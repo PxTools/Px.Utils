@@ -383,7 +383,6 @@ namespace Px.Utils.Validation.DatabaseValidation
         public Encoding Encoding { get; } = encoding;
     }
 
-
     public interface IDatabaseValidator
     {
         public ValidationFeedbackItem? Validate(DatabaseValidationItem item);
