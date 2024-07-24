@@ -128,12 +128,9 @@ namespace Px.Utils.Validation.ContentValidation
 
             if (availableLanguageEntries.Length == 1)
             {
-                string[] languages = availableLanguageEntries[0].Value.Split(validator.SyntaxConf.Symbols.Value.ListSeparator);
-                for (int i = 0; i < languages.Length; i++)
-                {
-                    languages[i] = SyntaxValidationUtilityMethods.CleanString(languages[i], validator.SyntaxConf);
-                }
-                validator._availableLanguages = languages;
+                List<string> languages = availableLanguageEntries[0].Value.Split(validator.SyntaxConf.Symbols.Value.ListSeparator).ToList();
+                languages = CleanListOfStrings(languages, validator.SyntaxConf);
+                validator._availableLanguages = [..languages];
                 return null;
             }
             else
