@@ -2,7 +2,6 @@
 using Px.Utils.UnitTests.Validation.Fixtures;
 using Px.Utils.UnitTests.Validation.SyntaxValidationTests;
 using Px.Utils.Validation;
-using Px.Utils.Validation.SyntaxValidation;
 using System.Text;
 
 namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
@@ -52,7 +51,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(14, result.FeedbackItems.Length);
+            Assert.AreEqual(11, result.FeedbackItems.Length);
         }
 
         [TestMethod]

@@ -91,6 +91,26 @@ namespace Px.Utils.Validation.SyntaxValidation
             return new SyntaxValidationResult([.. validationFeedback], structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
         }
 
+        /// <summary>
+        /// Checks whether the end of the metadata section of a px file stream has been reached.
+        /// </summary>
+        /// <param name="currentCharacter">Character currently being processed</param>
+        /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens used for px file syntax</param>
+        /// <param name="entryBuilder"><see cref="StringBuilder"/> object that contains the currently processed px file entry</param>
+        /// <param name="isProcessingString">Whether the character currently processed is enclosed between string delimiters</param>
+        /// <returns>True if the end of the metadata section has been reached, otherwise false.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsEndOfMetadataSection(char currentCharacter, PxFileSyntaxConf syntaxConf, StringBuilder entryBuilder, bool isProcessingString)
+        {
+            if (!isProcessingString && currentCharacter == syntaxConf.Symbols.KeywordSeparator)
+            {
+                string stringEntry = entryBuilder.ToString();
+                // When DATA keyword is reached, metadata parsing is complete
+                return SyntaxValidationUtilityMethods.CleanString(stringEntry, syntaxConf).Equals(syntaxConf.Tokens.KeyWords.Data, StringComparison.Ordinal);
+            }
+            return false;
+        }
+
         #region Interface implementation
 
         ValidationResult IPxFileValidator.Validate()
@@ -182,8 +202,7 @@ namespace Px.Utils.Validation.SyntaxValidation
             {
                 ValueType? valueType = SyntaxValidationUtilityMethods.GetValueTypeFromString(entry.KeyValuePair.Value, syntaxConf);
                 ValidationStructuredEntryKey key = ParseStructuredValidationEntryKey(entry.KeyValuePair.Key, syntaxConf);
-                string value = SyntaxValidationUtilityMethods.CleanValue(entry.KeyValuePair.Value, syntaxConf, valueType);
-                return new ValidationStructuredEntry(entry.File, key, value, entry.KeyStartLineIndex, entry.LineChangeIndexes, entry.ValueStartIndex, valueType);
+                return new ValidationStructuredEntry(entry.File, key, entry.KeyValuePair.Value, entry.KeyStartLineIndex, entry.LineChangeIndexes, entry.ValueStartIndex, valueType);
             }).ToList();
         }
 
@@ -194,12 +213,10 @@ namespace Px.Utils.Validation.SyntaxValidation
             List<int> lineChangeIndexes = [];
             int entryStartIndex = 0;
             int entryStartLineIndex = 0;
-
             using StreamReader reader = new(stream, encoding, leaveOpen: leaveStreamOpen);
             List<ValidationEntry> entries = [];
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
-
             while (reader.Read(buffer, 0, bufferSize) > 0)
             {
                 for (int i = 0; i < buffer.Length; i++)
@@ -289,18 +306,6 @@ namespace Px.Utils.Validation.SyntaxValidation
             while (read > 0);
 
             return entries;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsEndOfMetadataSection(char currentCharacter, PxFileSyntaxConf syntaxConf, StringBuilder entryBuilder, bool isProcessingString)
-        {
-            if (!isProcessingString && currentCharacter == syntaxConf.Symbols.KeywordSeparator)
-            {
-                string stringEntry = entryBuilder.ToString();
-                // When DATA keyword is reached, metadata parsing is complete
-                return SyntaxValidationUtilityMethods.CleanString(stringEntry, syntaxConf).Equals(syntaxConf.Tokens.KeyWords.Data, StringComparison.Ordinal);
-            }
-            return false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

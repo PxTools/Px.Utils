@@ -62,7 +62,7 @@ namespace Px.Utils.Validation
             SyntaxValidationResult syntaxValidationResult = syntaxValidator.Validate();
             feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
 
-            ContentValidator contentValidator = new(filename, encoding, [..syntaxValidationResult.Result], _customContentValidationFunctions, syntaxConf);
+            ContentValidator contentValidator = new(filename, encoding, [.. syntaxValidationResult.Result], _customContentValidationFunctions, syntaxConf);
             ContentValidationResult contentValidationResult = contentValidator.Validate();
             feedbacks.AddRange(contentValidationResult.FeedbackItems);
 

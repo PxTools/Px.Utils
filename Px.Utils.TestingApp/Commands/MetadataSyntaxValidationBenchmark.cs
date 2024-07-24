@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal sealed class MetadataSyntaxValidationBenchmark : Benchmark
+    internal sealed class MetadataSyntaxValidationBenchmark : FileBenchmark
     {
         internal override string Help =>
         "Validates the syntax of the Px file metadata given amount of times." + Environment.NewLine +
@@ -15,6 +15,7 @@ namespace Px.Utils.TestingApp.Commands
 
         private Encoding encoding;
         private SyntaxValidator validator;
+        private Stream stream;
 
         internal MetadataSyntaxValidationBenchmark()
         {             
@@ -26,26 +27,23 @@ namespace Px.Utils.TestingApp.Commands
         {
             base.OneTimeBenchmarkSetup();
 
-            using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
+            Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileMetadataReader reader = new();
             encoding = reader.GetEncoding(stream);
-            stream.Seek(0, SeekOrigin.Begin);
-            validator = new(stream, encoding, TestFilePath);
+            validator = new(stream, encoding, TestFilePath, leaveStreamOpen: true);
         }
 
         private void SyntaxValidationBenchmark()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            stream.Seek(0, SeekOrigin.Begin);
-
+            stream.Position = 0;
             validator.Validate();
         }
 
         private async Task SyntaxValidationBenchmarkAsync()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            stream.Seek(0, SeekOrigin.Begin);
-
+            stream.Position = 0;
             await validator.ValidateAsync();
         }
     }
