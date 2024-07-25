@@ -1,5 +1,4 @@
-﻿using Px.Utils.Models.Metadata.Dimensions;
-using System.Collections;
+﻿using System.Collections;
 
 namespace Px.Utils.Models.Metadata.Dimensions
 {
@@ -68,6 +67,19 @@ namespace Px.Utils.Models.Metadata.Dimensions
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Returns an enurable collection of requested properties of the value list that matches the selector function.
+        /// </summary>
+        /// <param name="selector">Condition to check the value against.</param>
+        /// <returns>Enumerable collection of the requested type in which all items match the condition</returns>
+        public virtual IEnumerable<TResult> Map<TResult>(Func<DimensionValue, TResult> selector)
+        {
+            foreach (DimensionValue dimension in Values)
+            {
+                yield return selector(dimension);
+            }
         }
 
         /// <summary>
@@ -153,5 +165,18 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <returns>An enumerator that can be used to iterate through the content dimension values.</returns>
         public override IEnumerator<ContentDimensionValue> GetEnumerator()
             => Values.Cast<ContentDimensionValue>().GetEnumerator();
+
+        /// <summary>
+        /// Returns an enurable collection of requested properties of the value list that matches the selector function.
+        /// </summary>
+        /// <param name="selector">Condition to check the value against.</param>
+        /// <returns>Enumerable collection of the requested type in which all items match the condition</returns>
+        public IEnumerable<TResult> Map<TResult>(Func<ContentDimensionValue, TResult> selector)
+        {
+            foreach (ContentDimensionValue dimension in Values.Cast<ContentDimensionValue>())
+            {
+                yield return selector(dimension);
+            }
+        }
     }
 }
