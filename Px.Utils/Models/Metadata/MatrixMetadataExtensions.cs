@@ -6,14 +6,14 @@ namespace Px.Utils.Models.Metadata
     {
         public static ContentDimension GetContentDimension(this MatrixMetadata metadata)
         {
-            ContentDimension? ct = metadata.Dimensions.OfType<ContentDimension>().FirstOrDefault();
-            return ct ?? throw new InvalidOperationException("Content dimension not found in metadata");
+            ContentDimension? contentDimension = metadata.Dimensions.Find(dimension => dimension.Type == Enums.DimensionType.Content) as ContentDimension;
+            return contentDimension ?? throw new InvalidOperationException("Content dimension not found in metadata");
         }
 
         public static TimeDimension GetTimeDimension(this MatrixMetadata metadata)
-        {             
-            TimeDimension? time = metadata.Dimensions.OfType<TimeDimension>().FirstOrDefault();
-            return time ?? throw new InvalidOperationException("Time dimension not found in metadata");
+        {
+            TimeDimension? timeDimension = metadata.Dimensions.Find(dimension => dimension.Type == Enums.DimensionType.Time) as TimeDimension;
+            return timeDimension ?? throw new InvalidOperationException("Time dimension not found in metadata");
         }
     }
 }

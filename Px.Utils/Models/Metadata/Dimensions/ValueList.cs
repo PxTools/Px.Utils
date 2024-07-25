@@ -70,15 +70,15 @@ namespace Px.Utils.Models.Metadata.Dimensions
         }
 
         /// <summary>
-        /// Returns an enurable collection of requested properties of the value list that matches the selector function.
+        /// Transforms the dimension values to an enumerable collection of the specified type.
         /// </summary>
-        /// <param name="selector">Condition to check the value against.</param>
-        /// <returns>Enumerable collection of the requested type in which all items match the condition</returns>
-        public virtual IEnumerable<TResult> Map<TResult>(Func<DimensionValue, TResult> selector)
+        /// <param name="func">Condition to check the value against.</param>
+        /// <returns>Collection of the specified type.</returns>
+        public virtual IEnumerable<TResult> Map<TResult>(Func<DimensionValue, TResult> func)
         {
-            foreach (DimensionValue dimension in Values)
+            foreach (DimensionValue dimension in this)
             {
-                yield return selector(dimension);
+                yield return func(dimension);
             }
         }
 
@@ -167,15 +167,15 @@ namespace Px.Utils.Models.Metadata.Dimensions
             => Values.Cast<ContentDimensionValue>().GetEnumerator();
 
         /// <summary>
-        /// Returns an enurable collection of requested properties of the value list that matches the selector function.
+        /// Transforms the content dimension values to a enumerable collection of the specified type.
         /// </summary>
-        /// <param name="selector">Condition to check the value against.</param>
-        /// <returns>Enumerable collection of the requested type in which all items match the condition</returns>
-        public IEnumerable<TResult> Map<TResult>(Func<ContentDimensionValue, TResult> selector)
+        /// <param name="func">Condition to check the value against.</param>
+        /// <returns>Collection of the specified type.</returns>
+        public IEnumerable<TResult> Map<TResult>(Func<ContentDimensionValue, TResult> func)
         {
-            foreach (ContentDimensionValue dimension in Values.Cast<ContentDimensionValue>())
+            foreach (ContentDimensionValue dimension in this)
             {
-                yield return selector(dimension);
+                yield return func(dimension);
             }
         }
     }
