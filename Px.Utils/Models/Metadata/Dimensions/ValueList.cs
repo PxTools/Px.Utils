@@ -1,5 +1,4 @@
-﻿using Px.Utils.Models.Metadata.Dimensions;
-using System.Collections;
+﻿using System.Collections;
 
 namespace Px.Utils.Models.Metadata.Dimensions
 {
@@ -68,6 +67,19 @@ namespace Px.Utils.Models.Metadata.Dimensions
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Transforms the dimension values to an enumerable collection of the specified type.
+        /// </summary>
+        /// <param name="func">Function to transform the dimension values.</param>
+        /// <returns>Enumerable of the specified type.</returns>
+        public virtual IEnumerable<TResult> Map<TResult>(Func<DimensionValue, TResult> func)
+        {
+            foreach (DimensionValue dimension in this)
+            {
+                yield return func(dimension);
+            }
         }
 
         /// <summary>
@@ -153,5 +165,18 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <returns>An enumerator that can be used to iterate through the content dimension values.</returns>
         public override IEnumerator<ContentDimensionValue> GetEnumerator()
             => Values.Cast<ContentDimensionValue>().GetEnumerator();
+
+        /// <summary>
+        /// Transforms the content dimension values to a enumerable collection of the specified type.
+        /// </summary>
+        /// <param name="func">Function to transform the content dimension values.</param>
+        /// <returns>Enumerable collection of the specified type.</returns>
+        public IEnumerable<TResult> Map<TResult>(Func<ContentDimensionValue, TResult> func)
+        {
+            foreach (ContentDimensionValue dimension in this)
+            {
+                yield return func(dimension);
+            }
+        }
     }
 }
