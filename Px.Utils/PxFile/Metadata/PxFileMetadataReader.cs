@@ -110,9 +110,7 @@ namespace Px.Utils.PxFile.Metadata
 
             StreamReader reader = new(stream, encoding);
 
-            ValueTask<int> readTask = reader.ReadAsync(readBuffer.AsMemory(), cancellationToken);
-
-            char nextDelimeter = keywordSeperator;
+            int readChars;
             bool keyWordMode = true;
             bool readingValueString = false;
             bool endOfMetaSection = false;
@@ -120,11 +118,9 @@ namespace Px.Utils.PxFile.Metadata
             StringBuilder keyWordBldr = new();
             StringBuilder valueStringBldr = new();
 
-            do
+            while ((readChars = await reader.ReadAsync(readBuffer, 0, readBufferSize)) > 0)
             {
-                int readChars = await readTask;
                 (readBuffer, parsingBuffer) = (parsingBuffer, readBuffer);
-                readTask = reader.ReadAsync(readBuffer.AsMemory(), cancellationToken);
 
                 int lastDelimeterIndx = -1;
 
@@ -138,7 +134,7 @@ namespace Px.Utils.PxFile.Metadata
                             throw new InvalidPxFileMetadataException($"Unexpected character '{parsingBuffer[i]}' found at position {i}.");
                         }
 
-                        if (parsingBuffer[i] == nextDelimeter)
+                        if (parsingBuffer[i] == keywordSeperator || parsingBuffer[i] == sectionSeparator)
                         {
                             Append(parsingBuffer, lastDelimeterIndx + 1, i, keyWordMode, keyWordBldr, valueStringBldr);
                             if (keyWordBldr.ToString().Trim() == dataKeyword)
@@ -155,13 +151,16 @@ namespace Px.Utils.PxFile.Metadata
 
                             lastDelimeterIndx = i;
                             keyWordMode = !keyWordMode;
-                            nextDelimeter = keyWordMode ? keywordSeperator : sectionSeparator;
                         }
                     }
                 }
                 Append(parsingBuffer, lastDelimeterIndx + 1, readChars, keyWordMode, keyWordBldr, valueStringBldr);
 
-            } while (!endOfMetaSection && !reader.EndOfStream);
+                if (endOfMetaSection || cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+            }
         }
 
         /// <summary>

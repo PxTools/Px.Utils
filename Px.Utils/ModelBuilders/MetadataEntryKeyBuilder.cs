@@ -1,5 +1,6 @@
 ﻿using Px.Utils.Models.Metadata;
 using Px.Utils.PxFile;
+using System.Text;
 
 namespace Px.Utils.ModelBuilders
 {
@@ -125,8 +126,7 @@ namespace Px.Utils.ModelBuilders
                 remaining[0] == _spesifierParamStart &&
                 remaining[^1] == _spesifierParamEnd)
             {
-                return remaining[1..^1]
-                    .Split(_listSeparator)
+                return SplitSpecifierParts(remaining[1..^1], _listSeparator)
                     .Select(ValidateAndTrimSpecifierValue)
                     .ToList();
             }
@@ -145,6 +145,25 @@ namespace Px.Utils.ModelBuilders
                 if (!trimmed.Contains(_stringDelimeter)) return trimmed;
             }
             throw new ArgumentException($"Invalid symbol found when parsing specifer value from string {input}");
+        }
+
+        private string[] SplitSpecifierParts(string input, char listSeparator)
+        {
+            bool inString = false;
+            List<string> output = [];
+            StringBuilder current = new();
+            foreach (char c in input)
+            {
+                if (c == _stringDelimeter) inString = !inString;
+                if (c == listSeparator && !inString)
+                {
+                    output.Add(current.ToString());
+                    current.Clear();
+                }
+                else current.Append(c);
+            }
+            output.Add(current.ToString());
+            return [.. output];
         }
     }
 }

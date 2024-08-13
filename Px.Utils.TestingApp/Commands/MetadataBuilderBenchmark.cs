@@ -16,7 +16,7 @@ namespace Px.Utils.TestingApp.Commands
         internal MetadataBuilderBenchmark()
         {
             BenchmarkFunctions = [BuildMetadata];
-            BenchmarkFunctionsAsync = [];
+            BenchmarkFunctionsAsync = [BuildMetadataAsync];
             _metaEntries = [];
         }
 
@@ -36,6 +36,14 @@ namespace Px.Utils.TestingApp.Commands
             var builder = new MatrixMetadataBuilder();
             IEnumerable<KeyValuePair<string, string>> copyMeta = [.. _metaEntries];
             builder.Build(copyMeta);
+        }
+
+        private async Task BuildMetadataAsync()
+        {
+            var builder = new MatrixMetadataBuilder();
+            IEnumerable<KeyValuePair<string, string>> copyMeta = [.. _metaEntries];
+            IAsyncEnumerable<KeyValuePair<string, string>> copyMetaAsync = copyMeta.ToAsyncEnumerable();
+            await builder.BuildAsync(copyMetaAsync);
         }
     }
 }

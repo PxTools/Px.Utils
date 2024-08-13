@@ -91,12 +91,12 @@ namespace Px.Utils.ModelBuilders
             string stubKey = _pxFileSyntaxConf.Tokens.KeyWords.StubDimensions;
             IEnumerable<MultilanguageString> stubDimensionNames = TryGetAndRemoveProperty(entries, stubKey, langs, out MetaProperty? maybeStub)
                 ? maybeStub.ValueAsListOfMultilanguageStrings(langs.DefaultLanguage, _listSeparator, _stringDelimeter)
-                : throw new ArgumentException("Stub variable names not found in metadata");
+                : [];
 
             string headingKey = _pxFileSyntaxConf.Tokens.KeyWords.HeadingDimensions;
             IEnumerable<MultilanguageString> headingDimensionNames = TryGetAndRemoveProperty(entries, headingKey, langs, out MetaProperty? maybeHeading)
                 ? maybeHeading.ValueAsListOfMultilanguageStrings(langs.DefaultLanguage, _listSeparator, _stringDelimeter)
-                : throw new ArgumentException("Heading variable names not found in metadata");
+                : [];
 
             ContentDimension? maybeCd = GetContentDimensionIfAvailable(entries, langs);
 
@@ -223,7 +223,7 @@ namespace Px.Utils.ModelBuilders
             }
             else
             {
-                DimensionValue? value = targetDimension?.Values.Find<DimensionValue>(v => v.Name[current.Key.Language ?? pxLangs.DefaultLanguage] == current.Key.SecondIdentifier) ??
+                DimensionValue? value = (targetDimension?.Values.Find<DimensionValue>(v => v.Name[current.Key.Language ?? pxLangs.DefaultLanguage] == current.Key.SecondIdentifier)) ??
                     throw new ArgumentException($"Failed to build property for key {current.Key} because the value with name {current.Key.SecondIdentifier} was not found.");
                 AddPropertyToDimensionValue(entries, current, targetDimension.Name, value, pxLangs);
             }
@@ -350,7 +350,8 @@ namespace Px.Utils.ModelBuilders
         {
             string unitKey = _pxFileSyntaxConf.Tokens.KeyWords.Units;
             if (TryGetAndRemoveProperty(entries, unitKey, langs, out MetaProperty? unit, dimName, valName) || // Both identifiers
-                TryGetAndRemoveProperty(entries, unitKey, langs, out unit, valName) // Only value identifier
+                TryGetAndRemoveProperty(entries, unitKey, langs, out unit, valName) || // Only value identifier
+                TryGetProperty(entries, unitKey, langs, out unit) // No identifiers
                 ) return unit.ValueAsMultilanguageString(_stringDelimeter, langs.DefaultLanguage);
 
             throw new ArgumentException("Unit information not found");
@@ -363,7 +364,7 @@ namespace Px.Utils.ModelBuilders
                 TryGetAndRemoveProperty(entries, lastUpdatedKey, langs, out lastUpdated, valName)) // Only value identifier
             {
                 string formatString = _pxFileSyntaxConf.Tokens.Time.DateTimeFormatString;
-                return lastUpdated.ValueAsDateTime(_stringDelimeter, formatString);
+                return lastUpdated.ValueAsDateTimes(_stringDelimeter, formatString).OrderDescending().First();
             }
 
             throw new ArgumentException("Last update information not found");
@@ -538,7 +539,6 @@ namespace Px.Utils.ModelBuilders
             MetadataEntryKey defaultKeyWithLang = new(propertyName, defLang, firstIdentifier?[defLang], secondIdentifier?[defLang]);
             if (entries.ContainsKey(defaultKey)) keys.Add(defaultKey);
             else if (entries.ContainsKey(defaultKeyWithLang)) keys.Add(defaultKeyWithLang);
-            else return keys;
 
             // Other languages
             List<MetadataEntryKey> otherLanguageKeys = [];
@@ -546,7 +546,6 @@ namespace Px.Utils.ModelBuilders
             {
                 MetadataEntryKey langKey = new(propertyName, lang, firstIdentifier?[lang], secondIdentifier?[lang]);
                 if (entries.ContainsKey(langKey)) otherLanguageKeys.Add(langKey);
-                else return keys;
             }
 
             keys.AddRange(otherLanguageKeys);
