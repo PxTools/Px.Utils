@@ -91,12 +91,12 @@ namespace Px.Utils.ModelBuilders
             string stubKey = _pxFileSyntaxConf.Tokens.KeyWords.StubDimensions;
             IEnumerable<MultilanguageString> stubDimensionNames = TryGetAndRemoveProperty(entries, stubKey, langs, out MetaProperty? maybeStub)
                 ? maybeStub.ValueAsListOfMultilanguageStrings(langs.DefaultLanguage, _listSeparator, _stringDelimeter)
-                : [];
+                : throw new ArgumentException("Stub variable names not found in metadata");
 
             string headingKey = _pxFileSyntaxConf.Tokens.KeyWords.HeadingDimensions;
             IEnumerable<MultilanguageString> headingDimensionNames = TryGetAndRemoveProperty(entries, headingKey, langs, out MetaProperty? maybeHeading)
                 ? maybeHeading.ValueAsListOfMultilanguageStrings(langs.DefaultLanguage, _listSeparator, _stringDelimeter)
-                : [];
+                : throw new ArgumentException("Heading variable names not found in metadata");
 
             ContentDimension? maybeCd = GetContentDimensionIfAvailable(entries, langs);
 

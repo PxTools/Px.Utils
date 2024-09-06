@@ -109,7 +109,8 @@ namespace Px.Utils.PxFile.Metadata
             char[] parsingBuffer = new char[readBufferSize];
 
             StreamReader reader = new(stream, encoding);
-
+            
+            char nextDelimeter = keywordSeperator;
             int readChars;
             bool keyWordMode = true;
             bool readingValueString = false;
@@ -134,7 +135,7 @@ namespace Px.Utils.PxFile.Metadata
                             throw new InvalidPxFileMetadataException($"Unexpected character '{parsingBuffer[i]}' found at position {i}.");
                         }
 
-                        if (parsingBuffer[i] == keywordSeperator || parsingBuffer[i] == sectionSeparator)
+                        if (parsingBuffer[i] == nextDelimeter)
                         {
                             Append(parsingBuffer, lastDelimeterIndx + 1, i, keyWordMode, keyWordBldr, valueStringBldr);
                             if (keyWordBldr.ToString().Trim() == dataKeyword)
@@ -151,6 +152,7 @@ namespace Px.Utils.PxFile.Metadata
 
                             lastDelimeterIndx = i;
                             keyWordMode = !keyWordMode;
+                            nextDelimeter = keyWordMode ? keywordSeperator : sectionSeparator;
                         }
                     }
                 }
