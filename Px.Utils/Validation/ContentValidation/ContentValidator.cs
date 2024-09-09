@@ -108,7 +108,7 @@ namespace Px.Utils.Validation.ContentValidation
                 return 0;
             }
             string[] dimensionNames = dimensions[lang];
-            if (dimensionNames is null || dimensionNames.Length == 0 || _dimensionValueNames is null)
+            if (dimensionNames is null || dimensionNames.Length == 0 || _dimensionValueNames is null || _dimensionValueNames.Count == 0)
             {
                 return 0;
             }

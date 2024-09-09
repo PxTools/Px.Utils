@@ -444,7 +444,11 @@ namespace Px.Utils.Validation.ContentValidation
             validator._dimensionValueNames = [];
             foreach (KeyValuePair<KeyValuePair<string, string>, string[]> item in dimensionValues)
             {
-                validator._dimensionValueNames.Add(item.Key, item.Value);
+                if (!validator._dimensionValueNames.TryAdd(item.Key, item.Value))
+                {
+                    var originalValue = validator._dimensionValueNames[item.Key];
+                    validator._dimensionValueNames[item.Key] = [.. originalValue, .. item.Value];
+                }
             }
 
             return [.. feedbackItems];

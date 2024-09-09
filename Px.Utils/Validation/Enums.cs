@@ -82,6 +82,8 @@
         FileLanguageDiffersFromDatabase = 52,
         FileEncodingDiffersFromDatabase = 53,
         AliasFileMissing = 54,
-        DuplicateFileNames = 55
+        DuplicateFileNames = 55,
+        StartOfDataSectionNotFound = 56,
+        DuplicateEntry = 57
     }
 }

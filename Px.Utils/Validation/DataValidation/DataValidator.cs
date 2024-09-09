@@ -47,7 +47,19 @@ namespace Px.Utils.Validation.DataValidation
             SetValidationParameters();
 
             List<ValidationFeedbackItem> validationFeedbacks = [];
-            stream.Position = GetStreamIndexOfFirstDataValue(ref validationFeedbacks);
+            int dataStartIndex = GetStreamIndexOfFirstDataValue(ref validationFeedbacks);
+            if (dataStartIndex == -1)
+            {
+                validationFeedbacks.Add(new(
+                    new(filename, 0, []),
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.StartOfDataSectionNotFound,
+                    0,
+                    0)));
+
+                return new ValidationResult([.. validationFeedbacks]);
+            }
+            stream.Position = dataStartIndex;
             ValidationFeedbackItem[] dataStreamFeedbacks = ValidateDataStream(stream);
             validationFeedbacks.AddRange(dataStreamFeedbacks);
 
@@ -68,7 +80,19 @@ namespace Px.Utils.Validation.DataValidation
             SetValidationParameters();
 
             List<ValidationFeedbackItem> validationFeedbacks = [];
-            stream.Position = GetStreamIndexOfFirstDataValue(ref validationFeedbacks);
+            int dataStartIndex = GetStreamIndexOfFirstDataValue(ref validationFeedbacks);
+            if (dataStartIndex == -1)
+            {
+                validationFeedbacks.Add(new(
+                    new(filename, 0, []),
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.StartOfDataSectionNotFound,
+                    0,
+                    0)));
+
+                return new ValidationResult([.. validationFeedbacks]);
+            }
+            stream.Position = dataStartIndex;
             ValidationFeedbackItem[] dataStreamFeedbacks =  await Task.Factory.StartNew(() => 
                 ValidateDataStream(stream, cancellationToken), cancellationToken);
             validationFeedbacks.AddRange(dataStreamFeedbacks);

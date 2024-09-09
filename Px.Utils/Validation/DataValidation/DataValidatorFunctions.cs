@@ -103,7 +103,6 @@ namespace Px.Utils.Validation.DataValidation
         private static bool IsValidIntegerPart(List<byte> entry, bool isInteger)
         {
             bool isNegative = entry[0] == 0x2D;
-            bool startsWithZero = isNegative ? entry[1] == zero : entry[0] == zero;
             List<byte> digits = isNegative ? entry.Skip(1).ToList() : entry;
             if (digits.Count > 1)
             {
@@ -111,12 +110,13 @@ namespace Px.Utils.Validation.DataValidation
                 {
                     return false;
                 }
+                bool startsWithZero = isNegative ? entry[1] == zero : entry[0] == zero;
                 if (startsWithZero && isInteger)
                 {
                     return false;
                 }
             }
-            if (isNegative && isInteger && digits[0] == zero)
+            if (isNegative && isInteger && digits.Count > 0 && digits[0] == zero)
             {
                 return false;
             }

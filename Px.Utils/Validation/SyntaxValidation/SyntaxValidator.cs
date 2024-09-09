@@ -185,6 +185,11 @@ namespace Px.Utils.Validation.SyntaxValidation
                 // Split the entry string into a key and a value from the first valid keyword separator
                 int[] keywordSeparatorIndeces = SyntaxValidationUtilityMethods.FindKeywordSeparatorIndeces(entry.EntryString, syntaxConf);
 
+                if (keywordSeparatorIndeces.Length == 0)
+                {
+                    return new ValidationKeyValuePair(entry.File, new KeyValuePair<string, string>(entry.EntryString, string.Empty), entry.KeyStartLineIndex, entry.LineChangeIndexes, -1);
+                }
+
                 // Key is the part of the entry string before the first keyword separator index
                 string key = entry.EntryString[..keywordSeparatorIndeces[0]];
 

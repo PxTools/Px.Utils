@@ -19,6 +19,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         [DataRow("79228162514264337593543950335")]
         [DataRow("100")]
         [DataRow("-100")]
+        [DataRow("-")]
         public void AllowedNumberValues(string allowedValue)
         {
             DataNumberValidator validator = new();

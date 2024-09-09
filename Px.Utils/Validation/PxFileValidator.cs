@@ -1,4 +1,5 @@
-﻿using Px.Utils.PxFile;
+﻿using Px.Utils.Exceptions;
+using Px.Utils.PxFile;
 using Px.Utils.Validation.ContentValidation;
 using Px.Utils.Validation.DataValidation;
 using Px.Utils.Validation.SyntaxValidation;
@@ -66,6 +67,18 @@ namespace Px.Utils.Validation
             ContentValidationResult contentValidationResult = contentValidator.Validate();
             feedbacks.AddRange(contentValidationResult.FeedbackItems);
 
+            if (syntaxValidationResult.DataStartStreamPosition == -1)
+            {
+                feedbacks.Add(new(
+                    new(filename, 0, []),
+                    new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.StartOfDataSectionNotFound,
+                        0, 0)
+                    ));
+
+                return new ValidationResult([.. feedbacks]);
+            }
+
             stream.Position = syntaxValidationResult.DataStartStreamPosition;
             DataValidator dataValidator = new(
                 stream,
@@ -108,6 +121,18 @@ namespace Px.Utils.Validation
             ContentValidator contentValidator = new(filename, encoding, [..syntaxValidationResult.Result], _customContentValidationFunctions, syntaxConf);
             ContentValidationResult contentValidationResult = contentValidator.Validate();
             feedbacks.AddRange(contentValidationResult.FeedbackItems);
+
+            if (syntaxValidationResult.DataStartStreamPosition == -1)
+            {
+                feedbacks.Add(new(
+                    new(filename, 0, []),
+                    new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.StartOfDataSectionNotFound,
+                        0, 0)
+                    ));
+
+                return new ValidationResult([.. feedbacks]);
+            }
 
             stream.Position = syntaxValidationResult.DataStartStreamPosition;
             DataValidator dataValidator = new(
