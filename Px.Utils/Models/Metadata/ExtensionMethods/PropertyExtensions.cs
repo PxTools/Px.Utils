@@ -105,18 +105,24 @@ namespace Px.Utils.Models.Metadata.ExtensionMethods
 
 
         /// <summary>
-        /// Extension method that returns the value of a <see cref="MetaProperty"/> object as a <see cref="DateTime"/> object, using the provided string delimiter and format string.
+        /// Extension method that returns the value of a <see cref="MetaProperty"/> object as a collection of <see cref="DateTime"/> objects, using the provided string delimiter and format string.
         /// </summary>
         /// <param name="input">Input property</param>
         /// <param name="stringDelimeter">The datetimes are surrounded by this character in the px file</param>
         /// <param name="formatString">The format string to use when parsing the datetime</param></param>
-        /// <returns>A <see cref="DateTime"/> object parsed from the input <see cref="MetaProperty"/>.</returns>
+        /// <returns>A collection of <see cref="DateTime"/> objects parsed from the input <see cref="MetaProperty"/>.</returns>
         /// <exception cref="ArgumentException">Thrown when the value of the <see cref="MetaProperty"/> cannot be presented as a <see cref="DateTime"/>.</exception>
-        public static DateTime ValueAsDateTime(this MetaProperty input, char stringDelimeter, string formatString)
+        public static DateTime[] ValueAsDateTimes(this MetaProperty input, char stringDelimeter, string formatString)
         {
             if (input.CanGetStringValue)
             {
-                return DateTime.ParseExact(input.ValueAsString(stringDelimeter), formatString, CultureInfo.InvariantCulture);
+                return [DateTime.ParseExact(input.ValueAsString(stringDelimeter), formatString, CultureInfo.InvariantCulture)];
+            }
+            else if (input.CanGetMultilanguageValue)
+            {
+                MultilanguageString value = input.GetRawValueMultiLanguageString();
+                return value.Languages.Select(lang =>
+                        DateTime.ParseExact(value[lang].Trim(stringDelimeter), formatString, CultureInfo.InvariantCulture)).ToArray();
             }
             else
             {

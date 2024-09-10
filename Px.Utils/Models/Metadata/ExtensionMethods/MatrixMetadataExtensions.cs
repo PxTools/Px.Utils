@@ -2,14 +2,27 @@
 
 namespace Px.Utils.Models.Metadata.ExtensionMethods
 {
+    /// <summary>
+    /// Extension methods for <see cref="IReadOnlyMatrixMetadata"/>.
+    /// </summary>
     public static class MatrixMetadataExtensions
     {
+        /// <summary>
+        /// Gets the content dimension from the metadata.
+        /// </summary>
+        /// <returns><see cref="ContentDimension"/> object containing information about the content dimension.</returns>
+        /// <exception>Throws <see cref="InvalidOperationException"/> if the content dimension is not found in the metadata.</exception>
         public static ContentDimension GetContentDimension(this IReadOnlyMatrixMetadata metadata)
         {
             ContentDimension? contentDimension = metadata.Dimensions.FirstOrDefault(dimension => dimension.Type == Enums.DimensionType.Content) as ContentDimension;
             return contentDimension ?? throw new InvalidOperationException("Content dimension not found in metadata");
         }
 
+        /// <summary>
+        /// Gets the time dimension from the metadata.
+        /// </summary>
+        /// <returns><see cref="TimeDimension"/> object containing information about the time dimension.</returns>
+        /// <exception>Throws <see cref="InvalidOperationException"/> if the time dimension is not found in the metadata.</exception>
         public static TimeDimension GetTimeDimension(this IReadOnlyMatrixMetadata metadata)
         {
             TimeDimension? timeDimension = metadata.Dimensions.FirstOrDefault(dimension => dimension.Type == Enums.DimensionType.Time) as TimeDimension;
