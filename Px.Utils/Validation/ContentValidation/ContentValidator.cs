@@ -102,7 +102,7 @@ namespace Px.Utils.Validation.ContentValidation
 
         private int GetProductOfDimensionValues(Dictionary<string, string[]> dimensions)
         {
-            string? lang = _defaultLanguage ?? _availableLanguages?[0];
+            string? lang = _defaultLanguage ?? _availableLanguages?[0] ?? string.Empty;
             if (lang is null || dimensions.Count == 0)
             {
                 return 0;

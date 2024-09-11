@@ -37,7 +37,7 @@ namespace Px.Utils.Validation.SyntaxValidation
                 MoreThanTwoSpecifierParts,
                 NoDelimiterBetweenSpecifierParts,
                 IllegalSymbolsInLanguageParamSection,
-                IllegalSymbolsInSpecifierParamSection,
+                IllegalCharactersInSpecifierSection,
                 InvalidValueFormat,
                 ExcessWhitespaceInValue,
                 KeyContainsExcessWhiteSpace,
@@ -61,7 +61,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         private static readonly Regex keywordIllegalSymbolsRegex = new(@"[^a-zA-Z0-9_-]", RegexOptions.Compiled, regexTimeout);
 
         /// <summary>
-        /// If <see cref="ValidationEntry"/> does not start with a line separator, it is considered as not being on its own line, and a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If <see cref="ValidationEntry"/> does not start with a line separator, it is considered as not being on its own line, and a new feedback is returned.
         /// </summary>
         /// <param name="validationEntry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -94,7 +94,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationKeyValuePair"/> key contains more than one language parameter, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationKeyValuePair"/> key contains more than one language parameter, a new feedback is returned.
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -129,7 +129,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationKeyValuePair"/> key contains more than one specifier parameter, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationKeyValuePair"/> key contains more than one specifier parameter, a new feedback is returned.
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -164,7 +164,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationKeyValuePair"/> key is not defined in the order of KEYWORD[language](\"specifier\"), a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationKeyValuePair"/> key is not defined in the order of KEYWORD[language](\"specifier\"), a new feedback is returned.
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -259,7 +259,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationKeyValuePair"/> key contains more than two specifiers, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationKeyValuePair"/> key contains more than two specifiers, a new feedback is returned.
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -308,7 +308,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If there is no delimeter between <see cref="ValidationKeyValuePair"/> specifier parts, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If there is no delimeter between <see cref="ValidationKeyValuePair"/> specifier parts, a new feedback is returned.
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -362,7 +362,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If any of the <see cref="ValidationKeyValuePair"/> specifiers are not enclosed a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If any of the <see cref="ValidationKeyValuePair"/> specifiers are not enclosed a new feedback is returned.
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -410,7 +410,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationKeyValuePair"/> key language section contains illegal symbols, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationKeyValuePair"/> key language section contains illegal symbols, a new feedback is returned.
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -457,7 +457,7 @@ namespace Px.Utils.Validation.SyntaxValidation
 
                 return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
                     new(ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.IllegalCharactersInLanguageParameter),
+                    ValidationFeedbackRule.IllegalCharactersInLanguageSection),
                     new(validationKeyValuePair.File,
                     feedbackIndexes.Key,
                     feedbackIndexes.Value,
@@ -471,12 +471,12 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationKeyValuePair"/> key specifier section contains illegal symbols, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// Checks that the <see cref="ValidationKeyValuePair"/> key specifier contains only specifier parts, whitespace and 0-1 list separators.
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
         /// <returns>A validation feedback key value pair if the key specifier section contains illegal symbols, null otherwise.</returns>
-        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? IllegalSymbolsInSpecifierParamSection(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? IllegalCharactersInSpecifierSection(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             string key = validationKeyValuePair.KeyValuePair.Key;
 
@@ -486,6 +486,7 @@ namespace Px.Utils.Validation.SyntaxValidation
                                     syntaxConf.Symbols.Key.StringDelimeter,
                                     syntaxConf.Symbols.Key.SpecifierParamEnd
                                 );
+
             string? specifierParamSection = specifierParam.Sections.FirstOrDefault();
 
             // If specifier section is not found, there are no specifiers
@@ -494,13 +495,21 @@ namespace Px.Utils.Validation.SyntaxValidation
                 return null;
             }
 
-            char[] specifierParamIllegalSymbols = [
-                syntaxConf.Symbols.EntrySeparator,
-                syntaxConf.Symbols.Key.LangParamStart,
-                syntaxConf.Symbols.Key.LangParamEnd
-            ];
+            // Remove specifier parts from the section
+            string removedSpecifiers = SyntaxValidationUtilityMethods.ExtractSectionFromString(
+                specifierParamSection,
+                syntaxConf.Symbols.Key.StringDelimeter,
+                syntaxConf.Symbols.Key.StringDelimeter
+            ).Remainder;
 
-            IEnumerable<char> foundIllegalSymbols = specifierParamSection.Where(c => specifierParamIllegalSymbols.Contains(c));
+            // Allowed symbols in the specifier section after removing specifiers
+            char[] allowedSymbols = [
+                syntaxConf.Symbols.Key.ListSeparator,
+                syntaxConf.Symbols.Key.StringDelimeter
+            ];
+            allowedSymbols = [.. allowedSymbols, .. CharacterConstants.WhitespaceCharacters];
+
+            IEnumerable<char> foundIllegalSymbols = removedSpecifiers.Where(c => !allowedSymbols.Contains(c));
             if (foundIllegalSymbols.Any())
             {
                 string foundSymbols = string.Join(", ", foundIllegalSymbols);
@@ -512,21 +521,42 @@ namespace Px.Utils.Validation.SyntaxValidation
 
                 return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
                     new(ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.IllegalCharactersInSpecifierParameter),
+                    ValidationFeedbackRule.IllegalCharactersInSpecifierSection),
                     new(validationKeyValuePair.File,
                     feedbackIndexes.Key,
                     feedbackIndexes.Value,
                     foundSymbols)
                 );
             }
+            // Only one list separator is allowed
             else
             {
-                return null;
+                int listSeparatorCount = removedSpecifiers.Count(c => c == syntaxConf.Symbols.Key.ListSeparator);
+                if (listSeparatorCount > 1)
+                {
+                    KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
+                        validationKeyValuePair.KeyStartLineIndex,
+                        specifierParam.StartIndexes[0] + removedSpecifiers.IndexOf(syntaxConf.Symbols.Key.ListSeparator),
+                        validationKeyValuePair.LineChangeIndexes);
+
+                    return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                        new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.IllegalCharactersInSpecifierSection),
+                        new(validationKeyValuePair.File,
+                        feedbackIndexes.Key,
+                        feedbackIndexes.Value,
+                        "Only one list separator is allowed.")
+                    );
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
         /// <summary>
-        /// If the <see cref="ValidationKeyValuePair"/> value section is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationKeyValuePair"/> value section is not following a valid format, a new feedback is returned.
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -580,7 +610,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationKeyValuePair"/> value section contains excess whitespace, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationKeyValuePair"/> value section contains excess whitespace, a new feedback is returned.
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -627,7 +657,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationKeyValuePair"/> key contains excess whitespace, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationKeyValuePair"/> key contains excess whitespace, a new feedback is returned.
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -695,7 +725,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationKeyValuePair"/> value section contains excess new lines, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationKeyValuePair"/> value section contains excess new lines, a new feedback is returned.
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -745,7 +775,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationStructuredEntry"/> specifier contains illegal characters, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationStructuredEntry"/> specifier contains illegal characters, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -801,7 +831,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationStructuredEntry"/> keyword doesn't start with a letter, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationStructuredEntry"/> keyword doesn't start with a letter, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -833,7 +863,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationStructuredEntry"/> language parameter is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationStructuredEntry"/> language parameter is not following a valid format, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -877,7 +907,7 @@ namespace Px.Utils.Validation.SyntaxValidation
 
                 return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
                     new(ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.IllegalCharactersInLanguageParameter),
+                    ValidationFeedbackRule.IllegalCharactersInLanguageSection),
                     new(validationStructuredEntry.File,
                     feedbackIndexes.Key,
                     feedbackIndexes.Value,
@@ -891,7 +921,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationStructuredEntry"/> specifier parameter is not following a valid format, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationStructuredEntry"/> specifier parameter is not following a valid format, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -904,7 +934,7 @@ namespace Px.Utils.Validation.SyntaxValidation
                 return null;
             }
 
-            char[] illegalCharacters = [syntaxConf.Symbols.EntrySeparator, syntaxConf.Symbols.Key.StringDelimeter, syntaxConf.Symbols.Key.ListSeparator];
+            char[] illegalCharacters = [syntaxConf.Symbols.EntrySeparator, syntaxConf.Symbols.Key.StringDelimeter];
             IEnumerable<char> illegalcharactersInFirstSpecifier = validationStructuredEntry.Key.FirstSpecifier.Where(c => illegalCharacters.Contains(c));
             IEnumerable<char> illegalcharactersInSecondSpecifier = [];
             if (validationStructuredEntry.Key.SecondSpecifier is not null)
@@ -939,7 +969,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If there is no <see cref="ValidationEntry"/> value section, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If there is no <see cref="ValidationEntry"/> value section, a new feedback is returned.
         /// </summary>
         /// <param name="validationEntry">The <see cref="ValidationEntry"/> validationKeyValuePair to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -985,7 +1015,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationStructuredEntry"/> language parameter is not compliant with ISO 639 or BCP 47, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationStructuredEntry"/> language parameter is not compliant with ISO 639 or BCP 47, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -1025,7 +1055,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationStructuredEntry"/> specifier contains unrecommended characters, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationStructuredEntry"/> specifier contains unrecommended characters, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -1055,7 +1085,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationStructuredEntry"/> specifier is not in upper case, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationStructuredEntry"/> specifier is not in upper case, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -1077,7 +1107,8 @@ namespace Px.Utils.Validation.SyntaxValidation
                     ValidationFeedbackRule.KeywordIsNotInUpperCase),
                     new(validationStructuredEntry.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value)
+                    feedbackIndexes.Value,
+                    validationStructuredEntry.Key.Keyword)
                 );
             }
             else
@@ -1087,7 +1118,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
-        /// If the <see cref="ValidationStructuredEntry"/> specifier is excessively long, a new <see cref="ValidationFeedbackItem"/> is returned.
+        /// If the <see cref="ValidationStructuredEntry"/> specifier is excessively long, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> object to validate</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
@@ -1109,7 +1140,8 @@ namespace Px.Utils.Validation.SyntaxValidation
                     ValidationFeedbackRule.KeywordExcessivelyLong),
                     new(validationStructuredEntry.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value)
+                    feedbackIndexes.Value,
+                    validationStructuredEntry.Key.Keyword)
                 );
             }
             else

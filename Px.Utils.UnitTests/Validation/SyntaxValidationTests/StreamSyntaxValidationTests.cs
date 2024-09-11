@@ -199,7 +199,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
 
             Assert.AreEqual(1, feedback.Count);
             Assert.AreEqual(3, feedback.First().Value.Count);
-            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageParameter, feedback.First().Key.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageSection, feedback.First().Key.Rule);
         }
 
         [TestMethod]
@@ -207,13 +207,14 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
         {
             // Arrange
             List<ValidationKeyValuePair> keyValuePairs = SyntaxValidationFixtures.KEYVALUEPAIR_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS;
-            List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.IllegalSymbolsInSpecifierParamSection];
+            List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.IllegalCharactersInSpecifierSection];
 
             // Act
             feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, syntaxConf]) as ValidationFeedback ?? [];
 
             Assert.AreEqual(1, feedback.Count);
-            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierParameter, feedback.First().Key.Rule);
+            Assert.AreEqual(3, feedback.First().Value.Count);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierSection, feedback.First().Key.Rule);
         }
 
         [TestMethod]
@@ -280,14 +281,16 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Arrange
             List<ValidationStructuredEntry> structuredEntries = SyntaxValidationFixtures.STRUCTURED_ENTRIES_WITH_INVALID_KEYWORDS;
             List<StructuredValidationFunction> functions = [SyntaxValidationFunctions.KeywordDoesntStartWithALetter, SyntaxValidationFunctions.KeywordContainsIllegalCharacters];
+            ValidationFeedbackKey startWithletterFeedbackKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.KeywordDoesntStartWithALetter);
+            ValidationFeedbackKey illegalCharactersFeedbackKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInKeyword);
 
             // Act
             feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, syntaxConf]) as ValidationFeedback ?? [];
 
             Assert.AreEqual(2, feedback.Count);
-            Assert.AreEqual(2, feedback.ElementAt(1).Value.Count);
-            Assert.AreEqual(ValidationFeedbackRule.KeywordDoesntStartWithALetter, feedback.First().Key.Rule);
-            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInKeyword, feedback.ElementAt(1).Key.Rule);
+            Assert.IsTrue(feedback.ContainsKey(startWithletterFeedbackKey));
+            Assert.IsTrue(feedback.ContainsKey(illegalCharactersFeedbackKey));
+            Assert.AreEqual(2, feedback[illegalCharactersFeedbackKey].Count);
         }
 
         [TestMethod]
@@ -314,14 +317,14 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, syntaxConf]) as ValidationFeedback ?? [];
 
             Assert.AreEqual(1, feedback.Count);
-            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageParameter, feedback.First().Key.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageSection, feedback.First().Key.Rule);
         }
 
         [TestMethod]
         public void ValidateObjectsCalledWithStructuredEntriesWithIllegalCharactersInSpecifiersReturnsWithErrors()
         {
             // Arrange
-            List<ValidationStructuredEntry> structuredEntries = SyntaxValidationFixtures.STRUCTIRED_ENTRIES_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS;
+            List<ValidationStructuredEntry> structuredEntries = SyntaxValidationFixtures.STRUCTIRED_ENTRIES_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIER_PARTS;
             List<StructuredValidationFunction> functions = [SyntaxValidationFunctions.IllegalCharactersInSpecifierParts];
 
             // Act

@@ -40,7 +40,7 @@ namespace Px.Utils.Validation.DataValidation
         /// </summary>
         /// <returns>
         /// <see cref="ValidationResult"/> object that contains a collection of 
-        /// ValidationFeedbackItem objects representing the feedback for the data validation.
+        /// validation feedback key value pairs representing the feedback for the data validation.
         /// </returns>
         public ValidationResult Validate()
         {
@@ -72,7 +72,7 @@ namespace Px.Utils.Validation.DataValidation
         /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
         /// <returns>
         /// <see cref="ValidationResult"/> object that contains a collection of 
-        /// ValidationFeedbackItem objects representing the feedback for the data validation.
+        /// validation feedback key value pairs representing the feedback for the data validation.
         /// </returns>
         public async Task<ValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
@@ -221,7 +221,8 @@ namespace Px.Utils.Validation.DataValidation
                     validationFeedbacks.Add(new(
                         new (ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength),
-                        new(filename, _lineNumber + startRow, _charPosition))
+                        new(filename, _lineNumber + startRow, _charPosition,
+                        $"Expected {rowLen}, got row length of {_currentRowLength}."))
                     );
                 }
                 _lineNumber++;

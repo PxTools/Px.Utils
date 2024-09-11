@@ -98,7 +98,9 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
             ];
 
         internal static List<ValidationKeyValuePair> KEYVALUEPAIR_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS => [
-            new("foo", new KeyValuePair<string, string>("FOO([\"first_specifier\"], [\"second_specifier\"])", "YES\n"), 0, [], 0)
+            new("foo", new KeyValuePair<string, string>("FOO([\"first_specifier\"], [\"second_specifier\"])", "YES\n"), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOO(\"first_specifier\",, \"second_specifier\")", "YES\n"), 1, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOO(\"first_specifier\"-\"second_specifier\")", "YES\n"), 2, [], 0)
             ];
 
         private const string multilineStringValue = "\"dis parturient montes nascetur ridiculus mus\"\n" +
@@ -171,7 +173,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         ];
 
         private readonly static ValidationStructuredEntryKey illegalSpecifier = new("FOO", "fi", "first\"specifier");
-        internal static List<ValidationStructuredEntry> STRUCTIRED_ENTRIES_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS => [
+        internal static List<ValidationStructuredEntry> STRUCTIRED_ENTRIES_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIER_PARTS => [
             new("foo", illegalSpecifier, "foo", 0, [], 0, Utils.Validation.ValueType.StringValue)
         ];
 

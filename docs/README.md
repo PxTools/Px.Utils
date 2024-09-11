@@ -52,7 +52,7 @@ PxFileValidator is a class that validates the whole px file including its data, 
 
 Custom validator objects can be injected by calling the SetCustomValidatorFunctions or SetCustomValidators methods of the PxFileValidator object. Custom validators must implement either the IPxFileValidator or IPxFileValidatorAsync interface. Custom validation methods are stored in CustomSyntaxValidationFunctions and CustomContentValidationFunctions objects for syntax and content validation processes respectively.
 
-Once the PxFileValidator object is instantiated, either the Validate or ValidateAsync method can be called to validate the px file. The Validate method returns a ValidationResult object that contains the validation results as ValidationFeedbackItem object array.
+Once the PxFileValidator object is instantiated, either the Validate or ValidateAsync method can be called to validate the px file. The Validate method returns a ValidationResult object that contains the validation results as a key value pair containing information about the rule violations.
 
 ##### SyntaxValidator
 SyntaxValidator is a class that validates the syntax of a px file's metadata. It needs to be run before other validators, because both the ContentValidator and DataValidator require information from the SyntaxValidationResult object that SyntaxValidator Validate and ValidateAsync methods return.
