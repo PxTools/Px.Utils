@@ -42,6 +42,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
             "\"mauris\", \"vitae\", \"ultricies\", \"leo\", \"integer\", \"malesuada\", \"nunc\", \"vel\", \"commodo\", \"viverra\",\n" +
             "\"maecenas\", \"accumsan\", \"lacus\", \"vel\",  \"facilisis\", \"volutpat\", \"est\", \"velit\", \"egestas\", \"dui\",\n" + // Excess whitespace
             "\"id\", \"ornare\";\n" +
+            "\"ENDOFMETADATA\";\n" + // Missing value
             "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
 
         internal static string UTF8_N_WITH_TIMEVALS =>

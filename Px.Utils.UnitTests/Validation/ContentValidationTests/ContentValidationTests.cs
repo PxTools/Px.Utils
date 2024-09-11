@@ -238,6 +238,36 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
+        public void ValidateFindDimensionValuesCalledWithDuplicateEntriesReturnsErrors()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_DUPLICATE_DIMENSION_VALUES;
+            ContentValidator validator = new(filename, encoding, entries);
+            SetValidatorField(validator, "_defaultLanguage", defaultLanguage);
+            SetValidatorField(validator, "_availableLanguages", availableLanguages);
+            SetValidatorField(validator, "_stubDimensionNames", new Dictionary<string, string[]>
+            {
+                { "fi", ["bar"] },
+                { "en", ["bar-en"] }
+            });
+            SetValidatorField(validator, "_headingDimensionNames", new Dictionary<string, string[]>
+            {
+                { "fi", ["bar"] },
+            });
+
+            // Act
+            ValidationFeedback? result = ContentValidator.ValidateFindDimensionValues(
+                entries,
+                validator
+                );
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.DuplicateEntry, result.First().Key.Rule);
+        }
+
+        [TestMethod]
         public void ValidateFindContentDimensionKeysCalledWithMissingContentValueKeyEntriesReturnsWithErrors()
         {
             // Arrange

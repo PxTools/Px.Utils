@@ -106,17 +106,19 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             SyntaxValidator validator = new(stream, encoding, filename);
             ValidationFeedbackKey keyWhiteSpaceFeedbackKey = new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.KeyContainsExcessWhiteSpace);
             ValidationFeedbackKey valueWhiteSpaceFeedbackKey = new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessWhitespaceInValue);
+            ValidationFeedbackKey entryWithoutValueFeedbackKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.EntryWithoutValue);
+            ValidationFeedbackKey invalidValue = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.InvalidValueFormat);
 
             // Assert
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
             SyntaxValidationResult result = validator.Validate();
-            Assert.AreEqual(2, result.FeedbackItems.Count);
+            Assert.AreEqual(4, result.FeedbackItems.Count);
             Assert.AreEqual(9, result.FeedbackItems[keyWhiteSpaceFeedbackKey][0].Line);
-            Assert.AreEqual(18, result.FeedbackItems[keyWhiteSpaceFeedbackKey][0].Character);
             Assert.AreEqual(12, result.FeedbackItems[valueWhiteSpaceFeedbackKey][0].Line);
-            Assert.AreEqual(40, result.FeedbackItems[valueWhiteSpaceFeedbackKey][0].Character);
+            Assert.AreEqual(14, result.FeedbackItems[entryWithoutValueFeedbackKey][0].Line);
+            Assert.AreEqual(13, result.FeedbackItems[invalidValue][0].Line);
         }
 
         [TestMethod]

@@ -403,6 +403,11 @@ namespace Px.Utils.Validation.ContentValidation
                 {
                     var originalValue = validator._dimensionValueNames[item.Key];
                     validator._dimensionValueNames[item.Key] = [.. originalValue, .. item.Value];
+
+                    feedbackItems.Add(new(
+                        new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.DuplicateEntry),
+                        new(validator._filename, 0, 0, $"{item.Key.Key}, {item.Key.Value}")
+                    ));
                 }
             }
 

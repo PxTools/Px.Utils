@@ -222,6 +222,15 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
                 7,
                 Utils.Validation.ValueType.ListOfStrings);
 
+        private static readonly ValidationStructuredEntry moreValuesForBarEntry = 
+            new(filename,
+                new ValidationStructuredEntryKey("VALUES", null, "bar"),
+                "bar,baz",
+                17,
+                [],
+                7,
+                Utils.Validation.ValueType.ListOfStrings);
+
         private static readonly ValidationStructuredEntry valuesBarEnEntry =
             new(filename,
                 new ValidationStructuredEntryKey("VALUES", "en", "bar-en"),
@@ -492,6 +501,13 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_DIMENSIONVALUES =>
             [
                 valuesBarEntry,
+            ];
+
+        internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_DUPLICATE_DIMENSION_VALUES =>
+            [
+                valuesBarEntry,
+                valuesBarEnEntry,
+                moreValuesForBarEntry
             ];
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_INVALID_CONTENT_VALUE_KEY_ENTRIES =>
