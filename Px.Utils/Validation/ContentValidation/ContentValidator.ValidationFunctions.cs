@@ -298,6 +298,25 @@ namespace Px.Utils.Validation.ContentValidation
 
                     feedbackItems.Add(feedback);
                 }
+                // Check if any of the heading names are also in the stub names
+                else if (validator._stubDimensionNames is not null &&
+                    validator._headingDimensionNames is not null &&
+                    validator._stubDimensionNames.TryGetValue(language, out string[]? stubValue) &&
+                    validator._headingDimensionNames.TryGetValue(language, out string[]? headingValue) &&
+                    stubValue.Intersect(headingValue).Any())
+                {
+                    string[] duplicates = stubValue.Intersect(headingValue).ToArray();
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                        new(ValidationFeedbackLevel.Warning,
+                        ValidationFeedbackRule.DuplicateDimension),
+                        new(validator._filename,
+                        0,
+                        0,
+                        $"{language}, {string.Join(", ", duplicates)}")
+                    );
+
+                    feedbackItems.Add(feedback);
+                }
             }
 
             return feedbackItems;

@@ -84,6 +84,7 @@
         AliasFileMissing = 54,
         DuplicateFileNames = 55,
         StartOfDataSectionNotFound = 56,
-        DuplicateEntry = 57
+        DuplicateEntry = 57,
+        DuplicateDimension = 58
     }
 }

@@ -188,6 +188,27 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
+        public void ValidateFindStubOrHeadingCalledWithDuplicateDimensionsReturnsWithWarning()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_DUPLICATE_DIMENSION;
+            ContentValidator validator = new(filename, encoding, entries);
+            SetValidatorField(validator, "_defaultLanguage", defaultLanguage);
+            SetValidatorField(validator, "_availableLanguages", availableLanguages);
+
+            // Act
+            ValidationFeedback? result = ContentValidator.ValidateFindStubAndHeading(
+                entries,
+                validator
+                );
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.DuplicateDimension, result.First().Key.Rule);
+        }
+
+        [TestMethod]
         public void ValidateFindRecommendedKeysCalledWithMissingDescriptionsReturnsWithWarnings()
         {
 
