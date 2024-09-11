@@ -4,9 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace Px.Utils.Validation.SyntaxValidation
 {
-    public delegate ValidationFeedbackItem? EntryValidationFunction(ValidationEntry validationObject, PxFileSyntaxConf syntaxConf);
-    public delegate ValidationFeedbackItem? KeyValuePairValidationFunction(ValidationKeyValuePair validationObject, PxFileSyntaxConf syntaxConf);
-    public delegate ValidationFeedbackItem? StructuredValidationFunction(ValidationStructuredEntry validationObject, PxFileSyntaxConf syntaxConf);
+    public delegate KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? EntryValidationFunction(ValidationEntry validationObject, PxFileSyntaxConf syntaxConf);
+    public delegate KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeyValuePairValidationFunction(ValidationKeyValuePair validationObject, PxFileSyntaxConf syntaxConf);
+    public delegate KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? StructuredValidationFunction(ValidationStructuredEntry validationObject, PxFileSyntaxConf syntaxConf);
 
     /// <summary>
     /// Contains the default validation functions for syntax validation.
@@ -65,8 +65,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationEntry">The <see cref="ValidationEntry"/> entry to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the entry does not start with a line separator, null otherwise.</returns>
-        public static ValidationFeedbackItem? MultipleEntriesOnLine (ValidationEntry validationEntry, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the entry does not start with a line separator, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? MultipleEntriesOnLine (ValidationEntry validationEntry, PxFileSyntaxConf syntaxConf)
         {
             // If the entry does not start with a line separator, it is not on its own line. For the first entry this is not relevant.
             if (
@@ -83,12 +83,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     0,
                     validationEntry.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationEntry, new ValidationFeedback(
-                    ValidationFeedbackLevel.Warning,
-                    ValidationFeedbackRule.MultipleEntriesOnOneLine,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Warning,
+                    ValidationFeedbackRule.MultipleEntriesOnOneLine),
+                    new(validationEntry.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value
-                ));
+                    feedbackIndexes.Value)
+                );
             }
         }
 
@@ -97,8 +98,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains more than one language parameter, null otherwise.</returns>
-        public static ValidationFeedbackItem? MoreThanOneLanguageParameter(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the key contains more than one language parameter, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? MoreThanOneLanguageParameter(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             ExtractSectionResult languageSections = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                 validationKeyValuePair.KeyValuePair.Key,
@@ -113,12 +114,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     languageSections.StartIndexes[1],
                     validationKeyValuePair.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.MoreThanOneLanguageParameterSection,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.MoreThanOneLanguageParameterSection),
+                    new(validationKeyValuePair.File,
                     lineAndCharacter.Key,
-                    lineAndCharacter.Value
-                ));
+                    lineAndCharacter.Value)
+                );
             }
             else
             {
@@ -131,8 +133,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains more than one specifier parameter, null otherwise.</returns>
-        public static ValidationFeedbackItem? MoreThanOneSpecifierParameter(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the key contains more than one specifier parameter, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? MoreThanOneSpecifierParameter(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             ExtractSectionResult specifierSpections = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                 validationKeyValuePair.KeyValuePair.Key,
@@ -147,12 +149,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     specifierSpections.StartIndexes[1],
                     validationKeyValuePair.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.MoreThanOneSpecifierParameterSection,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.MoreThanOneSpecifierParameterSection),
+                    new(validationKeyValuePair.File,
                     lineAndCharacter.Key,
-                    lineAndCharacter.Value
-                    ));
+                    lineAndCharacter.Value)
+                );
             }
             else
             {
@@ -165,8 +168,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key is not defined in the order of KEYWORD[language](\"specifier\"), null otherwise.</returns>
-        public static ValidationFeedbackItem? WrongKeyOrderOrMissingKeyword(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the key is not defined in the order of KEYWORD[language](\"specifier\"), null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? WrongKeyOrderOrMissingKeyword(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             string key = validationKeyValuePair.KeyValuePair.Key;
 
@@ -194,11 +197,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     0,
                     validationKeyValuePair.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.MissingKeyword,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.MissingKeyword),
+                    new(validationKeyValuePair.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value));
+                    feedbackIndexes.Value)
+                );
             }
 
             // Check where language and parameter sections start
@@ -220,12 +225,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     validationKeyValuePair.LineChangeIndexes
                     );
 
-                return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.KeyHasWrongOrder,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.KeyHasWrongOrder),
+                    new(validationKeyValuePair.File,
                     specifierIndexes.Key,
-                    specifierIndexes.Value
-                    ));
+                    specifierIndexes.Value)
+                );
             }
             // Check if the key starts with a language or specifier parameter section
             else if (
@@ -238,12 +244,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     validationKeyValuePair.LineChangeIndexes
                     );
 
-                return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.KeyHasWrongOrder,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.KeyHasWrongOrder),
+                    new(validationKeyValuePair.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value
-                    ));
+                    feedbackIndexes.Value)
+                );
             }
             else
             {
@@ -256,8 +263,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if more than two specifiers are found, null otherwise.</returns>
-        public static ValidationFeedbackItem? MoreThanTwoSpecifierParts(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if more than two specifiers are found, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? MoreThanTwoSpecifierParts(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             ExtractSectionResult specifierSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     validationKeyValuePair.KeyValuePair.Key,
@@ -289,12 +296,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     validationKeyValuePair.LineChangeIndexes
                     );
 
-                return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.TooManySpecifiers,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.TooManySpecifiers),
+                    new(validationKeyValuePair.File,
                     secondSpecifierIndexes.Key,
-                    secondSpecifierIndexes.Value
-                    ));
+                    secondSpecifierIndexes.Value)
+                );
             }
             return null;
         }
@@ -304,8 +312,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if there is no delimeter between specifier parts, null otherwise.</returns>
-        public static ValidationFeedbackItem? NoDelimiterBetweenSpecifierParts(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if there is no delimeter between specifier parts, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? NoDelimiterBetweenSpecifierParts(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             ExtractSectionResult specifierSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     validationKeyValuePair.KeyValuePair.Key,
@@ -339,11 +347,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     specifierSection.StartIndexes[0] + specifierResult.StartIndexes[1],
                     validationKeyValuePair.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.SpecifierDelimiterMissing,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.SpecifierDelimiterMissing),
+                    new(validationKeyValuePair.File,
                     specifierIndexes.Key,
-                    specifierIndexes.Value));
+                    specifierIndexes.Value)
+                );
             }
             else
             {
@@ -356,8 +366,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if specifier parts are not enclosed, null otherwise.</returns>
-        public static ValidationFeedbackItem? SpecifierPartNotEnclosed(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if specifier parts are not enclosed, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? SpecifierPartNotEnclosed(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             ExtractSectionResult specifierSection = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                                     validationKeyValuePair.KeyValuePair.Key,
@@ -387,12 +397,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                         validationKeyValuePair.LineChangeIndexes
                     );
 
-                    return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                        ValidationFeedbackLevel.Error, 
-                        ValidationFeedbackRule.SpecifierPartNotEnclosed,
+                    return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                        new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.SpecifierPartNotEnclosed),
+                        new(validationKeyValuePair.File,
                         specifierIndexes.Key,
-                        specifierIndexes.Value
-                        ));
+                        specifierIndexes.Value)
+                    );
                 }
             }
             return null;
@@ -403,8 +414,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key language section contains illegal symbols, null otherwise.</returns>
-        public static ValidationFeedbackItem? IllegalSymbolsInLanguageParamSection(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the key language section contains illegal symbols, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? IllegalSymbolsInLanguageParamSection(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             string key = validationKeyValuePair.KeyValuePair.Key;
 
@@ -442,12 +453,16 @@ namespace Px.Utils.Validation.SyntaxValidation
                     languageParam.StartIndexes[0] + indexOfFirstIllegalSymbol,
                     validationKeyValuePair.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.IllegalCharactersInLanguageParameter,
+
+
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.IllegalCharactersInLanguageParameter),
+                    new(validationKeyValuePair.File,
                     feedbackIndexes.Key,
                     feedbackIndexes.Value,
-                    foundSymbols));
+                    foundSymbols)
+                );
             }
             else
             {
@@ -460,8 +475,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key specifier section contains illegal symbols, null otherwise.</returns>
-        public static ValidationFeedbackItem? IllegalSymbolsInSpecifierParamSection(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the key specifier section contains illegal symbols, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? IllegalSymbolsInSpecifierParamSection(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             string key = validationKeyValuePair.KeyValuePair.Key;
 
@@ -495,12 +510,14 @@ namespace Px.Utils.Validation.SyntaxValidation
                     specifierParam.StartIndexes[0] + indexOfFirstIllegalSymbol,
                     validationKeyValuePair.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.IllegalCharactersInSpecifierParameter,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.IllegalCharactersInSpecifierParameter),
+                    new(validationKeyValuePair.File,
                     feedbackIndexes.Key,
                     feedbackIndexes.Value,
-                    foundSymbols));
+                    foundSymbols)
+                );
             }
             else
             {
@@ -513,8 +530,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section is not following a valid format, null otherwise.</returns>
-        public static ValidationFeedbackItem? InvalidValueFormat(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the value section is not following a valid format, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? InvalidValueFormat(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             string value = validationKeyValuePair.KeyValuePair.Value;
 
@@ -528,12 +545,14 @@ namespace Px.Utils.Validation.SyntaxValidation
                     validationKeyValuePair.ValueStartIndex,
                     validationKeyValuePair.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.InvalidValueFormat,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.InvalidValueFormat),
+                    new(validationKeyValuePair.File,
                     feedbackIndexes.Key,
                     feedbackIndexes.Value,
-                    value));
+                    value)
+                );
             }
 
             // If value is of type String or ListOfStrings, check if the line changes are compliant to the specification
@@ -547,12 +566,14 @@ namespace Px.Utils.Validation.SyntaxValidation
                         lineChangeValidityIndex,
                         validationKeyValuePair.LineChangeIndexes);
 
-                    return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.InvalidValueFormat,
+                    return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                        new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.InvalidValueFormat),
+                        new(validationKeyValuePair.File,
                         feedbackIndexes.Key,
                         feedbackIndexes.Value,
-                        value));
+                        value)
+                    );
                 }
             }
             return null;
@@ -563,8 +584,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section contains excess whitespace, null otherwise.</returns>
-        public static ValidationFeedbackItem? ExcessWhitespaceInValue(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the value section contains excess whitespace, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? ExcessWhitespaceInValue(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             // Validation only matters if the value is a list of strings
             if (!SyntaxValidationUtilityMethods.IsStringListFormat(
@@ -591,13 +612,15 @@ namespace Px.Utils.Validation.SyntaxValidation
                     validationKeyValuePair.KeyStartLineIndex,
                     validationKeyValuePair.ValueStartIndex + firstExcessWhitespaceIndex,
                     validationKeyValuePair.LineChangeIndexes);
-
-                return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                    ValidationFeedbackLevel.Warning,
-                    ValidationFeedbackRule.ExcessWhitespaceInValue,
+                
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Warning,
+                    ValidationFeedbackRule.ExcessWhitespaceInValue),
+                    new(validationKeyValuePair.File,
                     feedbackIndexes.Key,
                     feedbackIndexes.Value,
-                    value));
+                    value)
+                );
             }
 
             return null;
@@ -608,8 +631,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the key contains excess whitespace, null otherwise.</returns>
-        public static ValidationFeedbackItem? KeyContainsExcessWhiteSpace(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the key contains excess whitespace, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeyContainsExcessWhiteSpace(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             string key = validationKeyValuePair.KeyValuePair.Key;
             bool insideString = false;
@@ -640,12 +663,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                             i,
                             validationKeyValuePair.LineChangeIndexes);
 
-                        return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                            ValidationFeedbackLevel.Warning,
-                            ValidationFeedbackRule.KeyContainsExcessWhiteSpace,
+                        return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                            new( ValidationFeedbackLevel.Warning,
+                            ValidationFeedbackRule.KeyContainsExcessWhiteSpace),
+                            new(validationKeyValuePair.File,
                             feedbackIndexes.Key,
-                            feedbackIndexes.Value
-                        ));
+                            feedbackIndexes.Value)
+                        );
                     }
 
                     // Only expected whitespace outside string sections within key is between specifier parts, after list separator
@@ -656,12 +680,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                             i,
                             validationKeyValuePair.LineChangeIndexes);
 
-                        return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                            ValidationFeedbackLevel.Warning,
-                            ValidationFeedbackRule.KeyContainsExcessWhiteSpace,
+                        return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                            new(ValidationFeedbackLevel.Warning,
+                            ValidationFeedbackRule.KeyContainsExcessWhiteSpace),
+                            new(validationKeyValuePair.File,
                             feedbackIndexes.Key,
-                            feedbackIndexes.Value
-                        ));
+                            feedbackIndexes.Value)
+                        );
                     }
                 }
                 i++;
@@ -674,8 +699,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationKeyValuePair">The <see cref="ValidationKeyValuePair"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the value section contains excess new lines, null otherwise.</returns>
-        public static ValidationFeedbackItem? ExcessNewLinesInValue(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the value section contains excess new lines, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? ExcessNewLinesInValue(ValidationKeyValuePair validationKeyValuePair, PxFileSyntaxConf syntaxConf)
         {
             // We only need to run this validation if the value is less than 150 characters long and it is a string or list
             ValueType? type = SyntaxValidationUtilityMethods.GetValueTypeFromString(validationKeyValuePair.KeyValuePair.Value, syntaxConf);
@@ -705,11 +730,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     validationKeyValuePair.ValueStartIndex + firstNewLineIndex,
                     validationKeyValuePair.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationKeyValuePair, new ValidationFeedback(
-                    ValidationFeedbackLevel.Warning,
-                    ValidationFeedbackRule.ExcessNewLinesInValue,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Warning,
+                    ValidationFeedbackRule.ExcessNewLinesInValue),
+                    new(validationKeyValuePair.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value));
+                    feedbackIndexes.Value)
+                ); 
             }
             else
             {
@@ -722,8 +749,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier contains illegal characters, null otherwise.</returns>
-        public static ValidationFeedbackItem? KeywordContainsIllegalCharacters(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the specifier contains illegal characters, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordContainsIllegalCharacters(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
             string keyword = validationStructuredEntry.Key.Keyword;
             // Missing specifier is catched earlier
@@ -744,12 +771,14 @@ namespace Px.Utils.Validation.SyntaxValidation
                         keyword.IndexOf(illegalSymbolsInKeyWord.First(), StringComparison.Ordinal),
                         validationStructuredEntry.LineChangeIndexes);
 
-                    return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.IllegalCharactersInKeyword,
+                    return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                        new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.IllegalCharactersInKeyword),
+                        new(validationStructuredEntry.File,
                         feedbackIndexes.Key,
                         feedbackIndexes.Value,
-                        string.Join(", ", illegalSymbolsInKeyWord)));
+                        string.Join(", ", illegalSymbolsInKeyWord))
+                    );
                 }
             }
             catch (RegexMatchTimeoutException)
@@ -759,11 +788,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     0,
                     validationStructuredEntry.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.RegexTimeout,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.RegexTimeout),
+                    new(validationStructuredEntry.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value));
+                    feedbackIndexes.Value)
+                );
             }
 
             return null;
@@ -774,8 +805,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier doesn't start with a letter, null otherwise.</returns>
-        public static ValidationFeedbackItem? KeywordDoesntStartWithALetter(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the specifier doesn't start with a letter, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordDoesntStartWithALetter(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
             string keyword = validationStructuredEntry.Key.Keyword;
 
@@ -787,12 +818,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     0,
                     validationStructuredEntry.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error, 
-                    ValidationFeedbackRule.KeywordDoesntStartWithALetter,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error, 
+                    ValidationFeedbackRule.KeywordDoesntStartWithALetter),
+                    new(validationStructuredEntry.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value
-                    ));
+                    feedbackIndexes.Value)
+                );
             }
             else
             {
@@ -805,8 +837,10 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the language parameter is not following a valid format, null otherwise.</returns>
-        public static ValidationFeedbackItem? IllegalCharactersInLanguageParameter(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the language parameter is not following a valid format, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? IllegalCharactersInLanguageParameter(
+            ValidationStructuredEntry validationStructuredEntry,
+            PxFileSyntaxConf syntaxConf)
         {
             // Running this validation is relevant only for objects with a language parameter
             if (validationStructuredEntry.Key.Language is null)
@@ -840,12 +874,15 @@ namespace Px.Utils.Validation.SyntaxValidation
                     validationStructuredEntry.LineChangeIndexes);
 
                 string foundSymbols = string.Join(", ", foundIllegalCharacters);
-                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.IllegalCharactersInLanguageParameter,
+
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.IllegalCharactersInLanguageParameter),
+                    new(validationStructuredEntry.File,
                     feedbackIndexes.Key,
                     feedbackIndexes.Value,
-                    foundSymbols));
+                    foundSymbols)
+                );
             }
             else
             {
@@ -858,8 +895,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier parameter is not following a valid format, null otherwise.</returns>
-        public static ValidationFeedbackItem? IllegalCharactersInSpecifierParts(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the specifier parameter is not following a valid format, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? IllegalCharactersInSpecifierParts(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
             // Running this validation is relevant only for objects with a specifier
             if (validationStructuredEntry.Key.FirstSpecifier is null)
@@ -885,12 +922,15 @@ namespace Px.Utils.Validation.SyntaxValidation
                     validationStructuredEntry.LineChangeIndexes);
 
                 char[] characters = [..illegalcharactersInFirstSpecifier, ..illegalcharactersInSecondSpecifier];
-                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.IllegalCharactersInSpecifierPart,
+
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.IllegalCharactersInSpecifierPart),
+                    new(validationStructuredEntry.File,
                     feedbackIndexes.Key,
                     feedbackIndexes.Value,
-                    string.Join(", ", characters)));
+                    string.Join(", ", characters))
+                );
             }
             else
             {
@@ -903,8 +943,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationEntry">The <see cref="ValidationEntry"/> validationKeyValuePair to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if there is no value section, null otherwise.</returns>
-        public static ValidationFeedbackItem? EntryWithoutValue(ValidationEntry validationEntry, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if there is no value section, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? EntryWithoutValue(ValidationEntry validationEntry, PxFileSyntaxConf syntaxConf)
         {
             int[] keywordSeparatorIndeces = SyntaxValidationUtilityMethods.FindKeywordSeparatorIndeces(validationEntry.EntryString, syntaxConf);
 
@@ -915,11 +955,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     validationEntry.EntryString.Length,
                     validationEntry.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationEntry, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error, 
-                    ValidationFeedbackRule.EntryWithoutValue,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error, 
+                    ValidationFeedbackRule.EntryWithoutValue),
+                    new(validationEntry.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value));
+                    feedbackIndexes.Value)
+                );
             }
             else if (keywordSeparatorIndeces.Length > 1)
             {
@@ -928,11 +970,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     keywordSeparatorIndeces[1],
                     validationEntry.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationEntry, new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.EntryWithMultipleValues,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.EntryWithMultipleValues),
+                    new(validationEntry.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value));
+                    feedbackIndexes.Value)
+                );
             }
             else
             {
@@ -945,8 +989,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the language parameter is not compliant with ISO 639 or BCP 47, null otherwise.</returns>
-        public static ValidationFeedbackItem? IncompliantLanguage (ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the language parameter is not compliant with ISO 639 or BCP 47, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? IncompliantLanguage (ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
             // Running this validation is relevant only for objects with a language
             if (validationStructuredEntry.Key.Language is null)
@@ -970,12 +1014,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     validationStructuredEntry.Key.Keyword.Length + 1,
                     validationStructuredEntry.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
-                    ValidationFeedbackLevel.Warning,
-                    ValidationFeedbackRule.IncompliantLanguage,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Warning,
+                    ValidationFeedbackRule.IncompliantLanguage),
+                    new(validationStructuredEntry.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value
-                    ));
+                    feedbackIndexes.Value)
+                );
             }
         }
 
@@ -984,8 +1029,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier contains unrecommended characters, null otherwise.</returns>
-        public static ValidationFeedbackItem? KeywordContainsUnderscore (ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the specifier contains unrecommended characters, null otherwise.</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordContainsUnderscore (ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
             int underscoreIndex = validationStructuredEntry.Key.Keyword.IndexOf('_');
             if (underscoreIndex != -1)
@@ -995,11 +1040,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     underscoreIndex,
                     validationStructuredEntry.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
-                    ValidationFeedbackLevel.Warning,
-                    ValidationFeedbackRule.KeywordContainsUnderscore,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Warning,
+                    ValidationFeedbackRule.KeywordContainsUnderscore),
+                    new(validationStructuredEntry.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value));
+                    feedbackIndexes.Value)
+                );
             }
             else
             {
@@ -1012,8 +1059,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier is not in upper case, otherwise null</returns>
-        public static ValidationFeedbackItem? KeywordIsNotInUpperCase(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the specifier is not in upper case, otherwise null</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordIsNotInUpperCase(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
             string keyword = validationStructuredEntry.Key.Keyword;
             string uppercaseKeyword = keyword.ToUpper(CultureInfo.InvariantCulture);
@@ -1025,11 +1072,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     0,
                     validationStructuredEntry.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
-                    ValidationFeedbackLevel.Warning,
-                    ValidationFeedbackRule.KeywordIsNotInUpperCase,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Warning,
+                    ValidationFeedbackRule.KeywordIsNotInUpperCase),
+                    new(validationStructuredEntry.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value));
+                    feedbackIndexes.Value)
+                );
             }
             else
             {
@@ -1042,8 +1091,8 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> object to validate</param>
         /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
-        /// <returns>A <see cref="ValidationFeedbackItem"/> if the specifier is excessively long, otherwise null</returns>
-        public static ValidationFeedbackItem? KeywordIsExcessivelyLong(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        /// <returns>A validation feedback key value pair if the specifier is excessively long, otherwise null</returns>
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordIsExcessivelyLong(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
         {
             const int keywordLengthRecommendedLimit = 20;
             string keyword = validationStructuredEntry.Key.Keyword;
@@ -1055,11 +1104,13 @@ namespace Px.Utils.Validation.SyntaxValidation
                     keyword.Length,
                     validationStructuredEntry.LineChangeIndexes);
 
-                return new ValidationFeedbackItem(validationStructuredEntry, new ValidationFeedback(
-                    ValidationFeedbackLevel.Warning,
-                    ValidationFeedbackRule.KeywordExcessivelyLong,
+                return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Warning,
+                    ValidationFeedbackRule.KeywordExcessivelyLong),
+                    new(validationStructuredEntry.File,
                     feedbackIndexes.Key,
-                    feedbackIndexes.Value));
+                    feedbackIndexes.Value)
+                );
             }
             else
             {

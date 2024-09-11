@@ -19,7 +19,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             DatabaseFileInfo fileInfo = new("baz.px", "path/to/file", ["fi", "en", "sv"], Encoding.UTF8);
 
             // Act
-            ValidationFeedbackItem? feedback = validator.Validate(fileInfo);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(fileInfo);
 
             // Assert
             Assert.IsNull(feedback);
@@ -37,11 +37,11 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             DatabaseFileInfo fileInfo = new("bar.px", "path/to/file", ["fi", "en", "sv"], Encoding.UTF8);
 
             // Act
-            ValidationFeedbackItem? feedback = validator.Validate(fileInfo);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(fileInfo);
 
             // Assert
             Assert.IsNotNull(feedback);
-            Assert.AreEqual(ValidationFeedbackRule.DuplicateFileNames, feedback.Value.Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.DuplicateFileNames, feedback.Value.Key.Rule);
         }
 
         [TestMethod]
@@ -53,7 +53,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             DatabaseFileInfo fileInfo = new("foo.px", "path/to/file", ["fi", "en", "sv"], Encoding.UTF8);
 
             // Act
-            ValidationFeedbackItem? feedback = validator.Validate(fileInfo);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(fileInfo);
 
             // Assert
             Assert.IsNull(feedback);
@@ -68,11 +68,11 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             DatabaseFileInfo fileInfo = new("foo.px", "path/to/file", ["fi", "en"], Encoding.UTF8);
 
             // Act
-            ValidationFeedbackItem? feedback = validator.Validate(fileInfo);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(fileInfo);
 
             // Assert
             Assert.IsNotNull(feedback);
-            Assert.AreEqual(ValidationFeedbackRule.FileLanguageDiffersFromDatabase, feedback.Value.Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.FileLanguageDiffersFromDatabase, feedback.Value.Key.Rule);
         }
 
         [TestMethod]
@@ -84,7 +84,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             DatabaseFileInfo fileInfo = new("foo.px", "path/to/file", ["fi", "en", "sv"], Encoding.UTF8);
 
             // Act
-            ValidationFeedbackItem? feedback = validator.Validate(fileInfo);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(fileInfo);
 
             // Assert
             Assert.IsNull(feedback);
@@ -99,11 +99,11 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             DatabaseFileInfo fileInfo = new("foo.px", "path/to/file", ["fi", "en", "sv"], Encoding.UTF32);
 
             // Act
-            ValidationFeedbackItem? feedback = validator.Validate(fileInfo);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(fileInfo);
 
             // Assert
             Assert.IsNotNull(feedback);
-            Assert.AreEqual(ValidationFeedbackRule.FileEncodingDiffersFromDatabase, feedback.Value.Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.FileEncodingDiffersFromDatabase, feedback.Value.Key.Rule);
         }
 
         [TestMethod]
@@ -121,7 +121,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             DatabaseValidationItem directoryInfo = new(path);
 
             // Act
-            ValidationFeedbackItem? feedback = validator.Validate(directoryInfo);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(directoryInfo);
 
             // Assert
             Assert.IsNull(feedback);
@@ -141,11 +141,11 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             DatabaseValidationItem directoryInfo = new(path);
 
             // Act
-            ValidationFeedbackItem? feedback = validator.Validate(directoryInfo);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(directoryInfo);
 
             // Assert
             Assert.IsNotNull(feedback);
-            Assert.AreEqual(ValidationFeedbackRule.AliasFileMissing, feedback.Value.Feedback.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.AliasFileMissing, feedback.Value.Key.Rule);
         }
     }
 }

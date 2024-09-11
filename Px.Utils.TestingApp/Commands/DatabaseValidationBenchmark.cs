@@ -2,7 +2,7 @@
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal class DatabaseValidationBenchmark : Benchmark
+    internal sealed class DatabaseValidationBenchmark : Benchmark
     {
         internal override string Help => "Validates a px path database.";
 
@@ -56,12 +56,12 @@ namespace Px.Utils.TestingApp.Commands
             validator = new(TestFilePath);
         }
 
-        protected void ValidationBenchmark()
+        private void ValidationBenchmark()
         {
             validator.Validate();
         }
 
-        protected async Task ValidationBenchmarkAsync()
+        private async Task ValidationBenchmarkAsync()
         {
             await validator.ValidateAsync();
         }

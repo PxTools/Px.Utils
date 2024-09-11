@@ -15,20 +15,17 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// Validation function that checks if the filename of the given file is unique within the database
         /// </summary>
         /// <param name="item"><see cref="DatabaseValidationItem"/> object - in this case <see cref="DatabaseFileInfo"/> subject to validation</param>
-        /// <returns>Null if no issues are found, <see cref="ValidationFeedbackItem"/> in case there are multiple files with the same filename.</returns>
-        public ValidationFeedbackItem? Validate(DatabaseValidationItem item)
+        /// <returns>Null if no issues are found, a key value pair containing information about rule violation in case there are multiple files with the same filename.</returns>
+        public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(DatabaseValidationItem item)
         {
             if (item is DatabaseFileInfo fileInfo &&
                 _pxFiles.Exists(file => file.Name == fileInfo.Name && file != fileInfo))
             {
-                return new (
-                    new(fileInfo.Name, 0, []),
+                return new(
                     new(ValidationFeedbackLevel.Warning,
-                        ValidationFeedbackRule.DuplicateFileNames,
-                        0,
-                        0,
-                        $"Duplicate file name: {fileInfo.Name}"));
-
+                        ValidationFeedbackRule.DuplicateFileNames),
+                    new(fileInfo.Name, 0, 0, $"Duplicate file name: {fileInfo.Name}")
+                );
             }
             else
             {
@@ -49,19 +46,17 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// Validation function that checks if the given file contains all the languages that should be present in each px file
         /// </summary>
         /// <param name="item"><see cref="DatabaseValidationItem"/> object - in this case <see cref="DatabaseFileInfo"/> subject to validation</param>
-        /// <returns>Null if no issues are found, <see cref="ValidationFeedbackItem"/> in case some languages are missing</returns>
-        public ValidationFeedbackItem? Validate(DatabaseValidationItem item)
+        /// <returns>Null if no issues are found, a key value pair containing information about rule violation> in case some languages are missing</returns>
+        public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(DatabaseValidationItem item)
         {
             if (item is DatabaseFileInfo fileInfo &&
                 !_allLanguages.All(lang => fileInfo.Languages.Contains(lang)))
             {
-                return new (
-                    new(fileInfo.Name, 0, []),
+                return new(
                     new(ValidationFeedbackLevel.Warning,
-                    ValidationFeedbackRule.FileLanguageDiffersFromDatabase,
-                    0,
-                    0,
-                    $"Missing languages in file {fileInfo.Name}: {string.Join(", ", _allLanguages.Except(fileInfo.Languages))}"));
+                    ValidationFeedbackRule.FileLanguageDiffersFromDatabase),
+                    new(fileInfo.Name, 0, 0, $"Missing languages in file {fileInfo.Name}: {string.Join(", ", _allLanguages.Except(fileInfo.Languages))}")
+                );
             }
             else
             {
@@ -82,19 +77,16 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// Validation function that checks if the encoding of the given file is consistent with the most commonly used encoding
         /// </summary>
         /// <param name="item"><see cref="DatabaseValidationItem"/> object - in this case <see cref="DatabaseFileInfo"/> subject to validation</param>
-        /// <returns>Null if no issues are found, <see cref="ValidationFeedbackItem"/> in case the encoding is inconsistent</returns>
-        public ValidationFeedbackItem? Validate(DatabaseValidationItem item)
+        /// <returns>Null if no issues are found, a key value pair containing information about rule violation> in case the encoding is inconsistent</returns>
+        public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(DatabaseValidationItem item)
         {
             if (item is DatabaseFileInfo fileInfo &&
                 fileInfo.Encoding != _mostCommonEncoding)
             {
                 return new (
-                    new(fileInfo.Name, 0, []),
                     new(ValidationFeedbackLevel.Warning,
-                    ValidationFeedbackRule.FileEncodingDiffersFromDatabase,
-                    0,
-                    0,
-                    $"Inconsistent encoding in file {fileInfo.Name}: {fileInfo.Encoding.EncodingName}. " +
+                    ValidationFeedbackRule.FileEncodingDiffersFromDatabase),
+                    new(fileInfo.Name, 0, 0, $"Inconsistent encoding in file {fileInfo.Name}: {fileInfo.Encoding.EncodingName}. " +
                     $"Most commonly used encoding is {_mostCommonEncoding.EncodingName}"));
             }
             else
@@ -118,21 +110,18 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// Validation function that checks if the given subdirectory contains an alias file for each language
         /// </summary>
         /// <param name="item"><see cref="DatabaseValidationItem"/> object subject to validation</param>
-        /// <returns>Null if no issues are found, <see cref="ValidationFeedbackItem"/> in case some alias files are missing</returns>
-        public ValidationFeedbackItem? Validate(DatabaseValidationItem item)
+        /// <returns>Null if no issues are found, a key value pair containing information about rule violation> in case some alias files are missing</returns>
+        public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(DatabaseValidationItem item)
         {
             foreach (string language in _allLanguages)
             {
                 if (!_aliasFiles.Exists(file => file.Languages.Contains(language)))
                 {
                     return new(
-                        new(item.Path, 0, []),
                         new(ValidationFeedbackLevel.Warning,
-                        ValidationFeedbackRule.AliasFileMissing,
-                        0,
-                        0,
-                        $"Alias file for {language} in {item.Path} is missing"
-                        ));
+                        ValidationFeedbackRule.AliasFileMissing),
+                        new(item.Path, 0, 0, $"Alias file for {language} in {item.Path} is missing")
+                    );
                 }
             }
 

@@ -21,7 +21,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Length);
+            Assert.AreEqual(0, result.FeedbackItems.Count);
         }
 
         [TestMethod]
@@ -36,7 +36,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Length);
+            Assert.AreEqual(0, result.FeedbackItems.Count);
         }
 
         [TestMethod]
@@ -51,7 +51,8 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(11, result.FeedbackItems.Length);
+            Assert.AreEqual(9, result.FeedbackItems.Count); // Unique feedbacks
+            Assert.AreEqual(11, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
         }
 
         [TestMethod]
@@ -67,7 +68,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Length);
+            Assert.AreEqual(0, result.FeedbackItems.Count);
         }
 
         [TestMethod]
@@ -83,7 +84,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Length);
+            Assert.AreEqual(0, result.FeedbackItems.Count);
         }
 
         [TestMethod]
@@ -99,7 +100,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Length);
+            Assert.AreEqual(0, result.FeedbackItems.Count);
         }
     }
 }

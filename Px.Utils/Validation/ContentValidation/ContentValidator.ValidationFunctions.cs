@@ -4,8 +4,8 @@ using System.Globalization;
 
 namespace Px.Utils.Validation.ContentValidation
 {
-    public delegate ValidationFeedbackItem[]? ContentValidationEntryValidator(ValidationStructuredEntry entry, ContentValidator validator);
-    public delegate ValidationFeedbackItem[]? ContentValidationFindKeywordValidator(ValidationStructuredEntry[] entries, ContentValidator validator); 
+    public delegate ValidationFeedback? ContentValidationEntryValidator(ValidationStructuredEntry entry, ContentValidator validator);
+    public delegate ValidationFeedback? ContentValidationFindKeywordValidator(ValidationStructuredEntry[] entries, ContentValidator validator); 
     
     /// <summary>
     /// Collection of functions for validating Px file metadata contents
@@ -41,8 +41,9 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns>Null if no issues are found. <see cref="ValidationFeedbackItem"/> objects are returned if entry defining default language is not found or if more than one are found.</returns>
-        public static ValidationFeedbackItem[]? ValidateFindDefaultLanguage(ValidationStructuredEntry[] entries, ContentValidator validator)
+        /// <returns>Null if no issues are found.
+        /// Key value pairs containing information about rule violations are returned if entry defining default language is not found or if more than one are found.</returns>
+        public static ValidationFeedback? ValidateFindDefaultLanguage(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
             ValidationStructuredEntry[] langEntries = entries.Where(
                 e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.DefaultLanguage, StringComparison.Ordinal)).ToArray();
@@ -54,36 +55,26 @@ namespace Px.Utils.Validation.ContentValidation
                     0, 
                     entries[0].LineChangeIndexes);
 
-                ValidationFeedback feedback = new (
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.MultipleInstancesOfUniqueKey,
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new (
+                    new (ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.MultipleInstancesOfUniqueKey),
+                    new(validator._filename,
                         feedbackIndexes.Key,
                         0,
                         $"{validator.SyntaxConf.Tokens.KeyWords.DefaultLanguage}: " + string.Join(", ", entries.Select(e => e.Value).ToArray())
-                        );
+                    ));
 
-                return [
-                    new ValidationFeedbackItem(
-                    entries[0],
-                    feedback
-                    ),
-                ];
+                return new(feedback);
             }
             else if (langEntries.Length == 0)
             {
-                ValidationFeedback feedback = new (
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.MissingDefaultLanguage,
-                        0,
-                        0
-                        );
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                    new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.MissingDefaultLanguage),
+                    new(validator._filename, 0,0)
+                );
 
-                return [
-                    new ValidationFeedbackItem(
-                    new ValidationObject(validator._filename, 0, []),
-                    feedback
-                    ),
-                ];
+                return new(feedback);
             }
 
             validator._defaultLanguage = SyntaxValidationUtilityMethods.CleanString(langEntries[0].Value, validator.SyntaxConf);
@@ -95,9 +86,9 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns>Null if no issues are found. <see cref="ValidationFeedbackItem"/> object with a warning is returned if available languages entry is not found. 
+        /// <returns>Null if no issues are found. Key value pair containing information about the rule violation with a warning is returned if available languages entry is not found. 
         /// Error is returned if multiple entries are found.</returns>
-        public static ValidationFeedbackItem[]? ValidateFindAvailableLanguages(ValidationStructuredEntry[] entries, ContentValidator validator)
+        public static ValidationFeedback? ValidateFindAvailableLanguages(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
             ValidationStructuredEntry[] availableLanguageEntries = entries
                 .Where(e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.AvailableLanguages, StringComparison.Ordinal))
@@ -110,20 +101,16 @@ namespace Px.Utils.Validation.ContentValidation
                     0,
                     entries[0].LineChangeIndexes);
 
-                ValidationFeedback feedback = new (
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.MultipleInstancesOfUniqueKey,
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                    new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.MultipleInstancesOfUniqueKey),
+                    new(validator._filename,
                         feedbackIndexes.Key,
                         0,
-                        $"{validator.SyntaxConf.Tokens.KeyWords.AvailableLanguages}: " + string.Join(", ", entries.Select(e => e.Value).ToArray())
-                        );
+                        $"{validator.SyntaxConf.Tokens.KeyWords.AvailableLanguages}: " + string.Join(", ", entries.Select(e => e.Value).ToArray()))
+                );
 
-                return [
-                    new ValidationFeedbackItem(
-                    entries[0],
-                    feedback
-                    )
-               ];
+                return new(feedback);
             }
 
             if (availableLanguageEntries.Length == 1)
@@ -135,20 +122,16 @@ namespace Px.Utils.Validation.ContentValidation
             }
             else
             {
-                ValidationFeedback feedback = new (
-                        ValidationFeedbackLevel.Warning,
-                        ValidationFeedbackRule.RecommendedKeyMissing,
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                    new(ValidationFeedbackLevel.Warning,
+                        ValidationFeedbackRule.RecommendedKeyMissing),
+                    new(validator._filename,
                         0,
                         0,
-                        validator.SyntaxConf.Tokens.KeyWords.AvailableLanguages
-                        );
+                        validator.SyntaxConf.Tokens.KeyWords.AvailableLanguages)
+                );
 
-                return [
-                    new ValidationFeedbackItem(
-                    new ValidationObject(validator._filename, 0, []),
-                    feedback
-                    )
-               ];
+                return new(feedback);
             }
         }
 
@@ -157,8 +140,9 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns>Null of no issues are found. <see cref="ValidationFeedbackItem"/> object is returned if default language is not defined in the available languages entry</returns>
-        public static ValidationFeedbackItem[]? ValidateDefaultLanguageDefinedInAvailableLanguages(ValidationStructuredEntry[] entries, ContentValidator validator)
+        /// <returns>Null if no issues are found. 
+        /// Key value pair containing information about the rule violation is returned if default language is not defined in the available languages entry</returns>
+        public static ValidationFeedback? ValidateDefaultLanguageDefinedInAvailableLanguages(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
             if (validator._availableLanguages is not null && !validator._availableLanguages.Contains(validator._defaultLanguage))
             {
@@ -174,20 +158,16 @@ namespace Px.Utils.Validation.ContentValidation
                     0,
                     defaultLanguageEntry.LineChangeIndexes);
 
-                ValidationFeedback feedback = new (
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.UndefinedLanguageFound,
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                    new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.UndefinedLanguageFound),
+                    new(validator._filename,
                         feedbackIndexes.Key,
                         0,
-                        validator._defaultLanguage
-                        );
+                        validator._defaultLanguage)
+                );
 
-                return [
-                    new ValidationFeedbackItem(
-                    defaultLanguageEntry,
-                    feedback
-                    )
-                ];
+                return new(feedback);
             }
 
             return null;
@@ -198,10 +178,10 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if content dimension entry is not found for any available language</returns>
-        public static ValidationFeedbackItem[]? ValidateFindContentDimension(ValidationStructuredEntry[] entries, ContentValidator validator)
+        /// <returns>Key value pairs containing information about the rule violation are returned if content dimension entry is not found for any available language</returns>
+        public static ValidationFeedback? ValidateFindContentDimension(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
-            List<ValidationFeedbackItem> feedbackItems = [];
+            ValidationFeedback feedbackItems = [];
             ValidationStructuredEntry[] contentDimensionEntries = entries
                 .Where(e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.ContentVariableIdentifier, StringComparison.Ordinal))
                 .ToArray();
@@ -213,19 +193,16 @@ namespace Px.Utils.Validation.ContentValidation
                 ValidationStructuredEntry? contentDimension = Array.Find(contentDimensionEntries, c => c.Key.Language == language || (c.Key.Language is null && language == defaultLanguage));
                 if (contentDimension is null)
                 {
-                    ValidationFeedback feedback = new (
-                            ValidationFeedbackLevel.Warning,
-                            ValidationFeedbackRule.RecommendedKeyMissing,
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                        new(ValidationFeedbackLevel.Warning,
+                            ValidationFeedbackRule.RecommendedKeyMissing),
+                        new(validator._filename,
                             0,
                             0,
-                            $"{validator.SyntaxConf.Tokens.KeyWords.ContentVariableIdentifier}, {language}"
-                            );
+                            $"{validator.SyntaxConf.Tokens.KeyWords.ContentVariableIdentifier}, {language}")
+                    );
 
-                    feedbackItems.Add(
-                        new ValidationFeedbackItem(
-                        new ValidationObject(validator._filename, 0, []),
-                        feedback
-                        ));
+                    feedbackItems.Add(feedback);
                 }
             }
 
@@ -233,7 +210,7 @@ namespace Px.Utils.Validation.ContentValidation
                 e => e.Key.Language ?? defaultLanguage, 
                 e => e.Value);
             
-            return [.. feedbackItems];
+            return feedbackItems;
         }
 
         /// <summary>
@@ -241,10 +218,10 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if entries required keywords are not found</returns>
-        public static ValidationFeedbackItem[]? ValidateFindRequiredCommonKeys(ValidationStructuredEntry[] entries, ContentValidator validator)
+        /// <returns>Key value pairs containing information about the rule violation are returned if entries required keywords are not found</returns>
+        public static ValidationFeedback? ValidateFindRequiredCommonKeys(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
-            List<ValidationFeedbackItem> feedbackItems = [];
+            ValidationFeedback feedbackItems = [];
             string[] alwaysRequiredKeywords =
             [
                 validator.SyntaxConf.Tokens.KeyWords.Charset,
@@ -256,24 +233,20 @@ namespace Px.Utils.Validation.ContentValidation
             {
                 if (!Array.Exists(entries, e => e.Key.Keyword.Equals(keyword, StringComparison.Ordinal)))
                 {
-                    ValidationFeedback feedback = new (
-                                ValidationFeedbackLevel.Error,
-                                ValidationFeedbackRule.RequiredKeyMissing,
-                                0,
-                                0,
-                                keyword
-                                );
-
-                    feedbackItems.Add(
-                        new ValidationFeedbackItem(
-                            new ValidationObject(validator._filename, 0, []),
-                            feedback
-                            )
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                        new(ValidationFeedbackLevel.Error,
+                                ValidationFeedbackRule.RequiredKeyMissing),
+                        new(validator._filename,
+                            0,
+                            0,
+                            keyword)
                     );
+
+                    feedbackItems.Add(feedback);
                 }
             }
 
-            return [.. feedbackItems];
+            return feedbackItems;
         }
 
         /// <summary>
@@ -281,27 +254,21 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if stub and heading dimension entries are not found for any available language</returns>
-        public static ValidationFeedbackItem[]? ValidateFindStubAndHeading(ValidationStructuredEntry[] entries, ContentValidator validator)
+        /// <returns>Key value pairs containing information about the rule violation are returned if stub and heading dimension entries are not found for any available language</returns>
+        public static ValidationFeedback? ValidateFindStubAndHeading(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
             ValidationStructuredEntry[] stubEntries = entries.Where(e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.StubDimensions, StringComparison.Ordinal)).ToArray();
             ValidationStructuredEntry[] headingEntries = entries.Where(e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.HeadingDimensions, StringComparison.Ordinal)).ToArray();
 
             if (stubEntries.Length == 0 && headingEntries.Length == 0)
             {
-                ValidationFeedback feedback = new (
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.MissingStubAndHeading,
-                        0,
-                        0
-                        );
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                    new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.MissingStubAndHeading),
+                    new(validator._filename, 0, 0)
+                );
 
-                return [
-                    new(
-                    new ValidationObject(validator._filename, 0, []),
-                    feedback
-                    )
-                ];
+                return new(feedback);
             }
 
             string defaultLanguage = validator._defaultLanguage ?? string.Empty;
@@ -310,7 +277,7 @@ namespace Px.Utils.Validation.ContentValidation
             
             validator._headingDimensionNames = GetDimensionNames(headingEntries, defaultLanguage, validator.SyntaxConf);
 
-            List<ValidationFeedbackItem> feedbackItems = [];
+            ValidationFeedback feedbackItems = [];
 
             string[] languages = validator._availableLanguages ?? [defaultLanguage];
 
@@ -320,24 +287,20 @@ namespace Px.Utils.Validation.ContentValidation
                     &&
                     (validator._headingDimensionNames is null || !validator._headingDimensionNames.ContainsKey(language)))
                 {
-                    ValidationFeedback feedback = new (
-                                ValidationFeedbackLevel.Error,
-                                ValidationFeedbackRule.MissingStubAndHeading,
-                                0,
-                                0,
-                                $"{language}"
-                                );
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                        new(ValidationFeedbackLevel.Error,
+                                ValidationFeedbackRule.MissingStubAndHeading),
+                        new(validator._filename,
+                            0,
+                            0,
+                            $"{language}")
+                    );
 
-                    feedbackItems.Add(
-                        new ValidationFeedbackItem(
-                            new ValidationObject(validator._filename, 0, []),
-                            feedback
-                            )
-                        );
+                    feedbackItems.Add(feedback);
                 }
             }
 
-            return [.. feedbackItems];
+            return feedbackItems;
         }
 
         /// <summary>
@@ -345,10 +308,10 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> objects with warning are returned if recommended keys are missing</returns>
-        public static ValidationFeedbackItem[]? ValidateFindRecommendedKeys(ValidationStructuredEntry[] entries, ContentValidator validator)
+        /// <returns>Key value pairs containing information about the rule violation are returned if recommended keys are missing</returns>
+        public static ValidationFeedback? ValidateFindRecommendedKeys(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
-            List<ValidationFeedbackItem> feedbackItems = [];
+            ValidationFeedback feedbackItems = [];
 
             string[] commonKeys =
             [
@@ -363,20 +326,16 @@ namespace Px.Utils.Validation.ContentValidation
             {
                 if (!Array.Exists(entries, e => e.Key.Keyword.Equals(keyword, StringComparison.Ordinal)))
                 {
-                    ValidationFeedback feedback = new (
-                                ValidationFeedbackLevel.Warning,
-                                ValidationFeedbackRule.RecommendedKeyMissing,
-                                0,
-                                0,
-                                keyword
-                                );
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                        new(ValidationFeedbackLevel.Warning,
+                            ValidationFeedbackRule.RecommendedKeyMissing),
+                        new(validator._filename,
+                            0,
+                            0,
+                            keyword)
+                    );
 
-                    feedbackItems.Add(
-                        new ValidationFeedbackItem(
-                            new ValidationObject(validator._filename, 0, []),
-                            feedback
-                            )
-                        );
+                    feedbackItems.Add(feedback);
                 }
             }
 
@@ -390,25 +349,21 @@ namespace Px.Utils.Validation.ContentValidation
                     if (!Array.Exists(entries, e => e.Key.Keyword.Equals(keyword, StringComparison.Ordinal) && 
                     (e.Key.Language == language || (language == defaultLanguage && e.Key.Language is null))))
                     {
-                        ValidationFeedback feedback = new (
-                                    ValidationFeedbackLevel.Warning,
-                                    ValidationFeedbackRule.RecommendedKeyMissing,
-                                    0,
-                                    0,
-                                    $"{language}, {keyword}"
-                                    );
+                        KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                            new(ValidationFeedbackLevel.Warning,
+                                ValidationFeedbackRule.RecommendedKeyMissing),
+                            new(validator._filename,
+                                0,
+                                0,
+                                $"{language}, {keyword}")
+                        );
 
-                        feedbackItems.Add(
-                            new ValidationFeedbackItem(
-                                new ValidationObject(validator._filename, 0, []),
-                                feedback
-                                )
-                            );
+                        feedbackItems.Add(feedback);
                     }
                 }
             }
 
-            return [.. feedbackItems];
+            return feedbackItems;
         }
 
         /// <summary>
@@ -416,10 +371,10 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if values are missing for any dimension</returns>
-        public static ValidationFeedbackItem[]? ValidateFindDimensionValues(ValidationStructuredEntry[] entries, ContentValidator validator)
+        /// <returns>Key value pairs containing information about the rule violation are returned if values are missing for any dimension</returns>
+        public static ValidationFeedback? ValidateFindDimensionValues(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
-            List<ValidationFeedbackItem> feedbackItems = [];
+            ValidationFeedback feedbackItems = [];
             ValidationStructuredEntry[] dimensionEntries = entries.Where(
                 e => e.Key.Keyword.Equals(validator.SyntaxConf.Tokens.KeyWords.VariableValues, StringComparison.Ordinal)).ToArray();
 
@@ -451,7 +406,7 @@ namespace Px.Utils.Validation.ContentValidation
                 }
             }
 
-            return [.. feedbackItems];
+            return feedbackItems;
         }
 
         /// <summary>
@@ -459,10 +414,11 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if required entries are missing. Warnings are returned if entries are defined in an unrecommended way</returns>
-        public static ValidationFeedbackItem[]? ValidateFindContentDimensionKeys(ValidationStructuredEntry[] entries, ContentValidator validator)
+        /// <returns>Key value pairs containing information about the rule violation are returned if required entries are missing. 
+        /// Warnings are returned if entries are defined in an unrecommended way</returns>
+        public static ValidationFeedback? ValidateFindContentDimensionKeys(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
-            List<ValidationFeedbackItem>? feedbackItems = [];
+            ValidationFeedback feedbackItems = [];
 
             string[] languageSpecificKeywords =
                 [
@@ -494,12 +450,12 @@ namespace Px.Utils.Validation.ContentValidation
             {
                 foreach (string dimensionValueName in kvp.Value)
                 {
-                    List<ValidationFeedbackItem> items = ProcessContentDimensionValue(languageSpecificKeywords, requiredKeywords, recommendedKeywords, entries, validator, kvp.Key, dimensionValueName);
+                    ValidationFeedback items = ProcessContentDimensionValue(languageSpecificKeywords, requiredKeywords, recommendedKeywords, entries, validator, kvp.Key, dimensionValueName);
                     feedbackItems.AddRange(items);
                 }
             }
 
-            return [.. feedbackItems];
+            return feedbackItems;
         }
 
         /// <summary>
@@ -507,10 +463,10 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> objects with warnings are returned if any dimensions are missing recommended entries related to them</returns>
-        public static ValidationFeedbackItem[]? ValidateFindDimensionRecommendedKeys(ValidationStructuredEntry[] entries, ContentValidator validator)
+        /// <returns>Key value pairs containing information about the rule violation are returned if any dimensions are missing recommended entries related to them</returns>
+        public static ValidationFeedback? ValidateFindDimensionRecommendedKeys(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
-            List<ValidationFeedbackItem> feedbackItems = [];
+            ValidationFeedback feedbackItems = [];
 
             string[] dimensionRecommendedKeywords =
                 [
@@ -527,15 +483,20 @@ namespace Px.Utils.Validation.ContentValidation
 
             foreach (KeyValuePair<string, string[]> languageDimensions in allDimensions)
             {
-                ValidationFeedbackItem? timeValFeedback = FindDimensionRecommendedKey(entries, validator.SyntaxConf.Tokens.KeyWords.TimeVal, languageDimensions.Key, validator);
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? timeValFeedback = FindDimensionRecommendedKey(
+                    entries,
+                    validator.SyntaxConf.Tokens.KeyWords.TimeVal,
+                    languageDimensions.Key,
+                    validator);
+
                 if (timeValFeedback is not null)
                 {
-                    feedbackItems.Add((ValidationFeedbackItem)timeValFeedback);
+                    feedbackItems.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)timeValFeedback);
                 }
 
                 foreach (string dimension in languageDimensions.Value)
                 {
-                    List<ValidationFeedbackItem> dimensionFeedback = ProcessDimension(
+                    ValidationFeedback dimensionFeedback = ProcessDimension(
                         dimensionRecommendedKeywords,
                         validator.SyntaxConf.Tokens.KeyWords.DimensionType,
                         entries,
@@ -546,16 +507,16 @@ namespace Px.Utils.Validation.ContentValidation
                 }
             }
 
-            return [.. feedbackItems];
+            return feedbackItems;
         }
 
         /// <summary>
-        /// 
+        /// Validates that given entry does not contain specifiers if it is not allowed to have them based on keyword.
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if </returns>
-        public static ValidationFeedbackItem[]? ValidateUnexpectedSpecifiers(ValidationStructuredEntry entry, ContentValidator validator)
+        /// <returns>Key value pair containing information about the rule violation is returned if an unexpected specifier is detected.</returns>
+        public static ValidationFeedback? ValidateUnexpectedSpecifiers(ValidationStructuredEntry entry, ContentValidator validator)
         {
             string[] noSpecifierAllowedKeywords =
             [
@@ -582,20 +543,16 @@ namespace Px.Utils.Validation.ContentValidation
                     0,
                     entry.LineChangeIndexes);
 
-                ValidationFeedback feedback = new (
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.IllegalSpecifierDefinitionFound,
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                    new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.IllegalSpecifierDefinitionFound),
+                    new(validator._filename,
                         feedbackIndexes.Key,
                         0,
-                        $"{entry.Key.Keyword}: {entry.Key.FirstSpecifier}, {entry.Key.SecondSpecifier}"
-                        );
+                        $"{entry.Key.Keyword}: {entry.Key.FirstSpecifier}, {entry.Key.SecondSpecifier}")
+                );
 
-                return [
-                    new ValidationFeedbackItem(
-                        entry,
-                        feedback
-                    )
-                ];
+                return new(feedback);
             }
 
             return null;
@@ -606,8 +563,8 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> objects are returned if an illegal or unrecommended language parameter is detected in the entry</returns>
-        public static ValidationFeedbackItem[]? ValidateUnexpectedLanguageParams(ValidationStructuredEntry entry, ContentValidator validator)
+        /// <returns>Key value pair containing information about the rule violation is returned if an illegal or unrecommended language parameter is detected in the entry</returns>
+        public static ValidationFeedback? ValidateUnexpectedLanguageParams(ValidationStructuredEntry entry, ContentValidator validator)
         {
             string[] noLanguageParameterAllowedKeywords = [
                 validator.SyntaxConf.Tokens.KeyWords.Charset,
@@ -637,35 +594,29 @@ namespace Px.Utils.Validation.ContentValidation
 
                 if (noLanguageParameterAllowedKeywords.Contains(entry.Key.Keyword))
                 {
-                    ValidationFeedback feedback = new (
-                            ValidationFeedbackLevel.Error,
-                            ValidationFeedbackRule.IllegalLanguageDefinitionFound,
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                        new(ValidationFeedbackLevel.Error,
+                            ValidationFeedbackRule.IllegalLanguageDefinitionFound),
+                        new(validator._filename,
                             feedbackIndexes.Key,
                             0,
-                            $"{entry.Key.Keyword}, {entry.Key.Language}, {entry.Key.FirstSpecifier}, {entry.Key.SecondSpecifier}");
+                            $"{entry.Key.Keyword}, {entry.Key.Language}, {entry.Key.FirstSpecifier}, {entry.Key.SecondSpecifier}")
+                    );
 
-                    return [
-                        new ValidationFeedbackItem(
-                            entry,
-                            feedback
-                        )
-                    ];
+                    return new(feedback);
                 }
                 else if (noLanguageParameterRecommendedKeywords.Contains(entry.Key.Keyword))
                 {
-                    ValidationFeedback feedback = new (
-                            ValidationFeedbackLevel.Warning,
-                            ValidationFeedbackRule.UnrecommendedLanguageDefinitionFound,
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                        new(ValidationFeedbackLevel.Warning,
+                            ValidationFeedbackRule.UnrecommendedLanguageDefinitionFound),
+                        new(validator._filename,
                             feedbackIndexes.Key,
                             0,
-                            $"{entry.Key.Keyword}, {entry.Key.Language}, {entry.Key.FirstSpecifier}, {entry.Key.SecondSpecifier}");
+                            $"{entry.Key.Keyword}, {entry.Key.Language}, {entry.Key.FirstSpecifier}, {entry.Key.SecondSpecifier}")
+                    );
 
-                    return [
-                        new ValidationFeedbackItem(
-                            entry,
-                            feedback
-                        )
-                    ];
+                    return new(feedback);
                 }
             }
 
@@ -677,8 +628,8 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> object is returned if an undefined language is found from the entry</returns>
-        public static ValidationFeedbackItem[]? ValidateLanguageParams(ValidationStructuredEntry entry, ContentValidator validator)
+        /// <returns>Key value pair containing information about the rule violation is returned if an undefined language is found from the entry</returns>
+        public static ValidationFeedback? ValidateLanguageParams(ValidationStructuredEntry entry, ContentValidator validator)
         {
             if (entry.Key.Language is null)
             {
@@ -692,19 +643,17 @@ namespace Px.Utils.Validation.ContentValidation
                     0,
                     entry.LineChangeIndexes);
 
-                ValidationFeedback feedback = new (
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.UndefinedLanguageFound,
+
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                    new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.UndefinedLanguageFound),
+                    new(validator._filename,
                         feedbackIndexes.Key,
                         0,
-                        entry.Key.Language);
+                        entry.Key.Language)
+                );
 
-                return [
-                    new ValidationFeedbackItem(
-                        entry,
-                        feedback
-                    )
-                ];
+                return new(feedback);
             }
 
             return null;
@@ -716,10 +665,10 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> object is returned if the entry's specifier is defined in an unexpected way</returns>
-        public static ValidationFeedbackItem[]? ValidateSpecifiers(ValidationStructuredEntry entry, ContentValidator validator)
+        /// <returns>Key value pair containing information about the rule violation is returned if the entry's specifier is defined in an unexpected way</returns>
+        public static ValidationFeedback? ValidateSpecifiers(ValidationStructuredEntry entry, ContentValidator validator)
         {
-            List<ValidationFeedbackItem> feedbackItems = [];
+            ValidationFeedback feedbackItems = [];
             if ((entry.Key.FirstSpecifier is null && entry.Key.SecondSpecifier is null) || 
                 validator._dimensionValueNames is null)
             {
@@ -749,19 +698,15 @@ namespace Px.Utils.Validation.ContentValidation
                     0,
                     entry.LineChangeIndexes);
 
-                ValidationFeedback feedback = new (
-                            ValidationFeedbackLevel.Error,
-                            ValidationFeedbackRule.IllegalSpecifierDefinitionFound,
-                            feedbackIndexes.Key,
-                            0,
-                            entry.Key.FirstSpecifier);
-
-                feedbackItems.Add(
-                    new ValidationFeedbackItem(
-                        entry,
-                        feedback
-                    )
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                    new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.IllegalSpecifierDefinitionFound),
+                    new(validator._filename,
+                        feedbackIndexes.Key,
+                        0,
+                        entry.Key.FirstSpecifier)
                 );
+                feedbackItems.Add(feedback);
             }
             else if (entry.Key.SecondSpecifier is not null && 
                 !validator._dimensionValueNames.Values.Any(v => v.Contains(entry.Key.SecondSpecifier)))
@@ -771,22 +716,19 @@ namespace Px.Utils.Validation.ContentValidation
                     0,
                     entry.LineChangeIndexes);
 
-                ValidationFeedback feedback = new (
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.IllegalSpecifierDefinitionFound,
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                    new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.IllegalSpecifierDefinitionFound),
+                    new(validator._filename,
                         feedbackIndexes.Key,
                         0,
-                        entry.Key.SecondSpecifier);
-
-                feedbackItems.Add(
-                    new ValidationFeedbackItem(
-                        entry,
-                        feedback
-                    )
+                        entry.Key.SecondSpecifier)
                 );
+
+                feedbackItems.Add(feedback);
             }
 
-            return [.. feedbackItems];
+            return feedbackItems;
         }
 
         /// <summary>
@@ -794,8 +736,8 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> object is returned if an unexpected value type is detected</returns>
-        public static ValidationFeedbackItem[]? ValidateValueTypes(ValidationStructuredEntry entry, ContentValidator validator)
+        /// <returns>Key value pair containing information about the rule violation is returned if an unexpected value type is detected</returns>
+        public static ValidationFeedback? ValidateValueTypes(ValidationStructuredEntry entry, ContentValidator validator)
         {
             string[] stringTypes =
                 [
@@ -844,19 +786,16 @@ namespace Px.Utils.Validation.ContentValidation
                     entry.ValueStartIndex,
                     entry.LineChangeIndexes);
 
-                ValidationFeedback feedback = new (
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.UnmatchingValueType,
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                    new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.UnmatchingValueType),
+                    new(validator._filename,
                         feedbackIndexes.Key,
                         feedbackIndexes.Value,
-                        $"{entry.Key.Keyword}: {entry.ValueType}");
+                        $"{entry.Key.Keyword}: {entry.ValueType}")
+                );
 
-                return [
-                    new ValidationFeedbackItem(
-                        entry,
-                        feedback
-                    )
-                ];
+                return new(feedback);
             }
 
             return null;
@@ -867,8 +806,8 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> object is returned if an unexpected value is detected</returns>
-        public static ValidationFeedbackItem[]? ValidateValueContents(ValidationStructuredEntry entry, ContentValidator validator)
+        /// <returns>Key value pair containing information about the rule violation is returned if an unexpected value is detected</returns>
+        public static ValidationFeedback? ValidateValueContents(ValidationStructuredEntry entry, ContentValidator validator)
         {
             string[] allowedCharsets = ["ANSI", "Unicode"];
 
@@ -893,19 +832,16 @@ namespace Px.Utils.Validation.ContentValidation
                     entry.ValueStartIndex,
                     entry.LineChangeIndexes);
 
-                ValidationFeedback feedback = new(
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.InvalidValueFound,
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                    new(ValidationFeedbackLevel.Error,
+                        ValidationFeedbackRule.InvalidValueFound),
+                    new(validator._filename,
                         feedbackIndexes.Key,
                         feedbackIndexes.Value,
-                        $"{entry.Key.Keyword}: {entry.Value}");
+                        $"{entry.Key.Keyword}: {entry.Value}")
+                );
 
-                return [
-                    new ValidationFeedbackItem(
-                        entry,
-                        feedback
-                        )
-                ];
+                return new(feedback);
             }
             else if (entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.ContentVariableIdentifier)
             {
@@ -921,19 +857,16 @@ namespace Px.Utils.Validation.ContentValidation
                         entry.ValueStartIndex,
                         entry.LineChangeIndexes);
 
-                    ValidationFeedback feedback = new (
-                                ValidationFeedbackLevel.Error,
-                                ValidationFeedbackRule.InvalidValueFound,
-                                feedbackIndexes.Key,
-                                feedbackIndexes.Value,
-                                $"{entry.Key.Keyword}: {entry.Value}");
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                        new(ValidationFeedbackLevel.Error,
+                                ValidationFeedbackRule.InvalidValueFound),
+                        new(validator._filename,
+                            feedbackIndexes.Key,
+                            feedbackIndexes.Value,
+                            $"{entry.Key.Keyword}: {entry.Value}")
+                    );
 
-                    return [
-                        new ValidationFeedbackItem(
-                            entry,
-                            feedback
-                        )
-                    ];
+                    return new(feedback);
                 }
             }
 
@@ -945,8 +878,8 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> object is returned if an unexpected amount of values is detected</returns>
-        public static ValidationFeedbackItem[]? ValidateValueAmounts(ValidationStructuredEntry entry, ContentValidator validator)
+        /// <returns>Key value pair containing information about the rule violation is returned if an unexpected amount of values is detected</returns>
+        public static ValidationFeedback? ValidateValueAmounts(ValidationStructuredEntry entry, ContentValidator validator)
         {
             if (entry.Key.Keyword != validator.SyntaxConf.Tokens.KeyWords.VariableValueCodes ||
                 validator._dimensionValueNames is null ||
@@ -965,19 +898,16 @@ namespace Px.Utils.Validation.ContentValidation
                     entry.ValueStartIndex,
                     entry.LineChangeIndexes);
 
-                ValidationFeedback feedback = new(
-                            ValidationFeedbackLevel.Error,
-                            ValidationFeedbackRule.UnmatchingValueAmount,
-                            feedbackIndexes.Key,
-                            feedbackIndexes.Value,
-                            $"{entry.Key.Keyword}: {entry.Value}");
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                    new(ValidationFeedbackLevel.Error,
+                            ValidationFeedbackRule.UnmatchingValueAmount),
+                    new(validator._filename,
+                        feedbackIndexes.Key,
+                        feedbackIndexes.Value,
+                        $"{entry.Key.Keyword}: {entry.Value}")
+                );
 
-                return [
-                    new ValidationFeedbackItem(
-                        entry,
-                        feedback
-                    )
-                ];
+                return new(feedback);
             }
 
             return null;
@@ -988,8 +918,8 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns><see cref="ValidationFeedbackItem"/> object with warning is returned if the found value is not written in upper case</returns>
-        public static ValidationFeedbackItem[]? ValidateValueUppercaseRecommendations(ValidationStructuredEntry entry, ContentValidator validator)
+        /// <returns>Key value pair containing information about the rule violation is returned if the found value is not written in upper case</returns>
+        public static ValidationFeedback? ValidateValueUppercaseRecommendations(ValidationStructuredEntry entry, ContentValidator validator)
         {
             string[] recommendedUppercaseValueKeywords = [
                 validator.SyntaxConf.Tokens.KeyWords.CodePage
@@ -1009,19 +939,16 @@ namespace Px.Utils.Validation.ContentValidation
                     entry.ValueStartIndex,
                     entry.LineChangeIndexes);
 
-                ValidationFeedback feedback = new (
-                        ValidationFeedbackLevel.Warning,
-                        ValidationFeedbackRule.ValueIsNotInUpperCase,
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                    new(ValidationFeedbackLevel.Warning,
+                        ValidationFeedbackRule.ValueIsNotInUpperCase),
+                    new(validator._filename,
                         feedbackIndexes.Key,
                         entry.ValueStartIndex,
-                        $"{entry.Key.Keyword}: {entry.Value}");
+                        $"{entry.Key.Keyword}: {entry.Value}")
+                );
 
-                return [
-                    new ValidationFeedbackItem(
-                        entry,
-                        feedback
-                    )
-                ];
+                return new(feedback);
             }
             return null;
         }

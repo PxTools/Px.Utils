@@ -33,7 +33,7 @@ namespace Px.Utils.Validation.DatabaseValidation
         private readonly IDatabaseValidator[]? _customDirectoryValidators = customDirectoryValidators;
         private readonly IFileSystem _fileSystem = fileSystem is not null ? fileSystem : new DefaultFileSystem();
 
-        private readonly ConcurrentBag<ValidationFeedbackItem> feedbacks = [];
+        private readonly ValidationFeedback feedbacks = [];
         private readonly ConcurrentBag<DatabaseFileInfo> pxFiles = [];
         private readonly ConcurrentBag<DatabaseFileInfo> aliasFiles = [];
 
@@ -60,7 +60,7 @@ namespace Px.Utils.Validation.DatabaseValidation
 
             Task.WaitAll([.. fileTasks]);
             ValidateDatabaseContents();
-            return new ValidationResult([..feedbacks]);
+            return new (feedbacks);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             
             await Task.WhenAll(fileTasks);
             ValidateDatabaseContents();
-            return new ValidationResult([.. feedbacks]);
+            return new (feedbacks);
         }
 
         private void ProcessPxFile(string fileName)
@@ -98,10 +98,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             stream.Position = 0;
             PxFileValidator validator = new(stream, fileName, fileInfo.Encoding, _syntaxConf);
             ValidationResult result = validator.Validate();
-            foreach (ValidationFeedbackItem feedback in result.FeedbackItems)
-            {
-                feedbacks.Add(feedback);
-            }
+            feedbacks.AddRange(result.FeedbackItems);
         }
 
         private void ProcessAliasFile(string fileName)
@@ -119,10 +116,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             stream.Position = 0;
             PxFileValidator validator = new(stream, fileName, fileInfo.Encoding, _syntaxConf);
             ValidationResult result = await validator.ValidateAsync(cancellationToken);
-            foreach (ValidationFeedbackItem feedback in result.FeedbackItems)
-            {
-                feedbacks.Add(feedback);
-            }
+            feedbacks.AddRange(result.FeedbackItems);
             cancellationToken.ThrowIfCancellationRequested();
         }
 
@@ -165,10 +159,10 @@ namespace Px.Utils.Validation.DatabaseValidation
             {
                 foreach (IDatabaseValidator validator in pxFileValidators)
                 {
-                    ValidationFeedbackItem? feedback = validator.Validate(fileInfo);
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(fileInfo);
                     if (feedback is not null)
                     {
-                        feedbacks.Add((ValidationFeedbackItem)feedback);
+                        feedbacks.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
                     }
                 }
             }
@@ -189,10 +183,10 @@ namespace Px.Utils.Validation.DatabaseValidation
             {
                 foreach (IDatabaseValidator validator in aliasFileValidators)
                 {
-                    ValidationFeedbackItem? feedback = validator.Validate(fileInfo);
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(fileInfo);
                     if (feedback is not null)
                     {
-                        feedbacks.Add((ValidationFeedbackItem)feedback);
+                        feedbacks.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
                     }
                 }
             }
@@ -217,10 +211,10 @@ namespace Px.Utils.Validation.DatabaseValidation
 
                 foreach (IDatabaseValidator validator in directoryValidators)
                 {
-                    ValidationFeedbackItem? feedback = validator.Validate(new DatabaseValidationItem(directory));
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(new DatabaseValidationItem(directory));
                     if (feedback is not null)
                     {
-                        feedbacks.Add((ValidationFeedbackItem)feedback);
+                        feedbacks.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
                     }
                 }
             }
@@ -240,13 +234,11 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
             catch (InvalidPxFileMetadataException e)
             {
-                feedbacks.Add(new ValidationFeedbackItem(
-                    new(filename, 0, []),
+                feedbacks.Add(new(
                     new(ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.NoEncoding,
-                    0, 0,
-                    $"Error while reading the encoding of the file {filename}: {e.Message}"
-                    )));
+                    ValidationFeedbackRule.NoEncoding),
+                    new(filename, 0, 0, $"Error while reading the encoding of the file {filename}: {e.Message}"))
+                );
             }
             stream.Position = 0;
             const int bufferSize = 1024;
@@ -304,13 +296,11 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
             catch (InvalidPxFileMetadataException e)
             {
-                feedbacks.Add(new ValidationFeedbackItem(
-                    new(filename, 0, []),
+                feedbacks.Add(new(
                     new(ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.NoEncoding,
-                    0, 0,
-                    $"Error while reading the encoding of the file {filename}: {e.Message}"
-                    )));
+                    ValidationFeedbackRule.NoEncoding),
+                    new(filename, 0, 0, $"Error while reading the encoding of the file {filename}: {e.Message}"))
+                );
             }
             stream.Position = 0;
             const int bufferSize = 1024;
@@ -403,6 +393,6 @@ namespace Px.Utils.Validation.DatabaseValidation
 
     public interface IDatabaseValidator
     {
-        public ValidationFeedbackItem? Validate(DatabaseValidationItem item);
+        public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(DatabaseValidationItem item);
     }
 }

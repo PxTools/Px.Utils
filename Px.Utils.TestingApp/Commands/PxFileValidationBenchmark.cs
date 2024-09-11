@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal class PxFileValidationBenchmark : FileBenchmark
+    internal sealed class PxFileValidationBenchmark : FileBenchmark
     {
         internal override string Help =>
         "Runs through the whole px file validation process (metadata syntax- and contents-, data-) for the given file.";

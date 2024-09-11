@@ -5,11 +5,11 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 {
     internal sealed class MockCustomDatabaseValidator : IDatabaseValidator
     {
-        public ValidationFeedbackItem? Validate(DatabaseValidationItem item)
+        public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(DatabaseValidationItem item)
         {
-            return new ValidationFeedbackItem(
-                new ValidationObject("test", 0, []),
-                new ValidationFeedback(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.AliasFileMissing, 0, 0, "Test error"));
+            return new (
+                new (ValidationFeedbackLevel.Warning, ValidationFeedbackRule.AliasFileMissing),
+                new ("test", 0, 0, "Test error"));
         }
     }
 }

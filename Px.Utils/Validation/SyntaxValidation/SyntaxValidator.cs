@@ -31,7 +31,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// Validates the syntax of a PX file's metadata.
         ///</summary>
         /// <returns>A <see cref="SyntaxValidationResult"/> entry which contains a list of <see cref="ValidationStructuredEntry"/> entries 
-        /// and a list of <see cref="ValidationFeedbackItem"/> entries accumulated during the validation.</returns>
+        /// and a dictionary of type <see cref="ValidationFeedback"/> accumulated during the validation.</returns>
         public SyntaxValidationResult Validate()
         {
             SyntaxValidationFunctions validationFunctions = new();
@@ -48,23 +48,23 @@ namespace Px.Utils.Validation.SyntaxValidation
 
             syntaxConf ??= PxFileSyntaxConf.Default;
 
-            List<ValidationFeedbackItem> validationFeedback = [];
+            ValidationFeedback validationFeedbacks = [];
             List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, syntaxConf, filename, _bufferSize);
-            validationFeedback.AddRange(ValidateEntries(stringEntries, stringValidationFunctions, syntaxConf));
+            validationFeedbacks.AddRange(ValidateEntries(stringEntries, stringValidationFunctions, syntaxConf));
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(stringEntries, syntaxConf);
-            validationFeedback.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, syntaxConf));
+            validationFeedbacks.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, syntaxConf));
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
-            validationFeedback.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, syntaxConf));
+            validationFeedbacks.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, syntaxConf));
 
-            return new SyntaxValidationResult([.. validationFeedback], structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
+            return new SyntaxValidationResult(validationFeedbacks, structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
         }
 
         /// <summary>
         /// Asynchronously validates the syntax of a PX file's metadata.
         /// </summary>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> parameter that can be used to cancel the operation.</param>
-        /// <returns>A task that contains a <see cref="SyntaxValidationResult"/> entry, which contains the structured validation entries 
-        /// and a list of <see cref="ValidationStructuredEntry"/> entries accumulated during the validation.</returns>
+        /// <returns>A task that contains a <see cref="SyntaxValidationResult"/> entry which contains a list of <see cref="ValidationStructuredEntry"/> entries 
+        /// and a dictionary of type <see cref="ValidationFeedback"/> accumulated during the validation.</returns>
         public async Task<SyntaxValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
         {
             SyntaxValidationFunctions validationFunctions = new();
@@ -80,15 +80,15 @@ namespace Px.Utils.Validation.SyntaxValidation
             }
 
             syntaxConf ??= PxFileSyntaxConf.Default;
-            List<ValidationFeedbackItem> validationFeedback = [];
+            ValidationFeedback validationFeedbacks = [];
             List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, syntaxConf, filename, _bufferSize, cancellationToken);
-            validationFeedback.AddRange(ValidateEntries(entries, stringValidationFunctions, syntaxConf));
+            validationFeedbacks.AddRange(ValidateEntries(entries, stringValidationFunctions, syntaxConf));
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, syntaxConf);
-            validationFeedback.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, syntaxConf));
+            validationFeedbacks.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, syntaxConf));
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
-            validationFeedback.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, syntaxConf));
+            validationFeedbacks.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, syntaxConf));
 
-            return new SyntaxValidationResult([.. validationFeedback], structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
+            return new SyntaxValidationResult(validationFeedbacks, structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
         }
 
         /// <summary>
@@ -121,57 +121,57 @@ namespace Px.Utils.Validation.SyntaxValidation
 
         #endregion
 
-        private static List<ValidationFeedbackItem> ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunction> validationFunctions, PxFileSyntaxConf syntaxConf)
+        private static ValidationFeedback ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunction> validationFunctions, PxFileSyntaxConf syntaxConf)
         {
-            List<ValidationFeedbackItem> validationFeedback = [];
+            ValidationFeedback validationFeedback = [];
             foreach (ValidationEntry entry in entries)
             {
                 foreach (EntryValidationFunction function in validationFunctions)
                 {
-                    ValidationFeedbackItem? feedback = function(entry, syntaxConf);
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = function(entry, syntaxConf);
                     if (feedback is not null)
                     {
-                        validationFeedback.Add((ValidationFeedbackItem)feedback);
+                        validationFeedback.Add((KeyValuePair <ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
                     }
                 }
             }
             return validationFeedback;
         }
 
-        private static List<ValidationFeedbackItem> ValidateKeyValuePairs(
+        private static ValidationFeedback ValidateKeyValuePairs(
             IEnumerable<ValidationKeyValuePair> kvpObjects,
             IEnumerable<KeyValuePairValidationFunction> validationFunctions,
             PxFileSyntaxConf syntaxConf)
         {
-            List<ValidationFeedbackItem> validationFeedback = [];
+            ValidationFeedback validationFeedback = [];
             foreach (ValidationKeyValuePair kvpObject in kvpObjects)
             {
                 foreach (KeyValuePairValidationFunction function in validationFunctions)
                 {
-                    ValidationFeedbackItem? feedback = function(kvpObject, syntaxConf);
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = function(kvpObject, syntaxConf);
                     if (feedback is not null)
                     {
-                        validationFeedback.Add((ValidationFeedbackItem)feedback);
+                        validationFeedback.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
                     }
                 }
             }
             return validationFeedback;
         }
 
-        private static List<ValidationFeedbackItem> ValidateStructs(
+        private static ValidationFeedback ValidateStructs(
             IEnumerable<ValidationStructuredEntry> structuredEntries, 
             IEnumerable<StructuredValidationFunction> validationFunctions,
             PxFileSyntaxConf syntaxConf)
         {
-            List<ValidationFeedbackItem> validationFeedback = [];
+            ValidationFeedback validationFeedback = [];
             foreach (ValidationStructuredEntry structuredEntry in structuredEntries)
             {
                 foreach (StructuredValidationFunction function in validationFunctions)
                 {
-                    ValidationFeedbackItem? feedback = function(structuredEntry, syntaxConf);
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = function(structuredEntry, syntaxConf);
                     if (feedback is not null)
                     {
-                        validationFeedback.Add((ValidationFeedbackItem)feedback);
+                        validationFeedback.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
                     }
                 }
             }

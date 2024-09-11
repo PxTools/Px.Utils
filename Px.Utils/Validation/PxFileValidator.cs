@@ -58,7 +58,7 @@ namespace Px.Utils.Validation
             encoding ??= Encoding.Default;
             syntaxConf ??= PxFileSyntaxConf.Default;
 
-            List<ValidationFeedbackItem> feedbacks = [];
+            ValidationFeedback feedbacks = [];
             SyntaxValidator syntaxValidator = new(stream, encoding, filename, syntaxConf, _customSyntaxValidationFunctions, true);
             SyntaxValidationResult syntaxValidationResult = syntaxValidator.Validate();
             feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
@@ -70,13 +70,12 @@ namespace Px.Utils.Validation
             if (syntaxValidationResult.DataStartStreamPosition == -1)
             {
                 feedbacks.Add(new(
-                    new(filename, 0, []),
                     new(ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.StartOfDataSectionNotFound,
-                        0, 0)
+                        ValidationFeedbackRule.StartOfDataSectionNotFound),
+                    new(filename, 0, 0)
                     ));
 
-                return new ValidationResult([.. feedbacks]);
+                return new (feedbacks);
             }
 
             stream.Position = syntaxValidationResult.DataStartStreamPosition;
@@ -100,7 +99,7 @@ namespace Px.Utils.Validation
                 }
             }
 
-            return new ValidationResult([..feedbacks]);
+            return new ValidationResult(feedbacks);
         }
 
         /// <summary>
@@ -113,7 +112,7 @@ namespace Px.Utils.Validation
             encoding ??= Encoding.Default;
             syntaxConf ??= PxFileSyntaxConf.Default;
 
-            List<ValidationFeedbackItem> feedbacks = [];
+            ValidationFeedback feedbacks = [];
             SyntaxValidator syntaxValidator = new(stream, encoding, filename, syntaxConf, _customSyntaxValidationFunctions, true);
             SyntaxValidationResult syntaxValidationResult = await syntaxValidator.ValidateAsync(cancellationToken);
             feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
@@ -125,13 +124,12 @@ namespace Px.Utils.Validation
             if (syntaxValidationResult.DataStartStreamPosition == -1)
             {
                 feedbacks.Add(new(
-                    new(filename, 0, []),
                     new(ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.StartOfDataSectionNotFound,
-                        0, 0)
-                    ));
+                        ValidationFeedbackRule.StartOfDataSectionNotFound),
+                    new(filename, 0, 0)
+                ));
 
-                return new ValidationResult([.. feedbacks]);
+                return new (feedbacks);
             }
 
             stream.Position = syntaxValidationResult.DataStartStreamPosition;
@@ -156,7 +154,7 @@ namespace Px.Utils.Validation
                 }
             }
 
-            return new ValidationResult([..feedbacks]);
+            return new ValidationResult(feedbacks);
         }
     }
 }

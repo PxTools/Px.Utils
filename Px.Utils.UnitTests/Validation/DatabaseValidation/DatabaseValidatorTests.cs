@@ -18,7 +18,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Length);
+            Assert.AreEqual(0, result.FeedbackItems.Count);
         }
 
         [TestMethod]
@@ -33,7 +33,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Length);
+            Assert.AreEqual(0, result.FeedbackItems.Count);
         }
 
         [TestMethod]
@@ -48,7 +48,8 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(11, result.FeedbackItems.Length);
+            Assert.AreEqual(9, result.FeedbackItems.Count); // Unique feedbacks
+            Assert.AreEqual(11, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
         }
 
         [TestMethod]
@@ -63,7 +64,8 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(11, result.FeedbackItems.Length);
+            Assert.AreEqual(9, result.FeedbackItems.Count); // Unique feedbacks
+            Assert.AreEqual(11, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
         }
 
         [TestMethod]
@@ -87,7 +89,8 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(26, result.FeedbackItems.Length);
+            Assert.AreEqual(10, result.FeedbackItems.Count); // Unique feedbacks
+            Assert.AreEqual(26, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
         }
 
         [TestMethod]
@@ -111,7 +114,8 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(26, result.FeedbackItems.Length);
+            Assert.AreEqual(10, result.FeedbackItems.Count); // Unique feedbacks
+            Assert.AreEqual(26, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
         }
 
         [TestMethod]
@@ -127,7 +131,8 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
             // LANGUAGES keyword is recommended, but not required, three warning level feedback items are expected
-            Assert.AreEqual(3, result.FeedbackItems.Length);
+            Assert.AreEqual(1, result.FeedbackItems.Count); // Unique feedbacks
+            Assert.AreEqual(3, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
         }
 
         [TestMethod]
@@ -143,7 +148,8 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
             // LANGUAGES keyword is recommended, but not required, three warning level feedback items are expected
-            Assert.AreEqual(3, result.FeedbackItems.Length);
+            Assert.AreEqual(1, result.FeedbackItems.Count); // Unique feedbacks
+            Assert.AreEqual(3, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
         }
     }
 }

@@ -17,14 +17,17 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             stream.Seek(6, 0);
             DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
 
-            ValidationFeedbackItem[] validationFeedbacks = validator.Validate().FeedbackItems;
+            ValidationFeedback validationFeedbacks = validator.Validate().FeedbackItems;
 
-            foreach (ValidationFeedbackItem validationFeedback in validationFeedbacks)
+            foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
             {
-                Logger.LogMessage($"Line {validationFeedback.Feedback.Line}, Char {validationFeedback.Feedback.Character}: " 
-                                  + $"{validationFeedback.Feedback.Rule} {validationFeedback.Feedback.AdditionalInfo}");
+                foreach (ValidationFeedbackValue instance in validationFeedback.Value)
+                {
+                    Logger.LogMessage($"Line {instance.Line}, Char {instance.Character}: " 
+                        + $"{validationFeedback.Key.Rule} {instance.AdditionalInfo}");
+                }
             }
-            Assert.AreEqual(0, validationFeedbacks.Length);
+            Assert.AreEqual(0, validationFeedbacks.Count);
         }
 
         [TestMethod]
@@ -35,14 +38,17 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
 
             ValidationResult result = await validator.ValidateAsync();
-            ValidationFeedbackItem[] validationFeedbacks = result.FeedbackItems;
+            ValidationFeedback validationFeedbacks = result.FeedbackItems;
 
-            foreach (ValidationFeedbackItem validationFeedback in validationFeedbacks)
+            foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
             {
-                Logger.LogMessage($"Line {validationFeedback.Feedback.Line}, Char {validationFeedback.Feedback.Character}: "
-                                  + $"{validationFeedback.Feedback.Rule} {validationFeedback.Feedback.AdditionalInfo}");
+                foreach (ValidationFeedbackValue instance in validationFeedback.Value)
+                {
+                    Logger.LogMessage($"Line {instance.Line}, Char {instance.Character}: "
+                        + $"{validationFeedback.Key.Rule} {instance.AdditionalInfo}");
+                }
             }
-            Assert.AreEqual(0, validationFeedbacks.Length);
+            Assert.AreEqual(0, validationFeedbacks.Count);
 
         }
 
@@ -53,14 +59,19 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             stream.Seek(6, 0); 
             DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
 
-            ValidationFeedbackItem[] validationFeedbacks = validator.Validate().FeedbackItems;
+            ValidationFeedback validationFeedbacks = validator.Validate().FeedbackItems;
 
-            foreach (ValidationFeedbackItem validationFeedback in validationFeedbacks)
+            foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
             {
-                Logger.LogMessage($"Line {validationFeedback.Feedback.Line}, Char {validationFeedback.Feedback.Character}: "
-                                  + $"{validationFeedback.Feedback.Rule} {validationFeedback.Feedback.AdditionalInfo}");
+                foreach (ValidationFeedbackValue instance in validationFeedback.Value)
+                {
+                    Logger.LogMessage($"Line {instance.Line}, Char {instance.Character}: "
+                        + $"{validationFeedback.Key.Rule} {instance.AdditionalInfo}");
+                }
             }
-            Assert.AreEqual(13, validationFeedbacks.Length);
+
+            Assert.AreEqual(7, validationFeedbacks.Count); // Unique feedbacks
+            Assert.AreEqual(13, validationFeedbacks.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
         }
 
         [TestMethod]
@@ -71,14 +82,19 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
 
             ValidationResult result = await validator.ValidateAsync();
-            ValidationFeedbackItem[] validationFeedbacks = result.FeedbackItems;
+            ValidationFeedback validationFeedbacks = result.FeedbackItems;
 
-            foreach (ValidationFeedbackItem validationFeedback in validationFeedbacks)
+            foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
             {
-                Logger.LogMessage($"Line {validationFeedback.Feedback.Line}, Char {validationFeedback.Feedback.Character}: "
-                                  + $"{validationFeedback.Feedback.Rule} {validationFeedback.Feedback.AdditionalInfo}");
+                foreach (ValidationFeedbackValue instance in validationFeedback.Value)
+                {
+                    Logger.LogMessage($"Line {instance.Line}, Char {instance.Character}: "
+                        + $"{validationFeedback.Key.Rule} {instance.AdditionalInfo}");
+                }
             }
-            Assert.AreEqual(13, validationFeedbacks.Length);
+
+            Assert.AreEqual(7, validationFeedbacks.Count); // Unique feedbacks
+            Assert.AreEqual(13, validationFeedbacks.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
     public class StreamSyntaxValidationAsyncTests
     {
         private readonly string filename = "foo";
-        private readonly List<ValidationFeedbackItem> feedback = [];
+        private readonly ValidationFeedback feedback = [];
 
         [TestMethod]
         public async Task ValidatePxFileSyntaxAsyncCalledWithMinumalUTF8ReturnsValidResult()

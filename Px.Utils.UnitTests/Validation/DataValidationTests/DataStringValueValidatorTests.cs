@@ -21,7 +21,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             DataStringValidator validator = new();
             Encoding encoding = Encoding.UTF8;
             List<byte> value = [.. encoding.GetBytes(allowedValue)];
-            ValidationFeedback? nullableFeedback = validator.Validate(value, EntryType.DataItem, encoding, 0, 0);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? nullableFeedback = validator.Validate(value, EntryType.DataItem, encoding, 0, 0, "foo");
 
             Assert.IsNull(nullableFeedback);
         }
@@ -43,13 +43,13 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             Encoding encoding = Encoding.UTF8;
             List<byte> value = [.. encoding.GetBytes(notAllowedValue)];
 
-            ValidationFeedback? nullableFeedback = validator.Validate(value, EntryType.DataItem, encoding, 0, 0);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? nullableFeedback = validator.Validate(value, EntryType.DataItem, encoding, 0, 0, "foo");
 
             Assert.IsNotNull(nullableFeedback);
-            ValidationFeedback feedback = (ValidationFeedback)nullableFeedback;
-            Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidString, feedback.Rule);
-            Assert.AreEqual(notAllowedValue, feedback.AdditionalInfo);
-            Assert.AreEqual(ValidationFeedbackLevel.Error, feedback.Level);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = (KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)nullableFeedback;
+            Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidString, feedback.Key.Rule);
+            Assert.AreEqual(notAllowedValue, feedback.Value.AdditionalInfo);
+            Assert.AreEqual(ValidationFeedbackLevel.Error, feedback.Key.Level);
         }
     }
 }

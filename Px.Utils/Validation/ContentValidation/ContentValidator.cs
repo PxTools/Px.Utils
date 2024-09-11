@@ -65,11 +65,11 @@ namespace Px.Utils.Validation.ContentValidation
                 contentValidationFindKeywordFunctions = contentValidationFindKeywordFunctions.Concat(customContentValidationFunctions.CustomContentValidationFindKeywordFunctions);
             }
 
-            List <ValidationFeedbackItem> feedbackItems = [];
+            ValidationFeedback feedbackItems = [];
 
             foreach (ContentValidationFindKeywordValidator findingFunction in contentValidationFindKeywordFunctions)
             {
-                ValidationFeedbackItem[]? feedback = findingFunction(entries, this);
+                ValidationFeedback? feedback = findingFunction(entries, this);
                 if (feedback is not null)
                 {
                     feedbackItems.AddRange(feedback);
@@ -79,7 +79,7 @@ namespace Px.Utils.Validation.ContentValidation
             {
                 foreach (ValidationStructuredEntry entry in entries)
                 {
-                    ValidationFeedbackItem[]? feedback = entryFunction(entry, this);
+                    ValidationFeedback? feedback = entryFunction(entry, this);
                     if (feedback is not null)
                     {
                         feedbackItems.AddRange(feedback);
@@ -90,7 +90,7 @@ namespace Px.Utils.Validation.ContentValidation
             int amountOfDataRows = _stubDimensionNames is not null ? GetProductOfDimensionValues(_stubDimensionNames) : 0;
             ResetFields();
 
-            return new ContentValidationResult([.. feedbackItems], lengthOfDataRows, amountOfDataRows);
+            return new ContentValidationResult(feedbackItems, lengthOfDataRows, amountOfDataRows);
         }
 
         #region Interface implementation
