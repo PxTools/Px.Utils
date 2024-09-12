@@ -64,7 +64,7 @@ namespace Px.Utils.Validation
     /// <summary>
     /// Stores information about a specific instance of a validation feedback rule violation.
     /// </summary>
-    public readonly struct ValidationFeedbackValue(string filename, int line = 0, int character = 0, string? additionalInfo = null)
+    public readonly struct ValidationFeedbackValue(string filename, int? line = null, int? character = null, string? additionalInfo = null)
     {
         /// <summary>
         /// Name of the file where the violation occurred.
@@ -73,11 +73,11 @@ namespace Px.Utils.Validation
         /// <summary>
         /// Line number where the violation occurred.
         /// </summary>
-        public int Line { get; } = line;
+        public int? Line { get; } = line;
         /// <summary>
         /// Character position where the violation occurred.
         /// </summary>
-        public int Character { get; } = character;
+        public int? Character { get; } = character;
         /// <summary>
         /// Additional information about the violation.
         /// </summary>

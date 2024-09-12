@@ -425,7 +425,7 @@ namespace Px.Utils.Validation.ContentValidation
 
                     feedbackItems.Add(new(
                         new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.DuplicateEntry),
-                        new(validator._filename, 0, 0, $"{item.Key.Key}, {item.Key.Value}")
+                        new(validator._filename, additionalInfo: $"{item.Key.Key}, {item.Key.Value}")
                     ));
                 }
             }

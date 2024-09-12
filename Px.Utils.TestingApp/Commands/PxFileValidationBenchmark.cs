@@ -1,4 +1,5 @@
-﻿using Px.Utils.PxFile.Metadata;
+﻿using Px.Utils.Exceptions;
+using Px.Utils.PxFile.Metadata;
 using Px.Utils.Validation;
 using System.Text;
 
@@ -30,10 +31,10 @@ namespace Px.Utils.TestingApp.Commands
             {
                 encoding = reader.GetEncoding(stream);
             }
-            catch (Exception e)
+            catch (InvalidPxFileMetadataException)
             {
-                Console.WriteLine($"Error while reading the encoding of the file: {e.Message}");
                 encoding = Encoding.Default;
+                throw;
             }
         }
 

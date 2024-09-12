@@ -56,7 +56,7 @@ namespace Px.Utils.Validation.ContentValidation
                         KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
                             new(ValidationFeedbackLevel.Error,
                                 ValidationFeedbackRule.VariableValuesMissing),
-                            new(filename, 0, 0, $"{dimension}, {language}")
+                            new(filename, additionalInfo: $"{dimension}, {language}")
                         );
 
                         feedbackItems.Add(feedback);
@@ -98,7 +98,7 @@ namespace Px.Utils.Validation.ContentValidation
                 return new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> (
                     new(recommended ? ValidationFeedbackLevel.Warning : ValidationFeedbackLevel.Error,
                     recommended ? ValidationFeedbackRule.RecommendedKeyMissing : ValidationFeedbackRule.RequiredKeyMissing),
-                    new(validator._filename, 0, 0, $"{keyword}, {language}, {dimensionName}, {dimensionValueName}")
+                    new(validator._filename, additionalInfo: $"{keyword}, {language}, {dimensionName}, {dimensionValueName}")
                     );
             }
             else if (entry.Key.FirstSpecifier is null || entry.Key.SecondSpecifier is null)
@@ -143,7 +143,7 @@ namespace Px.Utils.Validation.ContentValidation
                 return new(
                     new(ValidationFeedbackLevel.Warning,
                     ValidationFeedbackRule.RecommendedKeyMissing),
-                    new(validator._filename, 0, 0, $"{keyword}, {language}, {dimensionName}")
+                    new(validator._filename, additionalInfo: $"{keyword}, {language}, {dimensionName}")
                     );
             }
 

@@ -237,7 +237,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 feedbacks.Add(new(
                     new(ValidationFeedbackLevel.Error,
                     ValidationFeedbackRule.NoEncoding),
-                    new(filename, 0, 0, $"Error while reading the encoding of the file {filename}: {e.Message}"))
+                    new(filename, additionalInfo: $"Error while reading the encoding of the file {filename}: {e.Message}"))
                 );
             }
             stream.Position = 0;
@@ -299,7 +299,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 feedbacks.Add(new(
                     new(ValidationFeedbackLevel.Error,
                     ValidationFeedbackRule.NoEncoding),
-                    new(filename, 0, 0, $"Error while reading the encoding of the file {filename}: {e.Message}"))
+                    new(filename, additionalInfo: $"Error while reading the encoding of the file {filename}: {e.Message}"))
                 );
             }
             stream.Position = 0;

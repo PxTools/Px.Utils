@@ -24,7 +24,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 return new(
                     new(ValidationFeedbackLevel.Warning,
                         ValidationFeedbackRule.DuplicateFileNames),
-                    new(fileInfo.Name, 0, 0, $"Duplicate file name: {fileInfo.Name}")
+                    new(fileInfo.Name)
                 );
             }
             else
@@ -55,7 +55,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 return new(
                     new(ValidationFeedbackLevel.Warning,
                     ValidationFeedbackRule.FileLanguageDiffersFromDatabase),
-                    new(fileInfo.Name, 0, 0, $"Missing languages in file {fileInfo.Name}: {string.Join(", ", _allLanguages.Except(fileInfo.Languages))}")
+                    new(fileInfo.Name, additionalInfo: $"Missing languages: {string.Join(", ", _allLanguages.Except(fileInfo.Languages))}")
                 );
             }
             else
@@ -86,7 +86,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 return new (
                     new(ValidationFeedbackLevel.Warning,
                     ValidationFeedbackRule.FileEncodingDiffersFromDatabase),
-                    new(fileInfo.Name, 0, 0, $"Inconsistent encoding in file {fileInfo.Name}: {fileInfo.Encoding.EncodingName}. " +
+                    new(fileInfo.Name, additionalInfo: $"Inconsistent encoding: {fileInfo.Encoding.EncodingName}. " +
                     $"Most commonly used encoding is {_mostCommonEncoding.EncodingName}"));
             }
             else
@@ -120,7 +120,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                     return new(
                         new(ValidationFeedbackLevel.Warning,
                         ValidationFeedbackRule.AliasFileMissing),
-                        new(item.Path, 0, 0, $"Alias file for {language} in {item.Path} is missing")
+                        new(item.Path, additionalInfo: $"Alias file for {language} is missing")
                     );
                 }
             }
