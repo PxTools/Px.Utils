@@ -33,15 +33,15 @@ namespace Px.Utils.TestingApp.Commands
         private void SyntaxValidationBenchmark()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            SyntaxValidator validator = new(stream, encoding, TestFilePath, leaveStreamOpen: true);
-            validator.Validate();
+            SyntaxValidator validator = new();
+            validator.Validate(stream, encoding, TestFilePath, true);
         }
 
         private async Task SyntaxValidationBenchmarkAsync()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            SyntaxValidator validator = new(stream, encoding, TestFilePath, leaveStreamOpen: true);
-            await validator.ValidateAsync();
+            SyntaxValidator validator = new();
+            await validator.ValidateAsync(stream, encoding, TestFilePath, leaveStreamOpen: true);
         }
     }
 }

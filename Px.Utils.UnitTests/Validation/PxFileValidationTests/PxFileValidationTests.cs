@@ -14,10 +14,10 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
         {
             // Arrange
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.MINIMAL_PX_FILE));
-            PxFileValidator validator = new (stream, "foo", Encoding.UTF8);
+            PxFileValidator validator = new();
 
             // Act
-            ValidationResult result = validator.Validate();
+            ValidationResult result = validator.Validate(stream, Encoding.UTF8, "foo");
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -29,10 +29,10 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
         {
             // Arrange
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.MINIMAL_PX_FILE));
-            PxFileValidator validator = new(stream, "foo", Encoding.UTF8);
+            PxFileValidator validator = new();
 
             // Act
-            ValidationResult result = await validator.ValidateAsync();
+            ValidationResult result = await validator.ValidateAsync(stream, Encoding.UTF8, "foo");
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -44,10 +44,10 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
         {
             // Arrange
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.INVALID_PX_FILE));
-            PxFileValidator validator = new(stream, "foo", Encoding.UTF8);
+            PxFileValidator validator = new();
 
             // Act
-            ValidationResult result = await validator.ValidateAsync();
+            ValidationResult result = await validator.ValidateAsync(stream, Encoding.UTF8, "foo");
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -60,11 +60,11 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
         {
             // Arrange
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.MINIMAL_PX_FILE));
-            PxFileValidator validator = new(stream, "foo", Encoding.UTF8);
-            validator.SetCustomValidators([new MockCustomValidators()]);
+            PxFileValidator validator = new();
+            validator.SetCustomValidators([new MockCustomStreamValidator()], [new MockCustomStreamAsyncValidator()], [new MockCustomValidator()], [new MockCustomAsyncValidator()]);
 
             // Act
-            ValidationResult result = validator.Validate();
+            ValidationResult result = validator.Validate(stream, Encoding.UTF8, "foo");
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -76,10 +76,10 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
         {
             // Arrange
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.PX_FILE_WITHOUT_DATA));
-            PxFileValidator validator = new(stream, "foo", Encoding.UTF8);
+            PxFileValidator validator = new();
 
             // Act
-            ValidationResult result = validator.Validate();
+            ValidationResult result = validator.Validate(stream, Encoding.UTF8, "foo");
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -91,10 +91,10 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
         {
             // Arrange
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.PX_FILE_WITHOUT_DATA));
-            PxFileValidator validator = new(stream, "foo", Encoding.UTF8);
+            PxFileValidator validator = new();
 
             // Act
-            ValidationResult result = await validator.ValidateAsync();
+            ValidationResult result = await validator.ValidateAsync(stream, Encoding.UTF8, "foo");
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -106,11 +106,11 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
         {
             // Arrange
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.MINIMAL_PX_FILE));
-            PxFileValidator validator = new(stream, "foo", Encoding.UTF8);
-            validator.SetCustomValidators(null, [new MockCustomValidators()]);
+            PxFileValidator validator = new();
+            validator.SetCustomValidators([new MockCustomStreamValidator()], [new MockCustomStreamAsyncValidator()], [new MockCustomValidator()], [new MockCustomAsyncValidator()]);
 
             // Act
-            ValidationResult result = await validator.ValidateAsync();
+            ValidationResult result = await validator.ValidateAsync(stream, Encoding.UTF8, "foo");
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -122,11 +122,11 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
         {
             // Arrange
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.MINIMAL_PX_FILE));
-            PxFileValidator validator = new(stream, "foo", Encoding.UTF8);
+            PxFileValidator validator = new();
             validator.SetCustomValidatorFunctions(new MockCustomSyntaxValidationFunctions(), new MockCustomContentValidationFunctions());
 
             // Act
-            ValidationResult result = validator.Validate();
+            ValidationResult result = validator.Validate(stream, Encoding.UTF8, "foo");
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");

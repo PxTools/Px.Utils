@@ -10,21 +10,17 @@ namespace Px.Utils.Validation
     /// <summary>
     /// Validates a Px file as a whole.
     /// </summary>
-    /// <param name="stream">Px file stream to be validated</param>
-    /// <param name="filename">Name of the file subject to validation</param>
-    /// <param name="encoding">Encoding format of the px file</param>
     /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens required for the px file syntax.</param>
     public class PxFileValidator(
-        Stream stream,
-        string filename,
-        Encoding? encoding,
         PxFileSyntaxConf? syntaxConf = null
-        ) : IPxFileValidator, IPxFileValidatorAsync
+        ) : IPxFileStreamValidator, IPxFileStreamValidatorAsync
     {
         private CustomSyntaxValidationFunctions? _customSyntaxValidationFunctions;
         private CustomContentValidationFunctions? _customContentValidationFunctions;
-        private IPxFileValidator[]? _customValidators;
-        private IPxFileValidatorAsync[]? _customAsyncValidators;
+        private IPxFileStreamValidator[]? _customStreamValidators;
+        private IPxFileStreamValidatorAsync[]? _customStreamAsyncValidators;
+        private IValidator[]? _customValidators;
+        private IValidatorAsync[]? _customAsyncValidators;
 
         /// <summary>
         /// Set custom validation functions to be used during validation.
@@ -40,10 +36,16 @@ namespace Px.Utils.Validation
         /// <summary>
         /// Set custom validators to be used during validation.
         /// </summary>
-        /// <param name="customValidators">Array of objects that implement <see cref="IPxFileValidator"/> interface, used for blocking validation.</param>
-        /// <param name="customAsyncValidators">Array of objects that implement <see cref="IPxFileValidatorAsync"/> interface, used for asynchronous validation.</param>
-        public void SetCustomValidators(IPxFileValidator[]? customValidators = null, IPxFileValidatorAsync[]? customAsyncValidators = null)
+        /// <param name="customValidators">Array of objects that implement <see cref="IPxFileStreamValidator"/> interface, used for blocking validation.</param>
+        /// <param name="customAsyncValidators">Array of objects that implement <see cref="IPxFileStreamValidatorAsync"/> interface, used for asynchronous validation.</param>
+        public void SetCustomValidators(
+            IPxFileStreamValidator[]? customStreamValidators = null,
+            IPxFileStreamValidatorAsync[]? customStreamAsyncValidators = null,
+            IValidator[]? customValidators = null,
+            IValidatorAsync[]? customAsyncValidators = null)
         {
+            _customStreamValidators = customStreamValidators;
+            _customStreamAsyncValidators = customStreamAsyncValidators;
             _customValidators = customValidators;
             _customAsyncValidators = customAsyncValidators;
         }
@@ -51,16 +53,23 @@ namespace Px.Utils.Validation
         /// <summary>
         /// Validates the Px file. Starts with metadata syntax validation, then metadata content validation, and finally data validation.
         /// If any custom validation functions are set, they are executed after the default validation steps.
+        /// <param name="stream">Px file stream to be validated</param>
+        /// <param name="encoding">Encoding format of the px file</param>
+        /// <param name="filename">Name of the file subject to validation</param>
+        /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
         /// </summary>
         /// <returns><see cref="ValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
-        public ValidationResult Validate()
+        public ValidationResult Validate(
+            Stream stream,
+            Encoding encoding,
+            string filename,
+            bool leaveStreamOpen = false)
         {
-            encoding ??= Encoding.Default;
             syntaxConf ??= PxFileSyntaxConf.Default;
 
             ValidationFeedback feedbacks = [];
-            SyntaxValidator syntaxValidator = new(stream, encoding, filename, syntaxConf, _customSyntaxValidationFunctions, true);
-            SyntaxValidationResult syntaxValidationResult = syntaxValidator.Validate();
+            SyntaxValidator syntaxValidator = new(syntaxConf, _customSyntaxValidationFunctions);
+            SyntaxValidationResult syntaxValidationResult = syntaxValidator.Validate(stream, encoding, filename, true);
             feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
 
             ContentValidator contentValidator = new(filename, encoding, [.. syntaxValidationResult.Result], _customContentValidationFunctions, syntaxConf);
@@ -80,19 +89,24 @@ namespace Px.Utils.Validation
 
             stream.Position = syntaxValidationResult.DataStartStreamPosition;
             DataValidator dataValidator = new(
-                stream,
                 contentValidationResult.DataRowLength,
                 contentValidationResult.DataRowAmount,
-                filename,
                 syntaxValidationResult.DataStartRow, 
-                encoding,
                 syntaxConf);
-            ValidationResult dataValidationResult = dataValidator.Validate();
+            ValidationResult dataValidationResult = dataValidator.Validate(stream, encoding, filename, leaveStreamOpen);
             feedbacks.AddRange(dataValidationResult.FeedbackItems);
 
+            if (_customStreamValidators is not null)
+            {
+                foreach (IPxFileStreamValidator customValidator in _customStreamValidators)
+                {
+                    ValidationResult customValidationResult = customValidator.Validate(stream, encoding, filename, leaveStreamOpen);
+                    feedbacks.AddRange(customValidationResult.FeedbackItems);
+                }
+            }
             if (_customValidators is not null)
             {
-                foreach (IPxFileValidator customValidator in _customValidators)
+                foreach (IValidator customValidator in _customValidators)
                 {
                     ValidationResult customValidationResult = customValidator.Validate();
                     feedbacks.AddRange(customValidationResult.FeedbackItems);
@@ -105,16 +119,25 @@ namespace Px.Utils.Validation
         /// <summary>
         /// Validates the Px file asynchronously. Starts with metadata syntax validation, then metadata content validation, and finally data validation.
         /// If any custom validation functions are set, they are executed after the default validation steps.
+        /// <param name="stream">Px file stream to be validated</param>
+        /// <param name="encoding">Encoding format of the px file</param>
+        /// <param name="filename">Name of the file subject to validation</param>
+        /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
+        /// <param name="cancellationToken">Cancellation token for cancelling the validation process</param>
         /// </summary>
         /// <returns><see cref="ValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
-        public async Task<ValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
+        public async Task<ValidationResult> ValidateAsync(
+            Stream stream,
+            Encoding encoding,
+            string filename,
+            bool leaveStreamOpen = false,
+            CancellationToken cancellationToken = default)
         {
-            encoding ??= Encoding.Default;
             syntaxConf ??= PxFileSyntaxConf.Default;
 
             ValidationFeedback feedbacks = [];
-            SyntaxValidator syntaxValidator = new(stream, encoding, filename, syntaxConf, _customSyntaxValidationFunctions, true);
-            SyntaxValidationResult syntaxValidationResult = await syntaxValidator.ValidateAsync(cancellationToken);
+            SyntaxValidator syntaxValidator = new(syntaxConf, _customSyntaxValidationFunctions);
+            SyntaxValidationResult syntaxValidationResult = await syntaxValidator.ValidateAsync(stream, encoding, filename, true, cancellationToken);
             feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
 
             ContentValidator contentValidator = new(filename, encoding, [..syntaxValidationResult.Result], _customContentValidationFunctions, syntaxConf);
@@ -134,20 +157,25 @@ namespace Px.Utils.Validation
 
             stream.Position = syntaxValidationResult.DataStartStreamPosition;
             DataValidator dataValidator = new(
-                stream,
                 contentValidationResult.DataRowLength,
                 contentValidationResult.DataRowAmount,
-                filename,
                 syntaxValidationResult.DataStartRow, 
-                encoding,
                 syntaxConf);
 
-            ValidationResult dataValidationResult = await dataValidator.ValidateAsync(cancellationToken);
+            ValidationResult dataValidationResult = await dataValidator.ValidateAsync(stream, encoding, filename, leaveStreamOpen, cancellationToken);
             feedbacks.AddRange(dataValidationResult.FeedbackItems);
 
+            if (_customStreamAsyncValidators is not null)
+            {
+                foreach (IPxFileStreamValidatorAsync customValidator in _customStreamAsyncValidators)
+                {
+                    ValidationResult customValidationResult = await customValidator.ValidateAsync(stream, encoding, filename, leaveStreamOpen, cancellationToken);
+                    feedbacks.AddRange(customValidationResult.FeedbackItems);
+                }
+            }
             if (_customAsyncValidators is not null)
             {
-                foreach (IPxFileValidatorAsync customValidator in _customAsyncValidators)
+                foreach (IValidatorAsync customValidator in _customAsyncValidators)
                 {
                     ValidationResult customValidationResult = await customValidator.ValidateAsync(cancellationToken);
                     feedbacks.AddRange(customValidationResult.FeedbackItems);

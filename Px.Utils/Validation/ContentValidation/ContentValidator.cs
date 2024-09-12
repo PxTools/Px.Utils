@@ -17,7 +17,7 @@ namespace Px.Utils.Validation.ContentValidation
         Encoding encoding,
         ValidationStructuredEntry[] entries,
         CustomContentValidationFunctions? customContentValidationFunctions = null,
-        PxFileSyntaxConf? syntaxConf = null) : IPxFileValidator
+        PxFileSyntaxConf? syntaxConf = null) : IValidator
     {
         private readonly string _filename = filename;
         private readonly Encoding _encoding = encoding;
@@ -95,7 +95,7 @@ namespace Px.Utils.Validation.ContentValidation
 
         #region Interface implementation
 
-        ValidationResult IPxFileValidator.Validate()
+        ValidationResult IValidator.Validate()
             => Validate();
 
         #endregion

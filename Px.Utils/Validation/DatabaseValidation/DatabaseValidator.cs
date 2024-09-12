@@ -24,7 +24,7 @@ namespace Px.Utils.Validation.DatabaseValidation
         IDatabaseValidator[]? customAliasFileValidators = null,
         IDatabaseValidator[]? customDirectoryValidators = null,
         IFileSystem? fileSystem = null
-        ) : IPxFileValidator, IPxFileValidatorAsync
+        ) : IValidator, IValidatorAsync
     {
         private readonly string _directoryPath = directoryPath;
         private readonly PxFileSyntaxConf _syntaxConf = syntaxConf is not null ? syntaxConf : PxFileSyntaxConf.Default;
@@ -96,8 +96,8 @@ namespace Px.Utils.Validation.DatabaseValidation
             DatabaseFileInfo fileInfo = GetPxFileInfo(fileName, stream);
             pxFiles.Add(fileInfo);
             stream.Position = 0;
-            PxFileValidator validator = new(stream, fileName, fileInfo.Encoding, _syntaxConf);
-            ValidationResult result = validator.Validate();
+            PxFileValidator validator = new(_syntaxConf);
+            ValidationResult result = validator.Validate(stream, fileInfo.Encoding, fileName);
             feedbacks.AddRange(result.FeedbackItems);
         }
 
@@ -114,8 +114,8 @@ namespace Px.Utils.Validation.DatabaseValidation
             DatabaseFileInfo fileInfo = await GetPxFileInfoAsync(fileName, stream, cancellationToken);
             pxFiles.Add(fileInfo);
             stream.Position = 0;
-            PxFileValidator validator = new(stream, fileName, fileInfo.Encoding, _syntaxConf);
-            ValidationResult result = await validator.ValidateAsync(cancellationToken);
+            PxFileValidator validator = new(_syntaxConf);
+            ValidationResult result = await validator.ValidateAsync(stream, fileInfo.Encoding, fileName, false, cancellationToken);
             feedbacks.AddRange(result.FeedbackItems);
             cancellationToken.ThrowIfCancellationRequested();
         }

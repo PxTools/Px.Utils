@@ -15,9 +15,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_VALID_DATA));
             stream.Seek(6, 0);
-            DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
+            DataValidator validator = new(5, 4, 1);
 
-            ValidationFeedback validationFeedbacks = validator.Validate().FeedbackItems;
+            ValidationFeedback validationFeedbacks = validator.Validate(stream, Encoding.UTF8, "foo").FeedbackItems;
 
             foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
             {
@@ -35,9 +35,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_VALID_DATA));
             stream.Seek(6, 0);
-            DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
+            DataValidator validator = new(5, 4, 1);
 
-            ValidationResult result = await validator.ValidateAsync();
+            ValidationResult result = await validator.ValidateAsync(stream, Encoding.UTF8, "foo");
             ValidationFeedback validationFeedbacks = result.FeedbackItems;
 
             foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
@@ -57,9 +57,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_INVALID_DATA));
             stream.Seek(6, 0); 
-            DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
+            DataValidator validator = new(5, 4, 1);
 
-            ValidationFeedback validationFeedbacks = validator.Validate().FeedbackItems;
+            ValidationFeedback validationFeedbacks = validator.Validate(stream, Encoding.UTF8, "foo").FeedbackItems;
 
             foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
             {
@@ -79,9 +79,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_INVALID_DATA));
             stream.Seek(6, 0);
-            DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
+            DataValidator validator = new(5, 4, 1);
 
-            ValidationResult result = await validator.ValidateAsync();
+            ValidationResult result = await validator.ValidateAsync(stream, Encoding.UTF8, "foo");
             ValidationFeedback validationFeedbacks = result.FeedbackItems;
 
             foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
@@ -101,9 +101,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         public void ValidateWithoutDataReturnsErrors()
         {
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.NO_DATA));
-            DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
+            DataValidator validator = new(5, 4, 1);
 
-            ValidationFeedback validationFeedbacks = validator.Validate().FeedbackItems;
+            ValidationFeedback validationFeedbacks = validator.Validate(stream, Encoding.UTF8, "foo").FeedbackItems;
 
             foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
             {
@@ -121,9 +121,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         public async Task ValidateAsyncWithoutDataReturnsErrors()
         {
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.NO_DATA));
-            DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
+            DataValidator validator = new(5, 4, 1);
 
-            ValidationResult result = await validator.ValidateAsync();
+            ValidationResult result = await validator.ValidateAsync(stream, Encoding.UTF8, "foo");
             ValidationFeedback validationFeedbacks = result.FeedbackItems;
 
             foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
@@ -142,9 +142,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         public void ValidateWithDataOnOnSingleRowReturnsErrors()
         {
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.DATA_ON_SINGLE_ROW));
-            DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
+            DataValidator validator = new(5, 4, 1);
 
-            ValidationFeedback validationFeedbacks = validator.Validate().FeedbackItems;
+            ValidationFeedback validationFeedbacks = validator.Validate(stream, Encoding.UTF8, "foo").FeedbackItems;
 
             foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
             {
@@ -163,9 +163,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         public async Task ValidateAsyncWithDataOnSingleRowReturnsErrors()
         {
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.DATA_ON_SINGLE_ROW));
-            DataValidator validator = new(stream, 5, 4, "foo", 1, Encoding.Default);
+            DataValidator validator = new(5, 4, 1);
 
-            ValidationResult result = await validator.ValidateAsync();
+            ValidationResult result = await validator.ValidateAsync(stream, Encoding.UTF8, "foo");
             ValidationFeedback validationFeedbacks = result.FeedbackItems;
 
             foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
