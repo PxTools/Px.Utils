@@ -79,6 +79,7 @@
             "\r\nAXIS-VERSION=\"2013\";" +
             "\r\nCODEPAGE=\"UTF-8\";" +
             "\r\nLANGUAGE=\"en\";" +
+            "\r\nLANGUAGES=\"en\";" +
             "\r\nNEXT-UPDATE=\"20240201 08:00\";" +
             "\r\nTABLEID=\"table-id\";" +
             "\r\nSUBJECT-AREA=\"subject-area\";" +

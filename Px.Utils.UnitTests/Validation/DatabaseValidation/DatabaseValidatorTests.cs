@@ -130,9 +130,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            // LANGUAGES keyword is recommended, but not required, three warning level feedback items are expected
-            Assert.AreEqual(1, result.FeedbackItems.Count); // Unique feedbacks
-            Assert.AreEqual(3, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
+            Assert.AreEqual(0, result.FeedbackItems.Count);
         }
 
         [TestMethod]
@@ -147,9 +145,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            // LANGUAGES keyword is recommended, but not required, three warning level feedback items are expected
-            Assert.AreEqual(1, result.FeedbackItems.Count); // Unique feedbacks
-            Assert.AreEqual(3, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
+            Assert.AreEqual(0, result.FeedbackItems.Count);
         }
     }
 }
