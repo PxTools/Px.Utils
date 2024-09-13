@@ -44,11 +44,10 @@ namespace Px.Utils.Validation.ContentValidation
                             valuesEntry.Value, 
                             syntaxConf.Symbols.Value.ListSeparator, 
                             syntaxConf.Symbols.Value.StringDelimeter);
-                        values = CleanListOfStrings(values, syntaxConf);
 
                         variableValues.Add(
                             new KeyValuePair<string, string> ( language, dimension ),
-                            [..values]
+                            [.. values.Select(v => SyntaxValidationUtilityMethods.CleanString(v, syntaxConf))]
                             );
                     }
                     else
@@ -241,22 +240,6 @@ namespace Px.Utils.Validation.ContentValidation
             return feedbackItems;
         }
 
-        /// <summary>
-        /// Cleans a list of strings from new line characters and quotation marks.
-        /// </summary>
-        /// <param name="input">The input array of strings to clean</param>
-        /// <param name="syntaxConf>The syntax configuration for the PX file. The syntax configuration is represented by a <see cref="PxFileSyntaxConf"/> object.</param>
-        /// <returns>A list of strings that are the input strings cleaned from new line characters and quotation marks</returns>
-        internal static List<string> CleanListOfStrings(List<string> input, PxFileSyntaxConf syntaxConf)
-        {
-            List<string> cleaned = [];
-            foreach (string item in input)
-            {
-                cleaned.Add(SyntaxValidationUtilityMethods.CleanString(item, syntaxConf));
-            }
-            return cleaned;
-        }
-
         private static Dictionary<string, string[]> GetDimensionNames(
             ValidationStructuredEntry[] entries,
             string defaultLanguage,
@@ -267,8 +250,7 @@ namespace Px.Utils.Validation.ContentValidation
             {
                 string language = entry.Key.Language ?? defaultLanguage;
                 List<string> names = SyntaxValidationUtilityMethods.GetListItemsFromString(entry.Value, syntaxConf.Symbols.Value.ListSeparator, syntaxConf.Symbols.Value.StringDelimeter);
-                names = CleanListOfStrings(names, syntaxConf);
-                dimensionNames.Add(language, [.. names]);
+                dimensionNames.Add(language, [.. names.Select(n => SyntaxValidationUtilityMethods.CleanString(n, syntaxConf))]);
             }
             return dimensionNames;
         }

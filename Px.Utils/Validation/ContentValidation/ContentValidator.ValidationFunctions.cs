@@ -116,8 +116,7 @@ namespace Px.Utils.Validation.ContentValidation
             if (availableLanguageEntries.Length == 1)
             {
                 List<string> languages = availableLanguageEntries[0].Value.Split(validator.SyntaxConf.Symbols.Value.ListSeparator).ToList();
-                languages = CleanListOfStrings(languages, validator.SyntaxConf);
-                validator._availableLanguages = [..languages];
+                validator._availableLanguages = [.. languages.Select(lang => SyntaxValidationUtilityMethods.CleanString(lang, validator.SyntaxConf))];
                 return null;
             }
             else
