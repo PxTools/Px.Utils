@@ -39,7 +39,7 @@ namespace Px.Utils.Validation.SyntaxValidation
             bool leaveStreamOpen = false,
             IFileSystem? fileSystem = null)
         {
-            fileSystem ??= new FileSystem();
+            fileSystem ??= new LocalFileSystem();
             encoding ??= fileSystem.GetEncoding(stream);
 
             SyntaxValidationFunctions validationFunctions = new();
@@ -86,7 +86,7 @@ namespace Px.Utils.Validation.SyntaxValidation
             IFileSystem? fileSystem = null,
             CancellationToken cancellationToken = default)
         {
-            fileSystem ??= new FileSystem();
+            fileSystem ??= new LocalFileSystem();
             encoding ??= await fileSystem.GetEncodingAsync(stream, cancellationToken);
 
             SyntaxValidationFunctions validationFunctions = new();

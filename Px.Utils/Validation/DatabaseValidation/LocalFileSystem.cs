@@ -10,7 +10,7 @@ namespace Px.Utils.Validation.DatabaseValidation
     /// Default file system used for database validation process. Contains default implementations of numerous IO operations
     /// and a function for determining a file's encoding format.
     /// </summary>
-    public class FileSystem : IFileSystem
+    public class LocalFileSystem : IFileSystem
     {
         public IEnumerable<string> EnumerateFiles(string path, string searchPattern)
         {

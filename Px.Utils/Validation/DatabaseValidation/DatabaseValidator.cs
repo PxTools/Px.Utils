@@ -31,7 +31,7 @@ namespace Px.Utils.Validation.DatabaseValidation
         private readonly IDatabaseValidator[]? _customPxFileValidators = customPxFileValidators;
         private readonly IDatabaseValidator[]? _customAliasFileValidators = customAliasFileValidators;
         private readonly IDatabaseValidator[]? _customDirectoryValidators = customDirectoryValidators;
-        private readonly IFileSystem _fileSystem = fileSystem is not null ? fileSystem : new FileSystem();
+        private readonly IFileSystem _fileSystem = fileSystem is not null ? fileSystem : new LocalFileSystem();
 
         private readonly ValidationFeedback feedbacks = [];
         private readonly ConcurrentBag<DatabaseFileInfo> pxFiles = [];

@@ -53,7 +53,7 @@ namespace Px.Utils.Validation.DataValidation
             bool leaveStreamOpen = false,
             IFileSystem? fileSystem = null)
         {
-            fileSystem ??= new FileSystem();
+            fileSystem ??= new LocalFileSystem();
             encoding ??= fileSystem.GetEncoding(stream);
             SetValidationParameters(encoding, filename);
 
@@ -99,7 +99,7 @@ namespace Px.Utils.Validation.DataValidation
             IFileSystem? fileSystem = null,
             CancellationToken cancellationToken = default)
         {
-            fileSystem ??= new FileSystem();
+            fileSystem ??= new LocalFileSystem();
             encoding ??= await fileSystem.GetEncodingAsync(stream, cancellationToken);
             SetValidationParameters(encoding, filename);
 
