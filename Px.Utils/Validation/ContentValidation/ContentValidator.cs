@@ -14,13 +14,13 @@ namespace Px.Utils.Validation.ContentValidation
     /// </summary>
     public sealed partial class ContentValidator(
         string filename,
-        Encoding encoding,
+        Encoding? encoding,
         ValidationStructuredEntry[] entries,
         CustomContentValidationFunctions? customContentValidationFunctions = null,
         PxFileSyntaxConf? syntaxConf = null) : IValidator
     {
         private readonly string _filename = filename;
-        private readonly Encoding _encoding = encoding;
+        private readonly Encoding? _encoding = encoding;
         /// <summary>
         /// Default language of the Px file defined with LANGUAGE keyword by default
         /// </summary>

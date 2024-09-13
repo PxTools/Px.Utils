@@ -17,7 +17,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             PxFileValidator validator = new();
 
             // Act
-            ValidationResult result = validator.Validate(stream, Encoding.UTF8, "foo");
+            ValidationResult result = validator.Validate(stream, "foo", Encoding.UTF8);
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -32,7 +32,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             PxFileValidator validator = new();
 
             // Act
-            ValidationResult result = await validator.ValidateAsync(stream, Encoding.UTF8, "foo");
+            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8);
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -47,7 +47,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             PxFileValidator validator = new();
 
             // Act
-            ValidationResult result = await validator.ValidateAsync(stream, Encoding.UTF8, "foo");
+            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8);
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -64,7 +64,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             validator.SetCustomValidators([new MockCustomStreamValidator()], [new MockCustomStreamAsyncValidator()], [new MockCustomValidator()], [new MockCustomAsyncValidator()]);
 
             // Act
-            ValidationResult result = validator.Validate(stream, Encoding.UTF8, "foo");
+            ValidationResult result = validator.Validate(stream, "foo", Encoding.UTF8);
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -79,7 +79,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             PxFileValidator validator = new();
 
             // Act
-            ValidationResult result = validator.Validate(stream, Encoding.UTF8, "foo");
+            ValidationResult result = validator.Validate(stream, "foo", Encoding.UTF8);
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -94,7 +94,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             PxFileValidator validator = new();
 
             // Act
-            ValidationResult result = await validator.ValidateAsync(stream, Encoding.UTF8, "foo");
+            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8);
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -110,7 +110,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             validator.SetCustomValidators([new MockCustomStreamValidator()], [new MockCustomStreamAsyncValidator()], [new MockCustomValidator()], [new MockCustomAsyncValidator()]);
 
             // Act
-            ValidationResult result = await validator.ValidateAsync(stream, Encoding.UTF8, "foo");
+            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8);
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
@@ -126,7 +126,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             validator.SetCustomValidatorFunctions(new MockCustomSyntaxValidationFunctions(), new MockCustomContentValidationFunctions());
 
             // Act
-            ValidationResult result = validator.Validate(stream, Encoding.UTF8, "foo");
+            ValidationResult result = validator.Validate(stream, "foo", Encoding.UTF8);
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");

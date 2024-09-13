@@ -42,14 +42,14 @@ namespace Px.Utils.TestingApp.Commands
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileValidator validator = new();
-            validator.Validate(stream, encoding, TestFilePath);
+            validator.Validate(stream, TestFilePath, encoding);
         }
 
         private async Task ValidatePxFileBenchmarksAsync()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileValidator validator = new();
-            await validator.ValidateAsync(stream, encoding, TestFilePath);
+            await validator.ValidateAsync(stream, TestFilePath, encoding);
         }
     }
 }

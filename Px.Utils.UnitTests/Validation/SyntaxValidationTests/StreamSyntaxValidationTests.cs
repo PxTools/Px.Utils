@@ -47,7 +47,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = validator.Validate(stream, encoding, "foo");
+            SyntaxValidationResult result = validator.Validate(stream, "foo", encoding);
             Assert.AreEqual(8, result.Result.Count);
             Assert.AreEqual(0, feedback.Count);
         }
@@ -82,7 +82,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = validator.Validate(stream, encoding, "foo");
+            SyntaxValidationResult result = validator.Validate(stream, "foo", encoding);
             Assert.AreEqual(10, result.Result.Count);
             Assert.AreEqual("YES", result.Result[8].Value);
             Assert.AreEqual("NO", result.Result[9].Value);
@@ -112,7 +112,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = validator.Validate(stream, encoding, "foo");
+            SyntaxValidationResult result = validator.Validate(stream, "foo", encoding);
             Assert.AreEqual(4, result.FeedbackItems.Count);
             Assert.AreEqual(9, result.FeedbackItems[keyWhiteSpaceFeedbackKey][0].Line);
             Assert.AreEqual(12, result.FeedbackItems[valueWhiteSpaceFeedbackKey][0].Line);
@@ -493,7 +493,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = validator.Validate(stream, encoding, "foo");
+            SyntaxValidationResult result = validator.Validate(stream, "foo", encoding);
             Assert.AreEqual(0, result.FeedbackItems.Count);
         }
 
@@ -512,7 +512,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = validator.Validate(stream, encoding, "foo");
+            SyntaxValidationResult result = validator.Validate(stream, "foo", encoding);
             Assert.AreEqual(1, result.FeedbackItems.Count);
             Assert.AreEqual(9, result.FeedbackItems.First().Value[0].Line);
             Assert.AreEqual(16, result.FeedbackItems.First().Value[0].Character);
@@ -534,7 +534,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
 
             // Act
             SyntaxValidator validator = new(customValidationFunctions: new MockCustomSyntaxValidationFunctions());
-            SyntaxValidationResult result = validator.Validate(stream, encoding, "foo");
+            SyntaxValidationResult result = validator.Validate(stream, "foo", encoding);
 
             // Assert
             Assert.AreEqual(0, result.FeedbackItems.Count);
@@ -552,7 +552,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
 
             // Act
             SyntaxValidator validator = new(customValidationFunctions: new MockCustomSyntaxValidationFunctions());
-            SyntaxValidationResult result = await validator.ValidateAsync(stream, encoding, "foo");
+            SyntaxValidationResult result = await validator.ValidateAsync(stream, "foo", encoding);
 
             // Assert
             Assert.AreEqual(0, result.FeedbackItems.Count);

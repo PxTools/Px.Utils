@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Px.Utils.PxFile;
+using Px.Utils.PxFile.Metadata;
 
 namespace Px.Utils.Validation.DataValidation
 {
@@ -28,16 +29,16 @@ namespace Px.Utils.Validation.DataValidation
         private int _charPosition;
         private EntryType _currentCharacterType;
         private long _currentRowLength;
-        private Encoding _encoding;
-        private string _filename;
+        private Encoding _encoding = Encoding.Default;
+        private string _filename = string.Empty;
 
         /// <summary>
         /// Validates the data in the stream according to the specified parameters and returns a collection of validation feedback items.
         /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
         /// </summary>
         /// <param name="stream">Px file stream to be validated</param>
-        /// <param name="encoding">Encoding of the stream</param>
         /// <param name="filename">Name of the file being validated</param>
+        /// <param name="encoding">Encoding of the stream. If not provided, validator tries to find encoding.</param>
         /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
         /// <returns>
         /// <see cref="ValidationResult"/> object that contains a collection of 
@@ -45,11 +46,11 @@ namespace Px.Utils.Validation.DataValidation
         /// </returns>
         public ValidationResult Validate(
             Stream stream,
-            Encoding encoding,
             string filename,
+            Encoding? encoding = null,
             bool leaveStreamOpen = false)
         {
-            SetValidationParameters(encoding, filename);
+            SetValidationParameters(encoding, filename, stream);
 
             ValidationFeedback validationFeedbacks = [];
             int dataStartIndex = GetStreamIndexOfFirstDataValue(stream, ref validationFeedbacks);
@@ -78,7 +79,7 @@ namespace Px.Utils.Validation.DataValidation
         /// <returns>
         /// <param name="stream">Px file stream to be validated</param>
         /// <param name="encoding">Encoding of the stream</param>
-        /// <param name="filename">Name of the file being validated</param>
+        /// <param name="filename">Name of the file being validated. If not provided, validator tries to find the encoding.</param>
         /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
         /// <paramref name="cancellationToken"/>Cancellation token for cancelling the validation process</param>
         /// <see cref="ValidationResult"/> object that contains a collection of 
@@ -86,12 +87,12 @@ namespace Px.Utils.Validation.DataValidation
         /// </returns>
         public async Task<ValidationResult> ValidateAsync(
             Stream stream,
-            Encoding encoding,
             string filename,
+            Encoding? encoding = null,
             bool leaveStreamOpen = false,
             CancellationToken cancellationToken = default)
         {
-            SetValidationParameters(encoding, filename);
+            SetValidationParameters(encoding, filename, stream);
 
             ValidationFeedback validationFeedbacks = [];
             int dataStartIndex = GetStreamIndexOfFirstDataValue(stream, ref validationFeedbacks);
@@ -115,8 +116,13 @@ namespace Px.Utils.Validation.DataValidation
             return new (validationFeedbacks);
         }
 
-        private void SetValidationParameters(Encoding encoding, string filename)
+        private void SetValidationParameters(Encoding? encoding, string filename, Stream stream)
         {
+            if (encoding is null)
+            {
+                PxFileMetadataReader reader = new();
+                encoding = reader.GetEncoding(stream);
+            }
             _commonValidators.Add(new DataStructureValidator());
             _dataNumValidators.AddRange(_commonValidators);
             _dataNumValidators.Add(new DataNumberValidator());

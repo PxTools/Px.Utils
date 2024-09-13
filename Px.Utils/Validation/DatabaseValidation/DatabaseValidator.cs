@@ -97,7 +97,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             pxFiles.Add(fileInfo);
             stream.Position = 0;
             PxFileValidator validator = new(_syntaxConf);
-            ValidationResult result = validator.Validate(stream, fileInfo.Encoding, fileName);
+            ValidationResult result = validator.Validate(stream, fileName, fileInfo.Encoding);
             feedbacks.AddRange(result.FeedbackItems);
         }
 
@@ -115,7 +115,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             pxFiles.Add(fileInfo);
             stream.Position = 0;
             PxFileValidator validator = new(_syntaxConf);
-            ValidationResult result = await validator.ValidateAsync(stream, fileInfo.Encoding, fileName, false, cancellationToken);
+            ValidationResult result = await validator.ValidateAsync(stream, fileName, fileInfo.Encoding, false, cancellationToken);
             feedbacks.AddRange(result.FeedbackItems);
             cancellationToken.ThrowIfCancellationRequested();
         }

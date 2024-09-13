@@ -27,7 +27,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = await validator.ValidateAsync(stream, encoding, filename);
+            SyntaxValidationResult result = await validator.ValidateAsync(stream, filename, encoding);
             Assert.AreEqual(8, result.Result.Count);
             Assert.AreEqual(0, feedback.Count);
         }
@@ -47,7 +47,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = await validator.ValidateAsync(stream, encoding, filename);
+            SyntaxValidationResult result = await validator.ValidateAsync(stream, filename, encoding);
             Assert.AreEqual(10, result.Result.Count);
             Assert.AreEqual("YES", result.Result[8].Value);
             Assert.AreEqual("NO", result.Result[9].Value);

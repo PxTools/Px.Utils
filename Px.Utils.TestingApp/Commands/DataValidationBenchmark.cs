@@ -54,7 +54,7 @@ namespace Px.Utils.TestingApp.Commands
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             stream.Position = start + dataKeyword.Length + readStartOffset; // skip the '=' and linechange
             DataValidator validator = new(expectedCols, expectedRows, 0);
-            validator.Validate(stream, encoding, TestFilePath);
+            validator.Validate(stream, TestFilePath, encoding);
         }
         
         private async Task ValidateDataBenchmarksAsync()
@@ -63,7 +63,7 @@ namespace Px.Utils.TestingApp.Commands
             stream.Position = start + dataKeyword.Length + readStartOffset; // skip the '=' and linechange
             DataValidator validator = new(expectedCols, expectedRows, 0);
 
-            await validator.ValidateAsync(stream, encoding, TestFilePath);
+            await validator.ValidateAsync(stream, TestFilePath, encoding);
         }
 
         protected override void SetRunParameters()

@@ -11,11 +11,11 @@ namespace Px.Utils.Validation
         /// Blocking method that validates some aspect of a Px file.
         /// </summary>
         /// <param name="stream">Stream of the PX file to be validated</param>
-        /// <param name="encoding">Encoding of the PX file</param>
         /// <param name="filename">Name of the PX file</param>
+        /// <param name="encoding">Encoding of the PX file. If not provided, validator tries to find the encoding.</param>
         /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
         /// <returns><see cref="ValidationResult"/> object that contains an array of feedback items gathered during the validation process.</returns>
-        public ValidationResult Validate(Stream stream, Encoding encoding, string filename, bool leaveStreamOpen = false);
+        public ValidationResult Validate(Stream stream, string filename, Encoding? encoding = null, bool leaveStreamOpen = false);
     }
 
     /// <summary>
@@ -27,11 +27,11 @@ namespace Px.Utils.Validation
         /// Asynchronous method that validates some aspect of a Px file.
         /// </summary>
         /// <param name="stream">Stream of the PX file to be validated</param>
-        /// <param name="encoding">Encoding of the PX file</param>
         /// <param name="filename">Name of the PX file</param>
+        /// <param name="encoding">Encoding of the PX file. If not provided, validator tries to find the encoding.</param>
         /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
         /// <param name="cancellationToken">Cancellation token for cancelling the validation process</param>
         /// <returns><see cref="ValidationResult"/> object that contains an array of feedback items gathered during the validation process.</returns>
-        public Task<ValidationResult> ValidateAsync(Stream stream, Encoding encoding, string filename, bool leaveStreamOpen = false, CancellationToken cancellationToken = default);
+        public Task<ValidationResult> ValidateAsync(Stream stream, string filename, Encoding? encoding = null, bool leaveStreamOpen = false, CancellationToken cancellationToken = default);
     }
 }

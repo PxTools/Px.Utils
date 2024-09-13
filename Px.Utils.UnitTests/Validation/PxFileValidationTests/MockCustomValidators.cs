@@ -24,7 +24,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
     internal sealed class MockCustomStreamValidator : IPxFileStreamValidator
     {
-        public ValidationResult Validate(Stream stream, Encoding encoding, string filename, bool leaveStreamOpen = false)
+        public ValidationResult Validate(Stream stream, string filename, Encoding? encoding = null, bool leaveStreamOpen = false)
         {
             return new ValidationResult([]);
         }
@@ -32,7 +32,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
     internal sealed class MockCustomStreamAsyncValidator : IPxFileStreamValidatorAsync
     {
-        public async Task<ValidationResult> ValidateAsync(Stream stream, Encoding encoding, string filename, bool leaveStreamOpen = false, CancellationToken cancellationToken = default)
+        public async Task<ValidationResult> ValidateAsync(Stream stream, string filename, Encoding? encoding = null, bool leaveStreamOpen = false, CancellationToken cancellationToken = default)
         {
             // Simulate async operation
             await Task.Delay(1, cancellationToken);

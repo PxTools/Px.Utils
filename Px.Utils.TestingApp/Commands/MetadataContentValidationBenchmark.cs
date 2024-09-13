@@ -27,7 +27,7 @@ namespace Px.Utils.TestingApp.Commands
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             stream.Seek(0, SeekOrigin.Begin);
             SyntaxValidator syntaxValidator = new();
-            SyntaxValidationResult validatorResult = syntaxValidator.Validate(stream, Encoding.Default, TestFilePath);
+            SyntaxValidationResult validatorResult = syntaxValidator.Validate(stream, TestFilePath, Encoding.Default);
             _entries = validatorResult.Result;
         }
 
