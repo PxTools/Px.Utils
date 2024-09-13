@@ -28,7 +28,6 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// <param name="stream">Stream of the PX file to be validated</param>
         /// <param name="filename">Name of the PX file</param>
         /// <param name="encoding">Encoding of the PX file. If not provided, the validator attempts to find the encoding.</param>
-        /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
         /// <param name="fileSystem">File system to use for file operations. If not provided, default file system is used.</param>
         /// <returns>A <see cref="SyntaxValidationResult"/> entry which contains a list of <see cref="ValidationStructuredEntry"/> entries 
         /// and a dictionary of type <see cref="ValidationFeedback"/> accumulated during the validation.</returns>
@@ -36,7 +35,6 @@ namespace Px.Utils.Validation.SyntaxValidation
             Stream stream,
             string filename,
             Encoding? encoding = null,
-            bool leaveStreamOpen = false,
             IFileSystem? fileSystem = null)
         {
             fileSystem ??= new LocalFileSystem();
@@ -57,7 +55,7 @@ namespace Px.Utils.Validation.SyntaxValidation
             syntaxConf ??= PxFileSyntaxConf.Default;
 
             ValidationFeedback validationFeedbacks = [];
-            List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, syntaxConf, filename, _bufferSize, leaveStreamOpen);
+            List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, syntaxConf, filename, _bufferSize);
             validationFeedbacks.AddRange(ValidateEntries(stringEntries, stringValidationFunctions, syntaxConf));
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(stringEntries, syntaxConf);
             validationFeedbacks.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, syntaxConf));
@@ -73,7 +71,6 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// <param name="stream">Stream of the PX file to be validated</param>
         /// <param name="filename">Name of the PX file</param>
         /// <param name="encoding">Encoding of the PX file. If not provided, the validator attempts to find the encoding.</param>
-        /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
         /// <param name="fileSystem">File system to use for file operations. If not provided, default file system is used.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> parameter that can be used to cancel the operation.</param>
         /// <returns>A task that contains a <see cref="SyntaxValidationResult"/> entry which contains a list of <see cref="ValidationStructuredEntry"/> entries 
@@ -82,7 +79,6 @@ namespace Px.Utils.Validation.SyntaxValidation
             Stream stream,
             string filename,
             Encoding? encoding = null,
-            bool leaveStreamOpen = false,
             IFileSystem? fileSystem = null,
             CancellationToken cancellationToken = default)
         {
@@ -103,7 +99,7 @@ namespace Px.Utils.Validation.SyntaxValidation
 
             syntaxConf ??= PxFileSyntaxConf.Default;
             ValidationFeedback validationFeedbacks = [];
-            List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, syntaxConf, filename, _bufferSize, leaveStreamOpen, cancellationToken);
+            List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, syntaxConf, filename, _bufferSize, cancellationToken);
             validationFeedbacks.AddRange(ValidateEntries(entries, stringValidationFunctions, syntaxConf));
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, syntaxConf);
             validationFeedbacks.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, syntaxConf));
@@ -115,17 +111,16 @@ namespace Px.Utils.Validation.SyntaxValidation
 
         #region Interface implementation
 
-        ValidationResult IPxFileStreamValidator.Validate(Stream stream, string filename, Encoding? encoding, bool leaveStreamOpen, IFileSystem? fileSystem)
-            => Validate(stream, filename, encoding, leaveStreamOpen, fileSystem);
+        ValidationResult IPxFileStreamValidator.Validate(Stream stream, string filename, Encoding? encoding, IFileSystem? fileSystem)
+            => Validate(stream, filename, encoding, fileSystem);
 
         Task<ValidationResult> IPxFileStreamValidatorAsync.ValidateAsync(
             Stream stream,
             string filename,
             Encoding? encoding,
-            bool leaveStreamOpen, 
             IFileSystem? fileSystem,
             CancellationToken cancellationToken)
-            => ValidateAsync(stream, filename, encoding, leaveStreamOpen, fileSystem, cancellationToken).ContinueWith(task => (ValidationResult)task.Result);
+            => ValidateAsync(stream, filename, encoding, fileSystem, cancellationToken).ContinueWith(task => (ValidationResult)task.Result);
 
         #endregion
 
@@ -239,14 +234,14 @@ namespace Px.Utils.Validation.SyntaxValidation
             }).ToList();
         }
 
-        private List<ValidationEntry> BuildValidationEntries(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize, bool leaveStreamOpen)
+        private List<ValidationEntry> BuildValidationEntries(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize)
         {
             bool isProcessingString = false;
             int characterIndex = 0;
             List<int> lineChangeIndexes = [];
             int entryStartIndex = 0;
             int entryStartLineIndex = 0;
-            using StreamReader reader = new(stream, encoding, leaveOpen: leaveStreamOpen);
+            using StreamReader reader = new(stream, encoding, leaveOpen: true);
             List<ValidationEntry> entries = [];
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
@@ -296,7 +291,6 @@ namespace Px.Utils.Validation.SyntaxValidation
             PxFileSyntaxConf syntaxConf,
             string filename,
             int bufferSize,
-            bool leaveStreamOpen,
             CancellationToken cancellationToken)
         {
             bool isProcessingString = false;
@@ -305,7 +299,7 @@ namespace Px.Utils.Validation.SyntaxValidation
             int entryStartIndex = 0;
             int entryStartLineIndex = 0;
             
-            using StreamReader reader = new(stream, encoding, leaveOpen: leaveStreamOpen);
+            using StreamReader reader = new(stream, encoding, leaveOpen: true);
             List<ValidationEntry> entries = [];
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];

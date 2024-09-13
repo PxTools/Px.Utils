@@ -53,7 +53,7 @@ namespace Px.Utils.TestingApp.Commands
         {
             base.OneTimeBenchmarkSetup();
 
-            validator = new(TestFilePath);
+            validator = new(TestFilePath, new LocalFileSystem());
         }
 
         private void ValidationBenchmark()

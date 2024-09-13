@@ -42,27 +42,24 @@ TBA
 
 #### Px file validation
 Px files can be validated either as a whole by using PxFileValidator or by using individual validators - SyntaxValidator, ContentValidator and DataValidator - for different parts of the file. Custom validation functions or validator classes can be added to the validation processes.
-
-##### PxFileValidator
-PxFileValidator is a class that validates the whole px file including its data, metadata syntax and metadata contents. The class can be instantiated with the following parameters:
+Validator classes implement either IPxFileStreamValidator or IPxFileStreamValidatorAsync interfaces for synchronous and asynchronous validation processes respectively. Custom validation functions must implement either the IPxFileValidator or IPxFileValidatorAsync, IValidator or IValidatorAsync interfaces.
+IPxFileStreamValidator and IPxFileStreamValidatorAsync interfaces required the following parameters to run their Validate or ValidateAsync functions:
 - stream (Stream): The stream of the px file to be validated
 - filename (string): Name of the file to be validated
 - encoding (Encoding, optional): Encoding of the px file. Default is Encoding.Default
+- fileSystem (IFileSystem, optional): Object that defines the file system used for the validation process. Default file called LocalFileSystem system is used if none provided.
+
+##### PxFileValidator (IPxFileStreamValidator, IPxFileStreamValidatorAsync)
+PxFileValidator is a class that validates the whole px file including its data, metadata syntax and metadata contents. The class can be instantiated with the following parameters:
 - syntaxConf (PxFileSyntaxConf, optional): Object that contains px file syntax configuration tokens and symbols.
-
 Custom validator objects can be injected by calling the SetCustomValidatorFunctions or SetCustomValidators methods of the PxFileValidator object. Custom validators must implement either the IPxFileValidator or IPxFileValidatorAsync interface. Custom validation methods are stored in CustomSyntaxValidationFunctions and CustomContentValidationFunctions objects for syntax and content validation processes respectively.
-
 Once the PxFileValidator object is instantiated, either the Validate or ValidateAsync method can be called to validate the px file. The Validate method returns a ValidationResult object that contains the validation results as a key value pair containing information about the rule violations.
 
 ##### SyntaxValidator
 SyntaxValidator is a class that validates the syntax of a px file's metadata. It needs to be run before other validators, because both the ContentValidator and DataValidator require information from the SyntaxValidationResult object that SyntaxValidator Validate and ValidateAsync methods return.
 The class can be instantiated with the following parameters:
-- stream (Stream): The stream of the px file to be validated
-- encoding (Encoding): Encoding of the px file.
-- filename (string): Name of the file to be validated
 - syntaxConf (PxFileSyntaxConf, optional): Object that contains px file syntax configuration tokens and symbols.
 - customValidationFunctions (CustomSyntaxValidationFunctions, optional): Object that contains custom validation functions for the syntax validation process.
-- leaveStreamOpen (bool, optional): If true, the stream will not be closed after the validation process. Default is false.
 
 ##### ContentValidator
 ContentValidator class validates the integrity of the contents of a px file's metadata. It needs to be run after the SyntaxValidator, because it requires information from the SyntaxValidationResult object that SyntaxValidator Validate and ValidateAsync methods return.
@@ -76,24 +73,22 @@ The class can be instantiated with the following parameters:
 ##### DataValidator
 DataValidator class is used to validate the data section of a px file. It needs to be run after the SyntaxValidator, because it requires information from both the SyntaxValidationResult and ContentValidationResult objects that SyntaxValidator and ContentValidator Validate and ValidateAsync methods return.
 The class can be instantiated with the following parameters:
-- stream (Stream): Px file stream to be validated
 - rowLen (int): Length of one row of Px file data. ContentValidationResult object contains this information.
 - numOfRows (int): Amount of rows of Px file data. This information is also stored in ContentValidationResult object.
-- filename (string): Name of the file being validated
 - startRow (long): The row number where the data section starts. This information is stored in the SyntaxValidationResult object.
-- encoding (Encoding, optional): Encoding of the stream
 - conf (PxFileSyntaxConf, optional): Syntax configuration for the Px file
 
 #### Database validation
-Whole px file databases can be validated using DataValidator class. Validation can be done by using the blocking Validate or asynchronous ValidateAsync methods. DatabaseValidator class can be instantiated using the following parameters:
+Whole px file databases can be validated using DatabaseValidator class. Validation can be done by using the blocking Validate or asynchronous ValidateAsync methods. DatabaseValidator class can be instantiated using the following parameters:
 - directoryPath (string): Path to the database root 
 - syntaxConf (PxFileSyntaxConf, optional): Syntax configuration for the Px file
+- fileSystem (IFileSystem, optional): Object that defines the file system used for the validation process. Default file system is used if none provided
 - customPxFileValidators (IDatabaseValidator, optional): Object containing validator functions ran for each px file within the database
 - customAliasFileValidators (IDatabaseValidator, optional): Object containing validator functions ran for each alias file within the database
 - customDirectoryValidators (IDatabaseValidator, optional): Object containing validator functions ran for each subdirectory within the database 
-- fileSystem (IFileSystem, optional): Object that defines the file system used for the validation process. Default file system is used if none provided
 
 Database validation process validates each px file within the database and also the required structure and consistency of the database languages and encoding formats. The return object is a ValidationResult object that contains ValidationFeedback objects gathered during the validation process.
+The database needs to contain alias files for each language used in the database for each folder that contains either subcategory folders or px files. If either languages or encoding formats differ between alias or px files, warnings are generated.
    
 ### Data models
 TBA

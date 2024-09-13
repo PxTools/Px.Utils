@@ -25,7 +25,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
     internal sealed class MockCustomStreamValidator : IPxFileStreamValidator
     {
-        public ValidationResult Validate(Stream stream, string filename, Encoding? encoding = null, bool leaveStreamOpen = false, IFileSystem? fileSystem = null)
+        public ValidationResult Validate(Stream stream, string filename, Encoding? encoding = null, IFileSystem? fileSystem = null)
         {
             return new ValidationResult([]);
         }
@@ -37,7 +37,6 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
             Stream stream, 
             string filename, 
             Encoding? encoding = null,
-            bool leaveStreamOpen = false,
             IFileSystem? fileSystem = null,
             CancellationToken cancellationToken = default)
         {

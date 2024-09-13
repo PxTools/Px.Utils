@@ -34,14 +34,16 @@ namespace Px.Utils.TestingApp.Commands
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             SyntaxValidator validator = new();
-            validator.Validate(stream, TestFilePath, encoding, true);
+            validator.Validate(stream, TestFilePath, encoding);
+            stream.Close();
         }
 
         private async Task SyntaxValidationBenchmarkAsync()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             SyntaxValidator validator = new();
-            await validator.ValidateAsync(stream, TestFilePath, encoding, leaveStreamOpen: true);
+            await validator.ValidateAsync(stream, TestFilePath, encoding);
+            stream.Close();
         }
     }
 }

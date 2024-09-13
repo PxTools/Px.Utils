@@ -40,7 +40,6 @@ namespace Px.Utils.Validation.DataValidation
         /// <param name="stream">Px file stream to be validated</param>
         /// <param name="filename">Name of the file being validated</param>
         /// <param name="encoding">Encoding of the stream. If not provided, validator tries to find encoding.</param>
-        /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
         /// <param name="fileSystem">File system used for file operations. If not provided, default file system is used.</param>
         /// <returns>
         /// <see cref="ValidationResult"/> object that contains a collection of 
@@ -50,7 +49,6 @@ namespace Px.Utils.Validation.DataValidation
             Stream stream,
             string filename,
             Encoding? encoding = null,
-            bool leaveStreamOpen = false,
             IFileSystem? fileSystem = null)
         {
             fileSystem ??= new LocalFileSystem();
@@ -85,7 +83,6 @@ namespace Px.Utils.Validation.DataValidation
         /// <param name="stream">Px file stream to be validated</param>
         /// <param name="encoding">Encoding of the stream</param>
         /// <param name="filename">Name of the file being validated. If not provided, validator tries to find the encoding.</param>
-        /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
         /// <param name="fileSystem">File system used for file operations. If not provided, default file system is used.</param>
         /// <paramref name="cancellationToken"/>Cancellation token for cancelling the validation process</param>
         /// <see cref="ValidationResult"/> object that contains a collection of 
@@ -95,7 +92,6 @@ namespace Px.Utils.Validation.DataValidation
             Stream stream,
             string filename,
             Encoding? encoding = null,
-            bool leaveStreamOpen = false,
             IFileSystem? fileSystem = null,
             CancellationToken cancellationToken = default)
         {

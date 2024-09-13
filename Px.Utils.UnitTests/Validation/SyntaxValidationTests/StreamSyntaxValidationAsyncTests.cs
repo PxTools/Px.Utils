@@ -28,6 +28,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
 
             // Act
             SyntaxValidationResult result = await validator.ValidateAsync(stream, filename, encoding);
+            stream.Close();
             Assert.AreEqual(8, result.Result.Count);
             Assert.AreEqual(0, feedback.Count);
         }
@@ -48,6 +49,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
 
             // Act
             SyntaxValidationResult result = await validator.ValidateAsync(stream, filename, encoding);
+            stream.Close();
             Assert.AreEqual(10, result.Result.Count);
             Assert.AreEqual("YES", result.Result[8].Value);
             Assert.AreEqual("NO", result.Result[9].Value);

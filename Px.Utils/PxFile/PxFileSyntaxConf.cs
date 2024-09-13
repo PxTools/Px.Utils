@@ -218,8 +218,10 @@
             public class DatabaseTokens
             {
                 private const string INDEX = "_INDEX";
+                private const char LANGUAGE_SEPARATOR = '_';
 
                 public string Index { get; } = INDEX;
+                public char LanguageSeparator { get; } = LANGUAGE_SEPARATOR;
 
                 public static DatabaseTokens DefaultDatabaseTokens => new();
             }
