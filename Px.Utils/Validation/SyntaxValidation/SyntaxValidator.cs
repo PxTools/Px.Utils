@@ -1,5 +1,6 @@
 ﻿using Px.Utils.PxFile;
 using Px.Utils.PxFile.Metadata;
+using Px.Utils.Validation.DatabaseValidation;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -28,19 +29,18 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// <param name="filename">Name of the PX file</param>
         /// <param name="encoding">Encoding of the PX file. If not provided, the validator attempts to find the encoding.</param>
         /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
+        /// <param name="fileSystem">File system to use for file operations. If not provided, default file system is used.</param>
         /// <returns>A <see cref="SyntaxValidationResult"/> entry which contains a list of <see cref="ValidationStructuredEntry"/> entries 
         /// and a dictionary of type <see cref="ValidationFeedback"/> accumulated during the validation.</returns>
         public SyntaxValidationResult Validate(
             Stream stream,
             string filename,
             Encoding? encoding = null,
-            bool leaveStreamOpen = false)
+            bool leaveStreamOpen = false,
+            IFileSystem? fileSystem = null)
         {
-            if (encoding is null)
-            {
-                PxFileMetadataReader reader = new();
-                encoding = reader.GetEncoding(stream);
-            }
+            fileSystem ??= new FileSystem();
+            encoding ??= fileSystem.GetEncoding(stream);
 
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
@@ -74,6 +74,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// <param name="filename">Name of the PX file</param>
         /// <param name="encoding">Encoding of the PX file. If not provided, the validator attempts to find the encoding.</param>
         /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
+        /// <param name="fileSystem">File system to use for file operations. If not provided, default file system is used.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> parameter that can be used to cancel the operation.</param>
         /// <returns>A task that contains a <see cref="SyntaxValidationResult"/> entry which contains a list of <see cref="ValidationStructuredEntry"/> entries 
         /// and a dictionary of type <see cref="ValidationFeedback"/> accumulated during the validation.</returns>
@@ -82,13 +83,11 @@ namespace Px.Utils.Validation.SyntaxValidation
             string filename,
             Encoding? encoding = null,
             bool leaveStreamOpen = false,
+            IFileSystem? fileSystem = null,
             CancellationToken cancellationToken = default)
         {
-            if (encoding is null)
-            {
-                PxFileMetadataReader reader = new();
-                encoding = await reader.GetEncodingAsync(stream, cancellationToken: cancellationToken);
-            }
+            fileSystem ??= new FileSystem();
+            encoding ??= await fileSystem.GetEncodingAsync(stream, cancellationToken);
 
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
@@ -116,11 +115,17 @@ namespace Px.Utils.Validation.SyntaxValidation
 
         #region Interface implementation
 
-        ValidationResult IPxFileStreamValidator.Validate(Stream stream, string filename, Encoding? encoding, bool leaveStreamOpen)
-            => Validate(stream, filename, encoding, leaveStreamOpen);
+        ValidationResult IPxFileStreamValidator.Validate(Stream stream, string filename, Encoding? encoding, bool leaveStreamOpen, IFileSystem? fileSystem)
+            => Validate(stream, filename, encoding, leaveStreamOpen, fileSystem);
 
-        Task<ValidationResult> IPxFileStreamValidatorAsync.ValidateAsync(Stream stream, string filename, Encoding? encoding, bool leaveStreamOpen, CancellationToken cancellationToken)
-            => ValidateAsync(stream, filename, encoding, leaveStreamOpen, cancellationToken).ContinueWith(task => (ValidationResult)task.Result);
+        Task<ValidationResult> IPxFileStreamValidatorAsync.ValidateAsync(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            bool leaveStreamOpen, 
+            IFileSystem? fileSystem,
+            CancellationToken cancellationToken)
+            => ValidateAsync(stream, filename, encoding, leaveStreamOpen, fileSystem, cancellationToken).ContinueWith(task => (ValidationResult)task.Result);
 
         #endregion
 

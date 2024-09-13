@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Px.Utils.PxFile;
 using Px.Utils.PxFile.Metadata;
+using Px.Utils.Validation.DatabaseValidation;
 
 namespace Px.Utils.Validation.DataValidation
 {
@@ -40,6 +41,7 @@ namespace Px.Utils.Validation.DataValidation
         /// <param name="filename">Name of the file being validated</param>
         /// <param name="encoding">Encoding of the stream. If not provided, validator tries to find encoding.</param>
         /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
+        /// <param name="fileSystem">File system used for file operations. If not provided, default file system is used.</param>
         /// <returns>
         /// <see cref="ValidationResult"/> object that contains a collection of 
         /// validation feedback key value pairs representing the feedback for the data validation.
@@ -48,9 +50,12 @@ namespace Px.Utils.Validation.DataValidation
             Stream stream,
             string filename,
             Encoding? encoding = null,
-            bool leaveStreamOpen = false)
+            bool leaveStreamOpen = false,
+            IFileSystem? fileSystem = null)
         {
-            SetValidationParameters(encoding, filename, stream);
+            fileSystem ??= new FileSystem();
+            encoding ??= fileSystem.GetEncoding(stream);
+            SetValidationParameters(encoding, filename);
 
             ValidationFeedback validationFeedbacks = [];
             int dataStartIndex = GetStreamIndexOfFirstDataValue(stream, ref validationFeedbacks);
@@ -81,6 +86,7 @@ namespace Px.Utils.Validation.DataValidation
         /// <param name="encoding">Encoding of the stream</param>
         /// <param name="filename">Name of the file being validated. If not provided, validator tries to find the encoding.</param>
         /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
+        /// <param name="fileSystem">File system used for file operations. If not provided, default file system is used.</param>
         /// <paramref name="cancellationToken"/>Cancellation token for cancelling the validation process</param>
         /// <see cref="ValidationResult"/> object that contains a collection of 
         /// validation feedback key value pairs representing the feedback for the data validation.
@@ -90,9 +96,12 @@ namespace Px.Utils.Validation.DataValidation
             string filename,
             Encoding? encoding = null,
             bool leaveStreamOpen = false,
+            IFileSystem? fileSystem = null,
             CancellationToken cancellationToken = default)
         {
-            SetValidationParameters(encoding, filename, stream);
+            fileSystem ??= new FileSystem();
+            encoding ??= await fileSystem.GetEncodingAsync(stream, cancellationToken);
+            SetValidationParameters(encoding, filename);
 
             ValidationFeedback validationFeedbacks = [];
             int dataStartIndex = GetStreamIndexOfFirstDataValue(stream, ref validationFeedbacks);
@@ -116,13 +125,8 @@ namespace Px.Utils.Validation.DataValidation
             return new (validationFeedbacks);
         }
 
-        private void SetValidationParameters(Encoding? encoding, string filename, Stream stream)
+        private void SetValidationParameters(Encoding encoding, string filename)
         {
-            if (encoding is null)
-            {
-                PxFileMetadataReader reader = new();
-                encoding = reader.GetEncoding(stream);
-            }
             _commonValidators.Add(new DataStructureValidator());
             _dataNumValidators.AddRange(_commonValidators);
             _dataNumValidators.Add(new DataNumberValidator());

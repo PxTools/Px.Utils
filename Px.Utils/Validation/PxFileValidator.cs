@@ -1,6 +1,7 @@
 ﻿using Px.Utils.Exceptions;
 using Px.Utils.PxFile;
 using Px.Utils.Validation.ContentValidation;
+using Px.Utils.Validation.DatabaseValidation;
 using Px.Utils.Validation.DataValidation;
 using Px.Utils.Validation.SyntaxValidation;
 using System.Text;
@@ -58,6 +59,7 @@ namespace Px.Utils.Validation
         /// <param name="stream">Px file stream to be validated</param>
         /// <param name="filename">Name of the file subject to validation</param>
         /// <param name="encoding">Encoding format of the px file</param>
+        /// <param name="fileSystem">File system to use for file operations. If not provided, default file system is used.</param>
         /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
         /// </summary>
         /// <returns><see cref="ValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
@@ -65,13 +67,14 @@ namespace Px.Utils.Validation
             Stream stream,
             string filename,
             Encoding? encoding = null,
-            bool leaveStreamOpen = false)
+            bool leaveStreamOpen = false,
+            IFileSystem? fileSystem = null)
         {
             syntaxConf ??= PxFileSyntaxConf.Default;
 
             ValidationFeedback feedbacks = [];
             SyntaxValidator syntaxValidator = new(syntaxConf, _customSyntaxValidationFunctions);
-            SyntaxValidationResult syntaxValidationResult = syntaxValidator.Validate(stream, filename, encoding, true);
+            SyntaxValidationResult syntaxValidationResult = syntaxValidator.Validate(stream, filename, encoding, true, fileSystem);
             feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
 
             ContentValidator contentValidator = new(filename, encoding, [.. syntaxValidationResult.Result], _customContentValidationFunctions, syntaxConf);
@@ -95,14 +98,14 @@ namespace Px.Utils.Validation
                 contentValidationResult.DataRowAmount,
                 syntaxValidationResult.DataStartRow, 
                 syntaxConf);
-            ValidationResult dataValidationResult = dataValidator.Validate(stream, filename, encoding, leaveStreamOpen);
+            ValidationResult dataValidationResult = dataValidator.Validate(stream, filename, encoding, leaveStreamOpen, fileSystem);
             feedbacks.AddRange(dataValidationResult.FeedbackItems);
 
             if (_customStreamValidators is not null)
             {
                 foreach (IPxFileStreamValidator customValidator in _customStreamValidators)
                 {
-                    ValidationResult customValidationResult = customValidator.Validate(stream, filename, encoding, leaveStreamOpen);
+                    ValidationResult customValidationResult = customValidator.Validate(stream, filename, encoding, leaveStreamOpen, fileSystem);
                     feedbacks.AddRange(customValidationResult.FeedbackItems);
                 }
             }
@@ -125,6 +128,7 @@ namespace Px.Utils.Validation
         /// <param name="filename">Name of the file subject to validation</param>
         /// <param name="encoding">Encoding format of the px file</param>
         /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
+        /// <param name="fileSystem">File system to use for file operations. If not provided, default file system is used.</param>
         /// <param name="cancellationToken">Cancellation token for cancelling the validation process</param>
         /// </summary>
         /// <returns><see cref="ValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
@@ -133,13 +137,14 @@ namespace Px.Utils.Validation
             string filename,
             Encoding? encoding = null,
             bool leaveStreamOpen = false,
+            IFileSystem? fileSystem = null,
             CancellationToken cancellationToken = default)
         {
             syntaxConf ??= PxFileSyntaxConf.Default;
 
             ValidationFeedback feedbacks = [];
             SyntaxValidator syntaxValidator = new(syntaxConf, _customSyntaxValidationFunctions);
-            SyntaxValidationResult syntaxValidationResult = await syntaxValidator.ValidateAsync(stream, filename, encoding, true, cancellationToken);
+            SyntaxValidationResult syntaxValidationResult = await syntaxValidator.ValidateAsync(stream, filename, encoding, true, fileSystem, cancellationToken);
             feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
 
             ContentValidator contentValidator = new(filename, encoding, [..syntaxValidationResult.Result], _customContentValidationFunctions, syntaxConf);
@@ -164,14 +169,14 @@ namespace Px.Utils.Validation
                 syntaxValidationResult.DataStartRow, 
                 syntaxConf);
 
-            ValidationResult dataValidationResult = await dataValidator.ValidateAsync(stream, filename, encoding, leaveStreamOpen, cancellationToken);
+            ValidationResult dataValidationResult = await dataValidator.ValidateAsync(stream, filename, encoding, leaveStreamOpen, fileSystem, cancellationToken);
             feedbacks.AddRange(dataValidationResult.FeedbackItems);
 
             if (_customStreamAsyncValidators is not null)
             {
                 foreach (IPxFileStreamValidatorAsync customValidator in _customStreamAsyncValidators)
                 {
-                    ValidationResult customValidationResult = await customValidator.ValidateAsync(stream, filename, encoding, leaveStreamOpen, cancellationToken);
+                    ValidationResult customValidationResult = await customValidator.ValidateAsync(stream, filename, encoding, leaveStreamOpen, fileSystem, cancellationToken);
                     feedbacks.AddRange(customValidationResult.FeedbackItems);
                 }
             }

@@ -1,4 +1,5 @@
 ﻿using Px.Utils.Validation;
+using Px.Utils.Validation.DatabaseValidation;
 using System.Text;
 
 namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
@@ -24,7 +25,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
     internal sealed class MockCustomStreamValidator : IPxFileStreamValidator
     {
-        public ValidationResult Validate(Stream stream, string filename, Encoding? encoding = null, bool leaveStreamOpen = false)
+        public ValidationResult Validate(Stream stream, string filename, Encoding? encoding = null, bool leaveStreamOpen = false, IFileSystem? fileSystem = null)
         {
             return new ValidationResult([]);
         }
@@ -32,7 +33,13 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
     internal sealed class MockCustomStreamAsyncValidator : IPxFileStreamValidatorAsync
     {
-        public async Task<ValidationResult> ValidateAsync(Stream stream, string filename, Encoding? encoding = null, bool leaveStreamOpen = false, CancellationToken cancellationToken = default)
+        public async Task<ValidationResult> ValidateAsync(
+            Stream stream, 
+            string filename, 
+            Encoding? encoding = null,
+            bool leaveStreamOpen = false,
+            IFileSystem? fileSystem = null,
+            CancellationToken cancellationToken = default)
         {
             // Simulate async operation
             await Task.Delay(1, cancellationToken);

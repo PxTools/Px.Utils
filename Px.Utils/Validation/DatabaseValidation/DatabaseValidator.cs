@@ -31,7 +31,7 @@ namespace Px.Utils.Validation.DatabaseValidation
         private readonly IDatabaseValidator[]? _customPxFileValidators = customPxFileValidators;
         private readonly IDatabaseValidator[]? _customAliasFileValidators = customAliasFileValidators;
         private readonly IDatabaseValidator[]? _customDirectoryValidators = customDirectoryValidators;
-        private readonly IFileSystem _fileSystem = fileSystem is not null ? fileSystem : new DefaultFileSystem();
+        private readonly IFileSystem _fileSystem = fileSystem is not null ? fileSystem : new FileSystem();
 
         private readonly ValidationFeedback feedbacks = [];
         private readonly ConcurrentBag<DatabaseFileInfo> pxFiles = [];
@@ -115,7 +115,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             pxFiles.Add(fileInfo);
             stream.Position = 0;
             PxFileValidator validator = new(_syntaxConf);
-            ValidationResult result = await validator.ValidateAsync(stream, fileName, fileInfo.Encoding, false, cancellationToken);
+            ValidationResult result = await validator.ValidateAsync(stream, fileName, fileInfo.Encoding, false, cancellationToken: cancellationToken);
             feedbacks.AddRange(result.FeedbackItems);
             cancellationToken.ThrowIfCancellationRequested();
         }
