@@ -53,17 +53,17 @@ namespace Px.Utils.TestingApp.Commands
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             stream.Position = start + dataKeyword.Length + readStartOffset; // skip the '=' and linechange
-            DataValidator validator = new(stream, expectedCols, expectedRows, TestFilePath, 0, encoding);
-            validator.Validate();
+            DataValidator validator = new(expectedCols, expectedRows, 0);
+            validator.Validate(stream, TestFilePath, encoding);
         }
         
         private async Task ValidateDataBenchmarksAsync()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             stream.Position = start + dataKeyword.Length + readStartOffset; // skip the '=' and linechange
-            DataValidator validator = new(stream, expectedCols, expectedRows, TestFilePath, 0, encoding);
+            DataValidator validator = new(expectedCols, expectedRows, 0);
 
-            await validator.ValidateAsync();
+            await validator.ValidateAsync(stream, TestFilePath, encoding);
         }
 
         protected override void SetRunParameters()

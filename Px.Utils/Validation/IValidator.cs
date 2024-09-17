@@ -1,21 +1,21 @@
 ﻿namespace Px.Utils.Validation
 {
     /// <summary>
-    /// Represents a validator for a Px file.
+    /// Represents a validator for a Px file or database
     /// </summary>
-    public interface IPxFileValidator
+    public interface IValidator
     {
         /// <summary>
-        /// Blocking method that validates some aspect of a Px file.
+        /// Blocking method that validates some aspect of a Px file or a database
         /// </summary>
         /// <returns><see cref="ValidationResult"/> object that contains an array of feedback items gathered during the validation process.</returns>
         public ValidationResult Validate();
     }
 
     /// <summary>
-    /// Represents a validator for a Px file with asynchronous validation capabilities.
+    /// Represents a validator for a Px file or database with asynchronous validation capabilities.
     /// </summary>
-    public interface IPxFileValidatorAsync
+    public interface IValidatorAsync
     {
         /// <summary>
         /// Asynchronous method that validates some aspect of a Px file.

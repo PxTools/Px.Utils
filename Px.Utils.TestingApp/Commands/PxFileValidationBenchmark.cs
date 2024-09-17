@@ -1,10 +1,11 @@
-﻿using Px.Utils.PxFile.Metadata;
+﻿using Px.Utils.Exceptions;
+using Px.Utils.PxFile.Metadata;
 using Px.Utils.Validation;
 using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
-    internal class PxFileValidationBenchmark : Benchmark
+    internal sealed class PxFileValidationBenchmark : FileBenchmark
     {
         internal override string Help =>
         "Runs through the whole px file validation process (metadata syntax- and contents-, data-) for the given file.";
@@ -26,21 +27,29 @@ namespace Px.Utils.TestingApp.Commands
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileMetadataReader reader = new();
-            encoding = reader.GetEncoding(stream);
+            try
+            {
+                encoding = reader.GetEncoding(stream);
+            }
+            catch (InvalidPxFileMetadataException)
+            {
+                encoding = Encoding.Default;
+                throw;
+            }
         }
 
         private void ValidatePxFileBenchmarks()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            PxFileValidator validator = new(stream, TestFilePath, encoding);
-            validator.Validate();
+            PxFileValidator validator = new();
+            validator.Validate(stream, TestFilePath, encoding);
         }
 
         private async Task ValidatePxFileBenchmarksAsync()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            PxFileValidator validator = new(stream, TestFilePath, encoding);
-            await validator.ValidateAsync();
+            PxFileValidator validator = new();
+            await validator.ValidateAsync(stream, TestFilePath, encoding);
         }
     }
 }

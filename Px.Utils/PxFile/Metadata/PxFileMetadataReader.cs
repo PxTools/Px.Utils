@@ -226,7 +226,7 @@ namespace Px.Utils.PxFile.Metadata
 
             stream.Position = position;
 
-            if (GetBom(bom) is Encoding utf) return utf;
+            if (GetEncodingFromBOM(bom) is Encoding utf) return utf;
 
             // Use ASCII because encoding is still unknown, CODEPAGE keyword is readable as ASCII
             KeyValuePair<string, string> encoding = ReadMetadata(stream, Encoding.ASCII, syntaxConf, 512)
@@ -255,7 +255,7 @@ namespace Px.Utils.PxFile.Metadata
 
             stream.Position = position;
 
-            if (GetBom(bom) is Encoding utf) return utf;
+            if (GetEncodingFromBOM(bom) is Encoding utf) return utf;
 
             // Use ASCII because encoding is still unknown, CODEPAGE keyword is readable as ASCII
             KeyValuePair<string, string> encoding = await ReadMetadataAsync(stream, Encoding.ASCII, syntaxConf, 512, cancellationToken)
@@ -263,6 +263,31 @@ namespace Px.Utils.PxFile.Metadata
 
             return GetEncodingFromValue(encoding.Value, syntaxConf);
         }
+
+        /// <summary>
+        /// Returns encoding based on the Byte Order Mark
+        /// </summary>
+        /// <param name="buffer">Array of bytes to determine the BOM from.</param>
+        /// <returns>Encoding if one is found based on the BOM or null if one is not found.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Encoding? GetEncodingFromBOM(byte[] buffer)
+        {
+            if (buffer.Take(CharacterConstants.BOMUTF8.Length).SequenceEqual(CharacterConstants.BOMUTF8))
+            {
+                return Encoding.UTF8;
+            }
+            else if (buffer.Take(CharacterConstants.BOMUTF16.Length).SequenceEqual(CharacterConstants.BOMUTF16))
+            {
+                return Encoding.Unicode;
+            }
+            else if (buffer.Take(CharacterConstants.BOMUTF32.Length).SequenceEqual(CharacterConstants.BOMUTF32))
+            {
+                return Encoding.UTF32;
+            }
+
+            return null;
+        }
+
 
         #region Private Methods
 
@@ -280,25 +305,6 @@ namespace Px.Utils.PxFile.Metadata
                     valueStringBldr.Append(buffer, start, endIndex - start);
                 }
             }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Encoding? GetBom(byte[] buffer)
-        {
-            if (buffer.Take(CharacterConstants.BOMUTF8.Length).SequenceEqual(CharacterConstants.BOMUTF8))
-            {
-                return Encoding.UTF8;
-            }
-            else if (buffer.Take(CharacterConstants.BOMUTF16.Length).SequenceEqual(CharacterConstants.BOMUTF16))
-            {
-                return Encoding.Unicode;
-            }
-            else if (buffer.Take(CharacterConstants.BOMUTF32.Length).SequenceEqual(CharacterConstants.BOMUTF32))
-            {
-                return Encoding.UTF32;
-            }
-
-            return null;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

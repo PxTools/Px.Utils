@@ -99,8 +99,44 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         private static readonly ValidationStructuredEntry stubEntry =
             new(filename,
                 new ValidationStructuredEntryKey("STUB"),
-                "bar",
+                "\"bar\"",
                 8,
+                [],
+                5,
+                Utils.Validation.ValueType.ListOfStrings);
+
+        private static readonly ValidationStructuredEntry multipleStubNamesEntry = 
+            new(filename,
+                new ValidationStructuredEntryKey("STUB"),
+                "\"bar\", \"baz\"",
+                8,
+                [],
+                5,
+                Utils.Validation.ValueType.ListOfStrings);
+
+        private static readonly ValidationStructuredEntry multipleHeadingNamesEntry =
+            new(filename,
+                new ValidationStructuredEntryKey("HEADING"),
+                "\"bar, time\", \"baz, time\"",
+                10,
+                [],
+                5,
+                Utils.Validation.ValueType.ListOfStrings);
+
+        private static readonly ValidationStructuredEntry multipleEnStubNamesEntry =
+            new(filename,
+                new ValidationStructuredEntryKey("STUB", "en"),
+                "\"bar-en\", \"baz-en\"",
+                8,
+                [],
+                5,
+                Utils.Validation.ValueType.ListOfStrings);
+
+        private static readonly ValidationStructuredEntry multipleEnHeadingNamesEntry =
+            new(filename,
+                new ValidationStructuredEntryKey("HEADING", "en"),
+                "\"bar, time (en)\", \"baz, time (en)\"",
+                10,
                 [],
                 5,
                 Utils.Validation.ValueType.ListOfStrings);
@@ -108,7 +144,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         private static readonly ValidationStructuredEntry stubEnEntry =
             new(filename,
                 new ValidationStructuredEntryKey("STUB", "en"),
-                "bar-en",
+                "\"bar-en\"",
                 9,
                 [],
                 9,
@@ -117,7 +153,16 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         private static readonly ValidationStructuredEntry headingEntry = 
             new(filename,
                 new ValidationStructuredEntryKey("HEADING"),
-                "bar-time",
+                "\"bar-time\"",
+                10,
+                [],
+                5,
+                Utils.Validation.ValueType.ListOfStrings);
+
+        private static readonly ValidationStructuredEntry headingEntryWithBar =
+            new(filename,
+                new ValidationStructuredEntryKey("HEADING"),
+                "\"bar-time\",\"bar\"",
                 10,
                 [],
                 5,
@@ -126,7 +171,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         private static readonly ValidationStructuredEntry headingEnEntry =
             new(filename,
                 new ValidationStructuredEntryKey("HEADING", "en"),
-                "bar-time-en",
+                "\"bar-time-en\"",
                 11,
                 [],
                 5,
@@ -186,6 +231,15 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
                 7,
                 Utils.Validation.ValueType.ListOfStrings);
 
+        private static readonly ValidationStructuredEntry moreValuesForBarEntry = 
+            new(filename,
+                new ValidationStructuredEntryKey("VALUES", null, "bar"),
+                "bar,baz",
+                17,
+                [],
+                7,
+                Utils.Validation.ValueType.ListOfStrings);
+
         private static readonly ValidationStructuredEntry valuesBarEnEntry =
             new(filename,
                 new ValidationStructuredEntryKey("VALUES", "en", "bar-en"),
@@ -203,6 +257,24 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
                 [],
                 13,
                 Utils.Validation.ValueType.DateTime);
+
+        private static readonly ValidationStructuredEntry lastUpdatedBarFooEntryOneSpecifier =
+            new(filename,
+                new ValidationStructuredEntryKey("LAST-UPDATED", null, "bar"),
+                "20230131 08:00",
+                19,
+                [],
+                13,
+                Utils.Validation.ValueType.DateTime);
+
+        private static readonly ValidationStructuredEntry unitsBarFooEnEntryOneSpecifier =
+            new(filename,
+                new ValidationStructuredEntryKey("UNITS", "en", "foo-en"),
+                "unit",
+                20,
+                [],
+                13,
+                Utils.Validation.ValueType.StringValue);
 
         private static readonly ValidationStructuredEntry unitsBarFooEntry =
             new(filename,
@@ -422,6 +494,22 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
                 stubEntry,
             ];
 
+        internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_DUPLICATE_DIMENSION =>
+            [
+                stubEntry,
+                stubEnEntry,
+                headingEntryWithBar,
+                headingEnEntry
+            ];
+
+        internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_MULTIPLE_DIMENSION_NAMES =>
+            [
+                multipleStubNamesEntry,
+                multipleHeadingNamesEntry,
+                multipleEnStubNamesEntry,
+                multipleEnHeadingNamesEntry
+            ];
+
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_DESCRIPTION =>
             [
                 descriptionEntry,
@@ -432,10 +520,24 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
                 valuesBarEntry,
             ];
 
+        internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_DUPLICATE_DIMENSION_VALUES =>
+            [
+                valuesBarEntry,
+                valuesBarEnEntry,
+                moreValuesForBarEntry
+            ];
+
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_INVALID_CONTENT_VALUE_KEY_ENTRIES =>
             [
                 unitsBarFooEntry,
                 precisionBarFooEntry,
+            ];
+
+        internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_MISSING_RECIMMENDED_SPECIFIERS =>
+            [
+                lastUpdatedBarFooEntryOneSpecifier,
+                unitsBarFooEntry,
+                unitsBarFooEnEntryOneSpecifier,
             ];
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_INCOMPLETE_VARIABLE_RECOMMENDED_KEYS =>

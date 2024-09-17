@@ -165,7 +165,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
             DataIndexer indexer = new(testMeta, matrixMap);
 
             using CancellationTokenSource cts = new();
-            cts.Cancel();
+            await cts.CancelAsync();
             CancellationToken cToken = cts.Token;
 
             async Task call() => await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, indexer, cToken);
@@ -224,7 +224,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
             DataIndexer indexer = new(testMeta, matrixMap);
 
             using CancellationTokenSource cts = new();
-            cts.Cancel();
+            await cts.CancelAsync();
             CancellationToken cToken = cts.Token;
 
             async Task call() => await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, indexer, cToken);
@@ -283,7 +283,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
             DataIndexer indexer = new(testMeta, matrixMap);
 
             using CancellationTokenSource cts = new();
-            cts.Cancel();
+            await cts.CancelAsync();
             CancellationToken cToken = cts.Token;
 
             // Act and Assert

@@ -10,7 +10,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
     public class StreamSyntaxValidationAsyncTests
     {
         private readonly string filename = "foo";
-        private readonly List<ValidationFeedbackItem> feedback = [];
+        private readonly ValidationFeedback feedback = [];
 
         [TestMethod]
         public async Task ValidatePxFileSyntaxAsyncCalledWithMinumalUTF8ReturnsValidResult()
@@ -21,13 +21,14 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             PxFileMetadataReader reader = new();
             Encoding encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            SyntaxValidator validator = new(stream, encoding, filename);
+            SyntaxValidator validator = new();
 
             // Assert
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = await validator.ValidateAsync();
+            SyntaxValidationResult result = await validator.ValidateAsync(stream, filename, encoding);
+            stream.Close();
             Assert.AreEqual(8, result.Result.Count);
             Assert.AreEqual(0, feedback.Count);
         }
@@ -41,13 +42,14 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             PxFileMetadataReader reader = new();
             Encoding encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            SyntaxValidator validator = new(stream, encoding, filename);
+            SyntaxValidator validator = new();
 
             // Assert
             Assert.IsNotNull(encoding, "Encoding should not be null");
 
             // Act
-            SyntaxValidationResult result = await validator.ValidateAsync();
+            SyntaxValidationResult result = await validator.ValidateAsync(stream, filename, encoding);
+            stream.Close();
             Assert.AreEqual(10, result.Result.Count);
             Assert.AreEqual("YES", result.Result[8].Value);
             Assert.AreEqual("NO", result.Result[9].Value);
