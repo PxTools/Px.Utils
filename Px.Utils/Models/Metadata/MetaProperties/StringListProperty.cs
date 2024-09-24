@@ -4,6 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace Px.Utils.Models.Metadata.MetaProperties
 {
+    /// <summary>
+    /// Class representing a list of strings property of a px-file.
+    /// The strings do not have any language information.
+    /// </summary>
+    /// <param name="values"></param>
     [JsonConverter(typeof(MetaPropertyConverter))]
     public class StringListProperty(List<string> values) : MetaProperty()
     {
