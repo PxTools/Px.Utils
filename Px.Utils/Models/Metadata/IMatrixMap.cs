@@ -1,8 +1,10 @@
-﻿
+﻿using System.Text.Json.Serialization;
+
 namespace Px.Utils.Models.Metadata
 {
     public interface IMatrixMap
     {
+        [JsonIgnore]
         IReadOnlyList<IDimensionMap> DimensionMaps { get; }
     }
 

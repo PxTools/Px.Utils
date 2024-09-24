@@ -1,4 +1,7 @@
-﻿namespace Px.Utils.PxFile
+﻿using Px.Utils.Models.Metadata.Enums;
+using Px.Utils.Models.Metadata.MetaProperties;
+
+namespace Px.Utils.PxFile
 {
     public class PxFileSyntaxConf
     {
@@ -249,13 +252,47 @@
             public static TokenDefinitions DefaultTokens => new();
         }
 
+        public class ContentConfiguration
+        {
+            public class EntryValueTypes
+            {
+                private const MetaPropertyType STUB = MetaPropertyType.MultilanguageTextArray;
+                private const MetaPropertyType HEADING = MetaPropertyType.MultilanguageTextArray;
+
+                public MetaPropertyType Stub { get; set; } = STUB;
+                public MetaPropertyType Heading { get; set; } = HEADING;
+
+                public static EntryValueTypes DefaultEntryValueTypes => new();
+
+                public static Dictionary<string, MetaPropertyType> GetTypeDictionary(PxFileSyntaxConf conf)
+                {
+                    return new Dictionary<string, MetaPropertyType>
+                    {
+                        { conf.Tokens.KeyWords.StubDimensions, conf.Content.EntryTypes.Stub },
+                        { conf.Tokens.KeyWords.HeadingDimensions, conf.Content.EntryTypes.Heading }
+                    };
+                }
+            }
+
+            public EntryValueTypes EntryTypes { get; set; }
+
+            private ContentConfiguration()
+            {
+                EntryTypes = EntryValueTypes.DefaultEntryValueTypes;
+            }
+
+            public static ContentConfiguration DefaultValues => new();
+        }
+
         public SymbolDefinitions Symbols { get; set; }
         public TokenDefinitions Tokens { get; set; }
+        public ContentConfiguration Content { get; set; }
 
         private PxFileSyntaxConf()
         {
             Symbols = SymbolDefinitions.DefaultSymbols;
             Tokens = TokenDefinitions.DefaultTokens;
+            Content = ContentConfiguration.DefaultValues;
         }
 
         public static PxFileSyntaxConf Default => new();
