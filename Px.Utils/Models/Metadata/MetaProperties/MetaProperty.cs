@@ -10,6 +10,9 @@ namespace Px.Utils.Models.Metadata.MetaProperties
     [JsonConverter(typeof(MetaPropertyConverter))]
     public abstract class MetaProperty()
     {
+        /// <summary>
+        /// Enum representing the type of the property. Required for deserialization.
+        /// </summary>
         public abstract MetaPropertyType Type { get; }
     }
 }

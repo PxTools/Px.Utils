@@ -4,6 +4,10 @@ using System.Text.Json.Serialization;
 
 namespace Px.Utils.Models.Metadata.MetaProperties
 {
+    /// <summary>
+    /// Class for representing a boolean property of a px-file.
+    /// </summary>
+    /// <param name="value"></param>
     [JsonConverter(typeof(MetaPropertyConverter))]
     public class BooleanProperty(bool value) : MetaProperty()
     {

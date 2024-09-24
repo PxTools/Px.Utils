@@ -13,6 +13,9 @@ namespace Px.Utils.Models.Metadata.MetaProperties
     {
         public override MetaPropertyType Type => MetaPropertyType.Text;
 
+        /// <summary>
+        /// The <see cref="string"/> value of the property. Should contains no delimeters or language information.
+        /// </summary>
         public string Value { get; } = value;
     }
 }
