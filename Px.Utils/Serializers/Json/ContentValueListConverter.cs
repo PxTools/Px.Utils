@@ -4,6 +4,9 @@ using System.Text.Json.Serialization;
 
 namespace Px.Utils.Serializers.Json
 {
+    /// <summary>
+    /// Custom converter for the <see cref="ContentValueList"/> class.
+    /// </summary>
     public class ContentValueListConverter : JsonConverter<ContentValueList>
     {
         public override ContentValueList? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

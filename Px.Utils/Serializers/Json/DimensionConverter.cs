@@ -7,6 +7,10 @@ using System.Text.Json.Serialization;
 
 namespace Px.Utils.Serializers.Json
 {
+    /// <summary>
+    /// Custom converter for all objects that implement the <see cref="IReadOnlyDimension"/> interface.
+    /// Deserialization produces <see cref="Dimension"/> objects that will have the correct subtype."/>
+    /// </summary>
     public class DimensionConverter : JsonConverter<Dimension>
     {
         public override bool CanConvert(Type typeToConvert)
@@ -60,7 +64,6 @@ namespace Px.Utils.Serializers.Json
             }
 
             return new Dimension(code, name, additionalProperties, values, type);
-
         }
 
         public override void Write(Utf8JsonWriter writer, Dimension value, JsonSerializerOptions options)

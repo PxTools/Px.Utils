@@ -4,6 +4,9 @@ using System.Text.Json.Serialization;
 
 namespace Px.Utils.Serializers.Json
 {
+    /// <summary>
+    /// Custom converter for <see cref="MultilanguageString"/> objects.
+    /// </summary>
     internal class MultilanguageStringConverter : JsonConverter<MultilanguageString>
     {
         public override MultilanguageString? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

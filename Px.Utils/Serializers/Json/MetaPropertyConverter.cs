@@ -6,6 +6,10 @@ using System.Text.Json.Serialization;
 
 namespace Px.Utils.Serializers.Json
 {
+    /// <summary>
+    /// Custom polymorphic converter for all <see cref="MetaProperty"/> objects.
+    /// Deserialization produces the correct subtype of <see cref="MetaProperty"/>.
+    /// </summary>
     public class MetaPropertyConverter : JsonConverter<MetaProperty>
     {
         public override bool CanConvert(Type typeToConvert)
