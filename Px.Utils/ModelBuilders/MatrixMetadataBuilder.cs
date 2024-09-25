@@ -393,7 +393,7 @@ namespace Px.Utils.ModelBuilders
             string unitKey = _pxFileSyntaxConf.Tokens.KeyWords.Units;
             if (TryGetEntries(entries, unitKey, langs, out Dictionary<MetadataEntryKey, string>? unitEntries, dimName, valName) || // Both identifiers
                 TryGetEntries(entries, unitKey, langs, out unitEntries, valName) || // Only value identifier 
-                TryGetEntries(entries, unitKey, langs, out unitEntries) // No identifiers 
+                TryGetEntries(entries, unitKey, langs, out unitEntries)) // No identifiers 
             {
                 Dictionary<string, string> translations = [];
                 foreach (KeyValuePair<MetadataEntryKey, string> kvp in unitEntries)
@@ -414,9 +414,9 @@ namespace Px.Utils.ModelBuilders
             {
                 foreach (MetadataEntryKey key in lastUpdatedEntries.Keys) entries.Remove(key);
                 string formatString = _pxFileSyntaxConf.Tokens.Time.DateTimeFormatString;
-                return DateTime lastUpdated = lastUpdatedEntries.Values
+                return lastUpdatedEntries.Values
                     .Select(v => DateTime.ParseExact(v.CleanStringDelimeters(_stringDelimeter), formatString, CultureInfo.InvariantCulture))
-                    .OrderByDescending().First();
+                    .OrderByDescending(v => v).First();
             }
 
             throw new ArgumentException("Last update information not found");
