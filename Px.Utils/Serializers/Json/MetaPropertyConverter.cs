@@ -38,11 +38,12 @@ namespace Px.Utils.Serializers.Json
             {
                 case MetaPropertyType.Text:
                     string stringValue = root.GetProperty(valuePropertyName).GetString()
-                        ?? throw new JsonException("Value property not found.");
+                        ?? throw new JsonException("Error reading string property, property named value not found.");
                     return new StringProperty(stringValue);
                 case MetaPropertyType.MultilanguageText:
                     MultilanguageString multilanguageString = root.GetProperty(valuePropertyName)
-                        .Deserialize<MultilanguageString>(options) ?? throw new JsonException("Value property not found.");
+                        .Deserialize<MultilanguageString>(options)
+                        ?? throw new JsonException("Error reading multilanguage string property, property named value not found.");
                     return new MultilanguageStringProperty(multilanguageString);
                 case MetaPropertyType.Numeric:
                     double numericValue = root.GetProperty(valuePropertyName).GetDouble();
@@ -52,11 +53,12 @@ namespace Px.Utils.Serializers.Json
                     return new BooleanProperty(booleanValue);
                 case MetaPropertyType.TextArray:
                     List<string> strings = root.GetProperty(valuePropertyName)
-                        .Deserialize<List<string>>(options) ?? throw new JsonException("Value property not found.");
+                        .Deserialize<List<string>>(options) ?? throw new JsonException("Error reading string list property, property named value not found.");
                     return new StringListProperty(strings);
                 case MetaPropertyType.MultilanguageTextArray:
                     List<MultilanguageString> multilanguageStrings = root.GetProperty(valuePropertyName)
-                        .Deserialize<List<MultilanguageString>>(options) ?? throw new JsonException("Value property not found.");
+                        .Deserialize<List<MultilanguageString>>(options)
+                        ?? throw new JsonException("Error reading multilanguage string list property, property named value not found.");
                     return new MultilanguageStringListProperty(multilanguageStrings);
                 default:
                     throw new NotSupportedException($"MetaProperty of type {type} is not supported.");
