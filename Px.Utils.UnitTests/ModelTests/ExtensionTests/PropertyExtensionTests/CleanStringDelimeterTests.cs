@@ -3,7 +3,7 @@
 namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
 {
     [TestClass]
-    public class CleanSringDelimeterTests
+    public class CleanStringDelimeterTests
     {
         [TestMethod]
         public void ValidInputStringReturnsString()
