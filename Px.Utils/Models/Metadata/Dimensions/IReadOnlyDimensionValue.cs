@@ -1,4 +1,5 @@
 ﻿using Px.Utils.Language;
+using Px.Utils.Models.Metadata.MetaProperties;
 
 namespace Px.Utils.Models.Metadata.Dimensions
 {
@@ -25,6 +26,6 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <summary>
         /// True if the value is not from the original data but was created by computing or aggregating other values.
         /// </summary>
-        public bool Virtual { get; }
+        public bool IsVirtual { get; }
     }
 }

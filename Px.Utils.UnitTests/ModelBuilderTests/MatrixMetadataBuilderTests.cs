@@ -4,7 +4,7 @@ using Px.Utils.ModelBuilders;
 using Px.Utils.Models.Metadata;
 using Px.Utils.Models.Metadata.Dimensions;
 using Px.Utils.Models.Metadata.Enums;
-using Px.Utils.Models.Metadata.ExtensionMethods;
+using Px.Utils.Models.Metadata.MetaProperties;
 using System.Globalization;
 
 namespace ModelBuilderTests
@@ -15,8 +15,6 @@ namespace ModelBuilderTests
         private MatrixMetadata Actual_3Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_3_Languages.Entries);
         private MatrixMetadata Actual_1Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_1_Language.Entries);
         private MatrixMetadata Actual_Recommended_3Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Recommended_3_Langs.Entries);
-
-        private const char _stringDelimeter = '"';
 
         [TestMethod]
         public void IEnumerableBuildTest()
@@ -59,47 +57,100 @@ namespace ModelBuilderTests
         }
 
         [DataTestMethod]
-        [DataRow("\"ANSI\"", "CHARSET")]
-        [DataRow("\"2013\"", "AXIS-VERSION")]
-        [DataRow("\"iso-8859-15\"", "CODEPAGE")]
-        [DataRow("\"20200121 09:00\"", "CREATION-DATE")]
-        [DataRow("\"20240131 08:00\"", "NEXT-UPDATE")]
-        [DataRow("YES", "OFFICIAL-STATISTICS")]
-        public void MultiLangTableLevelAdditionalNotTranslatedParametersTest(string expected, string keyWord)
+        [DataRow("ANSI", "CHARSET")]
+        [DataRow("2013", "AXIS-VERSION")]
+        [DataRow("iso-8859-15", "CODEPAGE")]
+        [DataRow("20200121 09:00", "CREATION-DATE")]
+        [DataRow("20240131 08:00", "NEXT-UPDATE")]
+        public void MultiLangTableLevelAdditionalNotTranslatedStringParametersTest(string expected, string keyWord)
         {
-            Assert.AreEqual(expected, Actual_3Lang.AdditionalProperties[keyWord].GetRawValueString());
+            if(Actual_3Lang.AdditionalProperties[keyWord] is StringProperty asp)
+            {
+                Assert.AreEqual(expected, asp.Value);
+            }
+            else
+            {
+                Assert.Fail("Property is not a StringProperty");
+            }
         }
 
         [DataTestMethod]
-        [DataRow("\"ANSI\"", "CHARSET")]
-        [DataRow("\"2013\"", "AXIS-VERSION")]
-        [DataRow("\"iso-8859-15\"", "CODEPAGE")]
-        [DataRow("\"20200121 09:00\"", "CREATION-DATE")]
-        [DataRow("\"20240131 08:00\"", "NEXT-UPDATE")]
-        [DataRow("YES", "OFFICIAL-STATISTICS")]
+        [DataRow(true, "OFFICIAL-STATISTICS")]
+        public void MultiLangTableLevelAdditionalBoolParametersTest(bool expected, string keyWord)
+        {
+            if(Actual_3Lang.AdditionalProperties[keyWord] is BooleanProperty abp)
+            {
+                Assert.AreEqual(expected, abp.Value);
+            }
+            else
+            {
+                Assert.Fail("Property is not a BooleanProperty");
+            }
+        }
+
+        [DataTestMethod]
+        [DataRow("ANSI", "CHARSET")]
+        [DataRow("2013", "AXIS-VERSION")]
+        [DataRow("iso-8859-15", "CODEPAGE")]
+        [DataRow("20200121 09:00", "CREATION-DATE")]
+        [DataRow("20240131 08:00", "NEXT-UPDATE")]
         public void SingleLangTableLevelAdditionalNotTranslatedParametersTest(string expected, string keyWord)
         {
-            Assert.AreEqual(expected, Actual_1Lang.AdditionalProperties[keyWord].GetRawValueString());
+            if(Actual_1Lang.AdditionalProperties[keyWord] is StringProperty asp)
+            {
+                Assert.AreEqual(expected, asp.Value);
+            }
+            else
+            {
+                Assert.Fail("Property is not a StringProperty");
+            }
         }
 
         [DataTestMethod]
-        [DataRow("\"abcd\"", "\"abcd\"", "\"abcd\"", "SUBJECT-AREA")]
-        [DataRow("\"test_description_fi\"", "\"test_description_sv\"", "\"test_description_en\"", "DESCRIPTION")]
-        [DataRow("\"test_note_fi\"", "\"test_note_sv\"", "\"test_note_en\"", "NOTE")]
+        [DataRow(true, "OFFICIAL-STATISTICS")]
+        public void SingleLangTableLevelAdditionalNotTranslatedParametersTest(bool expected, string keyWord)
+        {
+            if(Actual_1Lang.AdditionalProperties[keyWord] is BooleanProperty abp)
+            {
+                Assert.AreEqual(expected, abp.Value);
+            }
+            else
+            {
+                Assert.Fail("Property is not a BooleanProperty");
+            }
+        }
+
+        [DataTestMethod]
+        [DataRow("abcd", "abcd", "abcd", "SUBJECT-AREA")]
+        [DataRow("test_description_fi", "test_description_sv", "test_description_en", "DESCRIPTION")]
+        [DataRow("test_note_fi", "test_note_sv", "test_note_en", "NOTE")]
         public void MultiLangTableLevelAdditionalTranslatedParametersTest(string fi, string sv, string en, string keyWord)
         {
             MultilanguageString expected = new([new("fi", fi), new("sv", sv), new("en", en)]);
-            Assert.AreEqual(expected, Actual_3Lang.AdditionalProperties[keyWord].GetRawValueMultiLanguageString());
+            if (Actual_3Lang.AdditionalProperties[keyWord] is MultilanguageStringProperty msp)
+            {
+                Assert.AreEqual(expected, msp.Value);
+            }
+            else
+            {
+                Assert.Fail("Property is not a MultilanguageStringProperty");
+            }
         }
 
         [DataTestMethod]
-        [DataRow("\"abcd\"", "SUBJECT-AREA")]
-        [DataRow("\"test_description_fi\"", "DESCRIPTION")]
-        [DataRow("\"test_note_fi\"", "NOTE")]
+        [DataRow("abcd", "SUBJECT-AREA")]
+        [DataRow("test_description_fi", "DESCRIPTION")]
+        [DataRow("test_note_fi", "NOTE")]
         public void SingleLangTableLevelAdditionalTranslatedParametersTest(string input, string keyWord)
         {
-            string actual = Actual_1Lang.AdditionalProperties[keyWord].GetRawValueString();
-            Assert.AreEqual(input, actual);
+            if(Actual_1Lang.AdditionalProperties[keyWord] is StringProperty msp)
+            {
+                Assert.AreEqual(input, msp.Value);
+            }
+            else
+            {
+                Assert.Fail("Property is not a StringProperty");
+            }
         }
 
         [TestMethod]
@@ -328,10 +379,15 @@ namespace ModelBuilderTests
         {
             Dimension? building_type_dim = Actual_3Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
             Assert.IsNotNull(building_type_dim);
-            MultilanguageString defaultValue = building_type_dim.AdditionalProperties["ELIMINATION"].ValueAsMultilanguageString(_stringDelimeter, "fi");
-            Assert.IsNotNull(defaultValue);
-            MultilanguageString expected = new([new("fi", "Talotyypit yhteensä"), new("sv", "Hustyp totalt"), new("en", "Building types total")]);
-            Assert.AreEqual(expected, defaultValue);
+            if(building_type_dim.AdditionalProperties["ELIMINATION"] is MultilanguageStringProperty msp)
+            {
+                MultilanguageString expected = new([new("fi", "Talotyypit yhteensä"), new("sv", "Hustyp totalt"), new("en", "Building types total")]);
+                Assert.AreEqual(expected, msp.Value);
+            }
+            else
+            {
+                Assert.Fail("Property is not a MultilanguageStringProperty");
+            }
         }
 
         [TestMethod]
@@ -339,10 +395,14 @@ namespace ModelBuilderTests
         {
             Dimension? building_type_dim = Actual_1Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
             Assert.IsNotNull(building_type_dim);
-            string defaultValue = building_type_dim.AdditionalProperties["ELIMINATION"].ValueAsString(_stringDelimeter);
-            Assert.IsNotNull(defaultValue);
-            string expected = "Talotyypit yhteensä";
-            Assert.AreEqual(expected, defaultValue);
+            if(building_type_dim.AdditionalProperties["ELIMINATION"] is StringProperty msp)
+            {
+                Assert.AreEqual("Talotyypit yhteensä", msp.Value);
+            }
+            else
+            {
+                Assert.Fail("Property is not a StringProperty");
+            }
         }
 
         [TestMethod]

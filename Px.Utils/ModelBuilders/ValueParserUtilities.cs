@@ -1,4 +1,5 @@
 ﻿using Px.Utils.Models.Metadata.Enums;
+using Px.Utils.Models.Metadata.ExtensionMethods;
 using Px.Utils.PxFile;
 
 namespace Px.Utils.ModelBuilders
@@ -18,13 +19,15 @@ namespace Px.Utils.ModelBuilders
         /// <returns>A <see cref="TimeDimensionInterval"/> enumeration value parsed from the input string.</returns>
         public static TimeDimensionInterval ParseTimeIntervalFromTimeVal(string input, PxFileSyntaxConf? conf = null)
         {
-            const int intervalStart = 6;
             conf ??= PxFileSyntaxConf.Default;
-            string intervalPart = new(input.TakeWhile(c => c != conf.Symbols.Value.ListSeparator).ToArray());
+            int tlistTokenEndIndex = input.IndexOf(conf.Symbols.Value.TimeSeriesIntervalEnd, StringComparison.InvariantCulture); 
+            if(tlistTokenEndIndex < 0) throw new ArgumentException($"Invalid time value string {input}");
+            string timevalString = input[..(tlistTokenEndIndex + 1)];
             string inputStart = conf.Tokens.Time.TimeIntervalIndicator + conf.Symbols.Value.TimeSeriesIntervalStart;
             char inputEnd = conf.Symbols.Value.TimeSeriesIntervalEnd;
-            if(!string.IsNullOrEmpty(intervalPart) && intervalPart.StartsWith(inputStart, StringComparison.InvariantCulture) && intervalPart.EndsWith(inputEnd))
+            if(!string.IsNullOrEmpty(timevalString) && timevalString.StartsWith(inputStart, StringComparison.InvariantCulture) && timevalString.EndsWith(inputEnd))
             {
+                int endIndex = timevalString.IndexOfAny([conf.Symbols.Value.TimeSeriesIntervalEnd, conf.Symbols.Value.ListSeparator]);
                 Dictionary<string, TimeDimensionInterval> map = new()
                 {
                     {conf.Tokens.Time.YearInterval, TimeDimensionInterval.Year},
@@ -34,12 +37,44 @@ namespace Px.Utils.ModelBuilders
                     {conf.Tokens.Time.WeekInterval, TimeDimensionInterval.Week}
                 };
 
-                if(map.TryGetValue(intervalPart[intervalStart..^1], out TimeDimensionInterval interval)) return interval;
+                if(map.TryGetValue(timevalString[inputStart.Length..endIndex], out TimeDimensionInterval interval)) return interval;
                 else return TimeDimensionInterval.Other;
             }
             else
             {
                 throw new ArgumentException($"Invalid time interval string {input}");
+            }
+        }
+
+        /// <summary>
+        /// Removes the interval entry from the beginning of a time value string.
+        /// and returns the rest split into a list of strings.
+        /// </summary>
+        /// <param name="input">The complete timeval value in one language.</param>
+        /// <param name="conf">Configuration used for parsing the value strings and the interval part.</param>
+        /// <returns>
+        /// List of value strings excluding the interval part.
+        /// If the input string is in the range format, empty list is returned.
+        /// </returns>
+        /// <exception cref="ArgumentException">If the input string does not match the expected timeval format.</exception>
+        public static List<string> GetTimeValValueList(string input, PxFileSyntaxConf? conf = null)
+        {
+            conf ??= PxFileSyntaxConf.Default;
+
+            if (input.StartsWith(conf.Tokens.Time.TimeIntervalIndicator, StringComparison.InvariantCulture))
+            {
+                int endOftoken = input.IndexOf(conf.Symbols.Value.TimeSeriesIntervalEnd);
+                int firtsStringDelimeter = input.IndexOf(conf.Symbols.Value.StringDelimeter, endOftoken);
+                if (firtsStringDelimeter >= 0)
+                {
+                    return input[firtsStringDelimeter..]
+                        .SplitToListOfStrings(conf.Symbols.Value.ListSeparator, conf.Symbols.Value.StringDelimeter);
+                }
+                else return [];
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid time value string {input}");
             }
         }
 
@@ -65,7 +100,8 @@ namespace Px.Utils.ModelBuilders
                 {conf.Tokens.VariableTypes.Unknown, DimensionType.Unknown}
             };
 
-            if (map.TryGetValue(input, out DimensionType value)) return value;
+            string cleanString = input.CleanStringDelimeters(conf.Symbols.Value.StringDelimeter);
+            if (map.TryGetValue(cleanString, out DimensionType value)) return value;
             else return DimensionType.Unknown;
         }
     }

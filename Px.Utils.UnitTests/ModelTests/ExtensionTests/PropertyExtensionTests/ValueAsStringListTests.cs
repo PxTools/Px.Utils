@@ -1,5 +1,4 @@
-﻿using Px.Utils.Models.Metadata;
-using Px.Utils.Models.Metadata.ExtensionMethods;
+﻿using Px.Utils.Models.Metadata.ExtensionMethods;
 
 namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
 {
@@ -13,14 +12,13 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \"b\", \"c\"";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
             List<string> expected = ["a", "b", "c"];
 
             // Act
-            List<string> result = property.ValueAsListOfStrings(listSeparator, stringDelimeter);
+            List<string> result = input.SplitToListOfStrings(listSeparator, stringDelimeter);
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
@@ -31,14 +29,13 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \r\n \"b\", \r\n \"c\"";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
             List<string> expected = ["a", "b", "c"];
 
             // Act
-            List<string> result = property.ValueAsListOfStrings(listSeparator, stringDelimeter);
+            List<string> result = input.SplitToListOfStrings(listSeparator, stringDelimeter);
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
@@ -49,14 +46,13 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = " \" a \",   \" b \",   \" c \"  ";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
             List<string> expected = [" a ", " b ", " c "];
 
             // Act
-            List<string> result = property.ValueAsListOfStrings(listSeparator, stringDelimeter);
+            List<string> result = input.SplitToListOfStrings(listSeparator, stringDelimeter);
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
@@ -67,14 +63,13 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a,a\", \"b,b\", \"c,c\"";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
             List<string> expected = ["a,a", "b,b", "c,c"];
 
             // Act
-            List<string> result = property.ValueAsListOfStrings(listSeparator, stringDelimeter);
+            List<string> result = input.SplitToListOfStrings(listSeparator, stringDelimeter);
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
@@ -85,14 +80,13 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\"";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
             List<string> expected = ["a"];
 
             // Act
-            List<string> result = property.ValueAsListOfStrings(listSeparator, stringDelimeter);
+            List<string> result = input.SplitToListOfStrings(listSeparator, stringDelimeter);
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
@@ -103,14 +97,13 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
             List<string> expected = [];
 
             // Act
-            List<string> result = property.ValueAsListOfStrings(listSeparator, stringDelimeter);
+            List<string> result = input.SplitToListOfStrings(listSeparator, stringDelimeter);
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
@@ -121,14 +114,13 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\",,\"b\"";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
             List<string> expected = ["a", "", "b"];
 
             // Act
-            List<string> result = property.ValueAsListOfStrings(listSeparator, stringDelimeter);
+            List<string> result = input.SplitToListOfStrings(listSeparator, stringDelimeter);
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
@@ -139,14 +131,13 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\",\"\",\"b\"";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
             List<string> expected = ["a", "", "b"];
 
             // Act
-            List<string> result = property.ValueAsListOfStrings(listSeparator, stringDelimeter);
+            List<string> result = input.SplitToListOfStrings(listSeparator, stringDelimeter);
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
@@ -161,13 +152,12 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\" \"b\", \"c\"";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
 
             // Act
-            Action func = new(() => property.ValueAsListOfStrings(listSeparator, stringDelimeter));
+            Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -178,13 +168,12 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", b\", \"c\"";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
 
             // Act
-            Action func = new(() => property.ValueAsListOfStrings(listSeparator, stringDelimeter));
+            Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -195,13 +184,12 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \"b, \"c\"";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
 
             // Act
-            Action func = new(() => property.ValueAsListOfStrings(listSeparator, stringDelimeter));
+            Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -212,13 +200,12 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \", \"c\"";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
 
             // Act
-            Action func = new(() => property.ValueAsListOfStrings(listSeparator, stringDelimeter));
+            Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -230,13 +217,12 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \"\"\", \"c\"";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
 
             // Act
-            Action func = new(() => property.ValueAsListOfStrings(listSeparator, stringDelimeter));
+            Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -247,13 +233,12 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \"b\", \"c";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
 
             // Act
-            Action func = new(() => property.ValueAsListOfStrings(listSeparator, stringDelimeter));
+            Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);
@@ -264,13 +249,12 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             string input = "\"a\", \"b\", \"c\",";
-            MetaProperty property = new("key", input);
 
             char listSeparator = ',';
             char stringDelimeter = '"';
 
             // Act
-            Action func = new(() => property.ValueAsListOfStrings(listSeparator, stringDelimeter));
+            Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
             Assert.ThrowsException<ArgumentException>(func);

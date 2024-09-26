@@ -15,6 +15,16 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
 
             Assert.AreEqual(expected, actual);
         }
+        
+        [TestMethod]
+        public void ParseTimeIntervalFromTimeValTestA1WithRangeInputReturnsYear()
+        {
+            string input = "TLIST(A1, \"2000-2005\")";
+            TimeDimensionInterval expected = TimeDimensionInterval.Year;
+            TimeDimensionInterval actual = ValueParserUtilities.ParseTimeIntervalFromTimeVal(input);
+
+            Assert.AreEqual(expected, actual);
+        }
 
         [TestMethod]
         public void ParseTimeIntervalFromTimeValTestH1InputReturnsHalfYear()

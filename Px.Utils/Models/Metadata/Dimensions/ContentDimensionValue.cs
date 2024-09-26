@@ -1,4 +1,6 @@
 ﻿using Px.Utils.Language;
+using Px.Utils.Models.Metadata.MetaProperties;
+using System.Text.Json.Serialization;
 
 namespace Px.Utils.Models.Metadata.Dimensions
 {
@@ -63,6 +65,33 @@ namespace Px.Utils.Models.Metadata.Dimensions
             Precision = precision;
         }
 
+
+        /// <summary>
+        /// Constructor mainly for deserialization purposes. 
+        /// </summary>
+        /// <param name="code">Unique code among the values of this dimension</param>
+        /// <param name="name">Multilanguage name of the dimension value</param>
+        /// <param name="unit">Multilanguage name of the unit of all the data described by this dimension value</param>
+        /// <param name="lastUpdated">The date and time when the data described by this dimension value was last updated</param>
+        /// <param name="precision">How precise the data described by this dimension value is</param>
+        /// <param name="isVirtual">Indicates whether the value is in the original data or was created by computing or aggregating other values</param>
+        /// <param name="additionalProperties">Additional properties of the dimension value</param>
+        [JsonConstructor]
+        public ContentDimensionValue(
+            string code,
+            MultilanguageString name,
+            MultilanguageString unit,
+            DateTime lastUpdated,
+            int precision,
+            bool isVirtual,
+            Dictionary<string, MetaProperty> additionalProperties)
+            : base(code, name, isVirtual, additionalProperties)
+        {
+            Unit = unit;
+            LastUpdated = lastUpdated;
+            Precision = precision;
+        }
+
         /// <summary>
         /// Constructor that takes a dimension value as input.
         /// </summary>
@@ -75,7 +104,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
             MultilanguageString unit,
             DateTime lastUpdated,
             int precision)
-            : base(dimensionValue.Code, dimensionValue.Name, dimensionValue.Virtual)
+            : base(dimensionValue.Code, dimensionValue.Name, dimensionValue.IsVirtual)
         {
             Unit = unit;
             LastUpdated = lastUpdated;

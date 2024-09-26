@@ -1,18 +1,17 @@
 ﻿using Px.Utils.Language;
 using Px.Utils.Models.Metadata.Enums;
+using Px.Utils.Models.Metadata.MetaProperties;
+using Px.Utils.Serializers.Json;
+using System.Text.Json.Serialization;
 
 namespace Px.Utils.Models.Metadata.Dimensions
 {
     /// <summary>
     /// Class representing a content dimension.
     /// </summary>
+    [JsonConverter(typeof(DimensionConverter))]
     public class ContentDimension : Dimension
     {
-        /// <summary>
-        /// The type of the dimension. Always DimensionType.Content for this class.
-        /// </summary>
-        public static new DimensionType Type => DimensionType.Content;
-
         /// <summary>
         /// List of editable dimension values that define the structure of the dimension.
         /// </summary>
@@ -22,12 +21,13 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <param name="name">Multilanguage name of the dimension</param>
         /// <param name="additionalProperties">Properties of the dimension, excluding the required properties</param>
         /// <param name="values">Ordered list of dimension values that define the structure of the dimension</param>
+        [JsonConstructor]
         public ContentDimension(
             string code,
             MultilanguageString name,
             Dictionary<string, MetaProperty> additionalProperties,
             ContentValueList values
-        ) : base(code, name, additionalProperties, values, Type)
+        ) : base(code, name, additionalProperties, values, DimensionType.Content)
         {
             Values = values;
         }
@@ -41,7 +41,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
             MultilanguageString name,
             Dictionary<string, MetaProperty> additionalProperties,
             IReadOnlyList<ContentDimensionValue> values
-        ) : base(code, name, additionalProperties, values, Type)
+        ) : base(code, name, additionalProperties, values, DimensionType.Content)
         {
             Values = new(values);
         }
