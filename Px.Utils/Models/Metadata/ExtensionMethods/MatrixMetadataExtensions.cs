@@ -1,4 +1,5 @@
 ﻿using Px.Utils.Models.Metadata.Dimensions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Px.Utils.Models.Metadata.ExtensionMethods
 {
@@ -23,7 +24,7 @@ namespace Px.Utils.Models.Metadata.ExtensionMethods
         /// </summary>
         /// <param name="contentDimension"><see cref="ContentDimension"/> object representing the first dimension with type <see cref="Enums.DimensionType.Content"/>.</param>
         /// <returns>True if the content dimension is found in the metadata, false otherwise.</returns>
-        public static bool TryGetContentDimension(this IReadOnlyMatrixMetadata metadata, out ContentDimension? contentDimension)
+        public static bool TryGetContentDimension(this IReadOnlyMatrixMetadata metadata, [MaybeNullWhen(false)] out ContentDimension? contentDimension)
         {
             contentDimension = metadata.Dimensions.FirstOrDefault(dimension => dimension.Type == Enums.DimensionType.Content) as ContentDimension;
             return contentDimension != null;
@@ -45,7 +46,7 @@ namespace Px.Utils.Models.Metadata.ExtensionMethods
         /// </summary>
         /// <param name="timeDimension"><see cref="TimeDimension"/> object representing the first dimension with type <see cref="Enums.DimensionType.Time"/>.</param>
         /// <returns>True if the time dimension is found in the metadata, false otherwise.</returns>
-        public static bool TryGetTimeDimension(this IReadOnlyMatrixMetadata metadata, out TimeDimension? timeDimension)
+        public static bool TryGetTimeDimension(this IReadOnlyMatrixMetadata metadata, [MaybeNullWhen(false)] out TimeDimension? timeDimension)
         {
             timeDimension = metadata.Dimensions.FirstOrDefault(dimension => dimension.Type == Enums.DimensionType.Time) as TimeDimension;
             return timeDimension != null;
