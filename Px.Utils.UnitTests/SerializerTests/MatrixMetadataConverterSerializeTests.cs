@@ -11,7 +11,8 @@ namespace Px.Utils.UnitTests.SerializerTests
         private static readonly JsonSerializerOptions IndentedCachedOptions = new()
         {
             WriteIndented = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true
         };
 
         private static readonly JsonSerializerOptions OneLineCachedOptions = new()
@@ -56,6 +57,15 @@ namespace Px.Utils.UnitTests.SerializerTests
         {
             string output = JsonSerializer.Serialize(MatrixMetadataFixture.SimpleMeta, OneLineCachedOptions);
             Assert.AreEqual(MatrixMetadataJson.SimpleMetaWithoutWhitespace, output);
+        }
+
+        [TestMethod]
+        public void DeserializeMetadataFromPascalCaseJsonReturnsCorrectObject()
+        {
+            MatrixMetadata? deserialized = JsonSerializer.Deserialize<MatrixMetadata>(MatrixMetadataJson.SimpleMetaPascalCase, IndentedCachedOptions);
+            string output = JsonSerializer.Serialize(deserialized, IndentedCachedOptions);
+            string expected = JsonSerializer.Serialize(MatrixMetadataFixture.SimpleMeta, IndentedCachedOptions);
+            Assert.AreEqual(expected, output);
         }
     }
 }
