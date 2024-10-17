@@ -29,37 +29,37 @@ namespace Px.Utils.Serializers.Json
             JsonElement root = doc.RootElement;
 
             string typeName = FN(nameof(IReadOnlyDimension.Type), options);
-            DimensionType type = GetProperty(root, typeName, options).Deserialize<DimensionType>(options);
+            DimensionType type = root.GetProperty(typeName, options).Deserialize<DimensionType>(options);
 
             string codeName = FN(nameof(IReadOnlyDimension.Code), options);
-            string code = GetProperty(root, codeName, options).GetString()
+            string code = root.GetProperty(codeName, options).GetString()
                 ?? throw new JsonException("Code property not found.");
 
             string nameName = FN(nameof(IReadOnlyDimension.Name), options);
-            MultilanguageString name = GetProperty(root, nameName, options).Deserialize<MultilanguageString>(options)
+            MultilanguageString name = root.GetProperty(nameName, options).Deserialize<MultilanguageString>(options)
                 ?? throw new JsonException("Name property not found.");
 
             string additionalPropertiesName = FN(nameof(IReadOnlyDimension.AdditionalProperties), options);
-            Dictionary<string, MetaProperty> additionalProperties = GetProperty(root, additionalPropertiesName, options)
+            Dictionary<string, MetaProperty> additionalProperties = root.GetProperty(additionalPropertiesName, options)
                 .Deserialize<Dictionary<string, MetaProperty>>(options)
                 ?? throw new JsonException("AdditionalProperties property not found.");
 
             string valuesName = FN(nameof(IReadOnlyDimension.Values), options);
             if (type == DimensionType.Content)
             {
-                ContentValueList contentValues = GetProperty(root, valuesName, options).Deserialize<ContentValueList>(options)
+                ContentValueList contentValues = root.GetProperty(valuesName, options).Deserialize<ContentValueList>(options)
                     ?? throw new JsonException("Values property not found.");
 
                 return new ContentDimension(code, name, additionalProperties, contentValues);
             }
 
-            ValueList values = GetProperty(root, valuesName, options).Deserialize<ValueList>(options)
+            ValueList values = root.GetProperty(valuesName, options).Deserialize<ValueList>(options)
                 ?? throw new JsonException("Values property not found.");
 
             if (type == DimensionType.Time)
             {
                 string intervalName = FN(nameof(TimeDimension.Interval), options);
-                TimeDimensionInterval interval = GetProperty(root, intervalName, options).Deserialize<TimeDimensionInterval>(options);
+                TimeDimensionInterval interval = root.GetProperty(intervalName, options).Deserialize<TimeDimensionInterval>(options);
                 return new TimeDimension(code, name, additionalProperties, values, interval);
             }
 
@@ -117,22 +117,5 @@ namespace Px.Utils.Serializers.Json
 
         private static string FN(string input, JsonSerializerOptions options)
             => options.PropertyNamingPolicy?.ConvertName(input) ?? input;
-
-        /// <summary>
-        /// Utility function to enable case insensitive property name lookup.
-        /// </summary>
-        private static JsonElement GetProperty(JsonElement root, string propertyName, JsonSerializerOptions options)
-        {
-            if (options.PropertyNameCaseInsensitive)
-            {
-                return root.EnumerateObject()
-                    .FirstOrDefault(p => p.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase))
-                    .Value;
-            }
-            else
-            {
-                return root.GetProperty(propertyName);
-            }
-        }
     }
 }

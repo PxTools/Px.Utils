@@ -30,33 +30,33 @@ namespace Px.Utils.Serializers.Json
             JsonElement root = doc.RootElement;
 
             string typeName = options.PropertyNamingPolicy?.ConvertName(nameof(MetaProperty.Type)) ?? nameof(MetaProperty.Type);
-            MetaPropertyType type = root.GetProperty(typeName).Deserialize<MetaPropertyType>(options);
+            MetaPropertyType type = root.GetProperty(typeName, options).Deserialize<MetaPropertyType>(options);
 
             string valuePropertyName = options.PropertyNamingPolicy?.ConvertName(VALUE_PROPERTY_NAME) ?? VALUE_PROPERTY_NAME;
 
             switch (type)
             {
                 case MetaPropertyType.Text:
-                    string stringValue = root.GetProperty(valuePropertyName).GetString()
+                    string stringValue = root.GetProperty(valuePropertyName, options).GetString()
                         ?? throw new JsonException("Error reading string property, property named value not found.");
                     return new StringProperty(stringValue);
                 case MetaPropertyType.MultilanguageText:
-                    MultilanguageString multilanguageString = root.GetProperty(valuePropertyName)
+                    MultilanguageString multilanguageString = root.GetProperty(valuePropertyName, options)
                         .Deserialize<MultilanguageString>(options)
                         ?? throw new JsonException("Error reading multilanguage string property, property named value not found.");
                     return new MultilanguageStringProperty(multilanguageString);
                 case MetaPropertyType.Numeric:
-                    double numericValue = root.GetProperty(valuePropertyName).GetDouble();
+                    double numericValue = root.GetProperty(valuePropertyName, options).GetDouble();
                     return new NumericProperty(numericValue);
                 case MetaPropertyType.Boolean:
-                    bool booleanValue = root.GetProperty(valuePropertyName).GetBoolean();
+                    bool booleanValue = root.GetProperty(valuePropertyName, options).GetBoolean();
                     return new BooleanProperty(booleanValue);
                 case MetaPropertyType.TextArray:
-                    List<string> strings = root.GetProperty(valuePropertyName)
+                    List<string> strings = root.GetProperty(valuePropertyName, options)
                         .Deserialize<List<string>>(options) ?? throw new JsonException("Error reading string list property, property named value not found.");
                     return new StringListProperty(strings);
                 case MetaPropertyType.MultilanguageTextArray:
-                    List<MultilanguageString> multilanguageStrings = root.GetProperty(valuePropertyName)
+                    List<MultilanguageString> multilanguageStrings = root.GetProperty(valuePropertyName, options)
                         .Deserialize<List<MultilanguageString>>(options)
                         ?? throw new JsonException("Error reading multilanguage string list property, property named value not found.");
                     return new MultilanguageStringListProperty(multilanguageStrings);
