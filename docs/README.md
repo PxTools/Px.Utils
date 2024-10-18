@@ -36,7 +36,35 @@ nuget install Px.Utils -Version 1.0.0
 ## Features
 
 ### Reading the px files
-TBA
+
+#### PxFileMetadataReader : IPxFileMetadataReader
+```ReadMetadata(Stream stream, Encoding encoding)``` reads the metadata entries from the provided stream as a IEnumerable of ```KeyValuePair<string, string>``` representing the keys and values of the entries.
+**This method does not perform any validation on the metadata entries.**
+
+```ReadMetadataAsync(Stream stream, Encoding encoding)``` is an asynchronous version of the ```ReadMetadata``` method.
+
+#### MatrixMetadataBuilder : IMatrixMetadataBuilder
+``` Build(IEnumerable<KeyValuePair<string, string>> metadataInput)``` creates a ```MatrixMetadata``` object from the provided metadata entries.
+
+#### PxFileStreamDataReader : IPxFileStreamDataReader, IDisposable
+ ```ReadDecimalDataValues(DecimalDataValue[] buffer, int offset, DataIndexer indexer)``` reads data from the px-file into the provided buffer. There are simillary named methods for reading data in to other types of buffers.
+ The data will be written in to the buffer in order, starting form the offset.
+
+The ```DataIndexer``` generates the indexes where the data will be read from. It can be built with the map of the complete file meta and other map (targetMap) which describes the values that will be read.
+
+**IMPORTANT!** The target map must have the same order as the complete file map. This is for performance reasons, we do not want to move back and forth in the file or generate a second indexer for placing the data in the buffer.
+
+Simple example for using the datareader:
+```csharp
+    IReadOnlyMatrixMetadata metaWeUse = GetMetaFromSomewhere();
+    IMatrixMap completeMap = GetCompleteMapFromSomewhere();
+        
+    DataIndexer indexer = new(completeMap, meta);
+    Matrix<DecimalDataValue> output = new(meta, new DecimalDataValue[indexer.DataLength]);
+    using Stream fileStream = File.OpenRead(PATH_TO_PX_FILE);
+    using PxFileStreamDataReader dataReader = new(fileStream);
+    dataReader.ReadDecimalDataValues(output.Data, 0, indexer);
+```
 
 ### Metadata models
 #### ```Matrix<TData>```
@@ -53,20 +81,44 @@ Example: If we choose the second value from dim0 (index 1) and the first value f
 
 There are no limits for the number or size of dimensions. But it is important to note, that if even one dimension has a size of 0, the data array will be empty (the volume of the data cube will be 0).
 
+```GetTransform(IMatrixMap map)``` method can be used to take a subset of the the matrix and/or change the order of the dimensions or the dimension values.
+It creates a new mutable deep copy of the matrix that have the structure defined by the map parameter. The data array will also be copied and reordered based on the map.
+
+#### ```MatrixMap : IMatrixMap```
+This is a minimal way to represent the structure of the metadata. Does not contain any other information than the dimension and dimension value codes.
+The ```IReadOnlyMatrixMetadata``` also implements the ```IMatrixMap``` interface.
+
 #### ```MatrixMetadata : IReadOnlyMatrixMetadata```
+Represents the table level metadata of the px file. Contains the dimension list and the language information. 
+The ```IReadOnlyMatrixMetadata``` is a read-only interface for the metadata, this should be the primary way to access and use the metadata.
+
+Similar to the ```Matrix<TData>```, the ```IReadOnlyMatrixMetadata``` has a ```GetTransform(IMatrixMap map)``` method that can be used to create a mutable deep copy with the structure defined by the map parameter.
 
 #### ```Dimension : IReadOnlyDimension```
+Represents the dimension level metadata of a px-file. This is a base class for all dimensions, and all dimension in the ```MatrixMetadata``` are in this type.
+The dimensions have a ```Type``` property and dimensions with type ```Content``` or ```Time``` have some additional properties that can be accessed through type casting.
+
+Each dimension has a unique string code among the dimension in the matrix.
+
+Beacause the content dimension has its own type for dimension values, the dimensions hold their values in ```ValueList``` or ```ContentValueList``` collections to make it compatible with the C# type system.
+Those collections have their own methods for accessing and going through the values (```Map()```, ```Find()```).
+They both implement the ```IReadOnlyList<IReadOnlyDimensionValue>``` interface, but that does not allow accessing the values as mutable or as content dimension values.
 
 #### ```ContentDimension : Dimension```
+Differs from the base class by having values of type ```ContentDimensionValue```.
 
 #### ```TimeDimension : Dimension```
+Shares the same value type as the base class, but has additional properties in the dimension level metadata.
 
 #### ```DimensionValue : IReadOnlyDimensionValue```
+Represents the dimension value level metadata of a px-file. This is a base class for all dimension values. Each value has a unique string code among the values in the dimension.
 
 #### ```ContentDimensionValue : DimensionValue```
+Dimension value that contais content dimension value specific metadata.
 
 #### ```MetaProperty```
-
+Px.Utils supports reading any metadata properties that follow the px file syntax. The properties are stored in a ```Dictionary<string, MetaProperty>``` collection called ```AdditionalProperties``` where the dictionary key is the property keyword.
+The base class ```MetaProperty``` is abstract and each supported property type has its own class that inherits from it.
 
 ### Data models
 ```IDataValue``` is an interface for the data points that defines the basic computation methods for the data points. See the Computing section for more information.
