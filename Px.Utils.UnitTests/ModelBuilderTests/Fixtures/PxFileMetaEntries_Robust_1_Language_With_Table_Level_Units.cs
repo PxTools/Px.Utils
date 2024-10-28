@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Px.Utils.UnitTests.ModelBuilderTests.Fixtures
 {
-    internal class PxFileMetaEntries_Robust_1_Language_With_Table_Level_Units
+    internal static class PxFileMetaEntries_Robust_1_Language_With_Table_Level_Units
     {
         public static List<KeyValuePair<string, string>> Entries =
             [
