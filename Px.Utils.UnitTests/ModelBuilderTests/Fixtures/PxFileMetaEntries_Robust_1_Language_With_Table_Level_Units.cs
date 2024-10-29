@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Px.Utils.UnitTests.ModelBuilderTests.Fixtures
 {
-    internal static class PxFileMetaEntries_Robust_1_Language_With_Table_Level_Units
+    internal static class PxFileMetaEntries_Robust_1_Language_With_Table_Level_Units_And_Precision
     {
         public static List<KeyValuePair<string, string>> Entries =
             [
@@ -17,8 +17,8 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.Fixtures
                 new("CREATION-DATE", "\"20200121 09:00\""),
                 new("NEXT-UPDATE", "\"20240131 08:00\""),
                 new("TABLEID", "\"example_table_id_for_testing\""),
-                new("DECIMALS", "1"),
-                new("SHOWDECIMALS", "0"),
+                new("DECIMALS", "0"),
+                new("SHOWDECIMALS", "1"),
                 new("MATRIX", "\"001_12ab_2022\""),
                 new("SUBJECT-CODE", "\"ABCD\""),
                 new("SUBJECT-AREA", "\"abcd\""),
@@ -44,7 +44,6 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.Fixtures
                 new("VARIABLE-TYPE(\"Talotyyppi\")", "\"Classificatory\""),
                 new("MAP(\"Alue\")", "\"Alue 2018\""),
                 new("ELIMINATION(\"Talotyyppi\")", "\"Talotyypit yhteensä\""),
-                new("PRECISION(\"Tiedot\",\"Indeksi (2015=100)\")", "1"),
                 new("PRECISION(\"Tiedot\",\"Muutos edelliseen vuoteen (indeksi 2015=100)\")", "1"),
                 new("LAST-UPDATED(\"Indeksi (2015=100)\")", "\"20230131 08:00\""),
                 new("LAST-UPDATED(\"Muutos edelliseen vuoteen (indeksi 2015=100)\")", "\"20230131 09:00\""),
