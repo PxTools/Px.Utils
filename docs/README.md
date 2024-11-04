@@ -37,6 +37,10 @@ nuget install Px.Utils -Version 1.0.0
 
 ### Reading the px files
 
+The read pipeline consists of the following components: Reading the metadata, building the metadata and reading the data.
+Each of these components can be used separately and replaced with custom implementations.
+Especially if the contents of your px-files do not follow the standard px-file format, you might need to implement your own metadata builder.
+
 #### PxFileMetadataReader : IPxFileMetadataReader
 ```ReadMetadata(Stream stream, Encoding encoding)``` reads the metadata entries from the provided stream as a IEnumerable of ```KeyValuePair<string, string>``` representing the keys and values of the entries.
 **This method does not perform any validation on the metadata entries.**
@@ -45,6 +49,7 @@ nuget install Px.Utils -Version 1.0.0
 
 #### MatrixMetadataBuilder : IMatrixMetadataBuilder
 ``` Build(IEnumerable<KeyValuePair<string, string>> metadataInput)``` creates a ```MatrixMetadata``` object from the provided metadata entries.
+The entries need to be in the same key-value format as the output of the ```PxFileMetadataReader``` ```ReadMetadata``` method.
 
 #### PxFileStreamDataReader : IPxFileStreamDataReader, IDisposable
  ```ReadDecimalDataValues(DecimalDataValue[] buffer, int offset, DataIndexer indexer)``` reads data from the px-file into the provided buffer. There are simillary named methods for reading data in to other types of buffers.
