@@ -6,6 +6,8 @@ using Px.Utils.Models.Metadata.Dimensions;
 using Px.Utils.Models.Metadata.Enums;
 using Px.Utils.Models.Metadata.MetaProperties;
 using System.Globalization;
+using Px.Utils.PxFile;
+using Px.Utils.UnitTests.ModelBuilderTests.Fixtures;
 
 namespace ModelBuilderTests
 {
@@ -467,6 +469,36 @@ namespace ModelBuilderTests
             Dimension? area_dim = Actual_1Lang.Dimensions.Find(d => d.Code == "Alue");
             Assert.IsNotNull(area_dim);
             Assert.AreEqual(DimensionType.Geographical, area_dim.Type);
+        }
+
+        [TestMethod]
+        public void MultilanguageTableWithCustomMetaPropertiesAndPropetyTypes()
+        {
+            PxFileSyntaxConf syntaxConf = PxFileSyntaxConf.Default;
+            Dictionary<string, MetaPropertyType> customTypeDictionary = new()
+            {
+                { "TEXTPROPERTY", MetaPropertyType.Text },
+                { "MULTILANGUAGETEXTPROPERTY", MetaPropertyType.MultilanguageText },
+                { "NUMBERPROPERTY", MetaPropertyType.Numeric },
+                { "BOOLEANPROPERTY", MetaPropertyType.Boolean },
+                { "BOOLEANTEXTPROPERTY", MetaPropertyType.Text },
+                { "TEXTARRAYPROPERTY", MetaPropertyType.TextArray },
+                { "MULTILANGUAGETEXTARRAYPROPERTY", MetaPropertyType.MultilanguageTextArray },
+                { "SINGLEITEMTEXTARRAYPROPERTY", MetaPropertyType.TextArray },
+                { "SINGLEITEMMULTILANGUAGETEXTARRAYPROPERTY", MetaPropertyType.MultilanguageTextArray },
+            };
+            syntaxConf.Content.EntryTypes.CustomTypeDictionary = customTypeDictionary;
+            MatrixMetadata actual = new MatrixMetadataBuilder(syntaxConf).Build(PxFileMetaEntries_Robust_3_Languages_With_Custom_Properties.Entries);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(MetaPropertyType.Text, actual.AdditionalProperties["TEXTPROPERTY"].Type);
+            Assert.AreEqual(MetaPropertyType.MultilanguageText, actual.AdditionalProperties["MULTILANGUAGETEXTPROPERTY"].Type);
+            Assert.AreEqual(MetaPropertyType.Numeric, actual.AdditionalProperties["NUMBERPROPERTY"].Type);
+            Assert.AreEqual(MetaPropertyType.Boolean, actual.AdditionalProperties["BOOLEANPROPERTY"].Type);
+            Assert.AreEqual(MetaPropertyType.Text, actual.AdditionalProperties["BOOLEANTEXTPROPERTY"].Type);
+            Assert.AreEqual(MetaPropertyType.TextArray, actual.AdditionalProperties["TEXTARRAYPROPERTY"].Type);
+            Assert.AreEqual(MetaPropertyType.MultilanguageTextArray, actual.AdditionalProperties["MULTILANGUAGETEXTARRAYPROPERTY"].Type);
+            Assert.AreEqual(MetaPropertyType.TextArray, actual.AdditionalProperties["SINGLEITEMTEXTARRAYPROPERTY"].Type);
+            Assert.AreEqual(MetaPropertyType.MultilanguageTextArray, actual.AdditionalProperties["SINGLEITEMMULTILANGUAGETEXTARRAYPROPERTY"].Type);
         }
     }
 }
