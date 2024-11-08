@@ -147,7 +147,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.Fixtures
                new("MULTILANGUAGETEXTPROPERTY[en]", "\"foo(en)\""),
                new("NUMBERPROPERTY", "1"),
                new("BOOLEANPROPERTY", "YES"),
-               new("BOOLEANTEXTPROPERTY", "NO"),
+               new("BOOLEANTEXTPROPERTY", "\"NO\""),
                new("TEXTARRAYPROPERTY", "\"foo\",\"bar\",\"baz\""),
                new("MULTILANGUAGETEXTARRAYPROPERTY", "\"foo\",\"bar\",\"baz\""),
                new("MULTILANGUAGETEXTARRAYPROPERTY[sv]", "\"foo\",\"bar\",\"baz (sv)\""),
