@@ -1,5 +1,4 @@
 ﻿using Px.Utils.Models.Metadata.Enums;
-using Px.Utils.Models.Metadata.MetaProperties;
 
 namespace Px.Utils.PxFile
 {
@@ -264,13 +263,22 @@ namespace Px.Utils.PxFile
 
                 public static EntryValueTypes DefaultEntryValueTypes => new();
 
+                public Dictionary<string, MetaPropertyType> CustomTypeDictionary { get; set; } = [];
+
                 public static Dictionary<string, MetaPropertyType> GetTypeDictionary(PxFileSyntaxConf conf)
                 {
-                    return new Dictionary<string, MetaPropertyType>
+                    Dictionary<string, MetaPropertyType> typeDictionary = new()
                     {
                         { conf.Tokens.KeyWords.StubDimensions, conf.Content.EntryTypes.Stub },
                         { conf.Tokens.KeyWords.HeadingDimensions, conf.Content.EntryTypes.Heading }
                     };
+
+                    foreach (KeyValuePair<string, MetaPropertyType> entry in conf.Content.EntryTypes.CustomTypeDictionary)
+                    {
+                        typeDictionary[entry.Key] = entry.Value;
+                    }
+
+                    return typeDictionary;
                 }
             }
 
