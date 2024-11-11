@@ -487,7 +487,7 @@ namespace ModelBuilderTests
                 { "SINGLEITEMTEXTARRAYPROPERTY", MetaPropertyType.TextArray },
                 { "SINGLEITEMMULTILANGUAGETEXTARRAYPROPERTY", MetaPropertyType.MultilanguageTextArray },
             };
-            syntaxConf.Content.EntryTypes.CustomTypeDictionary = customTypeDictionary;
+            syntaxConf.Content.EntryTypes.PropertyTypeDefinitions = customTypeDictionary;
             MatrixMetadata actual = new MatrixMetadataBuilder(syntaxConf).Build(PxFileMetaEntries_Robust_3_Languages_With_Custom_Properties.Entries);
             Assert.IsNotNull(actual);
             Assert.AreEqual(MetaPropertyType.Text, actual.AdditionalProperties["TEXTPROPERTY"].Type);

@@ -263,7 +263,7 @@ namespace Px.Utils.PxFile
 
                 public static EntryValueTypes DefaultEntryValueTypes => new();
 
-                public Dictionary<string, MetaPropertyType> CustomTypeDictionary { get; set; } = [];
+                public Dictionary<string, MetaPropertyType> PropertyTypeDefinitions { get; set; } = [];
 
                 public static Dictionary<string, MetaPropertyType> GetTypeDictionary(PxFileSyntaxConf conf)
                 {
@@ -273,7 +273,7 @@ namespace Px.Utils.PxFile
                         { conf.Tokens.KeyWords.HeadingDimensions, conf.Content.EntryTypes.Heading }
                     };
 
-                    foreach (KeyValuePair<string, MetaPropertyType> entry in conf.Content.EntryTypes.CustomTypeDictionary)
+                    foreach (KeyValuePair<string, MetaPropertyType> entry in conf.Content.EntryTypes.PropertyTypeDefinitions)
                     {
                         typeDictionary[entry.Key] = entry.Value;
                     }
