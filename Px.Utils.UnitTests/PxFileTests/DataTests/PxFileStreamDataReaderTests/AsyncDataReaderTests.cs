@@ -26,14 +26,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0", "var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, indexer);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
 
             double[] expexted =
             [
@@ -59,14 +58,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0", "var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, indexer);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
 
             double[] expexted =
             [
@@ -92,14 +90,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0", "var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, indexer);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
 
             // Assert
             DoubleDataValue[] expexted =
@@ -131,14 +128,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 5, 2]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1", "var1_val2", "var1_val3", "var1_val4"]),
-                new DimensionMap("var2", ["var1_val0"])
+                new DimensionMap("var2", ["var2_val0"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, indexer, cToken);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta, cToken);
 
             double[] expexted = [0.00, 2.00, 4.00, 6.00, 8.00, canary];
             // The canary in the expected checks against overwrites
@@ -156,19 +152,18 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
             DoubleDataValue[] targetBuffer = new DoubleDataValue[5];
 
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 5, 2]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1", "var1_val2", "var1_val3", "var1_val4"]),
                 new DimensionMap("var2", ["var1_val0"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
 
             using CancellationTokenSource cts = new();
             await cts.CancelAsync();
             CancellationToken cToken = cts.Token;
 
-            async Task call() => await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, indexer, cToken);
+            async Task call() => await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta, cToken);
             await Assert.ThrowsExceptionAsync<TaskCanceledException>(call);
         }
 
@@ -186,14 +181,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0", "var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, indexer, cToken);
+            await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, targetMap, testMeta, cToken);
 
             decimal[] expexted =
             [
@@ -215,19 +209,18 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0", "var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
 
             using CancellationTokenSource cts = new();
             await cts.CancelAsync();
             CancellationToken cToken = cts.Token;
 
-            async Task call() => await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, indexer, cToken);
+            async Task call() => await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, targetMap, testMeta, cToken);
             await Assert.ThrowsExceptionAsync<TaskCanceledException>(call);
         }
 
@@ -245,14 +238,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0", "var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadUnsafeDoublesAsync(targetBuffer, 0, indexer, missingMarkers, cToken);
+            await reader.ReadUnsafeDoublesAsync(targetBuffer, 0, targetMap, testMeta, missingMarkers, cToken);
 
             double[] expexted =
             [
@@ -274,20 +266,19 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
             double[] targetBuffer = new double[20];
 
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0", "var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
 
             using CancellationTokenSource cts = new();
             await cts.CancelAsync();
             CancellationToken cToken = cts.Token;
 
             // Act and Assert
-            async Task call() => await reader.ReadUnsafeDoublesAsync(targetBuffer, 0, indexer, missingMarkers, cToken);
+            async Task call() => await reader.ReadUnsafeDoublesAsync(targetBuffer, 0, targetMap, testMeta, missingMarkers, cToken);
             await Assert.ThrowsExceptionAsync<TaskCanceledException>(call);
         }
 
@@ -304,14 +295,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 5, 2]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1", "var1_val2", "var1_val3", "var1_val4"]),
-                new DimensionMap("var2", ["var1_val0"])
+                new DimensionMap("var2", ["var2_val0"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, indexer);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
 
 
             double[] expexted = [0.00, 2.00, 4.00, 6.00, 8.00, canary];
@@ -332,14 +322,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 5, 2]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1", "var1_val2", "var1_val3", "var1_val4"]),
-                new DimensionMap("var2", ["var1_val0"])
+                new DimensionMap("var2", ["var2_val0"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, indexer);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
 
             // Assert
             double[] expexted = [10.00, 12.00, 14.00, 16.00, 18.00];
@@ -357,14 +346,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0", "var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, indexer);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
 
             // Assert
             double[] expexted =
@@ -387,14 +375,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 5, 2]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1", "var1_val2", "var1_val3", "var1_val4"]),
-                new DimensionMap("var2", ["var1_val0"])
+                new DimensionMap("var2", ["var2_val0"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, indexer);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
 
             // Assert
             double[] expexted = [0.00, 0.02, 0.04, 0.06, 0.08];
@@ -412,14 +399,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 5, 2]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1", "var1_val2", "var1_val3", "var1_val4"]),
-                new DimensionMap("var2", ["var1_val0"])
+                new DimensionMap("var2", ["var2_val0"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, indexer);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
 
             // Assert
             double[] expexted = [0.10, 0.12, 0.14, 0.16, 0.18];
@@ -437,14 +423,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0", "var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, indexer);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
 
             // Assert
             double[] expexted =
@@ -467,14 +452,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0", "var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, indexer);
+            await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
 
             // Assert
             decimal[] expexted =
@@ -497,14 +481,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0", "var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, indexer);
+            await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
 
             // Assert
             decimal[] expexted =
@@ -527,14 +510,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0", "var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadUnsafeDoublesAsync(targetBuffer, 0, indexer, missingMarkers);
+            await reader.ReadUnsafeDoublesAsync(targetBuffer, 0, targetMap, testMeta, missingMarkers);
 
             // Assert
             double[] expexted =
@@ -557,14 +539,13 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act
             MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
-            MatrixMap matrixMap = new(
+            MatrixMap targetMap = new(
             [
                 new DimensionMap("var0", ["var0_val0", "var0_val1"]),
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            DataIndexer indexer = new(testMeta, matrixMap);
-            await reader.ReadUnsafeDoublesAsync(targetBuffer, 0, indexer, missingMarkers);
+            await reader.ReadUnsafeDoublesAsync(targetBuffer, 0, targetMap, testMeta, missingMarkers);
 
             // Assert
             double[] expexted =
@@ -575,7 +556,5 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             CollectionAssert.AreEqual(expexted, targetBuffer);
         }
-
-
     }
 }

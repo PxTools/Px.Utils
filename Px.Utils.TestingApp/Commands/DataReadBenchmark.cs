@@ -21,7 +21,7 @@ namespace Px.Utils.TestingApp.Commands
 
         internal override string Description => "Benchmarks the data reading capabilities of the PxFileStreamDataReader.";
 
-        private DataIndexer? Indexer { get; set; }
+        private IMatrixMap? Target { get; set; }
 
         private int _numberOfCells = 1000000;
 
@@ -53,81 +53,81 @@ namespace Px.Utils.TestingApp.Commands
         private void RunReadDoubleDataValuesBenchmarks()
         {
             if(MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
-            Indexer = GenerateBenchmarkIndexer(MetaData, _numberOfCells);
+            Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            DoubleDataValue[] buffer = new DoubleDataValue[Indexer.DataLength];
+            DoubleDataValue[] buffer = new DoubleDataValue[Target.GetSize()];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
 
-            reader.ReadDoubleDataValues(buffer, 0, Indexer);
+            reader.ReadDoubleDataValues(buffer, 0, Target, MetaData);
         }
 
         private void RunReadDecimalDataValuesBenchmarks()
         {
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
-            Indexer = GenerateBenchmarkIndexer(MetaData, _numberOfCells);
+            Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            DecimalDataValue[] buffer = new DecimalDataValue[Indexer.DataLength];
+            DecimalDataValue[] buffer = new DecimalDataValue[Target.GetSize()];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
 
-            reader.ReadDecimalDataValues(buffer, 0, Indexer);
+            reader.ReadDecimalDataValues(buffer, 0, Target, MetaData);
         }
 
         private void RunReadUnsafeDoubleBenchmarks()
         {
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
-            Indexer = GenerateBenchmarkIndexer(MetaData, _numberOfCells);
+            Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            double[] buffer = new double[Indexer.DataLength];
+            double[] buffer = new double[Target.GetSize()];
             double[] missingValueEncodings = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
 
-            reader.ReadUnsafeDoubles(buffer, 0, Indexer, missingValueEncodings);
+            reader.ReadUnsafeDoubles(buffer, 0, Target, MetaData, missingValueEncodings);
         }
 
         private async Task RunReadDoubleDataValuesBenchmarksAsync()
         {
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
-            Indexer = GenerateBenchmarkIndexer(MetaData, _numberOfCells);
+            Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            DoubleDataValue[] buffer = new DoubleDataValue[Indexer.DataLength];
+            DoubleDataValue[] buffer = new DoubleDataValue[Target.GetSize()];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
 
-            await reader.ReadDoubleDataValuesAsync(buffer, 0, Indexer);
+            await reader.ReadDoubleDataValuesAsync(buffer, 0, Target, MetaData);
         }
 
         private async Task RunReadDecimalDataValuesBenchmarksAsync()
         {
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
-            Indexer = GenerateBenchmarkIndexer(MetaData, _numberOfCells);
+            Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            DecimalDataValue[] buffer = new DecimalDataValue[Indexer.DataLength];
+            DecimalDataValue[] buffer = new DecimalDataValue[Target.GetSize()];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
 
-            await reader.ReadDecimalDataValuesAsync(buffer, 0, Indexer);
+            await reader.ReadDecimalDataValuesAsync(buffer, 0, Target, MetaData);
         }
 
         private async Task RunReadUnsafeDoubleBenchmarksAsync()
         {
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
-            Indexer = GenerateBenchmarkIndexer(MetaData, _numberOfCells);
+            Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            double[] buffer = new double[Indexer.DataLength];
+            double[] buffer = new double[Target.GetSize()];
             double[] missingValueEncodings = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
 
-            await reader.ReadUnsafeDoublesAsync(buffer, 0, Indexer, missingValueEncodings);
+            await reader.ReadUnsafeDoublesAsync(buffer, 0, Target, MetaData, missingValueEncodings);
         }
 
         protected override void SetRunParameters()
@@ -143,12 +143,12 @@ namespace Px.Utils.TestingApp.Commands
             }
         }
 
-        private static DataIndexer GenerateBenchmarkIndexer(IMatrixMap map, int targetSize)
+        private static IMatrixMap GenerateBenchmarkTargetMap(IMatrixMap complete, int targetSize)
         {
-            int size = map.GetSize();
-            if (size < targetSize) return new DataIndexer(map, map);
+            int size = complete.GetSize();
+            if (size < targetSize) return complete;
 
-            List<IDimensionMap> sortedDimensions = [.. map.DimensionMaps];
+            List<IDimensionMap> sortedDimensions = [.. complete.DimensionMaps];
             while (size > targetSize)
             {
                 sortedDimensions = [.. sortedDimensions.OrderByDescending(x => x.ValueCodes.Count)];
@@ -157,7 +157,7 @@ namespace Px.Utils.TestingApp.Commands
                 size = sortedDimensions.Aggregate(1, (acc, x) => acc * x.ValueCodes.Count);
             }
 
-            List<IDimensionMap> dimList = map.DimensionMaps
+            List<IDimensionMap> dimList = complete.DimensionMaps
                 .Select(dim => dim.Code)
                 .Select(dimCode => new DimensionMap(
                     dimCode,
@@ -165,7 +165,7 @@ namespace Px.Utils.TestingApp.Commands
                 .Cast<IDimensionMap>()
                 .ToList();
 
-            return new DataIndexer(map, new MatrixMap(dimList));
+            return new MatrixMap(dimList);
         }
     }
 }
