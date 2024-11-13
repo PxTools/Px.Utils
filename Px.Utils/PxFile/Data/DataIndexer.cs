@@ -29,6 +29,11 @@ namespace Px.Utils.PxFile.Data
         /// <param name="targetMap">Produces the indexes of the items decribed by this map.</param>
         public DataIndexer(IMatrixMap completeMetaMap, IMatrixMap targetMap)
         {
+            if (completeMetaMap.DimensionMaps.Count != targetMap.DimensionMaps.Count)
+            {
+                throw new ArgumentException("The number of dimensions in the complete metadata map and the target map must be the same.");
+            }
+
             int[] dimensionSizes = completeMetaMap.DimensionMaps.Select(d => d.ValueCodes.Count).ToArray();
             _coordinates = new int[targetMap.DimensionMaps.Count][];
             _dimOrder = GetDimensionOrder(completeMetaMap, targetMap);
@@ -37,14 +42,22 @@ namespace Px.Utils.PxFile.Data
                 int dimIndex = _dimOrder[targetIndex];
                 IDimensionMap dimension = completeMetaMap.DimensionMaps.First(d => d.Code == targetMap.DimensionMaps[targetIndex].Code);
                 _coordinates[dimIndex] = new int[targetMap.DimensionMaps[targetIndex].ValueCodes.Count];
-                for (int mapIndex = 0; mapIndex < targetMap.DimensionMaps[targetIndex].ValueCodes.Count; mapIndex++)
+                IDimensionMap targetDimMap = targetMap.DimensionMaps[targetIndex];
+                for (int mapIndex = 0; mapIndex < targetDimMap.ValueCodes.Count; mapIndex++)
                 {
+                    bool found = false;
                     for (int valIndex = 0; valIndex < dimension.ValueCodes.Count; valIndex++)
                     {
-                        if (dimension.ValueCodes[valIndex] == targetMap.DimensionMaps[targetIndex].ValueCodes[mapIndex])
+                        if (dimension.ValueCodes[valIndex] == targetDimMap.ValueCodes[mapIndex])
                         {
                             _coordinates[dimIndex][mapIndex] = valIndex;
+                            found = true;
                         }
+                    }
+                    if(!found)
+                    {
+                        string msg = $"The value code '{targetDimMap.ValueCodes[mapIndex]}' was not found in the dimension '{targetDimMap.Code}' of the complete metadata map.";
+                        throw new ArgumentException(msg);
                     }
                 }
             }

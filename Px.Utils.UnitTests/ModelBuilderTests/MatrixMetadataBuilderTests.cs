@@ -8,10 +8,8 @@ using Px.Utils.Models.Metadata.MetaProperties;
 using Px.Utils.PxFile;
 using Px.Utils.UnitTests.ModelBuilderTests.Fixtures;
 using System.Globalization;
-using Px.Utils.PxFile;
-using Px.Utils.UnitTests.ModelBuilderTests.Fixtures;
 
-namespace ModelBuilderTests
+namespace Px.Utils.UnitTests.ModelBuilderTests
 {
     [TestClass]
     public class MatrixMetadataBuilderTests
@@ -19,7 +17,7 @@ namespace ModelBuilderTests
         private MatrixMetadata Actual_3Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_3_Languages.Entries);
         private MatrixMetadata Actual_1Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_1_Language.Entries);
         private MatrixMetadata Actual_Recommended_3Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Recommended_3_Langs.Entries);
-        private MatrixMetadata Actual_1Lang_With_Table_Level_Units_And_Precision { get; } = 
+        private MatrixMetadata Actual_1Lang_With_Table_Level_Units_And_Precision { get; } =
             new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_1_Language_With_Table_Level_Units_And_Precision.Entries);
 
         [TestMethod]
@@ -29,7 +27,7 @@ namespace ModelBuilderTests
             MatrixMetadata meta = builder.Build(PxFileMetaEntries_Robust_3_Languages.Entries);
             Assert.IsNotNull(meta);
         }
-        
+
         [TestMethod]
         public void DictionaryBuildTest()
         {
@@ -70,7 +68,7 @@ namespace ModelBuilderTests
         [DataRow("20240131 08:00", "NEXT-UPDATE")]
         public void MultiLangTableLevelAdditionalNotTranslatedStringParametersTest(string expected, string keyWord)
         {
-            if(Actual_3Lang.AdditionalProperties[keyWord] is StringProperty asp)
+            if (Actual_3Lang.AdditionalProperties[keyWord] is StringProperty asp)
             {
                 Assert.AreEqual(expected, asp.Value);
             }
@@ -84,7 +82,7 @@ namespace ModelBuilderTests
         [DataRow(true, "OFFICIAL-STATISTICS")]
         public void MultiLangTableLevelAdditionalBoolParametersTest(bool expected, string keyWord)
         {
-            if(Actual_3Lang.AdditionalProperties[keyWord] is BooleanProperty abp)
+            if (Actual_3Lang.AdditionalProperties[keyWord] is BooleanProperty abp)
             {
                 Assert.AreEqual(expected, abp.Value);
             }
@@ -102,7 +100,7 @@ namespace ModelBuilderTests
         [DataRow("20240131 08:00", "NEXT-UPDATE")]
         public void SingleLangTableLevelAdditionalNotTranslatedParametersTest(string expected, string keyWord)
         {
-            if(Actual_1Lang.AdditionalProperties[keyWord] is StringProperty asp)
+            if (Actual_1Lang.AdditionalProperties[keyWord] is StringProperty asp)
             {
                 Assert.AreEqual(expected, asp.Value);
             }
@@ -116,7 +114,7 @@ namespace ModelBuilderTests
         [DataRow(true, "OFFICIAL-STATISTICS")]
         public void SingleLangTableLevelAdditionalNotTranslatedParametersTest(bool expected, string keyWord)
         {
-            if(Actual_1Lang.AdditionalProperties[keyWord] is BooleanProperty abp)
+            if (Actual_1Lang.AdditionalProperties[keyWord] is BooleanProperty abp)
             {
                 Assert.AreEqual(expected, abp.Value);
             }
@@ -149,7 +147,7 @@ namespace ModelBuilderTests
         [DataRow("test_note_fi", "NOTE")]
         public void SingleLangTableLevelAdditionalTranslatedParametersTest(string input, string keyWord)
         {
-            if(Actual_1Lang.AdditionalProperties[keyWord] is StringProperty msp)
+            if (Actual_1Lang.AdditionalProperties[keyWord] is StringProperty msp)
             {
                 Assert.AreEqual(input, msp.Value);
             }
@@ -220,11 +218,11 @@ namespace ModelBuilderTests
                 new("fi", "%"),
                 new("fi", "lukumäärä")
             ];
-            for(int i = 0; i < contentDimension.Values.Count; i++)
+            for (int i = 0; i < contentDimension.Values.Count; i++)
             {
                 Assert.AreEqual(expectedUnits[i], contentDimension.Values[i].Unit);
             }
-            for(int i = 0; i < contentDimension.Values.Count; i++)
+            for (int i = 0; i < contentDimension.Values.Count; i++)
             {
                 Assert.AreEqual(1, contentDimension.Values[i].Precision);
             }
@@ -408,7 +406,7 @@ namespace ModelBuilderTests
         {
             Dimension? building_type_dim = Actual_3Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
             Assert.IsNotNull(building_type_dim);
-            if(building_type_dim.AdditionalProperties["ELIMINATION"] is MultilanguageStringProperty msp)
+            if (building_type_dim.AdditionalProperties["ELIMINATION"] is MultilanguageStringProperty msp)
             {
                 MultilanguageString expected = new([new("fi", "Talotyypit yhteensä"), new("sv", "Hustyp totalt"), new("en", "Building types total")]);
                 Assert.AreEqual(expected, msp.Value);
@@ -424,7 +422,7 @@ namespace ModelBuilderTests
         {
             Dimension? building_type_dim = Actual_1Lang.Dimensions.Find(d => d.Code == "Talotyyppi");
             Assert.IsNotNull(building_type_dim);
-            if(building_type_dim.AdditionalProperties["ELIMINATION"] is StringProperty msp)
+            if (building_type_dim.AdditionalProperties["ELIMINATION"] is StringProperty msp)
             {
                 Assert.AreEqual("Talotyypit yhteensä", msp.Value);
             }

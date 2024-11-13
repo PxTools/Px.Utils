@@ -174,5 +174,32 @@ namespace PxFileTests.DataTests
             }
             while (generator.Next());
         }
+
+        [TestMethod]
+        public void MismatchingValueCodesShouldCauseArgumentException()
+        {
+            MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([3, 2, 5]);
+            MatrixMap matrixMap = new(
+            [
+                new DimensionMap("var0", ["var0_val2", "var0_val1"]),
+                new DimensionMap("var1", ["var2_val0", "var1_val1"]),
+                new DimensionMap("var2", ["var2_val4", "var2_val3"])
+            ]);
+
+            Assert.ThrowsException<ArgumentException>(() => new DataIndexer(testMeta, matrixMap));
+        }
+
+        [TestMethod]
+        public void MissingDimensionShouldCauseArgumentException()
+        {
+            MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([3, 2, 5]);
+            MatrixMap matrixMap = new(
+            [
+                new DimensionMap("var0", ["var0_val2", "var0_val1"]),
+                new DimensionMap("var1", ["var1_val0", "var1_val1"])
+            ]);
+
+            Assert.ThrowsException<ArgumentException>(() => new DataIndexer(testMeta, matrixMap));
+        }
     }
 }
