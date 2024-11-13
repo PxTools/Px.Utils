@@ -52,23 +52,40 @@ Especially if the contents of your px-files do not follow the standard px-file f
 The entries need to be in the same key-value format as the output of the ```PxFileMetadataReader``` ```ReadMetadata``` method.
 
 #### PxFileStreamDataReader : IPxFileStreamDataReader, IDisposable
- ```ReadDecimalDataValues(DecimalDataValue[] buffer, int offset, DataIndexer indexer)``` reads data from the px-file into the provided buffer. There are simillary named methods for reading data in to other types of buffers.
+ ```ReadDecimalDataValues(DecimalDataValue[] buffer, int offset, IMatrixMap target, IMatrixMap complete)``` reads data from the px-file into the provided buffer. There are simillary named methods for reading data in to other types of buffers.
  The data will be written in to the buffer in order, starting form the offset.
-
-The ```DataIndexer``` generates the indexes where the data will be read from. It can be built with the map of the complete file meta and other map (targetMap) which describes the values that will be read.
 
 **IMPORTANT!** The target map must have the same order as the complete file map. This is for performance reasons, we do not want to move back and forth in the file or generate a second indexer for placing the data in the buffer.
 
-Simple example for using the datareader:
+### Metadata example
 ```csharp
-    IReadOnlyMatrixMetadata metaWeUse = GetMetaFromSomewhere();
-    IMatrixMap completeMap = GetCompleteMapFromSomewhere();
-        
-    DataIndexer indexer = new(completeMap, meta);
-    Matrix<DecimalDataValue> output = new(meta, new DecimalDataValue[indexer.DataLength]);
-    using Stream fileStream = File.OpenRead(PATH_TO_PX_FILE);
+    // Read meta
+    using Stream pxFileStream = GetFileStream();
+    PxFileMetadataReader reader = new();
+    Encoding encoding = reader.GetEncoding(fileStream);
+    IEnumerable<KeyValuePair<string, string>> entries = reader.ReadMetadata(fileStream, encoding);
+
+    // Build meta
+    MatrixMetadataBuilder builder = new();
+    MatrixMetadata completeMeta = builder.Build(entries);
+    MatrixMetadata metaWeUse = completeMeta.GetTransform(GetSomeSubsetMap());
+```
+
+### Data reader example
+```csharp
+    // Read data & build the matrix
+    Matrix<DecimalDataValue> output = new(metaWeUse, new DecimalDataValue[indexer.DataLength]);
+    using Stream fileStream = GetFileStream();
     using PxFileStreamDataReader dataReader = new(fileStream);
-    dataReader.ReadDecimalDataValues(output.Data, 0, indexer);
+    dataReader.ReadDecimalDataValues(output.Data, 0, metaWeUse, completeMap);
+```
+
+### Reader/builder configuration
+Behaviour of the reader and builder objects can be changed with ```PxFileSyntaxConf``` object.
+```csharp
+    PxFileSyntaxConf conf = PxFileSyntaxConf.Default;
+    conf.Content.PropertyTypeDefinitions["EXAMPLE"] = MetaPropertyType.TextArray;
+    MatrixMetadataBuilder builder = new(conf);
 ```
 
 ### Metadata models
