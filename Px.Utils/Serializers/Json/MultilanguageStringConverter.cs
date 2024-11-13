@@ -11,7 +11,7 @@ namespace Px.Utils.Serializers.Json
     {
         public override MultilanguageString? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            Dictionary<string, string>? translations = JsonSerializer.Deserialize<Dictionary<string, string>>(ref reader, options);
+            Dictionary<string, string>? translations = JsonSerializer.Deserialize<Dictionary<string, string>?>(ref reader, options);
             return translations is not null ? new MultilanguageString(translations) : null;
         }
 

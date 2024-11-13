@@ -1,5 +1,4 @@
-﻿using Px.Utils.PxFile.Data;
-using Px.Utils.Models.Data.DataValue;
+﻿using Px.Utils.Models.Data.DataValue;
 
 namespace Px.Utils.PxFile.Data
 {
@@ -10,6 +9,7 @@ namespace Px.Utils.PxFile.Data
     public sealed class PxFileStreamDataReader : IPxFileStreamDataReader, IDisposable
     {
         private readonly Stream _stream;
+        private bool _disposed; // default false
         private readonly PxFileSyntaxConf _conf;
         private long readIndex;
         private readonly int _readBufferSize;
@@ -242,7 +242,11 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         public void Dispose()
         {
-            _stream.Dispose();
+            if(!_disposed)
+            {
+                _stream.Dispose();
+                _disposed = true;
+            }
         }
 
         #region Private methods

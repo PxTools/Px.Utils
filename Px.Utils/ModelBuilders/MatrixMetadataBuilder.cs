@@ -226,7 +226,19 @@ namespace Px.Utils.ModelBuilders
         {
             string code = GetDimensionCode(entries, langs, dimensionName);
             ContentValueList values = BuildContentDimensionValues(entries, langs, dimensionName);
-
+            // Table level UNIT, SHOWDECIMALS and DECIMALS properties are not needed after building the content dimension, so they're removed here
+            if (TryGetEntries(entries, _pxFileSyntaxConf.Tokens.KeyWords.Units, langs, out Dictionary<MetadataEntryKey, string>? unitEntries))
+            {
+                foreach (MetadataEntryKey key in unitEntries.Keys) entries.Remove(key);
+            }
+            if (TryGetEntries(entries, _pxFileSyntaxConf.Tokens.KeyWords.Decimals, langs, out Dictionary<MetadataEntryKey, string>? decimalEntries))
+            {
+                foreach (MetadataEntryKey key in decimalEntries.Keys) entries.Remove(key);
+            }
+            if (TryGetEntries(entries, _pxFileSyntaxConf.Tokens.KeyWords.ShowDecimals, langs, out Dictionary<MetadataEntryKey, string>? showDecimalEntries))
+            {
+                foreach (MetadataEntryKey key in showDecimalEntries.Keys) entries.Remove(key);
+            }
             return new ContentDimension(code, dimensionName, [], values);
         }
 
@@ -391,19 +403,32 @@ namespace Px.Utils.ModelBuilders
         private MultilanguageString GetUnit(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimName, MultilanguageString valName)
         {
             string unitKey = _pxFileSyntaxConf.Tokens.KeyWords.Units;
+            // If table level unit is used, the unit key is not associated with a specific dimension value and is removed after building the content dimension
+            bool tableLevelUnitUsed;
             if (TryGetEntries(entries, unitKey, langs, out Dictionary<MetadataEntryKey, string>? unitEntries, dimName, valName) || // Both identifiers
-                TryGetEntries(entries, unitKey, langs, out unitEntries, valName) || // Only value identifier 
-                TryGetEntries(entries, unitKey, langs, out unitEntries)) // No identifiers 
+                TryGetEntries(entries, unitKey, langs, out unitEntries, valName)) // One identifier
             {
-                Dictionary<string, string> translations = [];
-                foreach (KeyValuePair<MetadataEntryKey, string> kvp in unitEntries)
+                tableLevelUnitUsed = false;
+            }
+            else if (TryGetEntries(entries, unitKey, langs, out unitEntries)) // No identifiers 
+            {
+                tableLevelUnitUsed = true;
+            }
+            else
+            {
+                throw new ArgumentException("Unit information not found");
+            }
+
+            Dictionary<string, string> translations = [];
+            foreach (KeyValuePair<MetadataEntryKey, string> kvp in unitEntries)
+            {
+                translations[kvp.Key.Language ?? langs.DefaultLanguage] = kvp.Value.CleanStringDelimeters(_stringDelimeter);
+                if (!tableLevelUnitUsed)
                 {
-                    translations[kvp.Key.Language ?? langs.DefaultLanguage] = kvp.Value.CleanStringDelimeters(_stringDelimeter);
                     entries.Remove(kvp.Key);
                 }
-                return new MultilanguageString(translations);
             }
-            throw new ArgumentException("Unit information not found");
+            return new MultilanguageString(translations);
         }
 
         private DateTime GetLastUpdated(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimName, MultilanguageString valName)
@@ -425,14 +450,28 @@ namespace Px.Utils.ModelBuilders
         private int GetPrecision(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimName, MultilanguageString valName)
         {
             string precisionKey = _pxFileSyntaxConf.Tokens.KeyWords.Precision;
-            if ((TryGetEntries(entries, precisionKey, langs, out Dictionary<MetadataEntryKey, string>? precisionEntries, dimName, valName) || // Both identifiers
+            // If table level precision is used, the precision key is not associated with a specific dimension value and is removed after building the content dimension
+            bool tableLevelPrecisionUsed = false;
+            if (TryGetEntries(entries, precisionKey, langs, out Dictionary<MetadataEntryKey, string>? precisionEntries, dimName, valName) || // Both identifiers
                TryGetEntries(entries, precisionKey, langs, out precisionEntries, valName)) // Only value identifier
-               && int.TryParse(precisionEntries.Values.First(), out int result)) 
             {
-                foreach (MetadataEntryKey key in precisionEntries.Keys) entries.Remove(key);
-                return result;
+                tableLevelPrecisionUsed = false;
+            }
+            // No identifiers, table level precision using SHOWDECIMALS and DECIMALS keyword
+            else if (TryGetEntries(entries, _pxFileSyntaxConf.Tokens.KeyWords.ShowDecimals, langs, out precisionEntries) ||
+                TryGetEntries(entries, _pxFileSyntaxConf.Tokens.KeyWords.Decimals, langs, out precisionEntries))
+            {
+                tableLevelPrecisionUsed = true;
             }
 
+            if (precisionEntries is not null && int.TryParse(precisionEntries.Values.First(), out int result))
+            {
+                if (!tableLevelPrecisionUsed)
+                {
+                    foreach (MetadataEntryKey key in precisionEntries.Keys) entries.Remove(key);
+                }
+                return result;
+            }
             return 0; // Default value
         }
 

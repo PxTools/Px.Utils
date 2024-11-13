@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using Px.Utils.PxFile;
-using Px.Utils.PxFile.Metadata;
 using Px.Utils.Validation.DatabaseValidation;
 
 namespace Px.Utils.Validation.DataValidation

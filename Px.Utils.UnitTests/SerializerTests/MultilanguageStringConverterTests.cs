@@ -107,5 +107,18 @@ namespace Px.Utils.UnitTests.SerializerTests
             Assert.IsNotNull(deserialized);
             Assert.AreEqual(0, deserialized.Languages.Count());
         }
+
+        [TestMethod]
+        public void DeserializeMultilanguageStringWithNull()
+        {
+            // Arrange
+            string serialized = "null";
+
+            // Act
+            MultilanguageString? deserialized = JsonSerializer.Deserialize<MultilanguageString>(serialized);
+
+            // Assert
+            Assert.IsNull(deserialized);
+        }
     }
 }

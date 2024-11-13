@@ -5,6 +5,8 @@ using Px.Utils.Models.Metadata;
 using Px.Utils.Models.Metadata.Dimensions;
 using Px.Utils.Models.Metadata.Enums;
 using Px.Utils.Models.Metadata.MetaProperties;
+using Px.Utils.PxFile;
+using Px.Utils.UnitTests.ModelBuilderTests.Fixtures;
 using System.Globalization;
 using Px.Utils.PxFile;
 using Px.Utils.UnitTests.ModelBuilderTests.Fixtures;
@@ -17,6 +19,8 @@ namespace ModelBuilderTests
         private MatrixMetadata Actual_3Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_3_Languages.Entries);
         private MatrixMetadata Actual_1Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_1_Language.Entries);
         private MatrixMetadata Actual_Recommended_3Lang { get; } = new MatrixMetadataBuilder().Build(PxFileMetaEntries_Recommended_3_Langs.Entries);
+        private MatrixMetadata Actual_1Lang_With_Table_Level_Units_And_Precision { get; } = 
+            new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_1_Language_With_Table_Level_Units_And_Precision.Entries);
 
         [TestMethod]
         public void IEnumerableBuildTest()
@@ -204,6 +208,29 @@ namespace ModelBuilderTests
                 new("fi", "Tiedot")
                 ];
             CollectionAssert.AreEqual(expectedNames, Actual_1Lang.Dimensions.Select(d => d.Name).ToList());
+        }
+
+        [TestMethod]
+        public void SingleLangWithTableLevelUnitsAndPrecisionBuildTest()
+        {
+            ContentDimension? contentDimension = (ContentDimension?)Actual_1Lang_With_Table_Level_Units_And_Precision.Dimensions.Find(d => d.Type == DimensionType.Content);
+            Assert.IsNotNull(contentDimension);
+            MultilanguageString[] expectedUnits = [
+                new("fi", "indeksipisteluku"),
+                new("fi", "%"),
+                new("fi", "lukumäärä")
+            ];
+            for(int i = 0; i < contentDimension.Values.Count; i++)
+            {
+                Assert.AreEqual(expectedUnits[i], contentDimension.Values[i].Unit);
+            }
+            for(int i = 0; i < contentDimension.Values.Count; i++)
+            {
+                Assert.AreEqual(1, contentDimension.Values[i].Precision);
+            }
+            Assert.IsFalse(Actual_1Lang_With_Table_Level_Units_And_Precision.AdditionalProperties.ContainsKey(PxFileSyntaxConf.Default.Tokens.KeyWords.Units));
+            Assert.IsFalse(Actual_1Lang_With_Table_Level_Units_And_Precision.AdditionalProperties.ContainsKey(PxFileSyntaxConf.Default.Tokens.KeyWords.Decimals));
+            Assert.IsFalse(Actual_1Lang_With_Table_Level_Units_And_Precision.AdditionalProperties.ContainsKey(PxFileSyntaxConf.Default.Tokens.KeyWords.ShowDecimals));
         }
 
         #region Content Dimension Tests

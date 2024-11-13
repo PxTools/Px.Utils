@@ -145,6 +145,8 @@ namespace Px.Utils.PxFile
                 private const string UNITS = "UNITS";
                 private const string LAST_UPDATED = "LAST-UPDATED";
                 private const string PRECISION = "PRECISION";
+                private const string DECIMALS = "DECIMALS";
+                private const string SHOWDECIMALS = "SHOWDECIMALS";
                 private const string DIMENSION_DEFAULT_VALUE = "ELIMINATION";
                 private const string TIME_VAL = "TIMEVAL";
                 private const string MAP = "MAP";
@@ -168,6 +170,8 @@ namespace Px.Utils.PxFile
                 public string Units { get; set; } = UNITS;
                 public string LastUpdated { get; set; } = LAST_UPDATED;
                 public string Precision { get; set; } = PRECISION;
+                public string Decimals { get; set; } = DECIMALS;
+                public string ShowDecimals { get; set; } = SHOWDECIMALS;
                 public string DimensionDefaultValue { get; set; } = DIMENSION_DEFAULT_VALUE;
                 public string TimeVal { get; set; } = TIME_VAL;
                 public string Map { get; set; } = MAP;
