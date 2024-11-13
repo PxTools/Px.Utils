@@ -295,7 +295,7 @@ namespace Px.Utils.PxFile.Data
 
         private void ReadItemsFromStreamByCoordinate<T>(T[] buffer, int offset, IMatrixMap target, IMatrixMap complete, Func<char[], int, T> readItem, CancellationToken? token = null)
         {
-            if(!target.IsSubmapOf(complete)) throw new ArgumentException("The target map is not a submap of the complete map.");
+            if(!target.IsSubmapOf(complete)) throw new ArgumentException($"The {nameof(target)} map is not a submap of the {nameof(complete)} map.");
             DataIndexer indexer = new(complete, target);
 
             int startingIndex = offset;
