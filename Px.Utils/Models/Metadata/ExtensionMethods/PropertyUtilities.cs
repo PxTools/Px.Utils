@@ -87,7 +87,7 @@ namespace Px.Utils.Models.Metadata.ExtensionMethods
         /// <param name="config">The configuration object that defines the symbols and tokens used for content type determination.</param>
         /// <returns>The content type of the input string.</returns>
         /// <exception cref="ArgumentException">Thrown when the input string is not in the correct format or contains illegal characters.</exception>
-        public static MetaPropertyType GetPropertyValueType(this string input, PxFileSyntaxConf config)
+        public static MetaPropertyType GetPropertyValueType(this string input, PxFileConfiguration config)
         {
             if (string.IsNullOrEmpty(input))
             {
@@ -185,7 +185,7 @@ namespace Px.Utils.Models.Metadata.ExtensionMethods
         }
 
 
-        private static MetaPropertyType GetStringType(string input, PxFileSyntaxConf config)
+        private static MetaPropertyType GetStringType(string input, PxFileConfiguration config)
         {
             int count = 0;
             bool inString = false;

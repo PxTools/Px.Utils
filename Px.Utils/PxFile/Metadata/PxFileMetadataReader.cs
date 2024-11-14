@@ -7,9 +7,11 @@ namespace Px.Utils.PxFile.Metadata
     /// <summary>
     /// Provides methods to read metadata and get the encoding from a stream of a Px file.
     /// </summary>
-    public class PxFileMetadataReader : IPxFileMetadataReader
+    /// <param name="config">The configuration to use when reading the metadata. If not specified the default configuration is used.</param>
+    public class PxFileMetadataReader(PxFileConfiguration? config = null) : IPxFileMetadataReader
     {
         private const int DEFAULT_READ_BUFFER_SIZE = 4096;
+        private readonly PxFileConfiguration _config = config ?? PxFileConfiguration.Default;
 
         /// <summary>
         /// Processes a provided stream to extract metadata, returning the results as an IEnumerable of key-value pairs.
@@ -17,17 +19,14 @@ namespace Px.Utils.PxFile.Metadata
         /// </summary>
         /// <param name="stream">The stream from which to read the metadata.</param>
         /// <param name="encoding">The encoding to use when reading the stream.</param>
-        /// <param name="syntaxConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="readBufferSize">The size of the buffer to use when reading the stream. If not specified, the default buffer size is used.</param>
         /// <returns>An IEnumerable of key-value pairs representing the metadata entries in the file.</returns>
-        public IEnumerable<KeyValuePair<string, string>> ReadMetadata(Stream stream, Encoding encoding, PxFileSyntaxConf? syntaxConf = null, int readBufferSize = DEFAULT_READ_BUFFER_SIZE)
+        public IEnumerable<KeyValuePair<string, string>> ReadMetadata(Stream stream, Encoding encoding, int readBufferSize = DEFAULT_READ_BUFFER_SIZE)
         {
-            syntaxConf ??= PxFileSyntaxConf.Default;
-
-            char keywordSeperator = syntaxConf.Symbols.KeywordSeparator;
-            char sectionSeparator = syntaxConf.Symbols.EntrySeparator;
-            char stringDelimeter = syntaxConf.Symbols.Value.StringDelimeter;
-            string dataKeyword = syntaxConf.Tokens.KeyWords.Data;
+            char keywordSeperator = _config.Symbols.KeywordSeparator;
+            char sectionSeparator = _config.Symbols.EntrySeparator;
+            char stringDelimeter = _config.Symbols.Value.StringDelimeter;
+            string dataKeyword = _config.Tokens.KeyWords.Data;
 
             char[] buffer = new char[readBufferSize];
             char nextDelimeter = keywordSeperator;
@@ -87,23 +86,19 @@ namespace Px.Utils.PxFile.Metadata
         /// </summary>
         /// <param name="stream">The stream from which to read the metadata.</param>
         /// <param name="encoding">The encoding to use when reading the stream.</param>
-        /// <param name="syntaxConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="readBufferSize">The size of the buffer to use when reading the stream. If not specified, the default buffer size is used.</param>
         /// <param name="cancellationToken">Can be used to cancel the operation.</param>
         /// <returns>An IAsyncEnumerable of key-value pairs representing the metadata entries in the file. This can be asynchronously iterated over as the data is read.</returns>
         public async IAsyncEnumerable<KeyValuePair<string, string>> ReadMetadataAsync(
             Stream stream,
             Encoding encoding,
-            PxFileSyntaxConf? syntaxConf = null,
             int readBufferSize = DEFAULT_READ_BUFFER_SIZE,
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            syntaxConf ??= PxFileSyntaxConf.Default;
-
-            char keywordSeperator = syntaxConf.Symbols.KeywordSeparator;
-            char sectionSeparator = syntaxConf.Symbols.EntrySeparator;
-            char stringDelimeter = syntaxConf.Symbols.Value.StringDelimeter;
-            string dataKeyword = syntaxConf.Tokens.KeyWords.Data;
+            char keywordSeperator = _config.Symbols.KeywordSeparator;
+            char sectionSeparator = _config.Symbols.EntrySeparator;
+            char stringDelimeter = _config.Symbols.Value.StringDelimeter;
+            string dataKeyword = _config.Tokens.KeyWords.Data;
 
             char[] readBuffer = new char[readBufferSize];
             char[] parsingBuffer = new char[readBufferSize];
@@ -171,15 +166,13 @@ namespace Px.Utils.PxFile.Metadata
         /// </summary>
         /// <param name="stream">The stream from which to read the metadata.</param>
         /// <param name="encoding">The encoding to use when reading the stream.</param>
-        /// <param name="syntaxConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="readBufferSize">The size of the buffer to use when reading the stream. If not specified, the default buffer size is used.</param>
         /// <returns>A dictionary containing the metadata entries in the file.</returns>
         public Dictionary<string, string> ReadMetadataToDictionary(
             Stream stream,
             Encoding encoding,
-            PxFileSyntaxConf? syntaxConf = null,
             int readBufferSize = DEFAULT_READ_BUFFER_SIZE)
-            => new(ReadMetadata(stream, encoding, syntaxConf, readBufferSize));
+            => new(ReadMetadata(stream, encoding, readBufferSize));
 
         /// <summary>
         /// Asynchronously reads the metadata from the provided stream and returns it as a dictionary of key-value pairs.
@@ -187,20 +180,18 @@ namespace Px.Utils.PxFile.Metadata
         /// </summary>
         /// <param name="stream">The stream from which to read the metadata.</param>
         /// <param name="encoding">The encoding to use when reading the stream.</param>
-        /// <param name="syntaxConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="readBufferSize">The size of the buffer to use when reading the stream. If not specified, the default buffer size is used.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A Task that represents the asynchronous operation. The Task result contains a dictionary of the metadata entries in the file.</returns>
         public async Task<Dictionary<string, string>> ReadMetadataToDictionaryAsync(
             Stream stream,
             Encoding encoding,
-            PxFileSyntaxConf? syntaxConf = null,
             int readBufferSize = DEFAULT_READ_BUFFER_SIZE,
             CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> metaDict = [];
             ConfiguredCancelableAsyncEnumerable<KeyValuePair<string, string>> metaEnumerable =
-                ReadMetadataAsync(stream, encoding, syntaxConf, readBufferSize, cancellationToken)
+                ReadMetadataAsync(stream, encoding, readBufferSize, cancellationToken)
                 .WithCancellation(cancellationToken);
 
             await foreach (KeyValuePair<string, string> kvp in metaEnumerable) metaDict.Add(kvp.Key, kvp.Value);
@@ -214,11 +205,9 @@ namespace Px.Utils.PxFile.Metadata
         /// it attempts to register it using the CodePagesEncodingProvider.
         /// </summary>
         /// <param name="stream">The stream from which to determine the encoding.</param>
-        /// <param name="syntaxConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <returns>The determined encoding of the stream.</returns>
-        public Encoding GetEncoding(Stream stream, PxFileSyntaxConf? syntaxConf = null)
+        public Encoding GetEncoding(Stream stream)
         {
-            syntaxConf ??= PxFileSyntaxConf.Default;
             long position = stream.Position;
 
             byte[] bom = new byte[3];
@@ -229,10 +218,10 @@ namespace Px.Utils.PxFile.Metadata
             if (GetEncodingFromBOM(bom) is Encoding utf) return utf;
 
             // Use ASCII because encoding is still unknown, CODEPAGE keyword is readable as ASCII
-            KeyValuePair<string, string> encoding = ReadMetadata(stream, Encoding.ASCII, syntaxConf, 512)
-                .FirstOrDefault(kvp => kvp.Key == syntaxConf.Tokens.KeyWords.CodePage);
+            KeyValuePair<string, string> encoding = ReadMetadata(stream, Encoding.ASCII, 512)
+                .FirstOrDefault(kvp => kvp.Key == _config.Tokens.KeyWords.CodePage);
 
-            return GetEncodingFromValue(encoding.Value, syntaxConf);
+            return GetEncodingFromValue(encoding.Value, _config);
         }
 
         /// <summary>
@@ -241,13 +230,11 @@ namespace Px.Utils.PxFile.Metadata
         /// it attempts to register it using the CodePagesEncodingProvider.
         /// </summary>
         /// <param name="stream">The stream from which to determine the encoding.</param>
-        /// <param name="syntaxConf">The symbols configuration to use when reading the metadata. If not specified the default configuration is used.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A Task that represents the asynchronous operation. The Task result contains the determined encoding of the stream.</returns>
-        public async Task<Encoding> GetEncodingAsync(Stream stream, PxFileSyntaxConf? syntaxConf = null, CancellationToken cancellationToken = default)
+        public async Task<Encoding> GetEncodingAsync(Stream stream, CancellationToken cancellationToken = default)
         {
             const int bomLength = 3;
-            syntaxConf ??= PxFileSyntaxConf.Default;
             long position = stream.Position;
 
             byte[] bom = new byte[bomLength];
@@ -258,10 +245,10 @@ namespace Px.Utils.PxFile.Metadata
             if (GetEncodingFromBOM(bom) is Encoding utf) return utf;
 
             // Use ASCII because encoding is still unknown, CODEPAGE keyword is readable as ASCII
-            KeyValuePair<string, string> encoding = await ReadMetadataAsync(stream, Encoding.ASCII, syntaxConf, 512, cancellationToken)
-                .FirstOrDefaultAsync(kvp => kvp.Key == syntaxConf.Tokens.KeyWords.CodePage, cancellationToken);
+            KeyValuePair<string, string> encoding = await ReadMetadataAsync(stream, Encoding.ASCII, 512, cancellationToken)
+                .FirstOrDefaultAsync(kvp => kvp.Key == _config.Tokens.KeyWords.CodePage, cancellationToken);
 
-            return GetEncodingFromValue(encoding.Value, syntaxConf);
+            return GetEncodingFromValue(encoding.Value, _config);
         }
 
         /// <summary>
@@ -308,11 +295,11 @@ namespace Px.Utils.PxFile.Metadata
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Encoding GetEncodingFromValue(string value, PxFileSyntaxConf syntaxConf)
+        private static Encoding GetEncodingFromValue(string value, PxFileConfiguration conf)
         {
             if (value is null) throw new InvalidPxFileMetadataException($"Could not find CODEPAGE keyword in the file.");
 
-            string encodingName = value.Trim(syntaxConf.Symbols.Value.StringDelimeter);
+            string encodingName = value.Trim(conf.Symbols.Value.StringDelimeter);
 
             bool isAvailable = Array.Exists(Encoding.GetEncodings(), e => e.Name == encodingName);
             if (!isAvailable) Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

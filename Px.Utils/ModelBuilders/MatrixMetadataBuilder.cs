@@ -1,12 +1,12 @@
-﻿using Px.Utils.Models.Metadata.Dimensions;
-using Px.Utils.Language;
-using Px.Utils.Models.Metadata;
+﻿using Px.Utils.Language;
+using Px.Utils.Models.Metadata.Dimensions;
 using Px.Utils.Models.Metadata.Enums;
 using Px.Utils.Models.Metadata.ExtensionMethods;
+using Px.Utils.Models.Metadata.MetaProperties;
+using Px.Utils.Models.Metadata;
 using Px.Utils.PxFile;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using Px.Utils.Models.Metadata.MetaProperties;
 
 namespace Px.Utils.ModelBuilders
 {
@@ -15,20 +15,20 @@ namespace Px.Utils.ModelBuilders
     /// </summary>
     public class MatrixMetadataBuilder : IMatrixMetadataBuilder
     {
-        private readonly PxFileSyntaxConf _pxFileSyntaxConf;
+        private readonly PxFileConfiguration _conf;
         private readonly char _listSeparator;
         private readonly char _stringDelimeter;
 
         /// <summary>
         /// Initializes a new instance of the MatrixMetadataBuilder class.
-        /// This constructor takes an optional PxFileSyntaxConf object. If none is provided, it uses the default configuration.
+        /// This constructor takes an optional PxFileConfiguration object. If none is provided, it uses the default configuration.
         /// </summary>
-        /// <param name="pxFileSyntaxConf">An optional configuration object for Px file syntax. If not provided, the default configuration is used.</param>
-        public MatrixMetadataBuilder(PxFileSyntaxConf? pxFileSyntaxConf = null)
+        /// <param name="conf">An optional configuration object for the Px file. If not provided, the default configuration is used.</param>
+        public MatrixMetadataBuilder(PxFileConfiguration? conf = null)
         {
-            _pxFileSyntaxConf = pxFileSyntaxConf ?? PxFileSyntaxConf.Default;
-            _listSeparator = _pxFileSyntaxConf.Symbols.Value.ListSeparator;
-            _stringDelimeter = _pxFileSyntaxConf.Symbols.Value.StringDelimeter;
+            _conf = conf ?? PxFileConfiguration.Default;
+            _listSeparator = _conf.Symbols.Value.ListSeparator;
+            _stringDelimeter = _conf.Symbols.Value.StringDelimeter;
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Px.Utils.ModelBuilders
             PxFileLanguages langs = GetLanguages(entries);
             List<MultilanguageString> dimensionNames = [];
 
-            string stubKey = _pxFileSyntaxConf.Tokens.KeyWords.StubDimensions;
+            string stubKey = _conf.Tokens.KeyWords.StubDimensions;
             if (TryGetEntries(entries, stubKey, langs, out Dictionary<MetadataEntryKey, string>? stubEntries))
             {
                 MultilanguageString stubLists = new(stubEntries.ToDictionary(
@@ -104,7 +104,7 @@ namespace Px.Utils.ModelBuilders
                 throw new ArgumentException("Stub dimension names not found in metadata");
             }
 
-            string headingKey = _pxFileSyntaxConf.Tokens.KeyWords.HeadingDimensions;
+            string headingKey = _conf.Tokens.KeyWords.HeadingDimensions;
             if (TryGetEntries(entries, headingKey, langs, out Dictionary<MetadataEntryKey, string>? headingEntries))
             {
                 MultilanguageString headingLists = new(headingEntries.ToDictionary(
@@ -137,7 +137,7 @@ namespace Px.Utils.ModelBuilders
 
         private ContentDimension? GetContentDimensionIfAvailable(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs)
         {
-            string contentKey = _pxFileSyntaxConf.Tokens.KeyWords.ContentVariableIdentifier;
+            string contentKey = _conf.Tokens.KeyWords.ContentVariableIdentifier;
             if (TryGetEntries(entries, contentKey, langs, out Dictionary<MetadataEntryKey, string>? contVarNameEntries))
             {
                 foreach (MetadataEntryKey key in contVarNameEntries.Keys) entries.Remove(key);
@@ -154,19 +154,19 @@ namespace Px.Utils.ModelBuilders
             MultilanguageString dimensionNameToTest,
             [MaybeNullWhen(false)] out TimeDimension timeDimension)
         {
-            string timeValIdentifierKey = _pxFileSyntaxConf.Tokens.KeyWords.TimeVal;
-            string dimensionTypeKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionType;
+            string timeValIdentifierKey = _conf.Tokens.KeyWords.TimeVal;
+            string dimensionTypeKey = _conf.Tokens.KeyWords.DimensionType;
             if (TryGetEntries(entries, timeValIdentifierKey, langs, out Dictionary<MetadataEntryKey, string>? timeValEntries, dimensionNameToTest))
             {
                 string timeValValueString = timeValEntries.Values.First();
-                List<string> timeValList = ValueParserUtilities.GetTimeValValueList(timeValValueString, _pxFileSyntaxConf);
+                List<string> timeValList = ValueParserUtilities.GetTimeValValueList(timeValValueString, _conf);
 
                 timeDimension = new(
                     code: GetDimensionCode(entries, langs, dimensionNameToTest),
                     name: dimensionNameToTest,
                     additionalProperties: new() { { timeValIdentifierKey, new StringListProperty(timeValList) } },
                     values: GetDimensionValues(entries, langs, dimensionNameToTest),
-                    interval: ValueParserUtilities.ParseTimeIntervalFromTimeVal(timeValValueString, _pxFileSyntaxConf)
+                    interval: ValueParserUtilities.ParseTimeIntervalFromTimeVal(timeValValueString, _conf)
                     );
 
                 foreach (MetadataEntryKey key in timeValEntries.Keys) entries.Remove(key);
@@ -202,7 +202,7 @@ namespace Px.Utils.ModelBuilders
 
         private DimensionType GetDimensionType(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName)
         {
-            string dimensionTypeKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionType;
+            string dimensionTypeKey = _conf.Tokens.KeyWords.DimensionType;
             DimensionType type = DimensionType.Unknown;
             if (TryGetEntries(entries, dimensionTypeKey, langs, out Dictionary<MetadataEntryKey, string>? dimTypeEntries, dimensionName))
             {
@@ -213,7 +213,7 @@ namespace Px.Utils.ModelBuilders
             if (type is DimensionType.Other or DimensionType.Unknown)
             {
                 // Checks for a map property, this is a legacy way of defining geographical dimensions
-                string mapKey = _pxFileSyntaxConf.Tokens.KeyWords.Map;
+                string mapKey = _conf.Tokens.KeyWords.Map;
                 if (TryGetEntries(entries, mapKey, langs, out Dictionary<MetadataEntryKey, string>? _, dimensionName))
                 {
                     type = DimensionType.Geographical;
@@ -227,15 +227,15 @@ namespace Px.Utils.ModelBuilders
             string code = GetDimensionCode(entries, langs, dimensionName);
             ContentValueList values = BuildContentDimensionValues(entries, langs, dimensionName);
             // Table level UNIT, SHOWDECIMALS and DECIMALS properties are not needed after building the content dimension, so they're removed here
-            if (TryGetEntries(entries, _pxFileSyntaxConf.Tokens.KeyWords.Units, langs, out Dictionary<MetadataEntryKey, string>? unitEntries))
+            if (TryGetEntries(entries, _conf.Tokens.KeyWords.Units, langs, out Dictionary<MetadataEntryKey, string>? unitEntries))
             {
                 foreach (MetadataEntryKey key in unitEntries.Keys) entries.Remove(key);
             }
-            if (TryGetEntries(entries, _pxFileSyntaxConf.Tokens.KeyWords.Decimals, langs, out Dictionary<MetadataEntryKey, string>? decimalEntries))
+            if (TryGetEntries(entries, _conf.Tokens.KeyWords.Decimals, langs, out Dictionary<MetadataEntryKey, string>? decimalEntries))
             {
                 foreach (MetadataEntryKey key in decimalEntries.Keys) entries.Remove(key);
             }
-            if (TryGetEntries(entries, _pxFileSyntaxConf.Tokens.KeyWords.ShowDecimals, langs, out Dictionary<MetadataEntryKey, string>? showDecimalEntries))
+            if (TryGetEntries(entries, _conf.Tokens.KeyWords.ShowDecimals, langs, out Dictionary<MetadataEntryKey, string>? showDecimalEntries))
             {
                 foreach (MetadataEntryKey key in showDecimalEntries.Keys) entries.Remove(key);
             }
@@ -301,7 +301,7 @@ namespace Px.Utils.ModelBuilders
             PxFileLanguages langs,
             MultilanguageString dimensionName)
         {
-            string valueNamesKey = _pxFileSyntaxConf.Tokens.KeyWords.VariableValues;
+            string valueNamesKey = _conf.Tokens.KeyWords.VariableValues;
             Dictionary<string, string> nameListsByLang = [];
             if (TryGetEntries(entries, valueNamesKey, langs, out Dictionary<MetadataEntryKey, string>? valueNameEntries, dimensionName))
             {
@@ -320,7 +320,7 @@ namespace Px.Utils.ModelBuilders
                 .ValueAsListOfMultilanguageStrings(_listSeparator, _stringDelimeter);
 
             DimensionValue[] values = new DimensionValue[valueNames.Count];
-            string valueCodesKey = _pxFileSyntaxConf.Tokens.KeyWords.VariableValueCodes;
+            string valueCodesKey = _conf.Tokens.KeyWords.VariableValueCodes;
             if(TryGetEntries(entries, valueCodesKey, langs, out Dictionary<MetadataEntryKey, string>? codeSet, dimensionName))
             {
                 foreach (MetadataEntryKey key in codeSet.Keys) entries.Remove(key);
@@ -391,7 +391,7 @@ namespace Px.Utils.ModelBuilders
 
         private string GetDimensionCode(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimensionName)
         {
-            string varCodeKey = _pxFileSyntaxConf.Tokens.KeyWords.DimensionCode;
+            string varCodeKey = _conf.Tokens.KeyWords.DimensionCode;
             if (TryGetEntries(entries, varCodeKey, langs, out Dictionary<MetadataEntryKey, string>? codeEntries, dimensionName))
             {
                 foreach (MetadataEntryKey key in codeEntries.Keys) entries.Remove(key);
@@ -402,7 +402,7 @@ namespace Px.Utils.ModelBuilders
 
         private MultilanguageString GetUnit(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimName, MultilanguageString valName)
         {
-            string unitKey = _pxFileSyntaxConf.Tokens.KeyWords.Units;
+            string unitKey = _conf.Tokens.KeyWords.Units;
             // If table level unit is used, the unit key is not associated with a specific dimension value and is removed after building the content dimension
             bool tableLevelUnitUsed;
             if (TryGetEntries(entries, unitKey, langs, out Dictionary<MetadataEntryKey, string>? unitEntries, dimName, valName) || // Both identifiers
@@ -433,12 +433,12 @@ namespace Px.Utils.ModelBuilders
 
         private DateTime GetLastUpdated(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimName, MultilanguageString valName)
         {
-            string lastUpdatedKey = _pxFileSyntaxConf.Tokens.KeyWords.LastUpdated;
+            string lastUpdatedKey = _conf.Tokens.KeyWords.LastUpdated;
             if (TryGetEntries(entries, lastUpdatedKey, langs, out Dictionary<MetadataEntryKey, string>? lastUpdatedEntries, dimName, valName) || // Both identifiers
                 TryGetEntries(entries, lastUpdatedKey, langs, out lastUpdatedEntries, valName)) // Only value identifier
             {
                 foreach (MetadataEntryKey key in lastUpdatedEntries.Keys) entries.Remove(key);
-                string formatString = _pxFileSyntaxConf.Tokens.Time.DateTimeFormatString;
+                string formatString = _conf.Tokens.Time.DateTimeFormatString;
                 return lastUpdatedEntries.Values
                     .Select(v => DateTime.ParseExact(v.CleanStringDelimeters(_stringDelimeter), formatString, CultureInfo.InvariantCulture))
                     .OrderByDescending(v => v).First();
@@ -449,7 +449,7 @@ namespace Px.Utils.ModelBuilders
 
         private int GetPrecision(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, MultilanguageString dimName, MultilanguageString valName)
         {
-            string precisionKey = _pxFileSyntaxConf.Tokens.KeyWords.Precision;
+            string precisionKey = _conf.Tokens.KeyWords.Precision;
             // If table level precision is used, the precision key is not associated with a specific dimension value and is removed after building the content dimension
             bool tableLevelPrecisionUsed = false;
             if (TryGetEntries(entries, precisionKey, langs, out Dictionary<MetadataEntryKey, string>? precisionEntries, dimName, valName) || // Both identifiers
@@ -458,8 +458,8 @@ namespace Px.Utils.ModelBuilders
                 tableLevelPrecisionUsed = false;
             }
             // No identifiers, table level precision using SHOWDECIMALS and DECIMALS keyword
-            else if (TryGetEntries(entries, _pxFileSyntaxConf.Tokens.KeyWords.ShowDecimals, langs, out precisionEntries) ||
-                TryGetEntries(entries, _pxFileSyntaxConf.Tokens.KeyWords.Decimals, langs, out precisionEntries))
+            else if (TryGetEntries(entries, _conf.Tokens.KeyWords.ShowDecimals, langs, out precisionEntries) ||
+                TryGetEntries(entries, _conf.Tokens.KeyWords.Decimals, langs, out precisionEntries))
             {
                 tableLevelPrecisionUsed = true;
             }
@@ -481,7 +481,7 @@ namespace Px.Utils.ModelBuilders
 
         private PxFileLanguages GetLanguages(Dictionary<MetadataEntryKey, string> entries)
         {
-            MetadataEntryKey defaultLangKey = new(_pxFileSyntaxConf.Tokens.KeyWords.DefaultLanguage);
+            MetadataEntryKey defaultLangKey = new(_conf.Tokens.KeyWords.DefaultLanguage);
             if (entries.TryGetValue(defaultLangKey, out string? defaultLang))
             {
                 entries.Remove(defaultLangKey);
@@ -493,7 +493,7 @@ namespace Px.Utils.ModelBuilders
 
             defaultLang = defaultLang.Trim().Trim(_stringDelimeter);
 
-            MetadataEntryKey availableLangsKey = new(_pxFileSyntaxConf.Tokens.KeyWords.AvailableLanguages);
+            MetadataEntryKey availableLangsKey = new(_conf.Tokens.KeyWords.AvailableLanguages);
             List<string> availableLangs = [defaultLang];
             if (entries.TryGetValue(availableLangsKey, out string? availableLangsString))
             {
@@ -586,13 +586,13 @@ namespace Px.Utils.ModelBuilders
                 else throw new ArgumentException($"Cannot build property from provided key: {key.KeyWord}. Key not found in metadata.");
             }
 
-            char stringDelimeter = _pxFileSyntaxConf.Symbols.Value.StringDelimeter;
-            char listSeparator = _pxFileSyntaxConf.Symbols.Value.ListSeparator;
+            char stringDelimeter = _conf.Symbols.Value.StringDelimeter;
+            char listSeparator = _conf.Symbols.Value.ListSeparator;
 
-            Dictionary<string, MetaPropertyType> typeDict = PxFileSyntaxConf.ContentConfiguration.EntryValueTypes.GetTypeDictionary(_pxFileSyntaxConf);
+            Dictionary<string, MetaPropertyType> typeDict = PxFileConfiguration.ContentConfiguration.EntryValueTypes.GetTypeDictionary(_conf);
             if (!typeDict.TryGetValue(keys[0].KeyWord, out MetaPropertyType type))
             {
-                type = read[keys[0]].GetPropertyValueType(_pxFileSyntaxConf);
+                type = read[keys[0]].GetPropertyValueType(_conf);
             }
 
             MultilanguageString BuildMLS() => new(read.Select(kvp => new KeyValuePair<string, string>(kvp.Key.Language ?? langs.DefaultLanguage, kvp.Value)));
@@ -614,7 +614,7 @@ namespace Px.Utils.ModelBuilders
                     else
                         return new MultilanguageStringListProperty(BuildMLS().ValueAsListOfMultilanguageStrings(listSeparator, stringDelimeter));
                 case MetaPropertyType.Boolean:
-                    return new BooleanProperty(read[keys[0]] == _pxFileSyntaxConf.Tokens.Booleans.Yes);
+                    return new BooleanProperty(read[keys[0]] == _conf.Tokens.Booleans.Yes);
                 case MetaPropertyType.Numeric:
                     return new NumericProperty(double.Parse(read[keys[0]], CultureInfo.InvariantCulture));
                 default:

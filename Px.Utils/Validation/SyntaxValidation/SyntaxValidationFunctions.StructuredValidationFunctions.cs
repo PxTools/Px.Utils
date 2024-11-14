@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Px.Utils.Validation.SyntaxValidation
 {
-    public delegate KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? StructuredValidationFunction(ValidationStructuredEntry validationObject, PxFileSyntaxConf syntaxConf);
+    public delegate KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? StructuredValidationFunction(ValidationStructuredEntry validationObject, PxFileConfiguration conf);
 
     /// <summary>
     /// Contains the default validation functions for syntax validation structured entries.
@@ -30,9 +30,9 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// If the <see cref="ValidationStructuredEntry"/> specifier contains illegal characters, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
+        /// <param name="conf">The configuration for the PX file.</param>
         /// <returns>A validation feedback key value pair if the specifier contains illegal characters, null otherwise.</returns>
-        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordContainsIllegalCharacters(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordContainsIllegalCharacters(ValidationStructuredEntry validationStructuredEntry, PxFileConfiguration conf)
         {
             string keyword = validationStructuredEntry.Key.Keyword;
             // Missing specifier is catched earlier
@@ -86,9 +86,9 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// If the <see cref="ValidationStructuredEntry"/> keyword doesn't start with a letter, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
+        /// <param name="conf">The configuration for the PX file.</param>
         /// <returns>A validation feedback key value pair if the specifier doesn't start with a letter, null otherwise.</returns>
-        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordDoesntStartWithALetter(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordDoesntStartWithALetter(ValidationStructuredEntry validationStructuredEntry, PxFileConfiguration conf)
         {
             string keyword = validationStructuredEntry.Key.Keyword;
 
@@ -118,11 +118,11 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// If the <see cref="ValidationStructuredEntry"/> language parameter is not following a valid format, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
+        /// <param name="conf">The configuration for the PX file.</param>
         /// <returns>A validation feedback key value pair if the language parameter is not following a valid format, null otherwise.</returns>
         public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? IllegalCharactersInLanguageParameter(
             ValidationStructuredEntry validationStructuredEntry,
-            PxFileSyntaxConf syntaxConf)
+            PxFileConfiguration conf)
         {
             // Running this validation is relevant only for objects with a language parameter
             if (validationStructuredEntry.Key.Language is null)
@@ -134,11 +134,11 @@ namespace Px.Utils.Validation.SyntaxValidation
 
             // Find illegal characters from language parameter string
             char[] illegalCharacters = [
-                syntaxConf.Symbols.Key.LangParamStart,
-                syntaxConf.Symbols.Key.LangParamEnd,
-                syntaxConf.Symbols.Key.StringDelimeter,
-                syntaxConf.Symbols.EntrySeparator,
-                syntaxConf.Symbols.KeywordSeparator,
+                conf.Symbols.Key.LangParamStart,
+                conf.Symbols.Key.LangParamEnd,
+                conf.Symbols.Key.StringDelimeter,
+                conf.Symbols.EntrySeparator,
+                conf.Symbols.KeywordSeparator,
                 CharacterConstants.CHARSPACE,
                 CharacterConstants.CHARCARRIAGERETURN,
                 CharacterConstants.CHARLINEFEED,
@@ -176,9 +176,9 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// If the <see cref="ValidationStructuredEntry"/> specifier parameter is not following a valid format, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
+        /// <param name="conf">The configuration for the PX file.</param>
         /// <returns>A validation feedback key value pair if the specifier parameter is not following a valid format, null otherwise.</returns>
-        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? IllegalCharactersInSpecifierParts(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? IllegalCharactersInSpecifierParts(ValidationStructuredEntry validationStructuredEntry, PxFileConfiguration conf)
         {
             // Running this validation is relevant only for objects with a specifier
             if (validationStructuredEntry.Key.FirstSpecifier is null)
@@ -186,7 +186,7 @@ namespace Px.Utils.Validation.SyntaxValidation
                 return null;
             }
 
-            char[] illegalCharacters = [syntaxConf.Symbols.EntrySeparator, syntaxConf.Symbols.Key.StringDelimeter];
+            char[] illegalCharacters = [conf.Symbols.EntrySeparator, conf.Symbols.Key.StringDelimeter];
             IEnumerable<char> illegalcharactersInFirstSpecifier = validationStructuredEntry.Key.FirstSpecifier.Where(c => illegalCharacters.Contains(c));
             IEnumerable<char> illegalcharactersInSecondSpecifier = [];
             if (validationStructuredEntry.Key.SecondSpecifier is not null)
@@ -224,9 +224,9 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// If the <see cref="ValidationStructuredEntry"/> language parameter is not compliant with ISO 639 or BCP 47, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
+        /// <param name="conf">The configuration for the PX file.</param>
         /// <returns>A validation feedback key value pair if the language parameter is not compliant with ISO 639 or BCP 47, null otherwise.</returns>
-        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? IncompliantLanguage(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? IncompliantLanguage(ValidationStructuredEntry validationStructuredEntry, PxFileConfiguration conf)
         {
             // Running this validation is relevant only for objects with a language
             if (validationStructuredEntry.Key.Language is null)
@@ -264,9 +264,9 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// If the <see cref="ValidationStructuredEntry"/> specifier contains unrecommended characters, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate.</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
+        /// <param name="conf">The configuration for the PX file.</param>
         /// <returns>A validation feedback key value pair if the specifier contains unrecommended characters, null otherwise.</returns>
-        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordContainsUnderscore(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordContainsUnderscore(ValidationStructuredEntry validationStructuredEntry, PxFileConfiguration conf)
         {
             int underscoreIndex = validationStructuredEntry.Key.Keyword.IndexOf('_');
             if (underscoreIndex != -1)
@@ -294,9 +294,9 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// If the <see cref="ValidationStructuredEntry"/> specifier is not in upper case, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> to validate</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
+        /// <param name="conf">The configuration for the PX file.</param>
         /// <returns>A validation feedback key value pair if the specifier is not in upper case, otherwise null</returns>
-        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordIsNotInUpperCase(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordIsNotInUpperCase(ValidationStructuredEntry validationStructuredEntry, PxFileConfiguration conf)
         {
             string keyword = validationStructuredEntry.Key.Keyword;
             string uppercaseKeyword = keyword.ToUpper(CultureInfo.InvariantCulture);
@@ -327,9 +327,9 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// If the <see cref="ValidationStructuredEntry"/> specifier is excessively long, a new feedback is returned.
         /// </summary>
         /// <param name="validationStructuredEntry">The <see cref="ValidationStructuredEntry"/> object to validate</param>
-        /// <param name="syntaxConf">The syntax configuration for the PX file.</param>
+        /// <param name="conf">The configuration for the PX file.</param>
         /// <returns>A validation feedback key value pair if the specifier is excessively long, otherwise null</returns>
-        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordIsExcessivelyLong(ValidationStructuredEntry validationStructuredEntry, PxFileSyntaxConf syntaxConf)
+        public static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? KeywordIsExcessivelyLong(ValidationStructuredEntry validationStructuredEntry, PxFileConfiguration conf)
         {
             const int keywordLengthRecommendedLimit = 20;
             string keyword = validationStructuredEntry.Key.Keyword;

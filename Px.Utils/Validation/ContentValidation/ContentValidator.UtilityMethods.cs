@@ -12,14 +12,14 @@ namespace Px.Utils.Validation.ContentValidation
         /// Finds the values for given dimensions in the Px file
         /// </summary>
         /// <param name="entries">The structured entries of the Px file</param>
-        /// <param name="syntaxConf">The syntax configuration for the Px file</param>
+        /// <param name="conf">The configuration for the Px file</param>
         /// <param name="dimensions">The dimensions to find values for</param>
         /// <param name="feedbackItems">A list of feedback items to add to</param>
         /// <param name="filename">The name of the Px file</param>
         /// <returns>A dictionary containing the values for the dimensions</returns>
         private static Dictionary<KeyValuePair<string, string>, string[]> FindDimensionValues(
             ValidationStructuredEntry[] entries,
-            PxFileSyntaxConf syntaxConf,
+            PxFileConfiguration conf,
             Dictionary<string, string[]>? dimensions,
             ref ValidationFeedback feedbackItems,
             string filename)
@@ -42,12 +42,12 @@ namespace Px.Utils.Validation.ContentValidation
                     {
                         List<string> values = SyntaxValidationUtilityMethods.GetListItemsFromString(
                             valuesEntry.Value, 
-                            syntaxConf.Symbols.Value.ListSeparator, 
-                            syntaxConf.Symbols.Value.StringDelimeter);
+                            conf.Symbols.Value.ListSeparator, 
+                            conf.Symbols.Value.StringDelimeter);
 
                         variableValues.Add(
                             new KeyValuePair<string, string> ( language, dimension ),
-                            [.. values.Select(v => SyntaxValidationUtilityMethods.CleanString(v, syntaxConf))]
+                            [.. values.Select(v => SyntaxValidationUtilityMethods.CleanString(v, conf))]
                             );
                     }
                     else
@@ -243,7 +243,7 @@ namespace Px.Utils.Validation.ContentValidation
         private static Dictionary<string, string[]> GetDimensionNames(
             ValidationStructuredEntry[] entries,
             string defaultLanguage,
-            PxFileSyntaxConf syntaxConf)
+            PxFileConfiguration syntaxConf)
         {
             Dictionary<string, string[]> dimensionNames = []; 
             foreach (ValidationStructuredEntry entry in entries)

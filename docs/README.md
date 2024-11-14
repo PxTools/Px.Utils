@@ -81,9 +81,9 @@ The entries need to be in the same key-value format as the output of the ```PxFi
 ```
 
 ### Reader/builder configuration
-Behaviour of the reader and builder objects can be changed with ```PxFileSyntaxConf``` object.
+Behaviour of the reader and builder objects can be changed with ```PxFileConfiguration``` object.
 ```csharp
-    PxFileSyntaxConf conf = PxFileSyntaxConf.Default;
+    PxFileConfiguration conf = PxFileConfiguration.Default;
     conf.Content.PropertyTypeDefinitions["EXAMPLE"] = MetaPropertyType.TextArray;
     MatrixMetadataBuilder builder = new(conf);
 ```
@@ -163,14 +163,14 @@ Validator classes implement either ```IPxFileStreamValidator``` or ```IPxFileStr
 
 #### PxFileValidator : IPxFileStreamValidator, IPxFileStreamValidatorAsync
 ```PxFileValidator``` is a class that validates the whole px file including its data, metadata syntax and metadata contents. The class can be instantiated with the following parameters:
-- syntaxConf (PxFileSyntaxConf, optional): Object that contains px file syntax configuration tokens and symbols.
+- conf (PxFileConfiguration, optional): Object that contains px file configuration.
 Custom validator objects can be injected by calling the SetCustomValidatorFunctions or SetCustomValidators methods of the PxFileValidator object. Custom validators must implement either the IPxFileValidator or IPxFileValidatorAsync interface. Custom validation methods are stored in CustomSyntaxValidationFunctions and CustomContentValidationFunctions objects for syntax and content validation processes respectively.
 Once the PxFileValidator object is instantiated, either the Validate or ValidateAsync method can be called to validate the px file. The Validate method returns a ValidationResult object that contains the validation results as a key value pair containing information about the rule violations.
 
 #### SyntaxValidator : IPxFileStreamValidator, IPxFileStreamValidatorAsync
 ```SyntaxValidator``` is a class that validates the syntax of a px file's metadata. It needs to be run before other validators, because both the ```ContentValidator``` and ```DataValidator``` require information from the ```SyntaxValidationResult``` object that ```SyntaxValidator``` ```Validate()``` and ```ValidateAsync()``` methods return.
 The class can be instantiated with the following parameters:
-- syntaxConf (PxFileSyntaxConf, optional): Object that contains px file syntax configuration tokens and symbols.
+- conf (PxFileConfiguration, optional): Object that contains px file configuration.
 - customValidationFunctions (CustomSyntaxValidationFunctions, optional): Object that contains custom validation functions for the syntax validation process.
 
 #### ContentValidator : IValidator
@@ -180,7 +180,7 @@ The class can be instantiated with the following parameters:
 - encoding (Encoding): Encoding of the px file.
 - entries (ValidationStructuredEntry[]): Array of ValidationStructuredEntry objects that contain the metadata entries of the px file. This object is returned by the SyntaxValidator Validate and ValidateAsync methods.
 - customContentValidationFunctions (CustomContentValidationFunctions, optional): Object that contains custom functions for validating the px file metadata contents.
-- syntaxConf (PxFileSyntaxConf, optional): Object that contains px file syntax configuration tokens and symbols.
+- conf (PxFileConfiguration, optional): Object that contains px file configuration.
 
 #### DataValidator : IPxFileStreamValidator, IPxFileStreamValidatorAsync
 ```DataValidator``` class is used to validate the data section of a px file. It needs to be run after the ```SyntaxValidator```, because it requires information from both the ```SyntaxValidationResult``` and ```ContentValidationResult``` objects that ```SyntaxValidator``` and ```ContentValidator``` ```Validate()``` and ```ValidateAsync()``` methods return.
@@ -188,12 +188,12 @@ The class can be instantiated with the following parameters:
 - rowLen (int): Length of one row of Px file data. ContentValidationResult object contains this information.
 - numOfRows (int): Amount of rows of Px file data. This information is also stored in ContentValidationResult object.
 - startRow (long): The row number where the data section starts. This information is stored in the SyntaxValidationResult object.
-- conf (PxFileSyntaxConf, optional): Syntax configuration for the Px file
+- conf (PxFileConfiguration, optional): Configuration for the Px file
 
 #### DatabaseValidator : IValidator, IValidatorAsync
 Whole px file databases can be validated using ```DatabaseValidator``` class. Validation can be done by using the blocking ```Validate()``` or asynchronous ```ValidateAsync()``` methods. ```DatabaseValidator``` class can be instantiated using the following parameters:
 - directoryPath (string): Path to the database root 
-- syntaxConf (PxFileSyntaxConf, optional): Syntax configuration for the Px file
+- conf (PxFileConfiguration, optional): Configuration for the Px file
 - fileSystem (IFileSystem, optional): Object that defines the file system used for the validation process. Default file system is used if none provided
 - customPxFileValidators (IDatabaseValidator, optional): Object containing validator functions ran for each px file within the database
 - customAliasFileValidators (IDatabaseValidator, optional): Object containing validator functions ran for each alias file within the database

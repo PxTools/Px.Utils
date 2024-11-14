@@ -8,13 +8,13 @@ namespace Px.Utils.Validation.DataValidation
     {
         private static readonly HashSet<string> ValidStringDataItems =
         [
-            PxFileSyntaxConf.Default.Tokens.DataValues.DataIsMissing,
-            PxFileSyntaxConf.Default.Tokens.DataValues.DataCategoryNotApplicable,
-            PxFileSyntaxConf.Default.Tokens.DataValues.DataIsConfidential,
-            PxFileSyntaxConf.Default.Tokens.DataValues.DataIsNotAvailable,
-            PxFileSyntaxConf.Default.Tokens.DataValues.DataHasNotBeenAsked,
-            PxFileSyntaxConf.Default.Tokens.DataValues.Missing6,
-            PxFileSyntaxConf.Default.Tokens.DataValues.DataIsNone
+            PxFileConfiguration.Default.Tokens.DataValues.DataIsMissing,
+            PxFileConfiguration.Default.Tokens.DataValues.DataCategoryNotApplicable,
+            PxFileConfiguration.Default.Tokens.DataValues.DataIsConfidential,
+            PxFileConfiguration.Default.Tokens.DataValues.DataIsNotAvailable,
+            PxFileConfiguration.Default.Tokens.DataValues.DataHasNotBeenAsked,
+            PxFileConfiguration.Default.Tokens.DataValues.Missing6,
+            PxFileConfiguration.Default.Tokens.DataValues.DataIsNone
         ];
 
         /// <summary>

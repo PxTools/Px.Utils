@@ -1,5 +1,4 @@
-﻿using Px.Utils.Exceptions;
-using Px.Utils.PxFile;
+﻿using Px.Utils.PxFile;
 using Px.Utils.Validation.ContentValidation;
 using Px.Utils.Validation.DatabaseValidation;
 using Px.Utils.Validation.DataValidation;
@@ -11,9 +10,9 @@ namespace Px.Utils.Validation
     /// <summary>
     /// Validates a Px file as a whole.
     /// </summary>
-    /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that contains symbols and tokens required for the px file syntax.</param>
+    /// <param name="conf"><see cref="PxFileConfiguration"/> object that contains symbols and tokens required for the px file syntax.</param>
     public class PxFileValidator(
-        PxFileSyntaxConf? syntaxConf = null
+        PxFileConfiguration? conf = null
         ) : IPxFileStreamValidator, IPxFileStreamValidatorAsync
     {
         private CustomSyntaxValidationFunctions? _customSyntaxValidationFunctions;
@@ -69,14 +68,14 @@ namespace Px.Utils.Validation
             IFileSystem? fileSystem = null)
         {
             encoding ??= new LocalFileSystem().GetEncoding(stream);
-            syntaxConf ??= PxFileSyntaxConf.Default;
+            conf ??= PxFileConfiguration.Default;
 
             ValidationFeedback feedbacks = [];
-            SyntaxValidator syntaxValidator = new(syntaxConf, _customSyntaxValidationFunctions);
+            SyntaxValidator syntaxValidator = new(conf, _customSyntaxValidationFunctions);
             SyntaxValidationResult syntaxValidationResult = syntaxValidator.Validate(stream, filename, encoding, fileSystem);
             feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
 
-            ContentValidator contentValidator = new(filename, encoding, [.. syntaxValidationResult.Result], _customContentValidationFunctions, syntaxConf);
+            ContentValidator contentValidator = new(filename, encoding, [.. syntaxValidationResult.Result], _customContentValidationFunctions, conf);
             ContentValidationResult contentValidationResult = contentValidator.Validate();
             feedbacks.AddRange(contentValidationResult.FeedbackItems);
 
@@ -96,7 +95,7 @@ namespace Px.Utils.Validation
                 contentValidationResult.DataRowLength,
                 contentValidationResult.DataRowAmount,
                 syntaxValidationResult.DataStartRow, 
-                syntaxConf);
+                conf);
             ValidationResult dataValidationResult = dataValidator.Validate(stream, filename, encoding, fileSystem);
             feedbacks.AddRange(dataValidationResult.FeedbackItems);
 
@@ -138,14 +137,14 @@ namespace Px.Utils.Validation
             CancellationToken cancellationToken = default)
         {
             encoding ??= await new LocalFileSystem().GetEncodingAsync(stream, cancellationToken);
-            syntaxConf ??= PxFileSyntaxConf.Default;
+            conf ??= PxFileConfiguration.Default;
 
             ValidationFeedback feedbacks = [];
-            SyntaxValidator syntaxValidator = new(syntaxConf, _customSyntaxValidationFunctions);
+            SyntaxValidator syntaxValidator = new(conf, _customSyntaxValidationFunctions);
             SyntaxValidationResult syntaxValidationResult = await syntaxValidator.ValidateAsync(stream, filename, encoding, fileSystem, cancellationToken);
             feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
 
-            ContentValidator contentValidator = new(filename, encoding, [..syntaxValidationResult.Result], _customContentValidationFunctions, syntaxConf);
+            ContentValidator contentValidator = new(filename, encoding, [..syntaxValidationResult.Result], _customContentValidationFunctions, conf);
             ContentValidationResult contentValidationResult = contentValidator.Validate();
             feedbacks.AddRange(contentValidationResult.FeedbackItems);
 
@@ -165,7 +164,7 @@ namespace Px.Utils.Validation
                 contentValidationResult.DataRowLength,
                 contentValidationResult.DataRowAmount,
                 syntaxValidationResult.DataStartRow, 
-                syntaxConf);
+                conf);
 
             ValidationResult dataValidationResult = await dataValidator.ValidateAsync(stream, filename, encoding, fileSystem, cancellationToken);
             feedbacks.AddRange(dataValidationResult.FeedbackItems);

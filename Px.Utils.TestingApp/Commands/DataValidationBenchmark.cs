@@ -42,7 +42,7 @@ namespace Px.Utils.TestingApp.Commands
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileMetadataReader reader = new();
             encoding = reader.GetEncoding(stream);
-            start = StreamUtilities.FindKeywordPosition(stream, dataKeyword, PxFileSyntaxConf.Default);
+            start = StreamUtilities.FindKeywordPosition(stream, dataKeyword, PxFileConfiguration.Default);
             if (start == -1)
             {
                 throw new ArgumentException($"Could not find data keyword '{dataKeyword}'");

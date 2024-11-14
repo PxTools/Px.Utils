@@ -31,15 +31,15 @@ namespace Px.Utils.Validation.ContentValidation
         {
             string[] noSpecifierAllowedKeywords =
             [
-                validator.SyntaxConf.Tokens.KeyWords.DefaultLanguage,
-                validator.SyntaxConf.Tokens.KeyWords.AvailableLanguages,
-                validator.SyntaxConf.Tokens.KeyWords.Charset,
-                validator.SyntaxConf.Tokens.KeyWords.CodePage,
-                validator.SyntaxConf.Tokens.KeyWords.StubDimensions,
-                validator.SyntaxConf.Tokens.KeyWords.HeadingDimensions,
-                validator.SyntaxConf.Tokens.KeyWords.TableId,
-                validator.SyntaxConf.Tokens.KeyWords.Description,
-                validator.SyntaxConf.Tokens.KeyWords.ContentVariableIdentifier,
+                validator.Conf.Tokens.KeyWords.DefaultLanguage,
+                validator.Conf.Tokens.KeyWords.AvailableLanguages,
+                validator.Conf.Tokens.KeyWords.Charset,
+                validator.Conf.Tokens.KeyWords.CodePage,
+                validator.Conf.Tokens.KeyWords.StubDimensions,
+                validator.Conf.Tokens.KeyWords.HeadingDimensions,
+                validator.Conf.Tokens.KeyWords.TableId,
+                validator.Conf.Tokens.KeyWords.Description,
+                validator.Conf.Tokens.KeyWords.ContentVariableIdentifier,
             ];
 
             if (!noSpecifierAllowedKeywords.Contains(entry.Key.Keyword))
@@ -78,17 +78,17 @@ namespace Px.Utils.Validation.ContentValidation
         public static ValidationFeedback? ValidateUnexpectedLanguageParams(ValidationStructuredEntry entry, ContentValidator validator)
         {
             string[] noLanguageParameterAllowedKeywords = [
-                validator.SyntaxConf.Tokens.KeyWords.Charset,
-                validator.SyntaxConf.Tokens.KeyWords.CodePage,
-                validator.SyntaxConf.Tokens.KeyWords.TableId,
-                validator.SyntaxConf.Tokens.KeyWords.DefaultLanguage,
-                validator.SyntaxConf.Tokens.KeyWords.AvailableLanguages,
+                validator.Conf.Tokens.KeyWords.Charset,
+                validator.Conf.Tokens.KeyWords.CodePage,
+                validator.Conf.Tokens.KeyWords.TableId,
+                validator.Conf.Tokens.KeyWords.DefaultLanguage,
+                validator.Conf.Tokens.KeyWords.AvailableLanguages,
             ];
 
             string[] noLanguageParameterRecommendedKeywords = [
-                validator.SyntaxConf.Tokens.KeyWords.LastUpdated,
-                validator.SyntaxConf.Tokens.KeyWords.DimensionType,
-                validator.SyntaxConf.Tokens.KeyWords.Precision
+                validator.Conf.Tokens.KeyWords.LastUpdated,
+                validator.Conf.Tokens.KeyWords.DimensionType,
+                validator.Conf.Tokens.KeyWords.Precision
             ];
 
             if (!noLanguageParameterAllowedKeywords.Contains(entry.Key.Keyword) && !noLanguageParameterRecommendedKeywords.Contains(entry.Key.Keyword))
@@ -189,11 +189,11 @@ namespace Px.Utils.Validation.ContentValidation
             // Content dimension specifiers are allowed to be defined using only the first specifier at value level and are checked separately
             string[] excludeKeywords =
                 [
-                    validator.SyntaxConf.Tokens.KeyWords.Precision,
-                    validator.SyntaxConf.Tokens.KeyWords.Units,
-                    validator.SyntaxConf.Tokens.KeyWords.LastUpdated,
-                    validator.SyntaxConf.Tokens.KeyWords.Contact,
-                    validator.SyntaxConf.Tokens.KeyWords.ValueNote
+                    validator.Conf.Tokens.KeyWords.Precision,
+                    validator.Conf.Tokens.KeyWords.Units,
+                    validator.Conf.Tokens.KeyWords.LastUpdated,
+                    validator.Conf.Tokens.KeyWords.Contact,
+                    validator.Conf.Tokens.KeyWords.ValueNote
                 ];
 
             if (excludeKeywords.Contains(entry.Key.Keyword))
@@ -252,38 +252,38 @@ namespace Px.Utils.Validation.ContentValidation
         {
             string[] stringTypes =
                 [
-                    validator.SyntaxConf.Tokens.KeyWords.Charset,
-                    validator.SyntaxConf.Tokens.KeyWords.CodePage,
-                    validator.SyntaxConf.Tokens.KeyWords.DefaultLanguage,
-                    validator.SyntaxConf.Tokens.KeyWords.Units,
-                    validator.SyntaxConf.Tokens.KeyWords.Description,
-                    validator.SyntaxConf.Tokens.KeyWords.TableId,
-                    validator.SyntaxConf.Tokens.KeyWords.ContentVariableIdentifier,
-                    validator.SyntaxConf.Tokens.KeyWords.DimensionCode
+                    validator.Conf.Tokens.KeyWords.Charset,
+                    validator.Conf.Tokens.KeyWords.CodePage,
+                    validator.Conf.Tokens.KeyWords.DefaultLanguage,
+                    validator.Conf.Tokens.KeyWords.Units,
+                    validator.Conf.Tokens.KeyWords.Description,
+                    validator.Conf.Tokens.KeyWords.TableId,
+                    validator.Conf.Tokens.KeyWords.ContentVariableIdentifier,
+                    validator.Conf.Tokens.KeyWords.DimensionCode
                 ];
 
             string[] listOfStringTypes =
                 [
-                    validator.SyntaxConf.Tokens.KeyWords.AvailableLanguages,
-                    validator.SyntaxConf.Tokens.KeyWords.StubDimensions,
-                    validator.SyntaxConf.Tokens.KeyWords.HeadingDimensions,
-                    validator.SyntaxConf.Tokens.KeyWords.VariableValues,
-                    validator.SyntaxConf.Tokens.KeyWords.VariableValueCodes
+                    validator.Conf.Tokens.KeyWords.AvailableLanguages,
+                    validator.Conf.Tokens.KeyWords.StubDimensions,
+                    validator.Conf.Tokens.KeyWords.HeadingDimensions,
+                    validator.Conf.Tokens.KeyWords.VariableValues,
+                    validator.Conf.Tokens.KeyWords.VariableValueCodes
                 ];
 
             string[] dateTimeTypes =
                 [
-                    validator.SyntaxConf.Tokens.KeyWords.LastUpdated
+                    validator.Conf.Tokens.KeyWords.LastUpdated
                 ];
 
             string[] numberTypes =
                 [
-                    validator.SyntaxConf.Tokens.KeyWords.Precision
+                    validator.Conf.Tokens.KeyWords.Precision
                 ];
 
             string[] timeval =
                 [
-                    validator.SyntaxConf.Tokens.KeyWords.TimeVal
+                    validator.Conf.Tokens.KeyWords.TimeVal
                 ];
 
             if ((stringTypes.Contains(entry.Key.Keyword) && entry.ValueType != ValueType.StringValue) ||
@@ -323,20 +323,20 @@ namespace Px.Utils.Validation.ContentValidation
             string[] allowedCharsets = ["ANSI", "Unicode"];
 
             string[] dimensionTypes = [
-                    validator.SyntaxConf.Tokens.VariableTypes.Content,
-                validator.SyntaxConf.Tokens.VariableTypes.Time,
-                validator.SyntaxConf.Tokens.VariableTypes.Geographical,
-                validator.SyntaxConf.Tokens.VariableTypes.Ordinal,
-                validator.SyntaxConf.Tokens.VariableTypes.Nominal,
-                validator.SyntaxConf.Tokens.VariableTypes.Other,
-                validator.SyntaxConf.Tokens.VariableTypes.Unknown,
-                validator.SyntaxConf.Tokens.VariableTypes.Classificatory
+                    validator.Conf.Tokens.VariableTypes.Content,
+                validator.Conf.Tokens.VariableTypes.Time,
+                validator.Conf.Tokens.VariableTypes.Geographical,
+                validator.Conf.Tokens.VariableTypes.Ordinal,
+                validator.Conf.Tokens.VariableTypes.Nominal,
+                validator.Conf.Tokens.VariableTypes.Other,
+                validator.Conf.Tokens.VariableTypes.Unknown,
+                validator.Conf.Tokens.VariableTypes.Classificatory
                     ];
 
-            string value = SyntaxValidationUtilityMethods.CleanString(entry.Value, validator.SyntaxConf);
-            if ((entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.Charset && !allowedCharsets.Contains(value)) ||
-                (entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.CodePage && !value.Equals(validator._encoding.BodyName, StringComparison.OrdinalIgnoreCase)) ||
-                (entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.DimensionType && !dimensionTypes.Contains(value)))
+            string value = SyntaxValidationUtilityMethods.CleanString(entry.Value, validator.Conf);
+            if ((entry.Key.Keyword == validator.Conf.Tokens.KeyWords.Charset && !allowedCharsets.Contains(value)) ||
+                (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.CodePage && !value.Equals(validator._encoding.BodyName, StringComparison.OrdinalIgnoreCase)) ||
+                (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.DimensionType && !dimensionTypes.Contains(value)))
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
@@ -354,7 +354,7 @@ namespace Px.Utils.Validation.ContentValidation
 
                 return new(feedback);
             }
-            else if (entry.Key.Keyword == validator.SyntaxConf.Tokens.KeyWords.ContentVariableIdentifier)
+            else if (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.ContentVariableIdentifier)
             {
                 string defaultLanguage = validator._defaultLanguage ?? string.Empty;
                 string lang = entry.Key.Language ?? defaultLanguage;
@@ -392,14 +392,14 @@ namespace Px.Utils.Validation.ContentValidation
         /// <returns>Key value pair containing information about the rule violation is returned if an unexpected amount of values is detected</returns>
         public static ValidationFeedback? ValidateValueAmounts(ValidationStructuredEntry entry, ContentValidator validator)
         {
-            if (entry.Key.Keyword != validator.SyntaxConf.Tokens.KeyWords.VariableValueCodes ||
+            if (entry.Key.Keyword != validator.Conf.Tokens.KeyWords.VariableValueCodes ||
                 validator._dimensionValueNames is null ||
                 entry.Key.FirstSpecifier is null)
             {
                 return null;
             }
 
-            string[] codes = entry.Value.Split(validator.SyntaxConf.Symbols.Value.ListSeparator);
+            string[] codes = entry.Value.Split(validator.Conf.Symbols.Value.ListSeparator);
             string defaultLanguage = validator._defaultLanguage ?? string.Empty;
             string lang = entry.Key.Language ?? defaultLanguage;
             if (codes.Length != validator._dimensionValueNames[new(lang, entry.Key.FirstSpecifier)].Length)
@@ -433,7 +433,7 @@ namespace Px.Utils.Validation.ContentValidation
         public static ValidationFeedback? ValidateValueUppercaseRecommendations(ValidationStructuredEntry entry, ContentValidator validator)
         {
             string[] recommendedUppercaseValueKeywords = [
-                validator.SyntaxConf.Tokens.KeyWords.CodePage
+                validator.Conf.Tokens.KeyWords.CodePage
             ];
 
             if (!recommendedUppercaseValueKeywords.Contains(entry.Key.Keyword))

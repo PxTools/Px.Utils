@@ -10,14 +10,14 @@ namespace Px.Utils.Validation.ContentValidation
     /// <param name="encoding"> encoding of the Px file</param>
     /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent key-value entries of the Px file metadata</param>"
     /// <param name="customContentValidationFunctions">Object that contains any optional additional validation functions</param>
-    /// <param name="syntaxConf">Object that stores syntax specific symbols and tokens for the Px file</param>
+    /// <param name="conf">Configuration for the px file. Can change symbols, tokens and some content related options.</param>
     /// </summary>
     public sealed partial class ContentValidator(
         string filename,
         Encoding encoding,
         ValidationStructuredEntry[] entries,
         CustomContentValidationFunctions? customContentValidationFunctions = null,
-        PxFileSyntaxConf? syntaxConf = null) : IValidator
+        PxFileConfiguration? conf = null) : IValidator
     {
         private readonly string _filename = filename;
         private readonly Encoding _encoding = encoding;
@@ -46,9 +46,9 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         private Dictionary<KeyValuePair<string, string>, string[]>? _dimensionValueNames;
         /// <summary>
-        /// Object that stores syntax specific symbols and tokens for the Px file
+        /// Stores the file configuration.
         /// </summary>
-        private PxFileSyntaxConf SyntaxConf { get; } = syntaxConf ?? PxFileSyntaxConf.Default;
+        private PxFileConfiguration Conf { get; } = conf ?? PxFileConfiguration.Default;
 
         /// <summary>
         /// Validates contents of Px file metadata. Metadata syntax must be valid for this method to work properly.

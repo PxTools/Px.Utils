@@ -146,7 +146,7 @@ namespace PxFileTests.reader.ests
             // Act
             Encoding encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding, null, 28);
+            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding, 28);
             IList<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
 
             // Assert
