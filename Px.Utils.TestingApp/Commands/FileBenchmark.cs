@@ -21,7 +21,7 @@
                 }
             }
 
-            throw new ArgumentException("File path parameter not found for a file based benchmark.");
+            StartInteractiveMode();
         }
 
         protected override void StartInteractiveMode()

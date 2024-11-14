@@ -44,8 +44,8 @@
         IllegalCharactersInKeyword = 13,
         KeywordDoesntStartWithALetter = 14,
         RegexTimeout = 15,
-        IllegalCharactersInLanguageParameter = 17,
-        IllegalCharactersInSpecifierParameter = 18,
+        IllegalCharactersInLanguageSection = 17,
+        IllegalCharactersInSpecifierSection = 18,
         EntryWithoutValue = 19,
         IncompliantLanguage = 20,
         KeywordContainsUnderscore = 21,
@@ -78,6 +78,13 @@
         DataValidationFeedbackInconsistentSeparator = 48,
         DataValidationFeedbackInvalidString = 49,
         DataValidationFeedbackInvalidNumber = 50,
-        DataValidationFeedbackInvalidChar = 51
+        DataValidationFeedbackInvalidChar = 51,
+        FileLanguageDiffersFromDatabase = 52,
+        FileEncodingDiffersFromDatabase = 53,
+        AliasFileMissing = 54,
+        DuplicateFileNames = 55,
+        StartOfDataSectionNotFound = 56,
+        DuplicateEntry = 57,
+        DuplicateDimension = 58
     }
 }

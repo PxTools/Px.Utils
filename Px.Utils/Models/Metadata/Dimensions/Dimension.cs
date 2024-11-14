@@ -1,13 +1,15 @@
-﻿using Px.Utils.Models.Metadata;
-using Px.Utils.Models.Metadata.Dimensions;
-using Px.Utils.Language;
+﻿using Px.Utils.Language;
 using Px.Utils.Models.Metadata.Enums;
+using Px.Utils.Models.Metadata.MetaProperties;
+using Px.Utils.Serializers.Json;
+using System.Text.Json.Serialization;
 
 namespace Px.Utils.Models.Metadata.Dimensions
 {
     /// <summary>
     /// Class representing a dimension without any fixed type.
     /// </summary>
+    [JsonConverter(typeof(DimensionConverter))]
     public class Dimension : IReadOnlyDimension
     {
         /// <summary>
@@ -63,6 +65,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <param name="additionalProperties">Properties of the dimension, excluding the required properties</param>
         /// <param name="values">Ordered list of dimension values that define the structure of the dimension</param>
         /// <param name="type">Type of the dimension. The dedicated classes must be used for time and content dimensions</param>
+        [JsonConstructor]
         public Dimension(string code, MultilanguageString name, Dictionary<string, MetaProperty> additionalProperties,
             ValueList values, DimensionType type)
         {

@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using Px.Utils.Serializers.Json;
+using System.Collections;
+using System.Text.Json.Serialization;
 
 namespace Px.Utils.Models.Metadata.Dimensions
 {
@@ -11,6 +13,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
     /// <summary>
     /// Ordered collection of dimension values with utility methods.
     /// </summary>
+    [JsonConverter(typeof(ValueListConverter))]
     public class ValueList : IReadOnlyList<IReadOnlyDimensionValue>
     {
         protected List<DimensionValue> Values { get; }
@@ -140,6 +143,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
     /// Initializes a new instance of the <see cref="ContentValueList"/> class.
     /// </remarks>
     /// <param name="dimensions">The collection of content dimension values in order.</param>
+    [JsonConverter(typeof(ContentValueListConverter))]
     public class ContentValueList(IEnumerable<ContentDimensionValue> dimensions) : ValueList(dimensions)
     {
 

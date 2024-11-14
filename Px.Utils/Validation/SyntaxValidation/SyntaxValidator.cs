@@ -1,4 +1,5 @@
 ﻿using Px.Utils.PxFile;
+using Px.Utils.Validation.DatabaseValidation;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -7,21 +8,14 @@ namespace Px.Utils.Validation.SyntaxValidation
     /// <summary>
     /// Provides methods for validating the syntax of a PX file. Validation can be done using both synchronous and asynchronous methods.
     /// Additionally custom validation functions can be provided to be used during validation.
-    /// <param name="stream">Stream of the PX file to be validated</param>
-    /// <param name="encoding">Encoding of the PX file</param>
-    /// <param name="filename">Name of the PX file</param>
-    /// <param name="syntaxConf">Object that stores syntax specific symbols and tokens for the PX file</param>
+    /// <param name="conf">Object that stores syntax specific symbols and tokens for the PX file</param>
     /// <param name="customValidationFunctions">Object that contains any optional additional validation functions</param>
-    /// <param name="leaveStreamOpen">Boolean value that determines whether the stream should be left open after validation.
     /// his is required if multiple validations are executed for the same stream.</param>
     /// </summary>
     public class SyntaxValidator(
-            Stream stream,
-            Encoding encoding,
-            string filename,
-            PxFileSyntaxConf? syntaxConf = null,
-            CustomSyntaxValidationFunctions? customValidationFunctions = null,
-            bool leaveStreamOpen = false) : IPxFileValidator, IPxFileValidatorAsync
+            PxFileConfiguration? conf = null,
+            CustomSyntaxValidationFunctions? customValidationFunctions = null) 
+        : IPxFileStreamValidator, IPxFileStreamValidatorAsync
     {
         private const int _bufferSize = 4096;
         private int _dataSectionStartRow = -1;
@@ -30,10 +24,21 @@ namespace Px.Utils.Validation.SyntaxValidation
         ///<summary>
         /// Validates the syntax of a PX file's metadata.
         ///</summary>
+        /// <param name="stream">Stream of the PX file to be validated</param>
+        /// <param name="filename">Name of the PX file</param>
+        /// <param name="encoding">Encoding of the PX file. If not provided, the validator attempts to find the encoding.</param>
+        /// <param name="fileSystem">File system to use for file operations. If not provided, default file system is used.</param>
         /// <returns>A <see cref="SyntaxValidationResult"/> entry which contains a list of <see cref="ValidationStructuredEntry"/> entries 
-        /// and a list of <see cref="ValidationFeedbackItem"/> entries accumulated during the validation.</returns>
-        public SyntaxValidationResult Validate()
+        /// and a dictionary of type <see cref="ValidationFeedback"/> accumulated during the validation.</returns>
+        public SyntaxValidationResult Validate(
+            Stream stream,
+            string filename,
+            Encoding? encoding = null,
+            IFileSystem? fileSystem = null)
         {
+            fileSystem ??= new LocalFileSystem();
+            encoding ??= fileSystem.GetEncoding(stream);
+
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
             IEnumerable<KeyValuePairValidationFunction> keyValueValidationFunctions = validationFunctions.DefaultKeyValueValidationFunctions;
@@ -46,27 +51,39 @@ namespace Px.Utils.Validation.SyntaxValidation
                 structuredValidationFunctions = structuredValidationFunctions.Concat(customValidationFunctions.CustomStructuredValidationFunctions);
             }
 
-            syntaxConf ??= PxFileSyntaxConf.Default;
+            conf ??= PxFileConfiguration.Default;
 
-            List<ValidationFeedbackItem> validationFeedback = [];
-            List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, syntaxConf, filename, _bufferSize);
-            validationFeedback.AddRange(ValidateEntries(stringEntries, stringValidationFunctions, syntaxConf));
-            List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(stringEntries, syntaxConf);
-            validationFeedback.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, syntaxConf));
-            List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
-            validationFeedback.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, syntaxConf));
+            ValidationFeedback validationFeedbacks = [];
+            List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, conf, filename, _bufferSize);
+            validationFeedbacks.AddRange(ValidateEntries(stringEntries, stringValidationFunctions, conf));
+            List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(stringEntries, conf);
+            validationFeedbacks.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, conf));
+            List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, conf);
+            validationFeedbacks.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, conf));
 
-            return new SyntaxValidationResult([.. validationFeedback], structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
+            return new SyntaxValidationResult(validationFeedbacks, structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
         }
 
         /// <summary>
         /// Asynchronously validates the syntax of a PX file's metadata.
         /// </summary>
+        /// <param name="stream">Stream of the PX file to be validated</param>
+        /// <param name="filename">Name of the PX file</param>
+        /// <param name="encoding">Encoding of the PX file. If not provided, the validator attempts to find the encoding.</param>
+        /// <param name="fileSystem">File system to use for file operations. If not provided, default file system is used.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> parameter that can be used to cancel the operation.</param>
-        /// <returns>A task that contains a <see cref="SyntaxValidationResult"/> entry, which contains the structured validation entries 
-        /// and a list of <see cref="ValidationStructuredEntry"/> entries accumulated during the validation.</returns>
-        public async Task<SyntaxValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
+        /// <returns>A task that contains a <see cref="SyntaxValidationResult"/> entry which contains a list of <see cref="ValidationStructuredEntry"/> entries 
+        /// and a dictionary of type <see cref="ValidationFeedback"/> accumulated during the validation.</returns>
+        public async Task<SyntaxValidationResult> ValidateAsync(
+            Stream stream,
+            string filename,
+            Encoding? encoding = null,
+            IFileSystem? fileSystem = null,
+            CancellationToken cancellationToken = default)
         {
+            fileSystem ??= new LocalFileSystem();
+            encoding ??= await fileSystem.GetEncodingAsync(stream, cancellationToken);
+
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
             IEnumerable<KeyValuePairValidationFunction> keyValueValidationFunctions = validationFunctions.DefaultKeyValueValidationFunctions;
@@ -79,91 +96,121 @@ namespace Px.Utils.Validation.SyntaxValidation
                 structuredValidationFunctions = structuredValidationFunctions.Concat(customValidationFunctions.CustomStructuredValidationFunctions);
             }
 
-            syntaxConf ??= PxFileSyntaxConf.Default;
-            List<ValidationFeedbackItem> validationFeedback = [];
-            List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, syntaxConf, filename, _bufferSize, cancellationToken);
-            validationFeedback.AddRange(ValidateEntries(entries, stringValidationFunctions, syntaxConf));
-            List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, syntaxConf);
-            validationFeedback.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, syntaxConf));
-            List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, syntaxConf);
-            validationFeedback.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, syntaxConf));
+            conf ??= PxFileConfiguration.Default;
+            ValidationFeedback validationFeedbacks = [];
+            List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, conf, filename, _bufferSize, cancellationToken);
+            validationFeedbacks.AddRange(ValidateEntries(entries, stringValidationFunctions, conf));
+            List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, conf);
+            validationFeedbacks.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, conf));
+            List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, conf);
+            validationFeedbacks.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, conf));
 
-            return new SyntaxValidationResult([.. validationFeedback], structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
+            return new SyntaxValidationResult(validationFeedbacks, structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
         }
 
         #region Interface implementation
 
-        ValidationResult IPxFileValidator.Validate()
-            => Validate();
+        ValidationResult IPxFileStreamValidator.Validate(Stream stream, string filename, Encoding? encoding, IFileSystem? fileSystem)
+            => Validate(stream, filename, encoding, fileSystem);
 
-        async Task<ValidationResult> IPxFileValidatorAsync.ValidateAsync(CancellationToken cancellationToken) 
-            => await ValidateAsync(cancellationToken);
+        Task<ValidationResult> IPxFileStreamValidatorAsync.ValidateAsync(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            CancellationToken cancellationToken)
+            => ValidateAsync(stream, filename, encoding, fileSystem, cancellationToken).ContinueWith(task => (ValidationResult)task.Result);
 
         #endregion
 
-        private static List<ValidationFeedbackItem> ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunction> validationFunctions, PxFileSyntaxConf syntaxConf)
+        /// <summary>
+        /// Checks whether the end of the metadata section of a px file stream has been reached.
+        /// </summary>
+        /// <param name="currentCharacter">Character currently being processed</param>
+        /// <param name="syntaxConf"><see cref="PxFileConfiguration"/> object that contains symbols and tokens used for px file syntax</param>
+        /// <param name="entryBuilder"><see cref="StringBuilder"/> object that contains the currently processed px file entry</param>
+        /// <param name="isProcessingString">Whether the character currently processed is enclosed between string delimiters</param>
+        /// <returns>True if the end of the metadata section has been reached, otherwise false.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsEndOfMetadataSection(char currentCharacter, PxFileConfiguration syntaxConf, StringBuilder entryBuilder, bool isProcessingString)
         {
-            List<ValidationFeedbackItem> validationFeedback = [];
+            if (!isProcessingString && currentCharacter == syntaxConf.Symbols.KeywordSeparator)
+            {
+                string stringEntry = entryBuilder.ToString();
+                // When DATA keyword is reached, metadata parsing is complete
+                return SyntaxValidationUtilityMethods.CleanString(stringEntry, syntaxConf).Equals(syntaxConf.Tokens.KeyWords.Data, StringComparison.Ordinal);
+            }
+            return false;
+        }
+
+        private static ValidationFeedback ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunction> validationFunctions, PxFileConfiguration syntaxConf)
+        {
+            ValidationFeedback validationFeedback = [];
             foreach (ValidationEntry entry in entries)
             {
                 foreach (EntryValidationFunction function in validationFunctions)
                 {
-                    ValidationFeedbackItem? feedback = function(entry, syntaxConf);
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = function(entry, syntaxConf);
                     if (feedback is not null)
                     {
-                        validationFeedback.Add((ValidationFeedbackItem)feedback);
+                        validationFeedback.Add((KeyValuePair <ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
                     }
                 }
             }
             return validationFeedback;
         }
 
-        private static List<ValidationFeedbackItem> ValidateKeyValuePairs(
+        private static ValidationFeedback ValidateKeyValuePairs(
             IEnumerable<ValidationKeyValuePair> kvpObjects,
             IEnumerable<KeyValuePairValidationFunction> validationFunctions,
-            PxFileSyntaxConf syntaxConf)
+            PxFileConfiguration syntaxConf)
         {
-            List<ValidationFeedbackItem> validationFeedback = [];
+            ValidationFeedback validationFeedback = [];
             foreach (ValidationKeyValuePair kvpObject in kvpObjects)
             {
                 foreach (KeyValuePairValidationFunction function in validationFunctions)
                 {
-                    ValidationFeedbackItem? feedback = function(kvpObject, syntaxConf);
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = function(kvpObject, syntaxConf);
                     if (feedback is not null)
                     {
-                        validationFeedback.Add((ValidationFeedbackItem)feedback);
+                        validationFeedback.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
                     }
                 }
             }
             return validationFeedback;
         }
 
-        private static List<ValidationFeedbackItem> ValidateStructs(
+        private static ValidationFeedback ValidateStructs(
             IEnumerable<ValidationStructuredEntry> structuredEntries, 
             IEnumerable<StructuredValidationFunction> validationFunctions,
-            PxFileSyntaxConf syntaxConf)
+            PxFileConfiguration syntaxConf)
         {
-            List<ValidationFeedbackItem> validationFeedback = [];
+            ValidationFeedback validationFeedback = [];
             foreach (ValidationStructuredEntry structuredEntry in structuredEntries)
             {
                 foreach (StructuredValidationFunction function in validationFunctions)
                 {
-                    ValidationFeedbackItem? feedback = function(structuredEntry, syntaxConf);
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = function(structuredEntry, syntaxConf);
                     if (feedback is not null)
                     {
-                        validationFeedback.Add((ValidationFeedbackItem)feedback);
+                        validationFeedback.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
                     }
                 }
             }
             return validationFeedback;
         }
 
-        private static List<ValidationKeyValuePair> BuildKeyValuePairs(List<ValidationEntry> validationEntries, PxFileSyntaxConf syntaxConf)
+        private static List<ValidationKeyValuePair> BuildKeyValuePairs(List<ValidationEntry> validationEntries, PxFileConfiguration syntaxConf)
         {
             return validationEntries.Select(entry =>
             {
                 // Split the entry string into a key and a value from the first valid keyword separator
                 int[] keywordSeparatorIndeces = SyntaxValidationUtilityMethods.FindKeywordSeparatorIndeces(entry.EntryString, syntaxConf);
+
+                if (keywordSeparatorIndeces.Length == 0)
+                {
+                    return new ValidationKeyValuePair(entry.File, new KeyValuePair<string, string>(entry.EntryString, string.Empty), entry.KeyStartLineIndex, entry.LineChangeIndexes, -1);
+                }
 
                 // Key is the part of the entry string before the first keyword separator index
                 string key = entry.EntryString[..keywordSeparatorIndeces[0]];
@@ -176,30 +223,27 @@ namespace Px.Utils.Validation.SyntaxValidation
             }).ToList();
         }
 
-        private static List<ValidationStructuredEntry> BuildValidationStructureEntries(List<ValidationKeyValuePair> keyValuePairs, PxFileSyntaxConf syntaxConf)
+        private static List<ValidationStructuredEntry> BuildValidationStructureEntries(List<ValidationKeyValuePair> keyValuePairs, PxFileConfiguration syntaxConf)
         {
             return keyValuePairs.Select(entry =>
             {
                 ValueType? valueType = SyntaxValidationUtilityMethods.GetValueTypeFromString(entry.KeyValuePair.Value, syntaxConf);
                 ValidationStructuredEntryKey key = ParseStructuredValidationEntryKey(entry.KeyValuePair.Key, syntaxConf);
-                string value = SyntaxValidationUtilityMethods.CleanValue(entry.KeyValuePair.Value, syntaxConf, valueType);
-                return new ValidationStructuredEntry(entry.File, key, value, entry.KeyStartLineIndex, entry.LineChangeIndexes, entry.ValueStartIndex, valueType);
+                return new ValidationStructuredEntry(entry.File, key, entry.KeyValuePair.Value, entry.KeyStartLineIndex, entry.LineChangeIndexes, entry.ValueStartIndex, valueType);
             }).ToList();
         }
 
-        private List<ValidationEntry> BuildValidationEntries(Stream stream, Encoding encoding, PxFileSyntaxConf syntaxConf, string filename, int bufferSize)
+        private List<ValidationEntry> BuildValidationEntries(Stream stream, Encoding encoding, PxFileConfiguration syntaxConf, string filename, int bufferSize)
         {
             bool isProcessingString = false;
             int characterIndex = 0;
             List<int> lineChangeIndexes = [];
             int entryStartIndex = 0;
             int entryStartLineIndex = 0;
-
-            using StreamReader reader = new(stream, encoding, leaveOpen: leaveStreamOpen);
+            using StreamReader reader = new(stream, encoding, leaveOpen: true);
             List<ValidationEntry> entries = [];
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
-
             while (reader.Read(buffer, 0, bufferSize) > 0)
             {
                 for (int i = 0; i < buffer.Length; i++)
@@ -243,7 +287,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         private async Task<List<ValidationEntry>> BuildValidationEntriesAsync(
             Stream stream, 
             Encoding encoding,
-            PxFileSyntaxConf syntaxConf,
+            PxFileConfiguration syntaxConf,
             string filename,
             int bufferSize,
             CancellationToken cancellationToken)
@@ -254,7 +298,7 @@ namespace Px.Utils.Validation.SyntaxValidation
             int entryStartIndex = 0;
             int entryStartLineIndex = 0;
             
-            using StreamReader reader = new(stream, encoding, leaveOpen: leaveStreamOpen);
+            using StreamReader reader = new(stream, encoding, leaveOpen: true);
             List<ValidationEntry> entries = [];
             StringBuilder entryBuilder = new();
             char[] buffer = new char[bufferSize];
@@ -292,19 +336,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsEndOfMetadataSection(char currentCharacter, PxFileSyntaxConf syntaxConf, StringBuilder entryBuilder, bool isProcessingString)
-        {
-            if (!isProcessingString && currentCharacter == syntaxConf.Symbols.KeywordSeparator)
-            {
-                string stringEntry = entryBuilder.ToString();
-                // When DATA keyword is reached, metadata parsing is complete
-                return SyntaxValidationUtilityMethods.CleanString(stringEntry, syntaxConf).Equals(syntaxConf.Tokens.KeyWords.Data, StringComparison.Ordinal);
-            }
-            return false;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void UpdateLineAndCharacter(char currentCharacter, PxFileSyntaxConf syntaxConf, ref int characterIndex, ref List<int> linebreakIndexes, ref bool isProcessingString)
+        private static void UpdateLineAndCharacter(char currentCharacter, PxFileConfiguration syntaxConf, ref int characterIndex, ref List<int> linebreakIndexes, ref bool isProcessingString)
         {
             if (currentCharacter == syntaxConf.Symbols.Linebreak)
             {
@@ -317,34 +349,34 @@ namespace Px.Utils.Validation.SyntaxValidation
             characterIndex++;
         }
 
-        private static ValidationStructuredEntryKey ParseStructuredValidationEntryKey(string input, PxFileSyntaxConf syntaxConf)
+        private static ValidationStructuredEntryKey ParseStructuredValidationEntryKey(string input, PxFileConfiguration conf)
         {
             ExtractSectionResult languageResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(
                 input, 
-                syntaxConf.Symbols.Key.LangParamStart, 
-                syntaxConf.Symbols.Key.StringDelimeter,
-                syntaxConf.Symbols.Key.LangParamEnd);
+                conf.Symbols.Key.LangParamStart, 
+                conf.Symbols.Key.StringDelimeter,
+                conf.Symbols.Key.LangParamEnd);
             string? language = languageResult.Sections.Length > 0 ? 
-                SyntaxValidationUtilityMethods.CleanString(languageResult.Sections[0], syntaxConf).Trim(syntaxConf.Symbols.Key.StringDelimeter) :
+                SyntaxValidationUtilityMethods.CleanString(languageResult.Sections[0], conf).Trim(conf.Symbols.Key.StringDelimeter) :
                 null;
             ExtractSectionResult specifierResult = SyntaxValidationUtilityMethods.ExtractSectionFromString(languageResult.Remainder,
-                syntaxConf.Symbols.Key.SpecifierParamStart, 
-                syntaxConf.Symbols.Key.StringDelimeter, 
-                syntaxConf.Symbols.Key.SpecifierParamEnd);
+                conf.Symbols.Key.SpecifierParamStart, 
+                conf.Symbols.Key.StringDelimeter, 
+                conf.Symbols.Key.SpecifierParamEnd);
             string[] specifiers = specifierResult.Sections.Length > 0
                 ? SyntaxValidationUtilityMethods.ExtractSectionFromString(
                     specifierResult.Sections[0], 
-                    syntaxConf.Symbols.Key.StringDelimeter, 
-                    syntaxConf.Symbols.Key.StringDelimeter)
+                    conf.Symbols.Key.StringDelimeter, 
+                    conf.Symbols.Key.StringDelimeter)
                 .Sections 
                 : [];
             string? firstSpecifier = specifiers.Length > 0 ?
-                SyntaxValidationUtilityMethods.CleanString(specifiers[0], syntaxConf).Trim(syntaxConf.Symbols.Key.StringDelimeter) : 
+                SyntaxValidationUtilityMethods.CleanString(specifiers[0], conf).Trim(conf.Symbols.Key.StringDelimeter) : 
                 null;
             string? secondSpecifier = specifiers.Length > 1 ?
-                SyntaxValidationUtilityMethods.CleanString(specifiers[1], syntaxConf).Trim(syntaxConf.Symbols.Key.StringDelimeter) :
+                SyntaxValidationUtilityMethods.CleanString(specifiers[1], conf).Trim(conf.Symbols.Key.StringDelimeter) :
                 null;
-            string keyword = SyntaxValidationUtilityMethods.CleanString(specifierResult.Remainder, syntaxConf);
+            string keyword = SyntaxValidationUtilityMethods.CleanString(specifierResult.Remainder, conf);
 
             return new(keyword, language, firstSpecifier, secondSpecifier);
         }

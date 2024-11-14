@@ -1,5 +1,4 @@
 ﻿using Px.Utils.Language;
-using Px.Utils.Models.Metadata;
 using Px.Utils.Models.Metadata.ExtensionMethods;
 
 namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
@@ -15,7 +14,6 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
             string b_list_string = "\"b_0\", \"b_1\", \"b_2\"";
             string c_list_string = "\"c_0\", \"c_1\", \"c_2\"";
             MultilanguageString mls = new([new("a", a_list_string), new("b", b_list_string), new("c", c_list_string)]);
-            MetaProperty property = new("test_property", mls);
 
             List<MultilanguageString> expected =
             [
@@ -25,7 +23,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
             ];
 
             // Act
-            List<MultilanguageString> result = property.ValueAsListOfMultilanguageStrings( "none", ',', '"');
+            List<MultilanguageString> result = mls.ValueAsListOfMultilanguageStrings(',', '"');
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
@@ -39,7 +37,6 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
             string b_list_string = "\"b_0\", \r\n \"b_1\", \r\n \"b_2\"";
             string c_list_string = "\"c_0\", \r\n \"c_1\", \r\n \"c_2\"";
             MultilanguageString mls = new([new("a", a_list_string), new("b", b_list_string), new("c", c_list_string)]);
-            MetaProperty property = new("test_property", mls);
 
             List<MultilanguageString> expected =
             [
@@ -49,20 +46,10 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
             ];
 
             // Act
-            List<MultilanguageString> result = property.ValueAsListOfMultilanguageStrings( "none", ',', '"');
+            List<MultilanguageString> result = mls.ValueAsListOfMultilanguageStrings(',', '"');
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
-        }
-
-        [TestMethod]
-        public void ParseListOfMultilanguageStringsNoLanguagePropertyThrows()
-        {
-            // Arrange
-            MetaProperty property = new("test_key", "test_value");
-
-            // Act and assert
-            Assert.ThrowsException<ArgumentException>(() => property.ValueAsListOfMultilanguageStrings( "none", ',', '"'));
         }
 
         [TestMethod]
@@ -70,15 +57,38 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
         {
             // Arrange
             MultilanguageString mls = new("lang_a", "\"a_0\"");
-            MetaProperty property = new("test_property", mls);
 
             List<MultilanguageString> expected = [new("lang_a", "a_0")];
 
             // Act
-            List<MultilanguageString> result = property.ValueAsListOfMultilanguageStrings( "none", ',', '"');
+            List<MultilanguageString> result = mls.ValueAsListOfMultilanguageStrings(',', '"');
 
             // Assert
             CollectionAssert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void ParseListOfMultilanguageStringsInputMissingListSeparatorThrows()
+        {
+            // Arrange
+            string a_list_string = "\"a_0\", \"a_1\", \"a_2\"";
+            string b_list_string = "\"b_0\", \"b_1\" \"b_2\"";
+            MultilanguageString mls = new([new("a", a_list_string), new("b", b_list_string)]);
+
+            // Act and assert
+            Assert.ThrowsException<ArgumentException>(() => mls.ValueAsListOfMultilanguageStrings(',', '"'));
+        }
+
+        [TestMethod]
+        public void ParseListOfMultilanguageStringsInputMissingStringDelimeterThrows()
+        {
+            // Arrange
+            string a_list_string = "a_0, a_1, a_2";
+            string b_list_string = "b_0, b_1, b_2";
+            MultilanguageString mls = new([new("a", a_list_string), new("b", b_list_string)]);
+
+            // Act and assert
+            Assert.ThrowsException<ArgumentException>(() => mls.ValueAsListOfMultilanguageStrings(',', '"'));
         }
     }
 }

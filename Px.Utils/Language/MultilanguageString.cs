@@ -1,11 +1,14 @@
 ﻿using Px.Utils.Exceptions;
+using Px.Utils.Serializers.Json;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace Px.Utils.Language
 {
     /// <summary>
     /// Class representing a string that has translations in multiple languages
     /// </summary>
+    [JsonConverter(typeof(MultilanguageStringConverter))]
     public sealed class MultilanguageString : IEquatable<MultilanguageString>, IEqualityComparer<MultilanguageString>
     {
         private readonly Dictionary<string, string> _translations;

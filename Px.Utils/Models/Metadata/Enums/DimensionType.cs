@@ -1,8 +1,11 @@
-﻿namespace Px.Utils.Models.Metadata.Enums
+﻿using System.Text.Json.Serialization;
+
+namespace Px.Utils.Models.Metadata.Enums
 {
     /// <summary>
     /// Enum for all possible dimension types
     /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum DimensionType
     {
         /// <summary>

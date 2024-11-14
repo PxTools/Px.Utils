@@ -21,14 +21,14 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
 
         public void AllowedTokenSequences(params EntryType[] tokenSequence)
         {
-            List<ValidationFeedback> feedbacks = [];
+            ValidationFeedback feedbacks = [];
             DataStructureValidator validator = new();
             foreach (EntryType tokenType in tokenSequence)
             {
-                ValidationFeedback? feedback = validator.Validate([], tokenType, Encoding.UTF8, 1, 1);
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate([], tokenType, Encoding.UTF8, 1, 1, "foo");
                 if (feedback is not null)
                 {
-                    feedbacks.Add((ValidationFeedback)feedback);
+                    feedbacks.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
                 }
             }
         
@@ -44,23 +44,23 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         [DataRow([EntryType.DataItem, EntryType.DataItemSeparator, EntryType.EndOfData])]
         public void NotAllowedTokenSequences(params EntryType[] tokenSequence)
         {
-            List<ValidationFeedback> feedbacks = [];
+            ValidationFeedback feedbacks = [];
             DataStructureValidator validator = new();
             foreach (EntryType tokenType in tokenSequence)
             {
-                ValidationFeedback? feedback = validator.Validate([], tokenType, Encoding.UTF8, 1, 1);
+                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate([], tokenType, Encoding.UTF8, 1, 1, "foo");
                 if (feedback is not null)
                 {
-                    feedbacks.Add((ValidationFeedback)feedback);
+                    feedbacks.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
                 }
             }
 
             Assert.AreEqual(1, feedbacks.Count);
-            Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidStructure, feedbacks[0].Rule);
-            Assert.AreEqual(ValidationFeedbackLevel.Error, feedbacks[0].Level);
+            Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidStructure, feedbacks.First().Key.Rule);
+            Assert.AreEqual(ValidationFeedbackLevel.Error, feedbacks.First().Key.Level);
             List<EntryType> expectedTokens = [ tokenSequence.Length > 1 ? tokenSequence[^2] : EntryType.Unknown, tokenSequence[^1] ];
 
-            Assert.AreEqual(string.Join(",", expectedTokens), feedbacks[0].AdditionalInfo);
+            Assert.AreEqual(string.Join(",", expectedTokens), feedbacks.First().Value[0].AdditionalInfo);
         }
     }
 }

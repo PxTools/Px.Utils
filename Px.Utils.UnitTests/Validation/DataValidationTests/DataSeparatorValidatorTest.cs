@@ -12,7 +12,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             DataSeparatorValidator validator = new();
             List<byte> separator = [.. Encoding.UTF8.GetBytes(" ")];
-            ValidationFeedback? nullableFeedback = validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? nullableFeedback = validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1, "foo");
 
             Assert.IsNull(nullableFeedback);
         }
@@ -22,14 +22,14 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             DataSeparatorValidator validator = new();
             List<byte> separator = [.. Encoding.UTF8.GetBytes(" ")];
-            validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
+            validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1, "foo");
             List<byte> otherSeparator = [.. Encoding.UTF8.GetBytes("\t")];
-            ValidationFeedback? nullableFeedback = validator.Validate(otherSeparator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? nullableFeedback = validator.Validate(otherSeparator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1, "foo");
 
             Assert.IsNotNull(nullableFeedback);
-            ValidationFeedback feedback = (ValidationFeedback)nullableFeedback;
-            Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInconsistentSeparator, feedback.Rule);
-            Assert.AreEqual(ValidationFeedbackLevel.Warning, feedback.Level);
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = (KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)nullableFeedback;
+            Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInconsistentSeparator, feedback.Key.Rule);
+            Assert.AreEqual(ValidationFeedbackLevel.Warning, feedback.Key.Level);
 
         
         }
@@ -39,8 +39,8 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         {
             DataSeparatorValidator validator = new();
             List<byte> separator = [.. Encoding.UTF8.GetBytes(" ")];
-            validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
-            ValidationFeedback? nullableFeedback = validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1);
+            validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1, "foo");
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? nullableFeedback = validator.Validate(separator, EntryType.DataItemSeparator, Encoding.UTF8, 1, 1, "foo");
             Assert.IsNull(nullableFeedback);
         }
     }

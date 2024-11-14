@@ -16,7 +16,7 @@
         public int KeyStartLineIndex { get; } = keyStartLineIndex;
 
         /// <summary>
-        /// Character indexes of the line changes in the entry starting from the entry start-
+        /// Character indexes of the line changes in the entry starting from the entry start.
         /// </summary>
         public int[] LineChangeIndexes { get; } = lineChangeIndexes;
     }

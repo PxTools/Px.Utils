@@ -10,5 +10,5 @@ using System.Diagnostics.CodeAnalysis;
     "S2583:Conditionally executed code should be reachable",
     Justification = "False positive",
     Scope = "member",
-    Target = "~M:Px.Utils.Models.Metadata.ExtensionMethods.PropertyExtensions.ParseStringList(System.String,System.Char,System.Char)~System.Collections.Generic.List{System.String}"
+    Target = "~M:Px.Utils.Models.Metadata.ExtensionMethods.PropertyUtilities.ParseStringList(System.String,System.Char,System.Char)~System.Collections.Generic.List{System.String}"
     )]

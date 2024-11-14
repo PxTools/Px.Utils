@@ -6,12 +6,12 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 {
     internal sealed class MockCustomContentValidationFunctions : CustomContentValidationFunctions
     {
-        internal static ValidationFeedbackItem[]? MockFindKeywordFunction(ValidationStructuredEntry[] entries, ContentValidator validator)
+        internal static ValidationFeedback? MockFindKeywordFunction(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
             return null;
         }
 
-        internal static ValidationFeedbackItem[]? MockEntryFunction(ValidationStructuredEntry entry, ContentValidator validator)
+        internal static ValidationFeedback? MockEntryFunction(ValidationStructuredEntry entry, ContentValidator validator)
         {
             return null;
         }

@@ -15,7 +15,7 @@ namespace Px.Utils.PxFile.Data
         /// <param name="conf">A configuration object that contains symbols used in the px file syntax.</param>
         /// <param name="bufferSize">The size of the buffer to use when reading from the stream. Defaults to 4096.</param>
         /// <returns>The position of the keyword in the stream if found, otherwise -1.</returns>
-        public static long FindKeywordPosition(Stream stream, string keyword, PxFileSyntaxConf conf, int bufferSize = 4096)
+        public static long FindKeywordPosition(Stream stream, string keyword, PxFileConfiguration conf, int bufferSize = 4096)
         {
             return FindKeywordPostionImpl(stream, keyword, conf, bufferSize);
         }
@@ -29,7 +29,7 @@ namespace Px.Utils.PxFile.Data
         /// <param name="cToken">A token that can be used to cancel the operation. Defaults to None.</param>
         /// <param name="bufferSize">The size of the buffer to use when reading from the stream. Defaults to 4096.</param>
         /// <returns>The task result contains the position of the keyword in the stream if found, otherwise -1.</returns>
-        public async static Task<long> FindKeywordPositionAsync(Stream stream, string keyword, PxFileSyntaxConf conf, CancellationToken? cToken = null, int bufferSize = 4096)
+        public async static Task<long> FindKeywordPositionAsync(Stream stream, string keyword, PxFileConfiguration conf, CancellationToken? cToken = null, int bufferSize = 4096)
         {
             return await Task.Factory.StartNew(
                 () => FindKeywordPostionImpl(stream, keyword, conf, bufferSize, cToken), cToken
@@ -37,7 +37,7 @@ namespace Px.Utils.PxFile.Data
             );
         }
 
-        private static long FindKeywordPostionImpl(Stream stream, string keyword, PxFileSyntaxConf conf, int bufferSize = 4096, CancellationToken? cancellationToken = null)
+        private static long FindKeywordPostionImpl(Stream stream, string keyword, PxFileConfiguration conf, int bufferSize = 4096, CancellationToken? cancellationToken = null)
         {
             char entrySeparator = conf.Symbols.EntrySeparator;
 

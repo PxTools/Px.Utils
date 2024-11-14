@@ -10,14 +10,14 @@ namespace Px.Utils.Validation.ContentValidation
     /// <param name="encoding"> encoding of the Px file</param>
     /// <param name="entries">Array of <see cref="ValidationStructuredEntry"/> objects that represent key-value entries of the Px file metadata</param>"
     /// <param name="customContentValidationFunctions">Object that contains any optional additional validation functions</param>
-    /// <param name="syntaxConf">Object that stores syntax specific symbols and tokens for the Px file</param>
+    /// <param name="conf">Configuration for the px file. Can change symbols, tokens and some content related options.</param>
     /// </summary>
     public sealed partial class ContentValidator(
         string filename,
         Encoding encoding,
         ValidationStructuredEntry[] entries,
         CustomContentValidationFunctions? customContentValidationFunctions = null,
-        PxFileSyntaxConf? syntaxConf = null) : IPxFileValidator
+        PxFileConfiguration? conf = null) : IValidator
     {
         private readonly string _filename = filename;
         private readonly Encoding _encoding = encoding;
@@ -46,9 +46,9 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         private Dictionary<KeyValuePair<string, string>, string[]>? _dimensionValueNames;
         /// <summary>
-        /// Object that stores syntax specific symbols and tokens for the Px file
+        /// Stores the file configuration.
         /// </summary>
-        private PxFileSyntaxConf SyntaxConf { get; } = syntaxConf ?? PxFileSyntaxConf.Default;
+        private PxFileConfiguration Conf { get; } = conf ?? PxFileConfiguration.Default;
 
         /// <summary>
         /// Validates contents of Px file metadata. Metadata syntax must be valid for this method to work properly.
@@ -56,7 +56,6 @@ namespace Px.Utils.Validation.ContentValidation
         /// <returns><see cref="ContentValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
         public ContentValidationResult Validate()
         {
-
             IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
             IEnumerable<ContentValidationFindKeywordValidator> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
 
@@ -66,11 +65,11 @@ namespace Px.Utils.Validation.ContentValidation
                 contentValidationFindKeywordFunctions = contentValidationFindKeywordFunctions.Concat(customContentValidationFunctions.CustomContentValidationFindKeywordFunctions);
             }
 
-            List <ValidationFeedbackItem> feedbackItems = [];
+            ValidationFeedback feedbackItems = [];
 
             foreach (ContentValidationFindKeywordValidator findingFunction in contentValidationFindKeywordFunctions)
             {
-                ValidationFeedbackItem[]? feedback = findingFunction(entries, this);
+                ValidationFeedback? feedback = findingFunction(entries, this);
                 if (feedback is not null)
                 {
                     feedbackItems.AddRange(feedback);
@@ -80,43 +79,41 @@ namespace Px.Utils.Validation.ContentValidation
             {
                 foreach (ValidationStructuredEntry entry in entries)
                 {
-                    ValidationFeedbackItem[]? feedback = entryFunction(entry, this);
+                    ValidationFeedback? feedback = entryFunction(entry, this);
                     if (feedback is not null)
                     {
                         feedbackItems.AddRange(feedback);
                     }
                 }
             }
-
             int lengthOfDataRows = _headingDimensionNames is not null ? GetProductOfDimensionValues(_headingDimensionNames) : 0;
             int amountOfDataRows = _stubDimensionNames is not null ? GetProductOfDimensionValues(_stubDimensionNames) : 0;
-
             ResetFields();
 
-            return new ContentValidationResult([.. feedbackItems], lengthOfDataRows, amountOfDataRows);
+            return new ContentValidationResult(feedbackItems, lengthOfDataRows, amountOfDataRows);
         }
 
         #region Interface implementation
 
-        ValidationResult IPxFileValidator.Validate()
+        ValidationResult IValidator.Validate()
             => Validate();
 
         #endregion
 
         private int GetProductOfDimensionValues(Dictionary<string, string[]> dimensions)
         {
-            string? lang = _defaultLanguage ?? _availableLanguages?[0];
-            if (lang is null)
+            string? lang = _defaultLanguage ?? _availableLanguages?[0] ?? string.Empty;
+            if (lang is null || dimensions.Count == 0)
             {
                 return 0;
             }
-            string[] headingDimensionNames = dimensions[lang];
-            if (headingDimensionNames is null || headingDimensionNames.Length == 0 || _dimensionValueNames is null)
+            string[] dimensionNames = dimensions[lang];
+            if (dimensionNames is null || dimensionNames.Length == 0 || _dimensionValueNames is null || _dimensionValueNames.Count == 0)
             {
                 return 0;
             }
             return _dimensionValueNames
-                .Where(kvp => headingDimensionNames
+                .Where(kvp => dimensionNames
                 .Contains(kvp.Key.Value)).Select(kvp => kvp.Value.Length)
                 .Aggregate((a, b) => a * b);
         }

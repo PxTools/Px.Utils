@@ -1,4 +1,6 @@
 ﻿using Px.Utils.Models.Metadata.Dimensions;
+using Px.Utils.Models.Metadata.MetaProperties;
+using System.Text.Json.Serialization;
 
 namespace Px.Utils.Models.Metadata
 {
@@ -42,6 +44,7 @@ namespace Px.Utils.Models.Metadata
 
         IReadOnlyDictionary<string, MetaProperty> IReadOnlyMatrixMetadata.AdditionalProperties => AdditionalProperties;
 
+        [JsonIgnore]
         IReadOnlyList<IDimensionMap> IMatrixMap.DimensionMaps => Dimensions;
 
         public MatrixMetadata GetTransform(IMatrixMap map)
