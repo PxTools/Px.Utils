@@ -1,12 +1,15 @@
-﻿using Px.Utils.Models.Metadata;
-using Px.Utils.Language;
+﻿using Px.Utils.Language;
 using Px.Utils.Models.Metadata.Enums;
+using Px.Utils.Models.Metadata.MetaProperties;
+using Px.Utils.Serializers.Json;
+using System.Text.Json.Serialization;
 
 namespace Px.Utils.Models.Metadata.Dimensions
 {
     /// <summary>
     /// Readonly interface for a dimension object in a structured format.
     /// </summary>
+    [JsonConverter(typeof(DimensionConverter))]
     public interface IReadOnlyDimension : IDimensionMap
     {
         /// <summary>

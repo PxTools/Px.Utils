@@ -3,7 +3,7 @@ using PxFileTests.Fixtures;
 using Px.Utils.Exceptions;
 using Px.Utils.PxFile.Metadata;
 
-namespace PxFileTests.reader.ests
+namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
 {
     [TestClass]
     public class ReadMetadataTests
@@ -143,7 +143,7 @@ namespace PxFileTests.reader.ests
             // Act
             Encoding encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IList<KeyValuePair<string, string>> metadata = reader.ReadMetadata(stream, encoding, null, 28).ToList();
+            IList<KeyValuePair<string, string>> metadata = reader.ReadMetadata(stream, encoding, 28).ToList();
 
             // Assert
             Assert.AreEqual(8, metadata.Count);

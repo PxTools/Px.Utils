@@ -8,13 +8,13 @@ namespace Px.Utils.Validation.DataValidation
     {
         private static readonly HashSet<string> ValidStringDataItems =
         [
-            PxFileSyntaxConf.Default.Tokens.DataValues.DataIsMissing,
-            PxFileSyntaxConf.Default.Tokens.DataValues.DataCategoryNotApplicable,
-            PxFileSyntaxConf.Default.Tokens.DataValues.DataIsConfidential,
-            PxFileSyntaxConf.Default.Tokens.DataValues.DataIsNotAvailable,
-            PxFileSyntaxConf.Default.Tokens.DataValues.DataHasNotBeenAsked,
-            PxFileSyntaxConf.Default.Tokens.DataValues.Missing6,
-            PxFileSyntaxConf.Default.Tokens.DataValues.DataIsNone
+            PxFileConfiguration.Default.Tokens.DataValues.DataIsMissing,
+            PxFileConfiguration.Default.Tokens.DataValues.DataCategoryNotApplicable,
+            PxFileConfiguration.Default.Tokens.DataValues.DataIsConfidential,
+            PxFileConfiguration.Default.Tokens.DataValues.DataIsNotAvailable,
+            PxFileConfiguration.Default.Tokens.DataValues.DataHasNotBeenAsked,
+            PxFileConfiguration.Default.Tokens.DataValues.Missing6,
+            PxFileConfiguration.Default.Tokens.DataValues.DataIsNone
         ];
 
         /// <summary>
@@ -25,14 +25,15 @@ namespace Px.Utils.Validation.DataValidation
         /// <param name="encoding">Encoding format of the Px file.</param>
         /// <param name="lineNumber">Line number for the validation item.</param>
         /// <param name="charPos">Represents the position relative to the line for the validation item.</param>
-        /// <returns><see cref="ValidationFeedback"/> object if the entry is not a missing value string sequence, otherwise null.</returns>
-        public ValidationFeedback? Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos)
+        /// <returns>Key value pair containing information about the rule violation if the entry is not a missing value string sequence, otherwise null.</returns>
+        public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, string filename)
         {
             string value = encoding.GetString(entry.ToArray());
             if (!ValidStringDataItems.Contains(value))
             {
-                return new ValidationFeedback(ValidationFeedbackLevel.Error,
-                ValidationFeedbackRule.DataValidationFeedbackInvalidString, lineNumber, charPos, $"{value}");
+                return new(
+                    new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidString),
+                    new(filename, lineNumber, charPos, $"{value}"));
             }
             else
             {
@@ -55,17 +56,15 @@ namespace Px.Utils.Validation.DataValidation
         /// <param name="encoding">Encoding format of the Px file.</param>
         /// <param name="lineNumber">Line number for the validation item.</param>
         /// <param name="charPos">Represents the position relative to the line for the validation item.</param>
-        /// <returns><see cref="ValidationFeedback"/> object if the entry is not a valid number, otherwise null.</returns>
-        public ValidationFeedback?Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos)
+        /// <returns>Key value pair containing information about the rule violation if the entry is not a valid number, otherwise null.</returns>
+        public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, string filename)
         {
             if (entry.Count >= MaxLength && !decimal.TryParse(entry.ToArray(), out _))
             {
-                return new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.DataValidationFeedbackInvalidNumber,
-                    lineNumber,
-                    charPos,
-                    encoding.GetString(entry.ToArray()));
+                return new(
+                    new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber),
+                    new(filename, lineNumber, charPos, encoding.GetString(entry.ToArray()))
+                );
             }
 
             int decimalSeparatorIndex = entry.IndexOf(0x2E);
@@ -73,12 +72,10 @@ namespace Px.Utils.Validation.DataValidation
             {
                 if (!IsValidIntegerPart(entry, true))
                 {
-                    return new ValidationFeedback(
-                        ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.DataValidationFeedbackInvalidNumber,
-                        lineNumber,
-                        charPos,
-                        encoding.GetString(entry.ToArray()));
+                    return new(
+                        new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber),
+                        new(filename, lineNumber, charPos, encoding.GetString(entry.ToArray()))
+                    );
                 }
                 else
                 {
@@ -87,12 +84,11 @@ namespace Px.Utils.Validation.DataValidation
             }
             else if (decimalSeparatorIndex == 0 || !IsValidIntegerPart(entry[0..decimalSeparatorIndex], false) || !IsValidDecimalPart(entry[decimalSeparatorIndex..]))
             {
-                return new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.DataValidationFeedbackInvalidNumber,
-                    lineNumber,
-                    charPos,
-                    encoding.GetString(entry.ToArray()));
+
+                return new(
+                    new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidNumber),
+                    new(filename, lineNumber, charPos, encoding.GetString(entry.ToArray()))
+                );
             }
             else
             {
@@ -103,7 +99,6 @@ namespace Px.Utils.Validation.DataValidation
         private static bool IsValidIntegerPart(List<byte> entry, bool isInteger)
         {
             bool isNegative = entry[0] == 0x2D;
-            bool startsWithZero = isNegative ? entry[1] == zero : entry[0] == zero;
             List<byte> digits = isNegative ? entry.Skip(1).ToList() : entry;
             if (digits.Count > 1)
             {
@@ -111,12 +106,13 @@ namespace Px.Utils.Validation.DataValidation
                 {
                     return false;
                 }
+                bool startsWithZero = isNegative ? entry[1] == zero : entry[0] == zero;
                 if (startsWithZero && isInteger)
                 {
                     return false;
                 }
             }
-            if (isNegative && isInteger && digits[0] == zero)
+            if (isNegative && isInteger && digits.Count > 0 && digits[0] == zero)
             {
                 return false;
             }
@@ -142,8 +138,8 @@ namespace Px.Utils.Validation.DataValidation
         /// <param name="encoding">Encoding format of the Px file.</param>
         /// <param name="lineNumber">Line number for the validation item.</param>
         /// <param name="charPos">Represents the position relative to the line for the validation item.</param>
-        /// <returns><see cref="ValidationFeedback"/> object if the entry is not a valid item separator, otherwise null.</returns>
-        public ValidationFeedback? Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos)
+        /// <returns>Key value pair containing information about the rule violation if the entry is not a valid item separator, otherwise null.</returns>
+        public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, string filename)
         {
             if (_separator == entry[0])
             {
@@ -155,11 +151,10 @@ namespace Px.Utils.Validation.DataValidation
                 return null;
             }
 
-            return new ValidationFeedback(
-                    ValidationFeedbackLevel.Warning,
-                    ValidationFeedbackRule.DataValidationFeedbackInconsistentSeparator,
-                    lineNumber,
-                    charPos);
+            return new(
+                new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.DataValidationFeedbackInconsistentSeparator),
+                new(filename, lineNumber, charPos)
+            );
         }
 
         private const byte Sentinel = 0x0;
@@ -187,8 +182,8 @@ namespace Px.Utils.Validation.DataValidation
         /// <param name="lineNumber">Line number for the validation item.</param>
         /// <param name="charPos">Represents the position relative to the line for the validation item.</param>
         /// <param name="feedbacks">Reference to a list of feedback items to which any validation feedback is added to.</param>
-        /// <returns><see cref="ValidationFeedback"/> object if the entry sequence is invalid. Otherwise null.</returns>
-        public ValidationFeedback? Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos)
+        /// <returns>Key value pair containing information about the rule violation if the entry sequence is invalid. Otherwise null.</returns>
+        public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, string filename)
         {
             if (_allowedPreviousTokens[entryType].Contains(_previousTokenType))
             {
@@ -199,12 +194,10 @@ namespace Px.Utils.Validation.DataValidation
             string additionalInfo = $"{_previousTokenType},{entryType}";
             _previousTokenType = entryType;
 
-            return new ValidationFeedback(
-                    ValidationFeedbackLevel.Error,
-                    ValidationFeedbackRule.DataValidationFeedbackInvalidStructure,
-                    lineNumber,
-                    charPos,
-                    additionalInfo);
+            return new(
+                new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidStructure),
+                new(filename, lineNumber, charPos, additionalInfo)
+            );
         }
     }
 }

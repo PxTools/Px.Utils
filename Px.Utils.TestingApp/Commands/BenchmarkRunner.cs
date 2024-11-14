@@ -14,6 +14,7 @@
             _benchmarks.Add("data-validation", new DataValidationBenchmark());
             _benchmarks.Add("file-validation", new PxFileValidationBenchmark());
             _benchmarks.Add("computation", new ComputationBenchmark());
+            _benchmarks.Add("database-validation", new DatabaseValidationBenchmark());
         }
 
         internal override string Help

@@ -1,5 +1,4 @@
-﻿using Px.Utils.PxFile;
-using Px.Utils.UnitTests.Validation.Fixtures;
+﻿using Px.Utils.UnitTests.Validation.Fixtures;
 using Px.Utils.Validation;
 using Px.Utils.Validation.ContentValidation;
 using Px.Utils.Validation.SyntaxValidation;
@@ -41,10 +40,10 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             ContentValidator validator = new(filename, encoding, entries);
 
             // Act
-            ValidationFeedbackItem[] feedback = validator.Validate().FeedbackItems;
+            ContentValidationResult feedback = validator.Validate();
 
             // Assert
-            Assert.AreEqual(0, feedback.Length);
+            Assert.AreEqual(0, feedback.FeedbackItems.Count);
         }
 
         [TestMethod]
@@ -55,15 +54,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             ContentValidator validator = new(filename, encoding, entries);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindDefaultLanguage(
+            ValidationFeedback? result = ContentValidator.ValidateFindDefaultLanguage(
                 entries,
                 validator
                 );
                 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.MissingDefaultLanguage, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.MissingDefaultLanguage, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -74,15 +73,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             ContentValidator validator = new(filename, encoding, entries);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindAvailableLanguages(
+            ValidationFeedback? result = ContentValidator.ValidateFindAvailableLanguages(
                 entries,
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -95,15 +94,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             SetValidatorField(validator, "_availableLanguages", availableLanguages);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateDefaultLanguageDefinedInAvailableLanguages(
+            ValidationFeedback? result = ContentValidator.ValidateDefaultLanguageDefinedInAvailableLanguages(
                 entries,
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.UndefinedLanguageFound, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.UndefinedLanguageFound, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -116,15 +115,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             SetValidatorField(validator, "_availableLanguages", availableLanguages);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindContentDimension(
+            ValidationFeedback? result = ContentValidator.ValidateFindContentDimension(
                 entries,
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -135,17 +134,36 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             ContentValidator validator = new(filename, encoding, entries);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindRequiredCommonKeys(
+            ValidationFeedback? result = ContentValidator.ValidateFindRequiredCommonKeys(
                 entries,
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(3, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result[0].Feedback.Rule);
-            Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result[1].Feedback.Rule);
-            Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result[2].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(3, result.First().Value.Count);   
+            Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result.First().Key.Rule);
+        }
+
+        [TestMethod]
+        public void ValidateFindStubOrHeadingCalledWithListsOfNamesReturnWithNoErrors()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_MULTIPLE_DIMENSION_NAMES;
+            ContentValidator validator = new(filename, encoding, entries);
+            SetValidatorField(validator, "_defaultLanguage", defaultLanguage);
+            SetValidatorField(validator, "_availableLanguages", availableLanguages);
+
+            // Act
+            ValidationFeedback? result = ContentValidator.ValidateFindStubAndHeading(
+                entries,
+                validator
+                );
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Count);
         }
 
         [TestMethod]
@@ -158,15 +176,36 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             SetValidatorField(validator, "_availableLanguages", availableLanguages);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindStubAndHeading(
+            ValidationFeedback? result = ContentValidator.ValidateFindStubAndHeading(
                 entries,
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.MissingStubAndHeading, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.MissingStubAndHeading, result.First().Key.Rule);
+        }
+
+        [TestMethod]
+        public void ValidateFindStubOrHeadingCalledWithDuplicateDimensionsReturnsWithWarning()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_DUPLICATE_DIMENSION;
+            ContentValidator validator = new(filename, encoding, entries);
+            SetValidatorField(validator, "_defaultLanguage", defaultLanguage);
+            SetValidatorField(validator, "_availableLanguages", availableLanguages);
+
+            // Act
+            ValidationFeedback? result = ContentValidator.ValidateFindStubAndHeading(
+                entries,
+                validator
+                );
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.DuplicateDimension, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -180,16 +219,16 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             SetValidatorField(validator, "_availableLanguages", availableLanguages);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindRecommendedKeys(
+            ValidationFeedback? result = ContentValidator.ValidateFindRecommendedKeys(
                 entries,
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(2, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result[0].Feedback.Rule);
-            Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result[1].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(2, result.First().Value.Count);
+            Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -207,21 +246,50 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
                 });
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindDimensionValues(
+            ValidationFeedback? result = ContentValidator.ValidateFindDimensionValues(
                 entries,
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(3, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.VariableValuesMissing, result[0].Feedback.Rule);
-            Assert.AreEqual(ValidationFeedbackRule.VariableValuesMissing, result[1].Feedback.Rule);
-            Assert.AreEqual(ValidationFeedbackRule.VariableValuesMissing, result[2].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(3, result.First().Value.Count);
+            Assert.AreEqual(ValidationFeedbackRule.VariableValuesMissing, result.First().Key.Rule);
         }
 
         [TestMethod]
-        public void ValidateFindContentDimensionKeysCalledWithInvalidContentValueKeyEntriesSReturnsWithErrors()
+        public void ValidateFindDimensionValuesCalledWithDuplicateEntriesReturnsErrors()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_DUPLICATE_DIMENSION_VALUES;
+            ContentValidator validator = new(filename, encoding, entries);
+            SetValidatorField(validator, "_defaultLanguage", defaultLanguage);
+            SetValidatorField(validator, "_availableLanguages", availableLanguages);
+            SetValidatorField(validator, "_stubDimensionNames", new Dictionary<string, string[]>
+            {
+                { "fi", ["bar"] },
+                { "en", ["bar-en"] }
+            });
+            SetValidatorField(validator, "_headingDimensionNames", new Dictionary<string, string[]>
+            {
+                { "fi", ["bar"] },
+            });
+
+            // Act
+            ValidationFeedback? result = ContentValidator.ValidateFindDimensionValues(
+                entries,
+                validator
+                );
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.DuplicateEntry, result.First().Key.Rule);
+        }
+
+        [TestMethod]
+        public void ValidateFindContentDimensionKeysCalledWithMissingContentValueKeyEntriesReturnsWithErrors()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_INVALID_CONTENT_VALUE_KEY_ENTRIES;
@@ -236,16 +304,48 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
                 });
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindContentDimensionKeys(
+            ValidationFeedback? result = ContentValidator.ValidateFindContentDimensionKeys(
                 entries,
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(2, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result[0].Feedback.Rule);
-            Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result[1].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(2, result.First().Value.Count);
+            Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result.First().Key.Rule);
+        }
+
+        [TestMethod]
+        public void ValidateFindContentDimensionKeysCalledWithMissingRecommendedSpecifiersEntriesReturnsWithWarnings()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_MISSING_RECIMMENDED_SPECIFIERS;
+            ContentValidator validator = new(filename, encoding, entries);
+            SetValidatorField(validator, "_defaultLanguage", defaultLanguage);
+            SetValidatorField(validator, "_availableLanguages", availableLanguages);
+            SetValidatorField(validator, "_contentDimensionNames", contentDimensionNames);
+            SetValidatorField(validator, "_dimensionValueNames", new Dictionary<KeyValuePair<string, string>, string[]>
+                {
+                    { new KeyValuePair<string, string>( "fi", "bar" ), ["foo"] },
+                    { new KeyValuePair<string, string>( "en", "bar-en" ), ["foo-en"] },
+                });
+            ValidationFeedbackKey recommendedKeyFeedbackKey = new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.RecommendedKeyMissing);
+            ValidationFeedbackKey recommendedSpecifierFeedbackKey = new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.RecommendedSpecifierDefinitionMissing); 
+
+
+            // Act
+            ValidationFeedback? result = ContentValidator.ValidateFindContentDimensionKeys(
+                entries,
+                validator
+                );
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count);
+            Assert.IsTrue(result.ContainsKey(recommendedKeyFeedbackKey));
+            Assert.IsTrue(result.ContainsKey(recommendedSpecifierFeedbackKey));
+            Assert.AreEqual(2, result[recommendedSpecifierFeedbackKey].Count);
         }
 
         [TestMethod]
@@ -260,18 +360,16 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             SetValidatorField(validator, "_stubDimensionNames", stubDimensionNames);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindDimensionRecommendedKeys(
+            ValidationFeedback? result = ContentValidator.ValidateFindDimensionRecommendedKeys(
                 entries,
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(4, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result[0].Feedback.Rule);
-            Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result[1].Feedback.Rule);
-            Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result[2].Feedback.Rule);
-            Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result[3].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(4, result.First().Value.Count);
+            Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -282,15 +380,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             ContentValidator validator = new(filename, encoding, entries);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateUnexpectedSpecifiers(
+            ValidationFeedback? result = ContentValidator.ValidateUnexpectedSpecifiers(
                 entries[0],
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.IllegalSpecifierDefinitionFound, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalSpecifierDefinitionFound, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -301,15 +399,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             ContentValidator validator = new(filename, encoding, entries);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateUnexpectedLanguageParams(
+            ValidationFeedback? result = ContentValidator.ValidateUnexpectedLanguageParams(
                 entries[0],
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.IllegalLanguageDefinitionFound, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalLanguageDefinitionFound, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -322,15 +420,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             SetValidatorField(validator, "_availableLanguages", availableLanguages);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateLanguageParams(
+            ValidationFeedback? result = ContentValidator.ValidateLanguageParams(
                 entries[0],
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.UndefinedLanguageFound, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.UndefinedLanguageFound, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -345,15 +443,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             SetValidatorField(validator, "_dimensionValueNames", dimensionValueNames);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateSpecifiers(
+            ValidationFeedback? result = ContentValidator.ValidateSpecifiers(
                 entries[0],
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.IllegalSpecifierDefinitionFound, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalSpecifierDefinitionFound, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -368,15 +466,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             SetValidatorField(validator, "_dimensionValueNames", dimensionValueNames);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateSpecifiers(
+            ValidationFeedback? result = ContentValidator.ValidateSpecifiers(
                 entries[0],
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.IllegalSpecifierDefinitionFound, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.IllegalSpecifierDefinitionFound, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -389,15 +487,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             // Act
             foreach (ValidationStructuredEntry entry in entries)
             {
-                ValidationFeedbackItem[]? result = ContentValidator.ValidateValueTypes(
+                ValidationFeedback? result = ContentValidator.ValidateValueTypes(
                     entry,
                     validator
                     );
 
                 // Assert
                 Assert.IsNotNull(result);
-                Assert.AreEqual(1, result.Length);
-                Assert.AreEqual(ValidationFeedbackRule.UnmatchingValueType, result[0].Feedback.Rule);
+                Assert.AreEqual(1, result.Count);
+                Assert.AreEqual(ValidationFeedbackRule.UnmatchingValueType, result.First().Key.Rule);
             }
         }
 
@@ -411,15 +509,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             // Act
             foreach (ValidationStructuredEntry entry in entries)
             {
-                ValidationFeedbackItem[]? result = ContentValidator.ValidateValueContents(
+                ValidationFeedback? result = ContentValidator.ValidateValueContents(
                     entry,
                     validator
                     );
 
                 // Assert
                 Assert.IsNotNull(result);
-                Assert.AreEqual(1, result.Length);
-                Assert.AreEqual(ValidationFeedbackRule.InvalidValueFound, result[0].Feedback.Rule);
+                Assert.AreEqual(1, result.Count);
+                Assert.AreEqual(ValidationFeedbackRule.InvalidValueFound, result.First().Key.Rule);
             }
         }
 
@@ -435,15 +533,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             SetValidatorField(validator, "_dimensionValueNames", dimensionValueNames);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateValueAmounts(
+            ValidationFeedback? result = ContentValidator.ValidateValueAmounts(
                 entries[0],
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.UnmatchingValueAmount, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.UnmatchingValueAmount, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -454,15 +552,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             ContentValidator validator = new(filename, encoding, entries);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateValueUppercaseRecommendations(
+            ValidationFeedback? result = ContentValidator.ValidateValueUppercaseRecommendations(
                 entries[0],
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.ValueIsNotInUpperCase, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.ValueIsNotInUpperCase, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -473,10 +571,10 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             ContentValidator validator = new(filename, encoding, entries, new MockCustomContentValidationFunctions());
 
             // Act
-            ValidationFeedbackItem[] feedback = validator.Validate().FeedbackItems;
+            ValidationFeedback feedback = validator.Validate().FeedbackItems;
 
             // Assert
-            Assert.AreEqual(0, feedback.Length);
+            Assert.AreEqual(0, feedback.Count);
         }
 
         [TestMethod]
@@ -487,15 +585,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             ContentValidator validator = new(filename, encoding, entries);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindDefaultLanguage(
+            ValidationFeedback? result = ContentValidator.ValidateFindDefaultLanguage(
                 entries,
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.MultipleInstancesOfUniqueKey, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.MultipleInstancesOfUniqueKey, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -506,15 +604,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             ContentValidator validator = new(filename, encoding, entries);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindAvailableLanguages(
+            ValidationFeedback? result = ContentValidator.ValidateFindAvailableLanguages(
                 entries,
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.MultipleInstancesOfUniqueKey, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.MultipleInstancesOfUniqueKey, result.First().Key.Rule);
         }
 
         [TestMethod]
@@ -525,15 +623,15 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             ContentValidator validator = new(filename, encoding, entries);
 
             // Act
-            ValidationFeedbackItem[]? result = ContentValidator.ValidateFindStubAndHeading(
+            ValidationFeedback? result = ContentValidator.ValidateFindStubAndHeading(
                 entries,
                 validator
                 );
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(ValidationFeedbackRule.MissingStubAndHeading, result[0].Feedback.Rule);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(ValidationFeedbackRule.MissingStubAndHeading, result.First().Key.Rule);
         }
 
         private static void SetValidatorField(ContentValidator validator, string fieldName, object value)

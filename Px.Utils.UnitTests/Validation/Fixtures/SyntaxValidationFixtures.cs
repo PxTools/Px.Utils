@@ -42,6 +42,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
             "\"mauris\", \"vitae\", \"ultricies\", \"leo\", \"integer\", \"malesuada\", \"nunc\", \"vel\", \"commodo\", \"viverra\",\n" +
             "\"maecenas\", \"accumsan\", \"lacus\", \"vel\",  \"facilisis\", \"volutpat\", \"est\", \"velit\", \"egestas\", \"dui\",\n" + // Excess whitespace
             "\"id\", \"ornare\";\n" +
+            "\"ENDOFMETADATA\";\n" + // Missing value
             "DATA=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20;";
 
         internal static string UTF8_N_WITH_TIMEVALS =>
@@ -98,7 +99,9 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
             ];
 
         internal static List<ValidationKeyValuePair> KEYVALUEPAIR_WITH_ILLEGAL_SYMBOLS_IN_SPECIFIER_SECTIONS => [
-            new("foo", new KeyValuePair<string, string>("FOO([\"first_specifier\"], [\"second_specifier\"])", "YES\n"), 0, [], 0)
+            new("foo", new KeyValuePair<string, string>("FOO([\"first_specifier\"], [\"second_specifier\"])", "YES\n"), 0, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOO(\"first_specifier\",, \"second_specifier\")", "YES\n"), 1, [], 0),
+            new("foo", new KeyValuePair<string, string>("FOO(\"first_specifier\"-\"second_specifier\")", "YES\n"), 2, [], 0)
             ];
 
         private const string multilineStringValue = "\"dis parturient montes nascetur ridiculus mus\"\n" +
@@ -171,7 +174,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         ];
 
         private readonly static ValidationStructuredEntryKey illegalSpecifier = new("FOO", "fi", "first\"specifier");
-        internal static List<ValidationStructuredEntry> STRUCTIRED_ENTRIES_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIERS => [
+        internal static List<ValidationStructuredEntry> STRUCTIRED_ENTRIES_WITH_ILLEGAL_CHARACTERS_IN_SPECIFIER_PARTS => [
             new("foo", illegalSpecifier, "foo", 0, [], 0, Utils.Validation.ValueType.StringValue)
         ];
 

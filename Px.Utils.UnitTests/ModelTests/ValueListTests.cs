@@ -20,7 +20,7 @@ namespace Px.Utils.UnitTests.ModelTests
             // Act
             string[] codes = valueList.Map(v => v.Code).ToArray();
             string[] names = valueList.Map(v => v.Name["en"]).ToArray();
-            bool[] isVirtual = valueList.Map(v => v.Virtual).ToArray();
+            bool[] isVirtual = valueList.Map(v => v.IsVirtual).ToArray();
 
             // Assert
             Assert.AreEqual(2, codes.Length);

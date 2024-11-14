@@ -6,17 +6,17 @@ namespace Px.Utils.UnitTests.Validation.SyntaxValidationTests
 {
     internal sealed class MockCustomSyntaxValidationFunctions : CustomSyntaxValidationFunctions
     {
-        internal static ValidationFeedbackItem? MockEntryValidationFunction(ValidationEntry validationEntry, PxFileSyntaxConf syntaxConf)
+        internal static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? MockEntryValidationFunction(ValidationEntry validationEntry, PxFileConfiguration conf)
         {
             return null;
         }
 
-        internal static ValidationFeedbackItem? MockKeyValuePairValidationFunction(ValidationKeyValuePair validationEntry, PxFileSyntaxConf syntaxConf)
+        internal static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? MockKeyValuePairValidationFunction(ValidationKeyValuePair validationEntry, PxFileConfiguration conf)
         {
             return null;
         }
 
-        internal static ValidationFeedbackItem? MockStructuredValidationFunction(ValidationStructuredEntry validationEntry, PxFileSyntaxConf syntaxConf)
+        internal static KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? MockStructuredValidationFunction(ValidationStructuredEntry validationEntry, PxFileConfiguration conf)
         {
             return null;
         }

@@ -20,7 +20,7 @@ namespace PxFileTests.DataTests
             using Stream stream = new MemoryStream(data);
 
             // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, "DATA", PxFileSyntaxConf.Default);
+            long position = StreamUtilities.FindKeywordPosition(stream, "DATA", PxFileConfiguration.Default);
 
             // Assert
             Assert.AreEqual(0, position);
@@ -34,7 +34,7 @@ namespace PxFileTests.DataTests
             using Stream stream = new MemoryStream(data);
 
             // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, "DATA", PxFileSyntaxConf.Default);
+            long position = StreamUtilities.FindKeywordPosition(stream, "DATA", PxFileConfiguration.Default);
 
             // Assert
             Assert.AreEqual(-1, position);
@@ -48,7 +48,7 @@ namespace PxFileTests.DataTests
             using Stream stream = new MemoryStream(data);
 
             // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, "DATA", PxFileSyntaxConf.Default);
+            long position = StreamUtilities.FindKeywordPosition(stream, "DATA", PxFileConfiguration.Default);
 
             // Assert
             Assert.AreEqual(15, position);
@@ -62,7 +62,7 @@ namespace PxFileTests.DataTests
             using Stream stream = new MemoryStream(data);
 
             // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, "DATA", PxFileSyntaxConf.Default);
+            long position = StreamUtilities.FindKeywordPosition(stream, "DATA", PxFileConfiguration.Default);
 
             // Assert
             Assert.AreEqual(-1, position);
@@ -76,7 +76,7 @@ namespace PxFileTests.DataTests
             using Stream stream = new MemoryStream(data);
 
             // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, "D", PxFileSyntaxConf.Default);
+            long position = StreamUtilities.FindKeywordPosition(stream, "D", PxFileConfiguration.Default);
 
             // Assert
             Assert.AreEqual(7, position);
@@ -92,7 +92,7 @@ namespace PxFileTests.DataTests
             using Stream stream = new MemoryStream(data);
 
             // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, keyword, PxFileSyntaxConf.Default);
+            long position = StreamUtilities.FindKeywordPosition(stream, keyword, PxFileConfiguration.Default);
             string result = Encoding.ASCII.GetString(data, (int)position, keyword.Length);
 
             // Assert
@@ -109,7 +109,7 @@ namespace PxFileTests.DataTests
             using Stream stream = new MemoryStream(data);
 
             // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, keyword, PxFileSyntaxConf.Default);
+            long position = StreamUtilities.FindKeywordPosition(stream, keyword, PxFileConfiguration.Default);
             string result = Encoding.ASCII.GetString(data, (int)position, keyword.Length);
 
             // Assert
@@ -126,7 +126,7 @@ namespace PxFileTests.DataTests
             using Stream stream = new MemoryStream(data);
 
             // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, keyword, PxFileSyntaxConf.Default, 3);
+            long position = StreamUtilities.FindKeywordPosition(stream, keyword, PxFileConfiguration.Default, 3);
             string result = Encoding.ASCII.GetString(data, (int)position, keyword.Length);
 
             // Assert
@@ -143,7 +143,7 @@ namespace PxFileTests.DataTests
             using Stream stream = new MemoryStream(data);
 
             // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, keyword, PxFileSyntaxConf.Default);
+            long position = StreamUtilities.FindKeywordPosition(stream, keyword, PxFileConfiguration.Default);
             string result = Encoding.ASCII.GetString(data, (int)position -1, keyword.Length+2);
 
             // Assert

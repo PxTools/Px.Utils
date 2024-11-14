@@ -1,5 +1,6 @@
-﻿using Px.Utils.PxFile.Data;
-using Px.Utils.Models.Data.DataValue;
+﻿using Px.Utils.Models.Data.DataValue;
+using Px.Utils.Models.Metadata;
+using Px.Utils.Models.Metadata.ExtensionMethods;
 
 namespace Px.Utils.PxFile.Data
 {
@@ -10,7 +11,8 @@ namespace Px.Utils.PxFile.Data
     public sealed class PxFileStreamDataReader : IPxFileStreamDataReader, IDisposable
     {
         private readonly Stream _stream;
-        private readonly PxFileSyntaxConf _conf;
+        private bool _disposed; // default false
+        private readonly PxFileConfiguration _conf;
         private long readIndex;
         private readonly int _readBufferSize;
         private readonly char _valueSeparator = ' ';
@@ -23,11 +25,11 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         /// <param name="stream">Px file stream</param>
         /// <param name="conf">Px file syntax configuration</param>
-        public PxFileStreamDataReader(Stream stream, PxFileSyntaxConf? conf = null, int readBufferSize = 4096)
+        public PxFileStreamDataReader(Stream stream, PxFileConfiguration? conf = null, int readBufferSize = 4096)
         {
             _stream = stream;
             _readBufferSize = readBufferSize;
-            _conf = conf ?? PxFileSyntaxConf.Default;
+            _conf = conf ?? PxFileConfiguration.Default;
         }
 
         /// <summary>
@@ -36,12 +38,12 @@ namespace Px.Utils.PxFile.Data
         /// <param name="stream">Px file stream</param>
         /// <param name="dataStart">Position of the first data point in the file</param>
         /// <param name="conf">Px file syntax configuration</param>
-        public PxFileStreamDataReader(Stream stream, long dataStart, PxFileSyntaxConf? conf = null, int readBufferSize = 4096)
+        public PxFileStreamDataReader(Stream stream, long dataStart, PxFileConfiguration? conf = null, int readBufferSize = 4096)
         {
             _stream = stream;
             _stream.Position = dataStart;
             _readBufferSize = readBufferSize;
-            _conf = conf ?? PxFileSyntaxConf.Default;
+            _conf = conf ?? PxFileConfiguration.Default;
         }
 
         #endregion
@@ -55,7 +57,8 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         /// <param name="buffer">The buffer to store the read values.</param>
         /// <param name="offset">The starting index in the buffer to begin storing the read values.</param>
-        /// <param name="indexer">Provides the indexes where the data will be read.</param>
+        /// <param name="target">Map defining the data to be read. Must be a submap of the <paramref name="complete"/> map.</param>
+        /// <param name="complete">Map defining the complete data set.</param>
         /// <param name="missingValueEncodings">
         /// An array of <see cref="double"/> values that represent missing data in the PX file in the following order:
         /// [0] "-"
@@ -66,11 +69,12 @@ namespace Px.Utils.PxFile.Data
         /// [5] "....."
         /// [6] "......"
         /// </param>
-        public void ReadUnsafeDoubles(double[] buffer, int offset, DataIndexer indexer, double[] missingValueEncodings)
+        /// <exception cref="ArgumentException">Thrown when the target map is not a submap of the complete map.</exception>"
+        public void ReadUnsafeDoubles(double[] buffer, int offset, IMatrixMap target, IMatrixMap complete, double[] missingValueEncodings)
         {
             SetReaderPositionIfZero();
-            ReadItemsFromStreamByCoordinate(buffer, offset, indexer, Parser);
-            
+            ReadItemsFromStreamByCoordinate(buffer, offset, target, complete, Parser);
+
             double Parser(char[] parseBuffer, int len)
             {
                 return DataValueParsers.FastParseUnsafeDoubleDangerous(parseBuffer, len, missingValueEncodings);
@@ -84,11 +88,13 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         /// <param name="buffer">The buffer to store the read values.</param>
         /// <param name="offset">The starting index in the buffer to begin storing the read values.</param>
-        /// <param name="indexer">Provides the indexes where the data will be read.</param>
-        public void ReadDoubleDataValues(DoubleDataValue[] buffer, int offset, DataIndexer indexer)
+        /// <param name="target">Map defining the data to be read. Must be a submap of the <paramref name="complete"/> map.</param>
+        /// <param name="complete">Map defining the complete data set.</param>
+        /// <exception cref="ArgumentException">Thrown when the target map is not a submap of the complete map.</exception>""
+        public void ReadDoubleDataValues(DoubleDataValue[] buffer, int offset, IMatrixMap target, IMatrixMap complete)
         {
             SetReaderPositionIfZero();
-            ReadItemsFromStreamByCoordinate(buffer, offset, indexer, DataValueParsers.FastParseDoubleDataValueDangerous);
+            ReadItemsFromStreamByCoordinate(buffer, offset, target, complete, DataValueParsers.FastParseDoubleDataValueDangerous);
         }
 
         /// <summary>
@@ -98,11 +104,13 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         /// <param name="buffer">The buffer to store the read values.</param>
         /// <param name="offset">The starting index in the buffer to begin storing the read values.</param>
-        /// <param name="indexer">Provides the indexes where the data will be read.</param>
-        public void ReadDecimalDataValues(DecimalDataValue[] buffer, int offset, DataIndexer indexer)
+        /// <param name="target">Map defining the data to be read. Must be a submap of the <paramref name="complete"/> map.</param>
+        /// <param name="complete">Map defining the complete data set.</param>
+        /// <exception cref="ArgumentException">Thrown when the target map is not a submap of the complete map.</exception>
+        public void ReadDecimalDataValues(DecimalDataValue[] buffer, int offset, IMatrixMap target, IMatrixMap complete)
         {
             SetReaderPositionIfZero();
-            ReadItemsFromStreamByCoordinate(buffer, offset, indexer, DataValueParsers.FastParseDecimalDataValueDangerous);
+            ReadItemsFromStreamByCoordinate(buffer, offset, target, complete, DataValueParsers.FastParseDecimalDataValueDangerous);
         }
 
         #endregion
@@ -116,7 +124,8 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         /// <param name="buffer">The buffer to store the read values.</param>
         /// <param name="offset">The starting index in the buffer to begin storing the read values.</param>
-        /// <param name="indexer">Provides the indexes where the data will be read.</param>
+        /// <param name="target">Map defining the data to be read. Must be a submap of the <paramref name="complete"/> map.</param>
+        /// <param name="complete">Map defining the complete data set.</param>
         /// <param name="missingValueEncodings">
         /// An array of <see cref="double"/> values that represent missing data in the PX file in the following order:
         /// [0] "-"
@@ -127,11 +136,12 @@ namespace Px.Utils.PxFile.Data
         /// [5] "....."
         /// [6] "......"
         /// </param>
-        public async Task ReadUnsafeDoublesAsync(double[] buffer, int offset, DataIndexer indexer, double[] missingValueEncodings)
+        /// <exception cref="ArgumentException">Thrown when the target map is not a submap of the complete map.</exception>"
+        public async Task ReadUnsafeDoublesAsync(double[] buffer, int offset, IMatrixMap target, IMatrixMap complete, double[] missingValueEncodings)
         {
             await SetReaderPositionIfZeroAsync();
             await Task.Factory.StartNew(() =>
-                ReadItemsFromStreamByCoordinate(buffer, offset, indexer, Parser));
+                ReadItemsFromStreamByCoordinate(buffer, offset, target, complete, Parser));
 
             double Parser(char[] parseBuffer, int len)
             {
@@ -147,7 +157,8 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         /// <param name="buffer">The buffer to store the read values.</param>
         /// <param name="offset">The starting index in the buffer to begin storing the read values.</param>
-        /// <param name="indexer">Provides the indexes where the data will be read.</param>
+        /// <param name="target">Map defining the data to be read. Must be a submap of the <paramref name="complete"/> map.</param>
+        /// <param name="complete">Map defining the complete data set.</param>
         /// <param name="missingValueEncodings">
         /// An array of <see cref="double"/> values that represent missing data in the PX file in the following order:
         /// [0] "-"
@@ -159,11 +170,12 @@ namespace Px.Utils.PxFile.Data
         /// [6] "......"
         /// </param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-        public async Task ReadUnsafeDoublesAsync(double[] buffer, int offset, DataIndexer indexer, double[] missingValueEncodings, CancellationToken cancellationToken)
+        /// <exception cref="ArgumentException">Thrown when the target map is not a submap of the complete map.</exception>"
+        public async Task ReadUnsafeDoublesAsync(double[] buffer, int offset, IMatrixMap target, IMatrixMap complete, double[] missingValueEncodings, CancellationToken cancellationToken)
         {
             await SetReaderPositionIfZeroAsync(cancellationToken);
             await Task.Factory.StartNew(() =>
-                ReadItemsFromStreamByCoordinate(buffer, offset, indexer, Parser, cancellationToken), cancellationToken);
+                ReadItemsFromStreamByCoordinate(buffer, offset, target, complete, Parser, cancellationToken), cancellationToken);
 
             double Parser(char[] parseBuffer, int len)
             {
@@ -178,12 +190,14 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         /// <param name="buffer">The buffer to store the read values.</param>
         /// <param name="offset">The starting index in the buffer to begin storing the read values.</param>
-        /// <param name="indexer">Provides the indexes where the data will be read.</param>
-        public async Task ReadDoubleDataValuesAsync(DoubleDataValue[] buffer, int offset, DataIndexer indexer)
+        /// <param name="target">Map defining the data to be read. Must be a submap of the <paramref name="complete"/> map.</param>
+        /// <param name="complete">Map defining the complete data set.</param>
+        /// <exception cref="ArgumentException">Thrown when the target map is not a submap of the complete map.</exception>""
+        public async Task ReadDoubleDataValuesAsync(DoubleDataValue[] buffer, int offset, IMatrixMap target, IMatrixMap complete)
         {
             await SetReaderPositionIfZeroAsync();
             await Task.Factory.StartNew(() =>
-                ReadItemsFromStreamByCoordinate(buffer, offset, indexer, DataValueParsers.FastParseDoubleDataValueDangerous));
+                ReadItemsFromStreamByCoordinate(buffer, offset, target, complete, DataValueParsers.FastParseDoubleDataValueDangerous));
         }
 
         /// <summary>
@@ -194,13 +208,15 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         /// <param name="buffer">The buffer to store the read values.</param>
         /// <param name="offset">The starting index in the buffer to begin storing the read values.</param>
-        /// <param name="indexer">Provides the indexes where the data will be read.</param>
+        /// <param name="target">Map defining the data to be read. Must be a submap of the <paramref name="complete"/> map.</param>
+        /// <param name="complete">Map defining the complete data set.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-        public async Task ReadDoubleDataValuesAsync(DoubleDataValue[] buffer, int offset, DataIndexer indexer, CancellationToken cancellationToken)
+        /// <exception cref="ArgumentException">Thrown when the target map is not a submap of the complete map.</exception>
+        public async Task ReadDoubleDataValuesAsync(DoubleDataValue[] buffer, int offset, IMatrixMap target, IMatrixMap complete, CancellationToken cancellationToken)
         {
             await SetReaderPositionIfZeroAsync(cancellationToken);
             await Task.Factory.StartNew(() =>
-                ReadItemsFromStreamByCoordinate(buffer, offset, indexer, DataValueParsers.FastParseDoubleDataValueDangerous, cancellationToken), cancellationToken);
+                ReadItemsFromStreamByCoordinate(buffer, offset, target, complete, DataValueParsers.FastParseDoubleDataValueDangerous, cancellationToken), cancellationToken);
         }
 
         /// <summary>
@@ -210,12 +226,14 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         /// <param name="buffer">The buffer to store the read values.</param>
         /// <param name="offset">The starting index in the buffer to begin storing the read values.</param>
-        /// <param name="indexer">Provides the indexes where the data will be read.</param>
-        public async Task ReadDecimalDataValuesAsync(DecimalDataValue[] buffer, int offset, DataIndexer indexer)
+        /// <param name="target">Map defining the data to be read. Must be a submap of the <paramref name="complete"/> map.</param>
+        /// <param name="complete">Map defining the complete data set.</param>
+        /// <exception cref="ArgumentException">Thrown when the target map is not a submap of the complete map.</exception>
+        public async Task ReadDecimalDataValuesAsync(DecimalDataValue[] buffer, int offset, IMatrixMap target, IMatrixMap complete)
         {
             await SetReaderPositionIfZeroAsync();
             await Task.Factory.StartNew(() =>
-                ReadItemsFromStreamByCoordinate(buffer, offset, indexer, DataValueParsers.FastParseDecimalDataValueDangerous));
+                ReadItemsFromStreamByCoordinate(buffer, offset, target, complete, DataValueParsers.FastParseDecimalDataValueDangerous));
         }
 
         /// <summary>
@@ -228,11 +246,11 @@ namespace Px.Utils.PxFile.Data
         /// <param name="offset">The starting index in the buffer to begin storing the read values.</param>
         /// <param name="indexer">Provides the indexes where the data will be read.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-        public async Task ReadDecimalDataValuesAsync(DecimalDataValue[] buffer, int offset, DataIndexer indexer, CancellationToken cancellationToken)
+        public async Task ReadDecimalDataValuesAsync(DecimalDataValue[] buffer, int offset, IMatrixMap target, IMatrixMap complete, CancellationToken cancellationToken)
         {
             await SetReaderPositionIfZeroAsync(cancellationToken);
             await Task.Factory.StartNew(() =>
-                ReadItemsFromStreamByCoordinate(buffer, offset, indexer, DataValueParsers.FastParseDecimalDataValueDangerous, cancellationToken), cancellationToken);
+                ReadItemsFromStreamByCoordinate(buffer, offset, target, complete, DataValueParsers.FastParseDecimalDataValueDangerous, cancellationToken), cancellationToken);
         }
 
         #endregion
@@ -242,7 +260,11 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         public void Dispose()
         {
-            _stream.Dispose();
+            if(!_disposed)
+            {
+                _stream.Dispose();
+                _disposed = true;
+            }
         }
 
         #region Private methods
@@ -271,8 +293,11 @@ namespace Px.Utils.PxFile.Data
             _stream.Position = start + dataKeyword.Length + 1; // +1 to skip the '='
         }
 
-        private void ReadItemsFromStreamByCoordinate<T>(T[] buffer, int offset, DataIndexer indexer, Func<char[], int, T> readItem, CancellationToken? token = null)
+        private void ReadItemsFromStreamByCoordinate<T>(T[] buffer, int offset, IMatrixMap target, IMatrixMap complete, Func<char[], int, T> readItem, CancellationToken? token = null)
         {
+            if(!target.IsSubmapOf(complete)) throw new ArgumentException($"The {nameof(target)} map is not a submap of the {nameof(complete)} map.");
+            DataIndexer indexer = new(complete, target);
+
             int startingIndex = offset;
 
             byte[] internalBuffer = new byte[_readBufferSize];

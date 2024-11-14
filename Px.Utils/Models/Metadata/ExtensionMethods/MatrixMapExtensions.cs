@@ -34,5 +34,35 @@
             }
             return new MatrixMap(newDimensionMaps);
         }
+
+        /// <summary>
+        /// Checks if the other map contains the same dimensions and values as this map in the same order.
+        /// The other map can contain values that are not found in this map.
+        /// </summary>
+        /// <returns>True if all of the values are found in the correct order.</returns>
+        public static bool IsSubmapOf(this IMatrixMap thisMap, IMatrixMap other)
+        {
+            if(thisMap.DimensionMaps.Count != other.DimensionMaps.Count) return false;
+            for (int i = 0; i < thisMap.DimensionMaps.Count; i++)
+            {
+                if (other.DimensionMaps[i].Code != thisMap.DimensionMaps[i].Code) return false;
+                int sourceIndex = 0;
+                for (int j = 0; j < thisMap.DimensionMaps[i].ValueCodes.Count; j++)
+                {
+                    bool found = false;
+                    for(int k = sourceIndex; k < other.DimensionMaps[i].ValueCodes.Count; k++)
+                    {
+                        if (other.DimensionMaps[i].ValueCodes[k] == thisMap.DimensionMaps[i].ValueCodes[j])
+                        {
+                            sourceIndex = k + 1;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found) return false;
+                }
+            }
+            return true;
+        }
     }
 }

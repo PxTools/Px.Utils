@@ -1,11 +1,15 @@
 ﻿using Px.Utils.Models.Metadata.Enums;
 using Px.Utils.Language;
+using Px.Utils.Models.Metadata.MetaProperties;
+using System.Text.Json.Serialization;
+using Px.Utils.Serializers.Json;
 
 namespace Px.Utils.Models.Metadata.Dimensions
 {
     /// <summary>
     /// Class representing a time dimension
     /// </summary>
+    [JsonConverter(typeof(DimensionConverter))]
     public class TimeDimension : Dimension
     {
         /// <summary>
