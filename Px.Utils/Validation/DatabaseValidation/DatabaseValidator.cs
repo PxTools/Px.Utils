@@ -13,21 +13,21 @@ namespace Px.Utils.Validation.DatabaseValidation
     /// </summary>
     /// <param name="directoryPath">Path to the database root directory</param>
     /// <param name="fileSystem"><see cref="IFileSystem"/> object that defines the file system used for the validation process.</param>
-    /// <param name="syntaxConf"><see cref="PxFileSyntaxConf"/> object that defines the tokens and symbols for px file syntax.</param>
+    /// <param name="conf">Configuration for the px files.</param>
     /// <param name="customPxFileValidators">Optional custom <see cref="IDatabaseValidator"/> validator functions ran for each px file within the database</param>
     /// <param name="customAliasFileValidators">Optional custom <see cref="IDatabaseValidator"/> validator functions that are ran for each alias file within the database</param>
     /// <param name="customDirectoryValidators">Optional custom <see cref="IDatabaseValidator"/> validator functions for each subdirectory within the database.</param>
     public class DatabaseValidator(
         string directoryPath,
         IFileSystem fileSystem,
-        PxFileSyntaxConf? syntaxConf = null,
+        PxFileConfiguration? conf = null,
         IDatabaseValidator[]? customPxFileValidators = null,
         IDatabaseValidator[]? customAliasFileValidators = null,
         IDatabaseValidator[]? customDirectoryValidators = null
         ) : IValidator, IValidatorAsync
     {
         private readonly string _directoryPath = directoryPath;
-        private readonly PxFileSyntaxConf _syntaxConf = syntaxConf is not null ? syntaxConf : PxFileSyntaxConf.Default;
+        private readonly PxFileConfiguration _conf = conf is not null ? conf : PxFileConfiguration.Default;
         private readonly IDatabaseValidator[]? _customPxFileValidators = customPxFileValidators;
         private readonly IDatabaseValidator[]? _customAliasFileValidators = customAliasFileValidators;
         private readonly IDatabaseValidator[]? _customDirectoryValidators = customDirectoryValidators;
@@ -119,7 +119,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 return (null, feedbacks);
             }
             stream.Position = 0;
-            PxFileValidator validator = new(_syntaxConf);
+            PxFileValidator validator = new(_conf);
             feedbacks.AddRange(validator.Validate(stream, fileName, fileInfo.Encoding).FeedbackItems);
             return (fileInfo, feedbacks);
         }
@@ -141,7 +141,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 return (null, feedbacks);
             }
             stream.Position = 0;
-            PxFileValidator validator = new(_syntaxConf);
+            PxFileValidator validator = new(_conf);
             ValidationResult result = await validator.ValidateAsync(stream, fileName, fileInfo.Encoding, cancellationToken: cancellationToken);
             feedbacks.AddRange(result.FeedbackItems);
             cancellationToken.ThrowIfCancellationRequested();
@@ -245,7 +245,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             foreach (string directory in allDirectories)
             {
                 string directoryName = new DirectoryInfo(directory).Name;
-                if (directoryName == _syntaxConf.Tokens.Database.Index) continue;
+                if (directoryName == _conf.Tokens.Database.Index) continue;
 
                 foreach (IDatabaseValidator validator in directoryValidators)
                 {
@@ -265,11 +265,11 @@ namespace Px.Utils.Validation.DatabaseValidation
             string? path = _fileSystem.GetDirectoryName(filename);
             string location =  path is not null ? path : string.Empty;
             string[] languages = [];
-            PxFileMetadataReader metadataReader = new ();
+            PxFileMetadataReader metadataReader = new (_conf);
             Encoding encoding;
             try
             {
-                encoding = metadataReader.GetEncoding(stream, _syntaxConf);
+                encoding = metadataReader.GetEncoding(stream);
             }
             catch (InvalidPxFileMetadataException e)
             {
@@ -302,15 +302,15 @@ namespace Px.Utils.Validation.DatabaseValidation
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ProcessBuffer(char character, ref StringBuilder entryBuilder, ref bool isProcessingString, ref string defaultLanguage, ref string[] languages)
         {
-            if (SyntaxValidator.IsEndOfMetadataSection(character, _syntaxConf, entryBuilder, isProcessingString) && defaultLanguage != string.Empty)
+            if (SyntaxValidator.IsEndOfMetadataSection(character, _conf, entryBuilder, isProcessingString) && defaultLanguage != string.Empty)
             {
-                languages = [defaultLanguage.Trim(_syntaxConf.Symbols.Key.StringDelimeter)];
+                languages = [defaultLanguage.Trim(_conf.Symbols.Key.StringDelimeter)];
             }
-            else if (character == _syntaxConf.Symbols.Key.StringDelimeter)
+            else if (character == _conf.Symbols.Key.StringDelimeter)
             {
                 isProcessingString = !isProcessingString;
             }
-            else if (character == _syntaxConf.Symbols.EntrySeparator && !isProcessingString)
+            else if (character == _conf.Symbols.EntrySeparator && !isProcessingString)
             {
                 ProcessEntry(entryBuilder.ToString(), ref defaultLanguage, ref languages);
                 entryBuilder.Clear();
@@ -327,11 +327,11 @@ namespace Px.Utils.Validation.DatabaseValidation
             string? path = _fileSystem.GetDirectoryName(filename);
             string location =  path is not null ? path : string.Empty;
             string[] languages = [];
-            PxFileMetadataReader metadataReader = new ();
+            PxFileMetadataReader metadataReader = new (_conf);
             Encoding encoding;
             try
             {
-                encoding = await metadataReader.GetEncodingAsync(stream, _syntaxConf, cancellationToken);
+                encoding = await metadataReader.GetEncodingAsync(stream, cancellationToken);
             }
             catch (InvalidPxFileMetadataException e)
             {
@@ -366,17 +366,17 @@ namespace Px.Utils.Validation.DatabaseValidation
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ProcessEntry(string entry, ref string defaultLanguage, ref string[] languages)
         {
-            string[] splitEntry = entry.Trim().Split(_syntaxConf.Symbols.KeywordSeparator);
-            if (splitEntry[0] == _syntaxConf.Tokens.KeyWords.DefaultLanguage)
+            string[] splitEntry = entry.Trim().Split(_conf.Symbols.KeywordSeparator);
+            if (splitEntry[0] == _conf.Tokens.KeyWords.DefaultLanguage)
             {
                 defaultLanguage = splitEntry[1];
             }
-            else if (splitEntry[0] == _syntaxConf.Tokens.KeyWords.AvailableLanguages)
+            else if (splitEntry[0] == _conf.Tokens.KeyWords.AvailableLanguages)
             {
-                languages = splitEntry[1].Split(_syntaxConf.Symbols.Value.ListSeparator);
+                languages = splitEntry[1].Split(_conf.Symbols.Value.ListSeparator);
                 for (int j = 0; j < languages.Length; j++)
                 {
-                    languages[j] = languages[j].Trim(_syntaxConf.Symbols.Key.StringDelimeter);
+                    languages[j] = languages[j].Trim(_conf.Symbols.Key.StringDelimeter);
                 }
             }
         }
@@ -387,7 +387,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             string? path = _fileSystem.GetDirectoryName(filename);
             string location =  path is not null ? path : string.Empty;
             string[] languages = [
-                name.Split(_syntaxConf.Tokens.Database.LanguageSeparator)[1].Split('.')[0]
+                name.Split(_conf.Tokens.Database.LanguageSeparator)[1].Split('.')[0]
             ];
 
             Encoding encoding = _fileSystem.GetEncoding(stream);
@@ -401,7 +401,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             string? path = _fileSystem.GetDirectoryName(filename);
             string location =  path is not null ? path : string.Empty;
             string[] languages = [
-                name.Split(_syntaxConf.Tokens.Database.LanguageSeparator)[1].Split('.')[0]
+                name.Split(_conf.Tokens.Database.LanguageSeparator)[1].Split('.')[0]
             ];
 
             Encoding encoding = await _fileSystem.GetEncodingAsync(stream, cancellationToken);

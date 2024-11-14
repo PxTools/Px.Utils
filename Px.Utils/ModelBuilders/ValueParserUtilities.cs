@@ -15,11 +15,11 @@ namespace Px.Utils.ModelBuilders
         /// It throws an exception if the input string is not in the correct format or does not represent a valid time interval.
         /// </summary>
         /// <param name="input">The string to parse into a <see cref="TimeDimensionInterval"/> enumeration value.</param>
-        /// <param name="conf">An optional <see cref="PxFileSyntaxConf"/> object. If not provided, the default configuration is used.</param>
+        /// <param name="conf">An optional <see cref="PxFileConfiguration"/> object. If not provided, the default configuration is used.</param>
         /// <returns>A <see cref="TimeDimensionInterval"/> enumeration value parsed from the input string.</returns>
-        public static TimeDimensionInterval ParseTimeIntervalFromTimeVal(string input, PxFileSyntaxConf? conf = null)
+        public static TimeDimensionInterval ParseTimeIntervalFromTimeVal(string input, PxFileConfiguration? conf = null)
         {
-            conf ??= PxFileSyntaxConf.Default;
+            conf ??= PxFileConfiguration.Default;
             int tlistTokenEndIndex = input.IndexOf(conf.Symbols.Value.TimeSeriesIntervalEnd, StringComparison.InvariantCulture); 
             if(tlistTokenEndIndex < 0) throw new ArgumentException($"Invalid time value string {input}");
             string timevalString = input[..(tlistTokenEndIndex + 1)];
@@ -57,9 +57,9 @@ namespace Px.Utils.ModelBuilders
         /// If the input string is in the range format, empty list is returned.
         /// </returns>
         /// <exception cref="ArgumentException">If the input string does not match the expected timeval format.</exception>
-        public static List<string> GetTimeValValueList(string input, PxFileSyntaxConf? conf = null)
+        public static List<string> GetTimeValValueList(string input, PxFileConfiguration? conf = null)
         {
-            conf ??= PxFileSyntaxConf.Default;
+            conf ??= PxFileConfiguration.Default;
 
             if (input.StartsWith(conf.Tokens.Time.TimeIntervalIndicator, StringComparison.InvariantCulture))
             {
@@ -80,15 +80,15 @@ namespace Px.Utils.ModelBuilders
 
         /// <summary>
         /// Parses a string into a <see cref="DimensionType"/> enumeration value.
-        /// This method maps the input string to a <see cref="DimensionType"/> enumeration value based on the provided or default PxFileSyntaxConf configuration.
+        /// This method maps the input string to a <see cref="DimensionType"/> enumeration value based on the provided or default PxFileConfiguration configuration.
         /// If the input string does not map to a known <see cref="DimensionType"/>, the method returns <see cref="DimensionType.Unknown"/>.
         /// </summary>
         /// <param name="input">The string to parse into a <see cref="DimensionType"/> enumeration value.</param>
-        /// <param name="conf">An optional <see cref="PxFileSyntaxConf"/> object. If not provided, the default configuration is used.</param>
+        /// <param name="conf">An optional <see cref="PxFileConfiguration"/> object. If not provided, the default configuration is used.</param>
         /// <returns>A <see cref="DimensionType"/> enumeration value parsed from the input string.</returns>
-        public static DimensionType StringToDimensionType(string input, PxFileSyntaxConf? conf = null)
+        public static DimensionType StringToDimensionType(string input, PxFileConfiguration? conf = null)
         {
-            conf ??= PxFileSyntaxConf.Default;
+            conf ??= PxFileConfiguration.Default;
             Dictionary<string, DimensionType> map = new()
             {
                 {conf.Tokens.VariableTypes.Content, DimensionType.Content},

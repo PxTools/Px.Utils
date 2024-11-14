@@ -22,12 +22,12 @@ namespace Px.Utils.ModelBuilders
 
         /// <summary>
         /// Initializes a new instance of the MetadataEntryKeyBuilder class.
-        /// This constructor takes an optional PxFileSyntaxConf object. If none is provided, it uses the default configuration.
+        /// This constructor takes an optional PxFileConfiguration object. If none is provided, it uses the default configuration.
         /// </summary>
-        /// <param name="configuration">An optional configuration object for Px file syntax. If not provided, the default configuration is used.</param>
-        public MetadataEntryKeyBuilder(PxFileSyntaxConf? configuration = null)
+        /// <param name="configuration">An optional configuration object for the Px file. If not provided, the default configuration is used.</param>
+        public MetadataEntryKeyBuilder(PxFileConfiguration? configuration = null)
         {
-            PxFileSyntaxConf _conf = configuration ?? PxFileSyntaxConf.Default;
+            PxFileConfiguration _conf = configuration ?? PxFileConfiguration.Default;
             _langParamStart = _conf.Symbols.Key.LangParamStart;
             _langParamEnd = _conf.Symbols.Key.LangParamEnd;
 

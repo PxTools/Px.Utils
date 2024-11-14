@@ -9,7 +9,7 @@ namespace Px.Utils.TestingApp.Commands
         internal override string Description => "Validates a px path database.";
         private static readonly string[] directoryFlags = ["-d", "-directory"];
 
-        private DatabaseValidator validator;
+        private DatabaseValidator? validator;
 
         internal DatabaseValidationBenchmark()
         {
@@ -58,11 +58,13 @@ namespace Px.Utils.TestingApp.Commands
 
         private void ValidationBenchmark()
         {
+            if(validator is null) throw new InvalidOperationException("Validator not initialized.");
             validator.Validate();
         }
 
         private async Task ValidationBenchmarkAsync()
         {
+            if(validator is null) throw new InvalidOperationException("Validator not initialized.");
             await validator.ValidateAsync();
         }
     }

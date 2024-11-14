@@ -226,9 +226,9 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             {
                 Assert.AreEqual(1, contentDimension.Values[i].Precision);
             }
-            Assert.IsFalse(Actual_1Lang_With_Table_Level_Units_And_Precision.AdditionalProperties.ContainsKey(PxFileSyntaxConf.Default.Tokens.KeyWords.Units));
-            Assert.IsFalse(Actual_1Lang_With_Table_Level_Units_And_Precision.AdditionalProperties.ContainsKey(PxFileSyntaxConf.Default.Tokens.KeyWords.Decimals));
-            Assert.IsFalse(Actual_1Lang_With_Table_Level_Units_And_Precision.AdditionalProperties.ContainsKey(PxFileSyntaxConf.Default.Tokens.KeyWords.ShowDecimals));
+            Assert.IsFalse(Actual_1Lang_With_Table_Level_Units_And_Precision.AdditionalProperties.ContainsKey(PxFileConfiguration.Default.Tokens.KeyWords.Units));
+            Assert.IsFalse(Actual_1Lang_With_Table_Level_Units_And_Precision.AdditionalProperties.ContainsKey(PxFileConfiguration.Default.Tokens.KeyWords.Decimals));
+            Assert.IsFalse(Actual_1Lang_With_Table_Level_Units_And_Precision.AdditionalProperties.ContainsKey(PxFileConfiguration.Default.Tokens.KeyWords.ShowDecimals));
         }
 
         #region Content Dimension Tests
@@ -499,7 +499,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         [TestMethod]
         public void MultilanguageTableWithCustomMetaPropertiesAndPropetyTypes()
         {
-            PxFileSyntaxConf syntaxConf = PxFileSyntaxConf.Default;
+            PxFileConfiguration conf = PxFileConfiguration.Default;
             Dictionary<string, MetaPropertyType> customTypeDictionary = new()
             {
                 { "TEXTPROPERTY", MetaPropertyType.Text },
@@ -512,8 +512,8 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
                 { "SINGLEITEMTEXTARRAYPROPERTY", MetaPropertyType.TextArray },
                 { "SINGLEITEMMULTILANGUAGETEXTARRAYPROPERTY", MetaPropertyType.MultilanguageTextArray },
             };
-            syntaxConf.Content.EntryTypes.PropertyTypeDefinitions = customTypeDictionary;
-            MatrixMetadata actual = new MatrixMetadataBuilder(syntaxConf).Build(PxFileMetaEntries_Robust_3_Languages_With_Custom_Properties.Entries);
+            conf.Content.EntryTypes.PropertyTypeDefinitions = customTypeDictionary;
+            MatrixMetadata actual = new MatrixMetadataBuilder(conf).Build(PxFileMetaEntries_Robust_3_Languages_With_Custom_Properties.Entries);
             Assert.IsNotNull(actual);
             Assert.AreEqual(MetaPropertyType.Text, actual.AdditionalProperties["TEXTPROPERTY"].Type);
             Assert.AreEqual(MetaPropertyType.MultilanguageText, actual.AdditionalProperties["MULTILANGUAGETEXTPROPERTY"].Type);

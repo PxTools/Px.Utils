@@ -9,13 +9,13 @@ namespace Px.Utils.Validation.DataValidation
     /// <param name="rowLen">Length of one row of Px file data</param>
     /// <param name="numOfRows">Amount of rows of Px file data</param>
     /// <param name="startRow">The row number where the data section starts</param>
-    /// <param name="conf">Syntax configuration for the Px file</param>
+    /// <param name="conf">Configuration for the Px file</param>
     /// </summary>
-    public class DataValidator(int rowLen, int numOfRows, int startRow, PxFileSyntaxConf? conf = null) : IPxFileStreamValidator, IPxFileStreamValidatorAsync
+    public class DataValidator(int rowLen, int numOfRows, int startRow, PxFileConfiguration? conf = null) : IPxFileStreamValidator, IPxFileStreamValidatorAsync
     {
         private const int _streamBufferSize = 4096;
 
-        private readonly PxFileSyntaxConf _conf = conf ?? PxFileSyntaxConf.Default;
+        private readonly PxFileConfiguration _conf = conf ?? PxFileConfiguration.Default;
 
         private readonly List<IDataValidator> _commonValidators = [];
         private readonly List<IDataValidator> _dataNumValidators = [];

@@ -2,7 +2,7 @@
 
 namespace Px.Utils.PxFile
 {
-    public class PxFileSyntaxConf
+    public class PxFileConfiguration
     {
         public class SymbolDefinitions
         {
@@ -269,7 +269,7 @@ namespace Px.Utils.PxFile
 
                 public Dictionary<string, MetaPropertyType> PropertyTypeDefinitions { get; set; } = [];
 
-                public static Dictionary<string, MetaPropertyType> GetTypeDictionary(PxFileSyntaxConf conf)
+                public static Dictionary<string, MetaPropertyType> GetTypeDictionary(PxFileConfiguration conf)
                 {
                     Dictionary<string, MetaPropertyType> typeDictionary = new()
                     {
@@ -300,13 +300,13 @@ namespace Px.Utils.PxFile
         public TokenDefinitions Tokens { get; set; }
         public ContentConfiguration Content { get; set; }
 
-        private PxFileSyntaxConf()
+        private PxFileConfiguration()
         {
             Symbols = SymbolDefinitions.DefaultSymbols;
             Tokens = TokenDefinitions.DefaultTokens;
             Content = ContentConfiguration.DefaultValues;
         }
 
-        public static PxFileSyntaxConf Default => new();
+        public static PxFileConfiguration Default => new();
     }
 }

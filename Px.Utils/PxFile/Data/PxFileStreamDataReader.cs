@@ -12,7 +12,7 @@ namespace Px.Utils.PxFile.Data
     {
         private readonly Stream _stream;
         private bool _disposed; // default false
-        private readonly PxFileSyntaxConf _conf;
+        private readonly PxFileConfiguration _conf;
         private long readIndex;
         private readonly int _readBufferSize;
         private readonly char _valueSeparator = ' ';
@@ -25,11 +25,11 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         /// <param name="stream">Px file stream</param>
         /// <param name="conf">Px file syntax configuration</param>
-        public PxFileStreamDataReader(Stream stream, PxFileSyntaxConf? conf = null, int readBufferSize = 4096)
+        public PxFileStreamDataReader(Stream stream, PxFileConfiguration? conf = null, int readBufferSize = 4096)
         {
             _stream = stream;
             _readBufferSize = readBufferSize;
-            _conf = conf ?? PxFileSyntaxConf.Default;
+            _conf = conf ?? PxFileConfiguration.Default;
         }
 
         /// <summary>
@@ -38,12 +38,12 @@ namespace Px.Utils.PxFile.Data
         /// <param name="stream">Px file stream</param>
         /// <param name="dataStart">Position of the first data point in the file</param>
         /// <param name="conf">Px file syntax configuration</param>
-        public PxFileStreamDataReader(Stream stream, long dataStart, PxFileSyntaxConf? conf = null, int readBufferSize = 4096)
+        public PxFileStreamDataReader(Stream stream, long dataStart, PxFileConfiguration? conf = null, int readBufferSize = 4096)
         {
             _stream = stream;
             _stream.Position = dataStart;
             _readBufferSize = readBufferSize;
-            _conf = conf ?? PxFileSyntaxConf.Default;
+            _conf = conf ?? PxFileConfiguration.Default;
         }
 
         #endregion
