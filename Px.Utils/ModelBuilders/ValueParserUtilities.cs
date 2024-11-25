@@ -79,6 +79,45 @@ namespace Px.Utils.ModelBuilders
         }
 
         /// <summary>
+        /// Removes the interval entry from the beginning of a time value string
+        /// and returns the rest as a string.
+        /// </summary>
+        /// <param name="input">The complete timeval value in one language.</param>
+        /// <param name="conf">Configuration used for parsing the value strings and the interval part.</param>
+        /// <returns>
+        /// Value string excluding the interval part.
+        /// If the input string is in the list format, empty string is returned.
+        /// </returns>
+        /// <exception cref="ArgumentException">If the input string does not match the expected timeval format.</exception>
+        public static string GetTimeValValueString(string input, PxFileConfiguration? conf = null)
+        {
+            conf ??= PxFileConfiguration.Default;
+
+            if (input.StartsWith(conf.Tokens.Time.TimeIntervalIndicator, StringComparison.InvariantCulture))
+            {
+                int endOftoken = conf.Tokens.Time.TimeIntervalIndicator.Length + 3; // 3 is the length of the characters between the interval indicator and the start of the value string
+                int firstStringDelimeter = input.IndexOf(conf.Symbols.Value.StringDelimeter, endOftoken);
+                if (firstStringDelimeter == -1 || 
+                    firstStringDelimeter > input.IndexOf(conf.Symbols.Value.TimeSeriesIntervalEnd, StringComparison.InvariantCulture) ||
+                    input.IndexOf(conf.Symbols.Value.TimeSeriesLimitsSeparator, firstStringDelimeter) == -1)
+                {
+                    return "";
+                }
+                int secondStringDelimeter = input.IndexOf(conf.Symbols.Value.StringDelimeter, firstStringDelimeter + 1);
+                if (firstStringDelimeter >= 0 &&
+                    secondStringDelimeter >= firstStringDelimeter)
+                {
+                    return input[firstStringDelimeter..secondStringDelimeter].CleanStringDelimeters(conf.Symbols.Value.StringDelimeter);
+                }
+                else return "";
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid time value string {input}");
+            }
+        }
+
+        /// <summary>
         /// Parses a string into a <see cref="DimensionType"/> enumeration value.
         /// This method maps the input string to a <see cref="DimensionType"/> enumeration value based on the provided or default PxFileConfiguration configuration.
         /// If the input string does not map to a known <see cref="DimensionType"/>, the method returns <see cref="DimensionType.Unknown"/>.
