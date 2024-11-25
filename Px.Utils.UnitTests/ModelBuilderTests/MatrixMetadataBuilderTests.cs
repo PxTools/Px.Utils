@@ -20,6 +20,9 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         private MatrixMetadata Actual_1Lang_With_Table_Level_Units_And_Precision { get; } =
             new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_1_Language_With_Table_Level_Units_And_Precision.Entries);
 
+        private MatrixMetadata Actual_1Lang_With_Range_Time_Dimension { get; } =
+            new MatrixMetadataBuilder().Build(PxFileMetaEntries_Robust_1_Language_With_Range_Time_Dimension.Entries);
+
         [TestMethod]
         public void IEnumerableBuildTest()
         {
@@ -524,6 +527,63 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Assert.AreEqual(MetaPropertyType.MultilanguageTextArray, actual.AdditionalProperties["MULTILANGUAGETEXTARRAYPROPERTY"].Type);
             Assert.AreEqual(MetaPropertyType.TextArray, actual.AdditionalProperties["SINGLEITEMTEXTARRAYPROPERTY"].Type);
             Assert.AreEqual(MetaPropertyType.MultilanguageTextArray, actual.AdditionalProperties["SINGLEITEMMULTILANGUAGETEXTARRAYPROPERTY"].Type);
+        }
+
+        [TestMethod]
+        public void MultilanguageRemovesDimensionTypeAndTimeValEntriesTest()
+        {
+            Assert.IsTrue(Actual_1Lang_With_Range_Time_Dimension.Dimensions.Exists(dim => dim.Type == DimensionType.Time));
+            foreach (Dimension dim in Actual_3Lang.Dimensions)
+            {
+                Assert.IsFalse(dim.AdditionalProperties.ContainsKey(PxFileConfiguration.Default.Tokens.KeyWords.DimensionType));
+
+                if (dim.Type == DimensionType.Time)
+                {
+                    Assert.IsTrue(dim.AdditionalProperties.TryGetValue(PxFileConfiguration.Default.Tokens.KeyWords.TimeVal, out MetaProperty? value));
+                    Assert.AreEqual(MetaPropertyType.TextArray, value.Type);
+                    StringListProperty property = (StringListProperty)value;
+                    Assert.AreEqual(8, property.Value.Count);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void MultilanguageWithRangeTimeDimensionTest()
+        {
+            Assert.IsTrue(Actual_1Lang_With_Range_Time_Dimension.Dimensions.Exists(dim => dim.Type == DimensionType.Time));
+            foreach (Dimension dim in Actual_1Lang_With_Range_Time_Dimension.Dimensions)
+            {
+                Assert.IsFalse(dim.AdditionalProperties.ContainsKey(PxFileConfiguration.Default.Tokens.KeyWords.DimensionType));
+
+                if (dim.Type == DimensionType.Time)
+                {
+                    Assert.IsTrue(dim.AdditionalProperties.ContainsKey(PxFileConfiguration.Default.Tokens.KeyWords.TimeVal));
+
+                    if (dim.Type == DimensionType.Time)
+                    {
+                        Assert.IsTrue(dim.AdditionalProperties.TryGetValue(PxFileConfiguration.Default.Tokens.KeyWords.TimeVal, out MetaProperty? value));
+                        Assert.AreEqual(MetaPropertyType.Text, value.Type);
+                        StringProperty property = (StringProperty)value;
+                        Assert.AreEqual("2015-2022", property.Value);
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void MultilanguageRemovesTableLevelMetaEntriesTest()
+        {
+            string[] keywords = [
+                PxFileConfiguration.Default.Tokens.KeyWords.Units,
+                PxFileConfiguration.Default.Tokens.KeyWords.ShowDecimals,
+                PxFileConfiguration.Default.Tokens.KeyWords.Precision,
+                PxFileConfiguration.Default.Tokens.KeyWords.Decimals
+            ];
+
+            foreach (string keyword in keywords)
+            {
+                Assert.IsFalse(Actual_3Lang.AdditionalProperties.ContainsKey(keyword));
+            }
         }
     }
 }
