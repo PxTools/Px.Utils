@@ -16,20 +16,20 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
         }
 
         [TestMethod]
-        public void GetTimeValValueStringTestListInputReturnsEmptyString()
+        public void GetTimeValValueStringTestListInputReturnsFirstEnclosedString()
         {
             string input = "TLIST(A1), \"9000\", \"9001\", \"9002\", \"9003\", \"9004\"";
-            string expected = "";
+            string expected = "9000";
             string actual = ValueParserUtilities.GetTimeValValueString(input);
 
             Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void GetTimeValValueStringTestSingularInputReturnsEmptyString()
+        public void GetTimeValValueStringTestSingularInputReturnsString()
         {
             string input = "TLIST(A1, \"9001\")";
-            string expected = "";
+            string expected = "9001";
             string actual = ValueParserUtilities.GetTimeValValueString(input);
 
             Assert.AreEqual(expected, actual);
@@ -46,19 +46,29 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
         }
 
         [TestMethod]
-        public void GetTimeValueStringTestInputWithTwoRangesReturnsEmpty()
+        public void GetTimeValueStringTestInputWithTwoRangesReturnsFirstEnclosedString()
         {
             string input = "TLIST(A1, \"9000-9001\", \"9002-9003\")";
-            string expected = "";
+            string expected = "9000-9001";
             string actual = ValueParserUtilities.GetTimeValValueString(input);
 
             Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void GetTimeValueStringTestInputWithRangeOfThreeValuesReturnsEmpty()
+        public void GetTimeValueStringTestInputWithRangeOfThreeValuesReturnsString()
         {
             string input = "TLIST(A1, \"9000-9001-9002\")";
+            string expected = "9000-9001-9002";
+            string actual = ValueParserUtilities.GetTimeValValueString(input);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void GetTimeValueStringTestInputRangeWithoutStringDelimetersReturnsEmptyString()
+        {
+            string input = "TLIST(A1, 9000-9001)";
             string expected = "";
             string actual = ValueParserUtilities.GetTimeValValueString(input);
 

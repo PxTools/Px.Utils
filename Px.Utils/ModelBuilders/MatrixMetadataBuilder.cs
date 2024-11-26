@@ -159,6 +159,10 @@ namespace Px.Utils.ModelBuilders
             if (TryGetEntries(entries, timeValIdentifierKey, langs, out Dictionary<MetadataEntryKey, string>? timeValEntries, dimensionNameToTest))
             {
                 string timeValValueString = timeValEntries.Values.First();
+                if (!timeValValueString.StartsWith(_conf.Tokens.Time.TimeIntervalIndicator, StringComparison.InvariantCulture))
+                {
+                    throw new ArgumentException($"Invalid time value string {timeValValueString}");
+                }
                 List<string> timeValList = ValueParserUtilities.GetTimeValValueList(timeValValueString, _conf);
                 MetaProperty timeValProperty = timeValList.Count > 0 ? new StringListProperty(timeValList) : new StringProperty(ValueParserUtilities.GetTimeValValueString(timeValValueString, _conf));
                 timeDimension = new(

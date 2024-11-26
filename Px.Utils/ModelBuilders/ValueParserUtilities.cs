@@ -56,26 +56,17 @@ namespace Px.Utils.ModelBuilders
         /// List of value strings excluding the interval part.
         /// If the input string is in the range format, empty list is returned.
         /// </returns>
-        /// <exception cref="ArgumentException">If the input string does not match the expected timeval format.</exception>
         public static List<string> GetTimeValValueList(string input, PxFileConfiguration? conf = null)
         {
             conf ??= PxFileConfiguration.Default;
-
-            if (input.StartsWith(conf.Tokens.Time.TimeIntervalIndicator, StringComparison.InvariantCulture))
+            int endOftoken = input.IndexOf(conf.Symbols.Value.TimeSeriesIntervalEnd);
+            int firtsStringDelimeter = input.IndexOf(conf.Symbols.Value.StringDelimeter, endOftoken);
+            if (firtsStringDelimeter >= 0)
             {
-                int endOftoken = input.IndexOf(conf.Symbols.Value.TimeSeriesIntervalEnd);
-                int firtsStringDelimeter = input.IndexOf(conf.Symbols.Value.StringDelimeter, endOftoken);
-                if (firtsStringDelimeter >= 0)
-                {
-                    return input[firtsStringDelimeter..]
-                        .SplitToListOfStrings(conf.Symbols.Value.ListSeparator, conf.Symbols.Value.StringDelimeter);
-                }
-                else return [];
+                return input[firtsStringDelimeter..]
+                    .SplitToListOfStrings(conf.Symbols.Value.ListSeparator, conf.Symbols.Value.StringDelimeter);
             }
-            else
-            {
-                throw new ArgumentException($"Invalid time value string {input}");
-            }
+            else return [];
         }
 
         /// <summary>
@@ -84,37 +75,17 @@ namespace Px.Utils.ModelBuilders
         /// </summary>
         /// <param name="input">The complete timeval value in one language.</param>
         /// <param name="conf">Configuration used for parsing the value strings and the interval part.</param>
-        /// <returns>
-        /// Value string excluding the interval part.
-        /// If the input string is in the list format, empty string is returned.
-        /// </returns>
-        /// <exception cref="ArgumentException">If the input string does not match the expected timeval format.</exception>
+        /// <returns> Value string excluding the interval part. If the string is not enclosed in string delimeters, empty string is returned.</returns>
         public static string GetTimeValValueString(string input, PxFileConfiguration? conf = null)
         {
             conf ??= PxFileConfiguration.Default;
-
-            if (input.StartsWith(conf.Tokens.Time.TimeIntervalIndicator, StringComparison.InvariantCulture))
+            int firstStringDelimeterIndex = input.IndexOf(conf.Symbols.Value.StringDelimeter);
+            int secondStringDelimeterIndex = input.IndexOf(conf.Symbols.Value.StringDelimeter, firstStringDelimeterIndex + 1);
+            if (firstStringDelimeterIndex >= 0 && secondStringDelimeterIndex >= 0)
             {
-                int endOftoken = conf.Tokens.Time.TimeIntervalIndicator.Length + 3; // 3 is the length of the characters between the interval indicator and the start of the value string
-                int firstStringDelimeter = input.IndexOf(conf.Symbols.Value.StringDelimeter, endOftoken);
-                if (firstStringDelimeter == -1 || // Interval indicator needs to be enclosed in string delimeters and exist inside the time series interval section
-                    firstStringDelimeter > input.IndexOf(conf.Symbols.Value.TimeSeriesIntervalEnd, StringComparison.InvariantCulture) ||
-                    input.Count(c => c == conf.Symbols.Value.TimeSeriesLimitsSeparator) != 1)
-                {
-                    return "";
-                }
-                int secondStringDelimeter = input.IndexOf(conf.Symbols.Value.StringDelimeter, firstStringDelimeter + 1);
-                if (firstStringDelimeter >= 0 &&
-                    secondStringDelimeter >= firstStringDelimeter)
-                {
-                    return input[firstStringDelimeter..secondStringDelimeter].CleanStringDelimeters(conf.Symbols.Value.StringDelimeter);
-                }
-                else return "";
+                return input[(firstStringDelimeterIndex + 1)..secondStringDelimeterIndex];
             }
-            else
-            {
-                throw new ArgumentException($"Invalid time value string {input}");
-            }
+            else return "";
         }
 
         /// <summary>
