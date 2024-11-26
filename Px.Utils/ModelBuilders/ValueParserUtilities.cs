@@ -97,9 +97,9 @@ namespace Px.Utils.ModelBuilders
             {
                 int endOftoken = conf.Tokens.Time.TimeIntervalIndicator.Length + 3; // 3 is the length of the characters between the interval indicator and the start of the value string
                 int firstStringDelimeter = input.IndexOf(conf.Symbols.Value.StringDelimeter, endOftoken);
-                if (firstStringDelimeter == -1 || 
+                if (firstStringDelimeter == -1 || // Interval indicator needs to be enclosed in string delimeters and exist inside the time series interval section
                     firstStringDelimeter > input.IndexOf(conf.Symbols.Value.TimeSeriesIntervalEnd, StringComparison.InvariantCulture) ||
-                    input.IndexOf(conf.Symbols.Value.TimeSeriesLimitsSeparator, firstStringDelimeter) == -1)
+                    input.Count(c => c == conf.Symbols.Value.TimeSeriesLimitsSeparator) != 1)
                 {
                     return "";
                 }

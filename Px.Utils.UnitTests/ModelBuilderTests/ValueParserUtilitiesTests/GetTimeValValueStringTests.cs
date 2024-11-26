@@ -36,10 +36,30 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
         }
 
         [TestMethod]
-        public void GetTimeValueStringTestProperInputReturnsString()
+        public void GetTimeValueStringTestValidInputReturnsString()
         {
             string input = "TLIST(A1, \"9000-9001\")";
             string expected = "9000-9001";
+            string actual = ValueParserUtilities.GetTimeValValueString(input);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void GetTimeValueStringTestInputWithTwoRangesReturnsEmpty()
+        {
+            string input = "TLIST(A1, \"9000-9001\", \"9002-9003\")";
+            string expected = "";
+            string actual = ValueParserUtilities.GetTimeValValueString(input);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void GetTimeValueStringTestInputWithRangeOfThreeValuesReturnsEmpty()
+        {
+            string input = "TLIST(A1, \"9000-9001-9002\")";
+            string expected = "";
             string actual = ValueParserUtilities.GetTimeValValueString(input);
 
             Assert.AreEqual(expected, actual);
