@@ -13,7 +13,7 @@ Extending the library with a new features should be as easy as possible and ever
 ## Installation
 Px.Utils can be installed using .NET CLI or NuGet Package Manager.
 
-### .NET CL
+### .NET CLI
 #### Latest
 ```bash
 dotnet add package Px.Utils
@@ -106,6 +106,16 @@ There are no limits for the number or size of dimensions. But it is important to
 ```GetTransform(IMatrixMap map)``` method can be used to take a subset of the the matrix and/or change the order of the dimensions or the dimension values.
 It creates a new mutable deep copy of the matrix that have the structure defined by the map parameter. The data array will also be copied and reordered based on the map.
 
+##### Example
+```csharp
+    MatrixMap map = new(
+    [
+        new DimensionMap("variable-0", ["variable-0_value-0", "variable-0_value-2", "variable-0_value-4"]),
+        new DimensionMap("variable-1", ["variable-1_value-0", "variable-1_value-2"])
+    ]);
+    Matrix<DecimalDataValue> output = matrix.GetTransform(map);
+```
+
 #### ```MatrixMap : IMatrixMap```
 This is a minimal way to represent the structure of the metadata. Does not contain any other information than the dimension and dimension value codes.
 The ```IReadOnlyMatrixMetadata``` also implements the ```IMatrixMap``` interface.
@@ -130,17 +140,24 @@ They both implement the ```IReadOnlyList<IReadOnlyDimensionValue>``` interface, 
 Differs from the base class by having values of type ```ContentDimensionValue```.
 
 #### ```TimeDimension : Dimension```
-Shares the same value type as the base class, but has additional properties in the dimension level metadata.
+Shares the same value type as the base class, but has an additional property in the dimension level metadata:
+- ```Interval``` (```TimeDimensionInterval```[enum]): Represents the interval of the time dimension. Can be either Year, HalfYear, Quarter, Month, Week, Other or Irregular.
+ 
+TimeDimension's Type (```DimensionType```[enum]) is always Time.
 
 #### ```DimensionValue : IReadOnlyDimensionValue```
 Represents the dimension value level metadata of a px-file. This is a base class for all dimension values. Each value has a unique string code among the values in the dimension.
 
 #### ```ContentDimensionValue : DimensionValue```
-Dimension value that contais content dimension value specific metadata.
+Dimension value that contais content dimension value specific metadata properties:
+- ```Unit``` (```MultilanguageString```): Stores the unit associated with the content dimension value (such as "EUR" or "%") as a multilanguage string.
+- ```LastUpdated``` (DateTime): Stores the date and time of the last updated associated with the content dimension value.
+- ```Precision``` (int): Stores the precision - the number of decimal places - of the content dimension value.
 
 #### ```MetaProperty```
 Px.Utils supports reading any metadata properties that follow the px file syntax. The properties are stored in a ```Dictionary<string, MetaProperty>``` collection called ```AdditionalProperties``` where the dictionary key is the property keyword.
 The base class ```MetaProperty``` is abstract and each supported property type has its own class that inherits from it.
+Currently supported property types (represented by ```MetaPropertyType``` enum) and their respective classes are: ```Text``` (```StringProperty```), ```MultilanguageText``` (```MultilanguageStringProperty```), ```TextArray``` (```StringListProperty```), ```MultilanguageTextArray``` (```MultilanguageStringListProperty```), ```Numeric``` (```NumericProperty```) and ```Boolean``` (```BooleanProperty```).
 
 ### Data models
 ```IDataValue``` is an interface for the data points that defines the basic computation methods for the data points. See the Computing section for more information.
@@ -167,11 +184,25 @@ Validator classes implement either ```IPxFileStreamValidator``` or ```IPxFileStr
 Custom validator objects can be injected by calling the SetCustomValidatorFunctions or SetCustomValidators methods of the PxFileValidator object. Custom validators must implement either the IPxFileValidator or IPxFileValidatorAsync interface. Custom validation methods are stored in CustomSyntaxValidationFunctions and CustomContentValidationFunctions objects for syntax and content validation processes respectively.
 Once the PxFileValidator object is instantiated, either the Validate or ValidateAsync method can be called to validate the px file. The Validate method returns a ValidationResult object that contains the validation results as a key value pair containing information about the rule violations.
 
+##### Example
+```csharp
+	PxFileValidator validator = new PxFileValidator();
+	ValidationResult result = validator.Validate(fileStream, "path/to/file.px", Encoding.UTF8);
+	ValidationResult asyncResult = await validator.ValidateAsync(fileStream, "path/to/file.px", Encoding.UTF8, cancellationToken: cancellationToken);
+```
+
 #### SyntaxValidator : IPxFileStreamValidator, IPxFileStreamValidatorAsync
 ```SyntaxValidator``` is a class that validates the syntax of a px file's metadata. It needs to be run before other validators, because both the ```ContentValidator``` and ```DataValidator``` require information from the ```SyntaxValidationResult``` object that ```SyntaxValidator``` ```Validate()``` and ```ValidateAsync()``` methods return.
 The class can be instantiated with the following parameters:
 - conf (PxFileConfiguration, optional): Object that contains px file configuration.
 - customValidationFunctions (CustomSyntaxValidationFunctions, optional): Object that contains custom validation functions for the syntax validation process.
+
+##### Example
+```csharp
+	SyntaxValidator validator = new SyntaxValidator();
+	SyntaxValidationResult result = validator.Validate(fileStream, "path/to/file.px", Encoding.UTF8);
+	SyntaxValidationResult asyncResult = await validator.ValidateAsync(fileStream, "path/to/file.px", Encoding.UTF8, cancellationToken: cancellationToken);
+```
 
 #### ContentValidator : IValidator
 ```ContentValidator``` class validates the integrity of the contents of a px file's metadata. It needs to be run after the ```SyntaxValidator```, because it requires information from the ```SyntaxValidationResult``` object that ```SyntaxValidator``` ```Validate()``` and ```ValidateAsync()``` methods return.
@@ -182,13 +213,33 @@ The class can be instantiated with the following parameters:
 - customContentValidationFunctions (CustomContentValidationFunctions, optional): Object that contains custom functions for validating the px file metadata contents.
 - conf (PxFileConfiguration, optional): Object that contains px file configuration.
 
+##### Example
+```csharp
+	Encoding encoding = Encoding.UTF8;
+	SyntaxValidator syntaxValidator = new SyntaxValidator();
+	SyntaxValidationResult syntaxResult = syntaxValidator.Validate(fileStream, "path/to/file.px", encoding);
+	ContentValidator validator = new ContentValidator("path/to/file.px", encoding, syntaxResult.Result);
+	ValidationResult result = validator.Validate();
+```
+
 #### DataValidator : IPxFileStreamValidator, IPxFileStreamValidatorAsync
-```DataValidator``` class is used to validate the data section of a px file. It needs to be run after the ```SyntaxValidator```, because it requires information from both the ```SyntaxValidationResult``` and ```ContentValidationResult``` objects that ```SyntaxValidator``` and ```ContentValidator``` ```Validate()``` and ```ValidateAsync()``` methods return.
+```DataValidator``` class is used to validate the data section of a px file. It needs to be run after the ```SyntaxValidator``` and ```ContentValidator``` because it requires information provided by the ```SyntaxValidationResult``` and ```ContentValidationResult``` objects that the ```SyntaxValidator``` and ```ContentValidator``` ```Validate()``` and ```ValidateAsync()``` methods return.
 The class can be instantiated with the following parameters:
 - rowLen (int): Length of one row of Px file data. ContentValidationResult object contains this information.
 - numOfRows (int): Amount of rows of Px file data. This information is also stored in ContentValidationResult object.
 - startRow (long): The row number where the data section starts. This information is stored in the SyntaxValidationResult object.
 - conf (PxFileConfiguration, optional): Configuration for the Px file
+
+##### Example
+```csharp
+	Encoding encoding = Encoding.UTF8;
+	SyntaxValidator syntaxValidator = new SyntaxValidator();
+	SyntaxValidationResult syntaxResult = syntaxValidator.Validate(fileStream, "path/to/file.px", encoding);
+	ContentValidator contentValidator = new ContentValidator("path/to/file.px", encoding, syntaxResult.Result);
+	ValidationResult contentResult = contentValidator.Validate();
+	DataValidator validator = new DataValidator(contentResult.DataRowLength, contentResult.DataRowAmount, syntaxResult.DataStartRow);
+	ValidationResult result = validator.Validate(fileStream, "path/to/file.px", encoding);
+```
 
 #### DatabaseValidator : IValidator, IValidatorAsync
 Whole px file databases can be validated using ```DatabaseValidator``` class. Validation can be done by using the blocking ```Validate()``` or asynchronous ```ValidateAsync()``` methods. ```DatabaseValidator``` class can be instantiated using the following parameters:
@@ -202,6 +253,13 @@ Whole px file databases can be validated using ```DatabaseValidator``` class. Va
 Database validation process validates each px file within the database and also the required structure and consistency of the database languages and encoding formats. The return object is a ```ValidationResult``` object that contains ```ValidationFeedback``` objects gathered during the validation process.
 The database needs to contain alias files for each language used in the database for each folder that contains either subcategory folders or px files. If either languages or encoding formats differ between alias or px files, warnings are generated.
    
+##### Example
+```csharp
+	DatabaseValidator validator = new DatabaseValidator("path/to/database");
+	ValidationResult result = validator.Validate();
+	ValidationResult asyncResult = await validator.ValidateAsync(cancellationToken);
+```
+
 ### Computing
 
 ```Matrix<TData>``` class has a set of extension methods for performing basic computations for the datapoints.
@@ -209,22 +267,56 @@ The database needs to contain alias files for each language used in the database
 #### Sum
 ```SumToNewValue<TData>()``` computes sums of datapoints defined by a subset of values from a given dimension.
 The method takes a new dimension value as a parameter that will define the resulting values.
-The method also has an asyncronous variant ```SumToNewValueAsync<TData>()```.  
+The method also has an asyncronous variant ```SumToNewValueAsync<TData>()```.
+
+##### Example
+```csharp
+    DimensionValue newDimensionValue = new("sumValueCode", new("en", "Sum value")); // New single language dimension value
+	Matrix<DecimalDataValue> output = matrix.SumToNewValue(newDimensionValue, matrix.Metadata.Dimensions[0]); // Sums up all values in the first dimension and creates a new dimension value for the result
+```
 
 ```AddConstantToSubset<TData>()``` adds a constant to a subset of datapoints. Also has an asynchronous variant ```AddConstantToSubsetAsync<TData>()```.
+
+##### Example
+```csharp
+	Matrix<DecimalDataValue> output = matrix.AddConstantToSubset(matrix.Metadata.Dimensions[0], 5); // Adds 5 to all values in the first dimension
+```
 
 #### Multiplication
 ```MultiplyToNewValue<TData>()``` computes products of datapoints defined by a subset of values from a given dimension.
 The method takes a new dimension value as a parameter that will define the resulting values.
 The method also has an asyncronous variant ```MultiplyToNewValueAsync<TData>()```.  
 
+##### Example
+```csharp
+	DimensionValue newDimensionValue = new("productValueCode", new("en", "Product value")); // New single language dimension value
+	Matrix<DecimalDataValue> output = matrix.MultiplyToNewValue(newDimensionValue, matrix.Metadata.Dimensions[0]); // Calculates the product of all values in the first dimension and creates a new dimension value for the result
+```
+
 ```MultiplySubsetByConstant<TData>()``` Multiply a subset of datapoints by a constant. Also has an asynchronous variant ```MultiplySubsetByConstantAsync<TData>()```.
 
+##### Example
+```csharp
+	Matrix<DecimalDataValue> output = matrix.MultiplySubsetByConstant(matrix.Metadata.Dimensions[0], 5); // Multiplies all values in the first dimension by 5
+```
+
+
 #### Division
-```DivideSubsetBySelectedValue()``` divides a subset of datapoints defined by values from one dimension with datapoints defined by a value from the same dimension.
+```DivideSubsetBySelectedValue<TData>()``` divides a subset of datapoints defined by values from one dimension with datapoints defined by a value from the same dimension.
 Also has an asyncronous variant ```DivideSubsetBySelectedValueAsync()```
 
+##### Example
+```csharp
+	Matrix<DecimalDataValue> output = matrix.DivideSubsetBySelectedValue(matrix.Metadata.Dimensions[0], matrix.Metadata.Dimensions[1].Values[0].Code); // Divides all values in the first dimension by the first value in the second dimension
+```
+
 ```DivideSubsetByConstant<TData>()``` Divide a subset of datapoints by a constant. Also has an asynchronous variant ```DivideSubsetByConstantAsync<TData>()```.
+
+##### Example
+```csharp
+	Matrix<DecimalDataValue> output = matrix.DivideSubsetByConstant(matrix.Metadata.Dimensions[0], 2); // Divides all values in the first dimension by 2
+```
+
 
 #### General
 
