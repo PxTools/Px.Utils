@@ -71,22 +71,32 @@ namespace Px.Utils.ModelBuilders
 
         /// <summary>
         /// Removes the interval entry from the beginning of a time value string
-        /// and returns the rest as a string.
+        /// and returns the rest as a string if the range format is used.
         /// </summary>
         /// <param name="input">The complete timeval value in one language.</param>
         /// <param name="conf">Configuration used for parsing the value strings and the interval part.</param>
-        /// <returns> Value string excluding the interval part. If the string is not enclosed in string delimeters, empty string is returned.</returns>
+        /// <returns> Value string excluding the interval part. If the right format is not used an exception is thrown.</returns>
+        /// <exception cref="ArgumentException">Thrown when the input string is not in the correct format.</exception>
         public static string GetTimeValValueRangeString(string input, PxFileConfiguration? conf = null)
         {
             conf ??= PxFileConfiguration.Default;
-            int firstStringDelimeterIndex = input.IndexOf(conf.Symbols.Value.StringDelimeter);
-            int secondStringDelimeterIndex = input.IndexOf(conf.Symbols.Value.StringDelimeter, firstStringDelimeterIndex + 1);
-            int thirdStringDelimeterIndex = input.IndexOf(conf.Symbols.Value.StringDelimeter, secondStringDelimeterIndex + 1);
-            if (firstStringDelimeterIndex >= 0 && secondStringDelimeterIndex >= 0 && thirdStringDelimeterIndex == -1)
+            int startOfRange = input.IndexOf(conf.Symbols.Value.ListSeparator);
+            int endOfToken = input.IndexOf(conf.Symbols.Value.TimeSeriesIntervalEnd);
+            if (startOfRange == -1 || endOfToken < startOfRange)
             {
-                return input[(firstStringDelimeterIndex + 1)..secondStringDelimeterIndex];
+                throw new ArgumentException($"Invalid time value range string. {input} range is not defined inside the time interval token");
             }
-            else throw new ArgumentException($"Invalid time value range string {input}");
+            string range = input[(startOfRange + 1)..endOfToken].Trim();
+            if (range.Count(c => c == conf.Symbols.Value.StringDelimeter) != 2 ||
+                (range[0] != conf.Symbols.Value.StringDelimeter || range[^1] != conf.Symbols.Value.StringDelimeter) ||
+                range.Count(c => c == conf.Symbols.Value.TimeSeriesLimitsSeparator) != 1)
+            {
+                throw new ArgumentException($"Invalid time value range string. {input} is not in valid range format.");
+            }
+            else
+            {
+                return range[1..^1];
+            }
         }
 
         /// <summary>
