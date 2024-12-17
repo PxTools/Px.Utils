@@ -60,10 +60,10 @@ namespace Px.Utils.ModelBuilders
         {
             conf ??= PxFileConfiguration.Default;
             int endOftoken = input.IndexOf(conf.Symbols.Value.TimeSeriesIntervalEnd);
-            int firtsStringDelimeter = input.IndexOf(conf.Symbols.Value.StringDelimeter, endOftoken);
-            if (firtsStringDelimeter >= 0)
+            int firstStringDelimeter = input.IndexOf(conf.Symbols.Value.StringDelimeter, endOftoken);
+            if (firstStringDelimeter >= 0)
             {
-                return input[firtsStringDelimeter..]
+                return input[firstStringDelimeter..]
                     .SplitToListOfStrings(conf.Symbols.Value.ListSeparator, conf.Symbols.Value.StringDelimeter);
             }
             else return [];
