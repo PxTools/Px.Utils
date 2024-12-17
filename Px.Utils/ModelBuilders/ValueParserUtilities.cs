@@ -81,7 +81,8 @@ namespace Px.Utils.ModelBuilders
             conf ??= PxFileConfiguration.Default;
             int firstStringDelimeterIndex = input.IndexOf(conf.Symbols.Value.StringDelimeter);
             int secondStringDelimeterIndex = input.IndexOf(conf.Symbols.Value.StringDelimeter, firstStringDelimeterIndex + 1);
-            if (firstStringDelimeterIndex >= 0 && secondStringDelimeterIndex >= 0)
+            int thirdStringDelimeterIndex = input.IndexOf(conf.Symbols.Value.StringDelimeter, secondStringDelimeterIndex + 1);
+            if (firstStringDelimeterIndex >= 0 && secondStringDelimeterIndex >= 0 && thirdStringDelimeterIndex == -1)
             {
                 return input[(firstStringDelimeterIndex + 1)..secondStringDelimeterIndex];
             }

@@ -3,27 +3,24 @@
 namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
 {
     [TestClass]
-    public class GetTimeValValueStringTests
+    public class GetTimeValValueRangeStringTests
     {
         [TestMethod]
-        public void GetTimeValValueStringTestEmptyInputThrowsException()
+        public void GetTimeValValueRangeStringTestEmptyInputThrowsException()
         {
             string input = "TLIST(A1)";
             Assert.ThrowsException<ArgumentException>(() => ValueParserUtilities.GetTimeValValueRangeString(input), $"Invalid time value range string {input}");
         }
 
         [TestMethod]
-        public void GetTimeValValueStringTestListInputReturnsFirstEnclosedString()
+        public void GetTimeValValueRangeStringTestListInputThrowsException()
         {
             string input = "TLIST(A1), \"9000\", \"9001\", \"9002\", \"9003\", \"9004\"";
-            string expected = "9000";
-            string actual = ValueParserUtilities.GetTimeValValueRangeString(input);
-
-            Assert.AreEqual(expected, actual);
+            Assert.ThrowsException<ArgumentException>(() => ValueParserUtilities.GetTimeValValueRangeString(input), $"Invalid time value range string {input}");
         }
 
         [TestMethod]
-        public void GetTimeValValueStringTestSingularInputReturnsString()
+        public void GetTimeValValueRangeStringTestSingularInputReturnsString()
         {
             string input = "TLIST(A1, \"9001\")";
             string expected = "9001";
@@ -43,13 +40,10 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
         }
 
         [TestMethod]
-        public void GetTimeValueStringTestInputWithTwoRangesReturnsFirstEnclosedString()
+        public void GetTimeValueStringTestInputWithTwoRangesThrowsException()
         {
             string input = "TLIST(A1, \"9000-9001\", \"9002-9003\")";
-            string expected = "9000-9001";
-            string actual = ValueParserUtilities.GetTimeValValueRangeString(input);
-
-            Assert.AreEqual(expected, actual);
+            Assert.ThrowsException<ArgumentException>(() => ValueParserUtilities.GetTimeValValueRangeString(input), $"Invalid time value range string {input}");
         }
 
         [TestMethod]
