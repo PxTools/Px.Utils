@@ -234,10 +234,9 @@ namespace Px.Utils.ModelBuilders
         {
             string code = GetDimensionCode(entries, langs, dimensionName);
             ContentValueList values = BuildContentDimensionValues(entries, langs, dimensionName);
-            // Table level UNIT, SHOWDECIMALS, PRECISION and DECIMALS properties are not needed after building the content dimension, so they're removed here
+            // Table level UNIT, PRECISION and DECIMALS properties are not needed after building the content dimension, so they're removed here
             string[] keywords = [
                 _conf.Tokens.KeyWords.Units,
-                _conf.Tokens.KeyWords.ShowDecimals,
                 _conf.Tokens.KeyWords.Precision,
                 _conf.Tokens.KeyWords.Decimals
             ];
