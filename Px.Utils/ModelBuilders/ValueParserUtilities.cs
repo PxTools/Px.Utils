@@ -76,7 +76,7 @@ namespace Px.Utils.ModelBuilders
         /// <param name="input">The complete timeval value in one language.</param>
         /// <param name="conf">Configuration used for parsing the value strings and the interval part.</param>
         /// <returns> Value string excluding the interval part. If the string is not enclosed in string delimeters, empty string is returned.</returns>
-        public static string GetTimeValValueString(string input, PxFileConfiguration? conf = null)
+        public static string GetTimeValValueRangeString(string input, PxFileConfiguration? conf = null)
         {
             conf ??= PxFileConfiguration.Default;
             int firstStringDelimeterIndex = input.IndexOf(conf.Symbols.Value.StringDelimeter);
@@ -85,7 +85,7 @@ namespace Px.Utils.ModelBuilders
             {
                 return input[(firstStringDelimeterIndex + 1)..secondStringDelimeterIndex];
             }
-            else return "";
+            else throw new ArgumentException($"Invalid time value range string {input}");
         }
 
         /// <summary>
