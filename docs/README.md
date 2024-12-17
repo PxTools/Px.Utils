@@ -264,6 +264,25 @@ The database needs to contain alias files for each language used in the database
 
 ```Matrix<TData>``` class has a set of extension methods for performing basic computations for the datapoints.
 
+Values of dimensions can be summed or multiplied together to new values. If the original matrix has the following structure:
+
+|| col-0 || col0-1 || col0-2 ||
+||-----------|-----------|-----------|-----------|-----------|-----------|
+|| col1-0 | col1-1| col1-0 | col1-1| col1-0 | col1-1 |
+|row0-0| 0 | 1 | 2 | 3 | 4 | 5 |
+|row0-1| 6 | 7 | 8 | 9 | 10 | 11 |
+|row0-2| 12 | 13 | 14 | 15 | 16 | 17 |
+
+If we sum the row0 dimension's values 1 and 2 together to form a new value "rowSum", the resulting matrix will look like this:
+
+|| col-0 || col0-1 || col0-2 ||
+||-----------|-----------|-----------|-----------|-----------|-----------|
+|| col1-0 | col1-1| col1-0 | col1-1| col1-0 | col1-1 |
+|row0-0| 0 | 1 | 2 | 3 | 4 | 5 |
+|row0-1| 6 | 7 | 8 | 9 | 10 | 11 |
+|row0-2| 12 | 13 | 14 | 15 | 16 | 17 |
+|rowSum | 18 | 20 | 22 | 24 | 26 | 28 |
+
 #### Sum
 ```SumToNewValue<TData>()``` computes sums of datapoints defined by a subset of values from a given dimension.
 The method takes a new dimension value as a parameter that will define the resulting values.
@@ -271,15 +290,20 @@ The method also has an asyncronous variant ```SumToNewValueAsync<TData>()```.
 
 ##### Example
 ```csharp
-    DimensionValue newDimensionValue = new("sumValueCode", new("en", "Sum value")); // New single language dimension value
-	Matrix<DecimalDataValue> output = matrix.SumToNewValue(newDimensionValue, matrix.Metadata.Dimensions[0]); // Sums up all values in the first dimension and creates a new dimension value for the result
+    DimensionValue newDimensionValue = new("sumValueCode", new("en", "Sum value"));
+    Matrix<DecimalDataValue> output = matrix.SumToNewValue(newDimensionValue, matrix.Metadata.Dimensions[0]);
 ```
 
 ```AddConstantToSubset<TData>()``` adds a constant to a subset of datapoints. Also has an asynchronous variant ```AddConstantToSubsetAsync<TData>()```.
 
 ##### Example
 ```csharp
-	Matrix<DecimalDataValue> output = matrix.AddConstantToSubset(matrix.Metadata.Dimensions[0], 5); // Adds 5 to all values in the first dimension
+    IMatrixMap map = new MatrixMap([
+        new DimensionMap("var0", ["var0_val0"]),
+        new DimensionMap("var1", ["var1_val1", "var1_val2"]),
+    ]);
+
+    Matrix<DecimalDataValue> output = matrix.AddConstantToSubset(map, 5);
 ```
 
 #### Multiplication
@@ -289,15 +313,20 @@ The method also has an asyncronous variant ```MultiplyToNewValueAsync<TData>()``
 
 ##### Example
 ```csharp
-	DimensionValue newDimensionValue = new("productValueCode", new("en", "Product value")); // New single language dimension value
-	Matrix<DecimalDataValue> output = matrix.MultiplyToNewValue(newDimensionValue, matrix.Metadata.Dimensions[0]); // Calculates the product of all values in the first dimension and creates a new dimension value for the result
+    DimensionValue newDimensionValue = new("productValueCode", new("en", "Product value"));
+    Matrix<DecimalDataValue> output = matrix.MultiplyToNewValue(newDimensionValue, matrix.Metadata.Dimensions[0]);
 ```
 
 ```MultiplySubsetByConstant<TData>()``` Multiply a subset of datapoints by a constant. Also has an asynchronous variant ```MultiplySubsetByConstantAsync<TData>()```.
 
 ##### Example
 ```csharp
-	Matrix<DecimalDataValue> output = matrix.MultiplySubsetByConstant(matrix.Metadata.Dimensions[0], 5); // Multiplies all values in the first dimension by 5
+    IMatrixMap map = new MatrixMap([
+        new DimensionMap("var0", ["var0_val0"]),
+        new DimensionMap("var1", ["var1_val1", "var1_val2"]),
+    ]);
+
+    Matrix<DecimalDataValue> output = matrix.MultiplySubsetByConstant(map, 5);
 ```
 
 
@@ -305,16 +334,46 @@ The method also has an asyncronous variant ```MultiplyToNewValueAsync<TData>()``
 ```DivideSubsetBySelectedValue<TData>()``` divides a subset of datapoints defined by values from one dimension with datapoints defined by a value from the same dimension.
 Also has an asyncronous variant ```DivideSubsetBySelectedValueAsync()```
 
+If the original matrix has the following structure:
+
+|| col-0 || col0-1 || col0-2 ||
+||-----------|-----------|-----------|-----------|-----------|-----------|
+|| col1-0 | col1-1| col1-0 | col1-1| col1-0 | col1-1 |
+|row0-0| 0 | 1 | 2 | 3 | 4 | 5 |
+|row0-1| 6 | 7 | 8 | 9 | 10 | 11 |
+|row0-2| 12 | 13 | 14 | 15 | 16 | 17 |
+|rowSum | 18 | 20 | 22 | 24 | 26 | 28 |
+
+And we divide row dimension values row0-1 and row0-2 by rowSum the resulting matrix will look like this:
+
+|| col-0 || col0-1 || col0-2 ||
+||-----------|-----------|-----------|-----------|-----------|-----------|
+|| col1-0 | col1-1| col1-0 | col1-1| col1-0 | col1-1 |
+|row0-0| 0 | 1 | 2 | 3 | 4 | 5 |
+|row0-1| 0.33 | 0.35 | 0.36 | 0.38 | 0.39 | 0.41 |
+|row0-2| 0.67 | 0.65 | 0.64 | 0.63 | 0.61 | 0.59 |
+|rowSum | 18 | 20 | 22 | 24 | 26 | 28 |
+
 ##### Example
 ```csharp
-	Matrix<DecimalDataValue> output = matrix.DivideSubsetBySelectedValue(matrix.Metadata.Dimensions[0], matrix.Metadata.Dimensions[1].Values[0].Code); // Divides all values in the first dimension by the first value in the second dimension
+    IMatrixMap map = new MatrixMap([
+        new DimensionMap("var0", ["var0_val0"]),
+        new DimensionMap("var1", ["var1_val1", "var1_val2"]),
+    ]);
+
+    Matrix<DecimalDataValue> output = matrix.DivideSubsetBySelectedValue(matrix.Metadata.Dimensions[0], matrix.Metadata.Dimensions[1].Values[0].Code);
 ```
 
 ```DivideSubsetByConstant<TData>()``` Divide a subset of datapoints by a constant. Also has an asynchronous variant ```DivideSubsetByConstantAsync<TData>()```.
 
 ##### Example
 ```csharp
-	Matrix<DecimalDataValue> output = matrix.DivideSubsetByConstant(matrix.Metadata.Dimensions[0], 2); // Divides all values in the first dimension by 2
+    IMatrixMap map = new MatrixMap([
+        new DimensionMap("var0", ["var0_val0"]),
+        new DimensionMap("var1", ["var1_val1", "var1_val2"]),
+    ]);
+
+    Matrix<DecimalDataValue> output = matrix.DivideSubsetByConstant(map, 2);
 ```
 
 
