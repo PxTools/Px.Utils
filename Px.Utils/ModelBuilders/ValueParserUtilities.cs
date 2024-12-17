@@ -56,25 +56,46 @@ namespace Px.Utils.ModelBuilders
         /// List of value strings excluding the interval part.
         /// If the input string is in the range format, empty list is returned.
         /// </returns>
-        /// <exception cref="ArgumentException">If the input string does not match the expected timeval format.</exception>
         public static List<string> GetTimeValValueList(string input, PxFileConfiguration? conf = null)
         {
             conf ??= PxFileConfiguration.Default;
-
-            if (input.StartsWith(conf.Tokens.Time.TimeIntervalIndicator, StringComparison.InvariantCulture))
+            int endOftoken = input.IndexOf(conf.Symbols.Value.TimeSeriesIntervalEnd);
+            int firstStringDelimeter = input.IndexOf(conf.Symbols.Value.StringDelimeter, endOftoken);
+            if (firstStringDelimeter >= 0)
             {
-                int endOftoken = input.IndexOf(conf.Symbols.Value.TimeSeriesIntervalEnd);
-                int firtsStringDelimeter = input.IndexOf(conf.Symbols.Value.StringDelimeter, endOftoken);
-                if (firtsStringDelimeter >= 0)
-                {
-                    return input[firtsStringDelimeter..]
-                        .SplitToListOfStrings(conf.Symbols.Value.ListSeparator, conf.Symbols.Value.StringDelimeter);
-                }
-                else return [];
+                return input[firstStringDelimeter..]
+                    .SplitToListOfStrings(conf.Symbols.Value.ListSeparator, conf.Symbols.Value.StringDelimeter);
+            }
+            else return [];
+        }
+
+        /// <summary>
+        /// Removes the interval entry from the beginning of a time value string
+        /// and returns the rest as a string if the range format is used.
+        /// </summary>
+        /// <param name="input">The complete timeval value in one language.</param>
+        /// <param name="conf">Configuration used for parsing the value strings and the interval part.</param>
+        /// <returns> Value string excluding the interval part. If the right format is not used an exception is thrown.</returns>
+        /// <exception cref="ArgumentException">Thrown when the input string is not in the correct format.</exception>
+        public static string GetTimeValValueRangeString(string input, PxFileConfiguration? conf = null)
+        {
+            conf ??= PxFileConfiguration.Default;
+            int startOfRange = input.IndexOf(conf.Symbols.Value.ListSeparator);
+            int endOfToken = input.IndexOf(conf.Symbols.Value.TimeSeriesIntervalEnd);
+            if (startOfRange == -1 || endOfToken < startOfRange)
+            {
+                throw new ArgumentException($"Invalid time value range string. {input} range is not defined inside the time interval token");
+            }
+            string range = input[(startOfRange + 1)..endOfToken].Trim();
+            if (range.Count(c => c == conf.Symbols.Value.StringDelimeter) != 2 ||
+                (range[0] != conf.Symbols.Value.StringDelimeter || range[^1] != conf.Symbols.Value.StringDelimeter) ||
+                range.Count(c => c == conf.Symbols.Value.TimeSeriesLimitsSeparator) != 1)
+            {
+                throw new ArgumentException($"Invalid time value range string. {input} is not in valid range format.");
             }
             else
             {
-                throw new ArgumentException($"Invalid time value string {input}");
+                return range[1..^1];
             }
         }
 
