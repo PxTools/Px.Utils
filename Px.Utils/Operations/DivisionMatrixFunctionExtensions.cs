@@ -80,10 +80,10 @@ namespace Px.Utils.Operations
         /// <param name="dividerValueCode">The set of datapoints defined by this dimension value 
         /// will be used to divide the corresponding datapoints defined by <paramref name="targetMap"/></param>
         /// <returns>A new <see cref="Matrix{TData}"/> object that contais the results of the operation.</returns>
-        public static async Task<Matrix<TData>> DivideSubsetBySelectedValueAsync<TData>(this Matrix<TData> input, IDimensionMap targetMap, string baseValueCode)
+        public static async Task<Matrix<TData>> DivideSubsetBySelectedValueAsync<TData>(this Matrix<TData> input, IDimensionMap targetMap, string dividerValueCode)
             where TData : IDivisionOperators<TData, TData, TData>, IMultiplicativeIdentity<TData, TData>
         { 
-            return await Task.Factory.StartNew(() => DivideSubsetBySelectedValue(input, targetMap, baseValueCode));
+            return await Task.Factory.StartNew(() => DivideSubsetBySelectedValue(input, targetMap, dividerValueCode));
         }
 
         /// <summary>
@@ -96,10 +96,10 @@ namespace Px.Utils.Operations
         /// <param name="dividerValueCode">The set of datapoints defined by this dimension value 
         /// will be used to divide the corresponding datapoints defined by <paramref name="targetMap"/></param>
         /// <returns>A new <see cref="Matrix{TData}"/> object that contais the results of the operation.</returns>
-        public static async Task<Matrix<TData>> DivideSubsetBySelectedValueAsync<TData>(this Task<Matrix<TData>> input, IDimensionMap targetMap, string baseValueCode)
+        public static async Task<Matrix<TData>> DivideSubsetBySelectedValueAsync<TData>(this Task<Matrix<TData>> input, IDimensionMap targetMap, string dividerValueCode)
             where TData : IDivisionOperators<TData, TData, TData>, IMultiplicativeIdentity<TData, TData>
         { 
-            return await DivideSubsetBySelectedValueAsync(await input, targetMap, baseValueCode);
+            return await DivideSubsetBySelectedValueAsync(await input, targetMap, dividerValueCode);
         }
 
         private static TData Divide<TData>(TData a, TData b) where TData : IDivisionOperators<TData, TData, TData>, IMultiplicativeIdentity<TData, TData>
