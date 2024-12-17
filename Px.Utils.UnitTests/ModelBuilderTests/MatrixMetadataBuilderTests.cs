@@ -231,7 +231,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             }
             Assert.IsFalse(Actual_1Lang_With_Table_Level_Units_And_Precision.AdditionalProperties.ContainsKey(PxFileConfiguration.Default.Tokens.KeyWords.Units));
             Assert.IsFalse(Actual_1Lang_With_Table_Level_Units_And_Precision.AdditionalProperties.ContainsKey(PxFileConfiguration.Default.Tokens.KeyWords.Decimals));
-            Assert.IsFalse(Actual_1Lang_With_Table_Level_Units_And_Precision.AdditionalProperties.ContainsKey(PxFileConfiguration.Default.Tokens.KeyWords.ShowDecimals));
+            Assert.IsTrue(Actual_1Lang_With_Table_Level_Units_And_Precision.AdditionalProperties.ContainsKey(PxFileConfiguration.Default.Tokens.KeyWords.ShowDecimals));
         }
 
         #region Content Dimension Tests
@@ -570,7 +570,6 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         {
             string[] keywords = [
                 PxFileConfiguration.Default.Tokens.KeyWords.Units,
-                PxFileConfiguration.Default.Tokens.KeyWords.ShowDecimals,
                 PxFileConfiguration.Default.Tokens.KeyWords.Precision,
                 PxFileConfiguration.Default.Tokens.KeyWords.Decimals
             ];

@@ -6,13 +6,10 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
     public class GetTimeValValueStringTests
     {
         [TestMethod]
-        public void GetTimeValValueStringTestEmptyInputReturnsEmptyString()
+        public void GetTimeValValueStringTestEmptyInputThrowsException()
         {
             string input = "TLIST(A1)";
-            string expected = "";
-            string actual = ValueParserUtilities.GetTimeValValueString(input);
-
-            Assert.AreEqual(expected, actual);
+            Assert.ThrowsException<ArgumentException>(() => ValueParserUtilities.GetTimeValValueRangeString(input), $"Invalid time value range string {input}");
         }
 
         [TestMethod]
@@ -20,7 +17,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
         {
             string input = "TLIST(A1), \"9000\", \"9001\", \"9002\", \"9003\", \"9004\"";
             string expected = "9000";
-            string actual = ValueParserUtilities.GetTimeValValueString(input);
+            string actual = ValueParserUtilities.GetTimeValValueRangeString(input);
 
             Assert.AreEqual(expected, actual);
         }
@@ -30,7 +27,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
         {
             string input = "TLIST(A1, \"9001\")";
             string expected = "9001";
-            string actual = ValueParserUtilities.GetTimeValValueString(input);
+            string actual = ValueParserUtilities.GetTimeValValueRangeString(input);
 
             Assert.AreEqual(expected, actual);
         }
@@ -40,7 +37,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
         {
             string input = "TLIST(A1, \"9000-9001\")";
             string expected = "9000-9001";
-            string actual = ValueParserUtilities.GetTimeValValueString(input);
+            string actual = ValueParserUtilities.GetTimeValValueRangeString(input);
 
             Assert.AreEqual(expected, actual);
         }
@@ -50,7 +47,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
         {
             string input = "TLIST(A1, \"9000-9001\", \"9002-9003\")";
             string expected = "9000-9001";
-            string actual = ValueParserUtilities.GetTimeValValueString(input);
+            string actual = ValueParserUtilities.GetTimeValValueRangeString(input);
 
             Assert.AreEqual(expected, actual);
         }
@@ -60,19 +57,16 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
         {
             string input = "TLIST(A1, \"9000-9001-9002\")";
             string expected = "9000-9001-9002";
-            string actual = ValueParserUtilities.GetTimeValValueString(input);
+            string actual = ValueParserUtilities.GetTimeValValueRangeString(input);
 
             Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void GetTimeValueStringTestInputRangeWithoutStringDelimetersReturnsEmptyString()
+        public void GetTimeValueStringTestInputRangeWithoutStringDelimetersThrowsException()
         {
             string input = "TLIST(A1, 9000-9001)";
-            string expected = "";
-            string actual = ValueParserUtilities.GetTimeValValueString(input);
-
-            Assert.AreEqual(expected, actual);
+            Assert.ThrowsException<ArgumentException>(() => ValueParserUtilities.GetTimeValValueRangeString(input), $"Invalid time value range string {input}");
         }
     }
 }
