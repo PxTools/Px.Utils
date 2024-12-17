@@ -530,9 +530,9 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         }
 
         [TestMethod]
-        public void MultilanguageRemovesDimensionTypeAndTimeValEntriesTest()
+        public void MultilanguageTableRemovesDimensionTypeAndTimeValEntriesTest()
         {
-            Assert.IsTrue(Actual_1Lang_With_Range_Time_Dimension.Dimensions.Exists(dim => dim.Type == DimensionType.Time));
+            Assert.IsTrue(Actual_3Lang.Dimensions.Exists(dim => dim.Type == DimensionType.Time));
             foreach (Dimension dim in Actual_3Lang.Dimensions)
             {
                 Assert.IsFalse(dim.AdditionalProperties.ContainsKey(PxFileConfiguration.Default.Tokens.KeyWords.DimensionType));
@@ -557,15 +557,10 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
 
                 if (dim.Type == DimensionType.Time)
                 {
-                    Assert.IsTrue(dim.AdditionalProperties.ContainsKey(PxFileConfiguration.Default.Tokens.KeyWords.TimeVal));
-
-                    if (dim.Type == DimensionType.Time)
-                    {
-                        Assert.IsTrue(dim.AdditionalProperties.TryGetValue(PxFileConfiguration.Default.Tokens.KeyWords.TimeVal, out MetaProperty? value));
-                        Assert.AreEqual(MetaPropertyType.Text, value.Type);
-                        StringProperty property = (StringProperty)value;
-                        Assert.AreEqual("2015-2022", property.Value);
-                    }
+                    Assert.IsTrue(dim.AdditionalProperties.TryGetValue(PxFileConfiguration.Default.Tokens.KeyWords.TimeVal, out MetaProperty? value));
+                    Assert.AreEqual(MetaPropertyType.Text, value.Type);
+                    StringProperty property = (StringProperty)value;
+                    Assert.AreEqual("2015-2022", property.Value);
                 }
             }
         }
