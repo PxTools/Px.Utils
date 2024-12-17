@@ -164,7 +164,9 @@ namespace Px.Utils.ModelBuilders
                     throw new ArgumentException($"Invalid time value string {timeValValueString}");
                 }
                 List<string> timeValList = ValueParserUtilities.GetTimeValValueList(timeValValueString, _conf);
-                MetaProperty timeValProperty = timeValList.Count > 0 ? new StringListProperty(timeValList) : new StringProperty(ValueParserUtilities.GetTimeValValueRangeString(timeValValueString, _conf));
+                MetaProperty timeValProperty = timeValList.Count > 0 ? 
+                    new StringListProperty(timeValList) : 
+                    new StringProperty(ValueParserUtilities.GetTimeValValueRangeString(timeValValueString, _conf));
                 timeDimension = new(
                     code: GetDimensionCode(entries, langs, dimensionNameToTest),
                     name: dimensionNameToTest,
