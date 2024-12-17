@@ -266,7 +266,7 @@ The database needs to contain alias files for each language used in the database
 
 Values of dimensions can be summed or multiplied together to new values. If the original matrix has the following structure:
 
-|| col-0 || col0-1 || col0-2 ||
+|| col0-0 || col0-1 || col0-2 ||
 ||-----------|-----------|-----------|-----------|-----------|-----------|
 || col1-0 | col1-1| col1-0 | col1-1| col1-0 | col1-1 |
 |row0-0| 0 | 1 | 2 | 3 | 4 | 5 |
@@ -275,7 +275,7 @@ Values of dimensions can be summed or multiplied together to new values. If the 
 
 If we sum the row0 dimension's values 1 and 2 together to form a new value "rowSum", the resulting matrix will look like this:
 
-|| col-0 || col0-1 || col0-2 ||
+|| col0-0 || col0-1 || col0-2 ||
 ||-----------|-----------|-----------|-----------|-----------|-----------|
 || col1-0 | col1-1| col1-0 | col1-1| col1-0 | col1-1 |
 |row0-0| 0 | 1 | 2 | 3 | 4 | 5 |
@@ -290,8 +290,9 @@ The method also has an asyncronous variant ```SumToNewValueAsync<TData>()```.
 
 ##### Example
 ```csharp
-    DimensionValue newDimensionValue = new("sumValueCode", new("en", "Sum value"));
-    Matrix<DecimalDataValue> output = matrix.SumToNewValue(newDimensionValue, matrix.Metadata.Dimensions[0]);
+    DimensionValue newDimensionValue = new("rowSum", new("en", "Sum value"));
+    DimensionMap map = new("row0", ["row0-1", "row0-2"]);
+    Matrix<DecimalDataValue> output = matrix.SumToNewValue(newDimensionValue, map);
 ```
 
 ```AddConstantToSubset<TData>()``` adds a constant to a subset of datapoints. Also has an asynchronous variant ```AddConstantToSubsetAsync<TData>()```.
@@ -299,8 +300,8 @@ The method also has an asyncronous variant ```SumToNewValueAsync<TData>()```.
 ##### Example
 ```csharp
     IMatrixMap map = new MatrixMap([
-        new DimensionMap("var0", ["var0_val0"]),
-        new DimensionMap("var1", ["var1_val1", "var1_val2"]),
+        new DimensionMap("col0", ["col0-0"]),
+        new DimensionMap("col1", ["col1-0", "col1-1"]),
     ]);
 
     Matrix<DecimalDataValue> output = matrix.AddConstantToSubset(map, 5);
@@ -313,8 +314,9 @@ The method also has an asyncronous variant ```MultiplyToNewValueAsync<TData>()``
 
 ##### Example
 ```csharp
-    DimensionValue newDimensionValue = new("productValueCode", new("en", "Product value"));
-    Matrix<DecimalDataValue> output = matrix.MultiplyToNewValue(newDimensionValue, matrix.Metadata.Dimensions[0]);
+    DimensionValue newDimensionValue = new("rowProduct", new("en", "Product value"));
+    DimensionMap map = new("row0", ["row0-1", "row0-2"]);
+    Matrix<DecimalDataValue> output = matrix.MultiplyToNewValue(newDimensionValue, map);
 ```
 
 ```MultiplySubsetByConstant<TData>()``` Multiply a subset of datapoints by a constant. Also has an asynchronous variant ```MultiplySubsetByConstantAsync<TData>()```.
@@ -322,8 +324,8 @@ The method also has an asyncronous variant ```MultiplyToNewValueAsync<TData>()``
 ##### Example
 ```csharp
     IMatrixMap map = new MatrixMap([
-        new DimensionMap("var0", ["var0_val0"]),
-        new DimensionMap("var1", ["var1_val1", "var1_val2"]),
+        new DimensionMap("col0", ["col0-0"]),
+        new DimensionMap("col1", ["col1-0", "col1-1"]),
     ]);
 
     Matrix<DecimalDataValue> output = matrix.MultiplySubsetByConstant(map, 5);
@@ -336,7 +338,7 @@ Also has an asyncronous variant ```DivideSubsetBySelectedValueAsync()```
 
 If the original matrix has the following structure:
 
-|| col-0 || col0-1 || col0-2 ||
+|| col0-0 || col0-1 || col0-2 ||
 ||-----------|-----------|-----------|-----------|-----------|-----------|
 || col1-0 | col1-1| col1-0 | col1-1| col1-0 | col1-1 |
 |row0-0| 0 | 1 | 2 | 3 | 4 | 5 |
@@ -346,7 +348,7 @@ If the original matrix has the following structure:
 
 And we divide row dimension values row0-1 and row0-2 by rowSum the resulting matrix will look like this:
 
-|| col-0 || col0-1 || col0-2 ||
+|| col0-0 || col0-1 || col0-2 ||
 ||-----------|-----------|-----------|-----------|-----------|-----------|
 || col1-0 | col1-1| col1-0 | col1-1| col1-0 | col1-1 |
 |row0-0| 0 | 1 | 2 | 3 | 4 | 5 |
@@ -356,12 +358,9 @@ And we divide row dimension values row0-1 and row0-2 by rowSum the resulting mat
 
 ##### Example
 ```csharp
-    IMatrixMap map = new MatrixMap([
-        new DimensionMap("var0", ["var0_val0"]),
-        new DimensionMap("var1", ["var1_val1", "var1_val2"]),
-    ]);
+    DimensionMap map = new("row0", ["row0-1", "row0-2"]);
 
-    Matrix<DecimalDataValue> output = matrix.DivideSubsetBySelectedValue(matrix.Metadata.Dimensions[0], matrix.Metadata.Dimensions[1].Values[0].Code);
+    Matrix<DecimalDataValue> output = matrix.DivideSubsetBySelectedValue(map, "rowSum");
 ```
 
 ```DivideSubsetByConstant<TData>()``` Divide a subset of datapoints by a constant. Also has an asynchronous variant ```DivideSubsetByConstantAsync<TData>()```.
@@ -369,8 +368,8 @@ And we divide row dimension values row0-1 and row0-2 by rowSum the resulting mat
 ##### Example
 ```csharp
     IMatrixMap map = new MatrixMap([
-        new DimensionMap("var0", ["var0_val0"]),
-        new DimensionMap("var1", ["var1_val1", "var1_val2"]),
+        new DimensionMap("col0", ["col0-0"]),
+        new DimensionMap("col1", ["col1-0", "col1-1"]),
     ]);
 
     Matrix<DecimalDataValue> output = matrix.DivideSubsetByConstant(map, 2);
