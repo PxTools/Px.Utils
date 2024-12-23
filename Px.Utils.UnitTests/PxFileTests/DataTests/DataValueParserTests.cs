@@ -75,6 +75,21 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public void FastParseDoubleDataValueDangerousNillSymbolWithoutDelimetersReturnsNillValueType()
+        {
+            // Arrange
+            char[] buffer = ['-'];
+            int len = 1;
+
+            // Act
+            DoubleDataValue result = DataValueParsers.FastParseDoubleDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(0, result.UnsafeValue);
+            Assert.AreEqual(DataValueType.Nill, result.Type);
+        }
+
+        [TestMethod]
         public void FastParseDoubleDataValueDangerousValidWithDecimalPartReturnsDoubleDataValue()
         {
             // Arrange
@@ -149,11 +164,39 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public void FastParseDoubleDataValueDangerousMissingSymbolWithoutDelimetersReturnsMissingValueType()
+        {
+            // Arrange
+            char[] buffer = ['.'];
+            int len = 1;
+
+            // Act
+            DoubleDataValue result = DataValueParsers.FastParseDoubleDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.Missing, result.Type);
+        }
+
+        [TestMethod]
         public void FastParseDoubleDataValueDangerousCanNotRepresentSymbolReturnsCanNotRepresentValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '"'];
             int len = 4;
+
+            // Act
+            DoubleDataValue result = DataValueParsers.FastParseDoubleDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.CanNotRepresent, result.Type);
+        }
+
+        [TestMethod]
+        public void FastParseDoubleDataValueDangerousCanNotRepresentSymbolWithoutDelimetersReturnsCanNotRepresentValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.'];
+            int len = 2;
 
             // Act
             DoubleDataValue result = DataValueParsers.FastParseDoubleDataValueDangerous(buffer, len);
@@ -177,11 +220,39 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public void FastParseDoubleDataValueDangerousConfidentialSymbolWithoutDelimetersReturnsConfidentialValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.'];
+            int len = 3;
+
+            // Act
+            DoubleDataValue result = DataValueParsers.FastParseDoubleDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.Confidential, result.Type);
+        }
+
+        [TestMethod]
         public void FastParseDoubleDataValueDangerousNotAcquiredSymbolReturnsNotAcquiredValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '"'];
             int len = 6;
+
+            // Act
+            DoubleDataValue result = DataValueParsers.FastParseDoubleDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.NotAcquired, result.Type);
+        }
+
+        [TestMethod]
+        public void FastParseDoubleDataValueDangerousNotAcquiredSymbolWithoutDelimetersReturnsNotAcquiredValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.'];
+            int len = 4;
 
             // Act
             DoubleDataValue result = DataValueParsers.FastParseDoubleDataValueDangerous(buffer, len);
@@ -205,11 +276,39 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public void FastParseDoubleDataValueDangerousNotAskedSymbolWithoutDelimetersReturnsNotAskedValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.', '.'];
+            int len = 5;
+
+            // Act
+            DoubleDataValue result = DataValueParsers.FastParseDoubleDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.NotAsked, result.Type);
+        }
+
+        [TestMethod]
         public void FastParseDoubleDataValueDangerousEmptySymbolReturnsEmptyValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '.', '"'];
             int len = 8;
+
+            // Act
+            DoubleDataValue result = DataValueParsers.FastParseDoubleDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.Empty, result.Type);
+        }
+
+        [TestMethod]
+        public void FastParseDoubleDataValueDangerousEmptySymbolWithoutDelimetersReturnsEmptyValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.', '.', '.'];
+            int len = 6;
 
             // Act
             DoubleDataValue result = DataValueParsers.FastParseDoubleDataValueDangerous(buffer, len);
@@ -278,6 +377,21 @@ namespace PxFileTests.DataTests
             // Arrange
             char[] buffer = ['"', '-', '"'];
             int len = 3;
+
+            // Act
+            DecimalDataValue result = DataValueParsers.FastParseDecimalDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(0m, result.UnsafeValue);
+            Assert.AreEqual(DataValueType.Nill, result.Type);
+        }
+
+        [TestMethod]
+        public void FastParseDecimalDataValueDangerousNillSymbolWithoutDelimetersReturnsNillValueType()
+        {
+            // Arrange
+            char[] buffer = ['-'];
+            int len = 1;
 
             // Act
             DecimalDataValue result = DataValueParsers.FastParseDecimalDataValueDangerous(buffer, len);
@@ -362,11 +476,39 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public void FastParseDecimalDataValueDangerousMissingSymbolWithoutDelimetersReturnsMissingValueType()
+        {
+            // Arrange
+            char[] buffer = ['.'];
+            int len = 1;
+
+            // Act
+            DecimalDataValue result = DataValueParsers.FastParseDecimalDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.Missing, result.Type);
+        }
+
+        [TestMethod]
         public void FastParseDecimalDataValueDangerousCanNotRepresentSymbolReturnsCanNotRepresentValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '"'];
             int len = 4;
+
+            // Act
+            DecimalDataValue result = DataValueParsers.FastParseDecimalDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.CanNotRepresent, result.Type);
+        }
+
+        [TestMethod]
+        public void FastParseDecimalDataValueDangerousCanNotRepresentSymbolWithoutDelimetersReturnsCanNotRepresentValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.'];
+            int len = 2;
 
             // Act
             DecimalDataValue result = DataValueParsers.FastParseDecimalDataValueDangerous(buffer, len);
@@ -390,11 +532,39 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public void FastParseDecimalDataValueDangerousConfidentialSymbolWithoutDelimetersReturnsConfidentialValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.'];
+            int len = 3;
+
+            // Act
+            DecimalDataValue result = DataValueParsers.FastParseDecimalDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.Confidential, result.Type);
+        }
+
+        [TestMethod]
         public void FastParseDecimalDataValueDangerousNotAcquiredSymbolReturnsNotAcquiredValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '"'];
             int len = 6;
+
+            // Act
+            DecimalDataValue result = DataValueParsers.FastParseDecimalDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.NotAcquired, result.Type);
+        }
+
+        [TestMethod]
+        public void FastParseDecimalDataValueDangerousNotAcquiredSymbolWithoutDelimetersReturnsNotAcquiredValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.'];
+            int len = 4;
 
             // Act
             DecimalDataValue result = DataValueParsers.FastParseDecimalDataValueDangerous(buffer, len);
@@ -418,11 +588,39 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public void FastParseDecimalDataValueDangerousNotAskedSymbolWithoutDelimetersReturnsNotAskedValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.', '.'];
+            int len = 5;
+
+            // Act
+            DecimalDataValue result = DataValueParsers.FastParseDecimalDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.NotAsked, result.Type);
+        }
+
+        [TestMethod]
         public void FastParseDecimalDataValueDangerousEmptySymbolReturnsEmptyValueType()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '.', '"'];
             int len = 8;
+
+            // Act
+            DecimalDataValue result = DataValueParsers.FastParseDecimalDataValueDangerous(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.Empty, result.Type);
+        }
+
+        [TestMethod]
+        public void FastParseDecimalDataValueDangerousEmptySymbolWithoutDelimetersReturnsEmptyValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.', '.', '.'];
+            int len = 6;
 
             // Act
             DecimalDataValue result = DataValueParsers.FastParseDecimalDataValueDangerous(buffer, len);
@@ -490,6 +688,20 @@ namespace PxFileTests.DataTests
             // Arrange
             char[] buffer = ['"', '-', '"'];
             int len = 3;
+
+            // Act
+            double result = DataValueParsers.FastParseUnsafeDoubleDangerous(buffer, len, missingValueEncodings);
+
+            // Assert
+            Assert.AreEqual(0, result);
+        }
+
+        [TestMethod]
+        public void FastParseUnsafeDoubleDangerousNillSymbolWithoutDelimetersReturnsNillValue()
+        {
+            // Arrange
+            char[] buffer = ['-'];
+            int len = 1;
 
             // Act
             double result = DataValueParsers.FastParseUnsafeDoubleDangerous(buffer, len, missingValueEncodings);
@@ -569,11 +781,39 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public void FastParseUnsafeDoubleDangerousMissingSymbolWithoutDelimetersReturnsMissingValue()
+        {
+            // Arrange
+            char[] buffer = ['.'];
+            int len = 1;
+
+            // Act
+            double result = DataValueParsers.FastParseUnsafeDoubleDangerous(buffer, len, missingValueEncodings);
+
+            // Assert
+            Assert.AreEqual(1, result);
+        }
+
+        [TestMethod]
         public void FastParseUnsafeDoubleDangerousCanNotRepresentSymbolReturnsCanNotRepresentValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '"'];
             int len = 4;
+
+            // Act
+            double result = DataValueParsers.FastParseUnsafeDoubleDangerous(buffer, len, missingValueEncodings);
+
+            // Assert
+            Assert.AreEqual(2, result);
+        }
+
+        [TestMethod]
+        public void FastParseUnsafeDoubleDangerousCanNotRepresentSymbolWithoutDelimetersReturnsCanNotRepresentValue()
+        {
+            // Arrange
+            char[] buffer = ['.', '.'];
+            int len = 2;
 
             // Act
             double result = DataValueParsers.FastParseUnsafeDoubleDangerous(buffer, len, missingValueEncodings);
@@ -597,11 +837,39 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public void FastParseUnsafeDoubleDangerousConfidentialSymbolWithoutDelimetersReturnsConfidentialValue()
+        {
+            // Arrange
+            char[] buffer = [ '.', '.', '.' ];
+            int len = 3;
+
+            // Act
+            double result = DataValueParsers.FastParseUnsafeDoubleDangerous(buffer, len, missingValueEncodings);
+
+            // Assert
+            Assert.AreEqual(3, result);
+        }
+
+        [TestMethod]
         public void FastParseUnsafeDoubleDangerousNotAcquiredSymbolReturnsNotAcquiredValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '"'];
             int len = 6;
+
+            // Act
+            double result = DataValueParsers.FastParseUnsafeDoubleDangerous(buffer, len, missingValueEncodings);
+
+            // Assert
+            Assert.AreEqual(4, result);
+        }
+
+        [TestMethod]
+        public void FastParseUnsafeDoubleDangerousNotAcquiredSymbolWithoutDelimetersReturnsNotAcquiredValue()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.'];
+            int len = 4;
 
             // Act
             double result = DataValueParsers.FastParseUnsafeDoubleDangerous(buffer, len, missingValueEncodings);
@@ -625,11 +893,39 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public void FastParseUnsafeDoubleDangerousNotAskedSymbolWithoutDelimetersReturnsNotAskedValue()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.', '.'];
+            int len = 5;
+
+            // Act
+            double result = DataValueParsers.FastParseUnsafeDoubleDangerous(buffer, len, missingValueEncodings);
+
+            // Assert
+            Assert.AreEqual(5, result);
+        }
+
+        [TestMethod]
         public void FastParseUnsafeDoubleDangerousEmptySymbolReturnsEmptyValue()
         {
             // Arrange
             char[] buffer = ['"', '.', '.', '.', '.', '.', '.', '"'];
             int len = 8;
+
+            // Act
+            double result = DataValueParsers.FastParseUnsafeDoubleDangerous(buffer, len, missingValueEncodings);
+
+            // Assert
+            Assert.AreEqual(6, result);
+        }
+
+        [TestMethod]
+        public void FastParseUnsafeDoubleDangerousEmptySymbolWithoutDelimetersReturnsEmptyValue()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.', '.', '.'];
+            int len = 6;
 
             // Act
             double result = DataValueParsers.FastParseUnsafeDoubleDangerous(buffer, len, missingValueEncodings);
@@ -1110,17 +1406,6 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseDecimalDataValueMissingCodeWithoutQuotesThrows()
-        {
-            // Arrange
-            char[] buffer = ['.', '.', '.', '.',];
-            int len = 4;
-
-            // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseDecimalDataValue(buffer, len));
-        }
-
-        [TestMethod]
         public void ParseDecimalDataValueMissingCodeWithoutEndQuoteThrows()
         {
             // Arrange
@@ -1365,17 +1650,6 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public void ParseUnsafeDoubleMissingCodeWithoutQuotesThrows()
-        {
-            // Arrange
-            char[] buffer = ['.', '.', '.', '.',];
-            int len = 4;
-
-            // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings));
-        }
-
-        [TestMethod]
         public void ParseUnsafeDoubleMissingCodeWithoutEndQuoteThrows()
         {
             // Arrange
@@ -1417,6 +1691,90 @@ namespace PxFileTests.DataTests
 
             // Act
             Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings));
+        }
+
+        [TestMethod]
+        public void ParseUnsafeDoubleMissingSymbolWithoutDelimetersReturnsMissingValue()
+        {
+            // Arrange
+            char[] buffer = ['.'];
+            int len = 1;
+
+            // Act
+            double result = DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings);
+
+            // Assert
+            Assert.AreEqual(1, result);
+        }
+
+        [TestMethod]
+        public void ParseUnsafeDoubleCanNotRepresentSymbolWithoutDelimetersReturnsCanNotRepresentValue()
+        {
+            // Arrange
+            char[] buffer = ['.', '.'];
+            int len = 2;
+
+            // Act
+            double result = DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings);
+
+            // Assert
+            Assert.AreEqual(2, result);
+        }
+
+        [TestMethod]
+        public void ParseUnsafeDoubleConfidentialSymbolWithoutDelimetersReturnsConfidentialValue()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.'];
+            int len = 3;
+
+            // Act
+            double result = DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings);
+
+            // Assert
+            Assert.AreEqual(3, result);
+        }
+
+        [TestMethod]
+        public void ParseUnsafeDoubleNotAcquiredSymbolWithoutDelimetersReturnsNotAcquiredValue()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.'];
+            int len = 4;
+
+            // Act
+            double result = DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings);
+
+            // Assert
+            Assert.AreEqual(4, result);
+        }
+
+        [TestMethod]
+        public void ParseUnsafeDoubleNotAskedSymbolWithoutDelimetersReturnsNotAskedValue()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.', '.'];
+            int len = 5;
+
+            // Act
+            double result = DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings);
+
+            // Assert
+            Assert.AreEqual(5, result);
+        }
+
+        [TestMethod]
+        public void ParseUnsafeDoubleEmptySymbolWithoutDelimetersReturnsEmptyValue()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.', '.', '.'];
+            int len = 6;
+
+            // Act
+            double result = DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings);
+
+            // Assert
+            Assert.AreEqual(6, result);
         }
 
         #endregion

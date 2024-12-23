@@ -28,6 +28,19 @@
             "\".\" 1 \".\" 3 \".\" 5 \".\" 7 \".\" 9 \n" +
             "\"...\" 11 \"...\" 13 \"...\" 15 \"...\" 17 \"...\" 19;";
 
+        internal static string MINIMAL_UTF8_20DATAVALUES_WITH_UNENCLOSED_MISSING =>
+            "CHARSET=\"Unicode\";\n" +
+            "AXIS-VERSION=\"2013\";\n" +
+            "CODEPAGE=\"utf-8\";\n" +
+            "LANGUAGES=\"aa\",\"åå\",\"öö\";\n" +
+            "NEXT-UPDATE=\"20240131 08:00\";\n" +
+            "SUBJECT-AREA=\"test\";\n" +
+            "SUBJECT-AREA[åå]=\"test\";\n" +
+            "COPYRIGHT=YES;\n" +
+            "DATA=\n" +
+            "\".\" 1 \".\" 3 \".\" 5 \".\" 7 \".\" 9 \n" +
+            "... 11 ... 13 ... 15 ... 17 ... 19;";
+
         internal static string MINIMAL_UTF8_20DECIMALVALUES =>
             "CHARSET=\"Unicode\";\n" +
             "AXIS-VERSION=\"2013\";\n" +
