@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 using Px.Utils.PxFile;
 using Px.Utils.Validation.DatabaseValidation;
 
@@ -185,6 +186,7 @@ namespace Px.Utils.Validation.DataValidation
             return validationFeedbacks;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void HandleEntryTypeChange(ref ValidationFeedback validationFeedbacks)
         {
             if (_currentEntryType == EntryType.Unknown && (_lineNumber > 1 || _charPosition > 0))
@@ -199,7 +201,7 @@ namespace Px.Utils.Validation.DataValidation
                 List<IDataValidator> validators = _currentEntryType switch
                 {
                     EntryType.DataItemSeparator => _dataSeparatorValidators,
-                    EntryType.DataItem => _currentEntry[0] == _stringDelimeter ? _dataStringValidators : _dataNumValidators,
+                    EntryType.DataItem => CurrentEntryIsNumber() ? _dataNumValidators : _dataStringValidators,
                     _ => _commonValidators
                 };
 
@@ -220,6 +222,7 @@ namespace Px.Utils.Validation.DataValidation
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void HandleNonSeparatorType(ref ValidationFeedback validationFeedbacks)
         {
             if (_currentCharacterType == EntryType.DataItem)
@@ -240,6 +243,25 @@ namespace Px.Utils.Validation.DataValidation
                 _lineNumber++;
                 _currentRowLength = 0;
                 _charPosition = 0;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool CurrentEntryIsNumber()
+        {
+            if (_currentEntry[0] < '0')
+            {
+                if (_currentEntry[0] == '"') return false;
+                else if (_currentEntry[0] == '-')
+                {
+                    if (_currentEntry.Count == 1) return false;
+                    else return true;
+                }
+                return false;
+            }
+            else
+            {
+                return true;
             }
         }
 

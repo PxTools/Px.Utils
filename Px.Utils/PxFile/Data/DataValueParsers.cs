@@ -25,16 +25,18 @@ namespace Px.Utils.PxFile.Data
         {
             // All special/missing values are encoded either as strings in the format "..." and "-" or ... and -
             // The length of the string (number of dots) is used to determine the type of missing value.
-            if (buffer[0] == '"')
+            if (buffer[0] < '0')
             {
-                if (buffer[1] == '-') return new DoubleDataValue(0, DataValueType.Nill);
-                return new DoubleDataValue(0, (DataValueType)(len - stringDelimiterOffset));
-            }
-            else if (buffer[0] < '0')
-            {
+                if (buffer[0] == '"')
+                {
+                    if (buffer[1] == '-') return new DoubleDataValue(0, DataValueType.Nill);
+                    return new DoubleDataValue(0, (DataValueType)(len - stringDelimiterOffset));
+                }
                 if (buffer[0] == '-')
+                {
                     if (len == 1) return new DoubleDataValue(0, DataValueType.Nill);
-                    else return new(FastParseDoubleDangerous(buffer, len), DataValueType.Exists);
+                    return new(FastParseDoubleDangerous(buffer, len), DataValueType.Exists);
+                }
                 return new DoubleDataValue(0, (DataValueType)len);
             }
             else
@@ -57,16 +59,18 @@ namespace Px.Utils.PxFile.Data
         {
             // All special/missing values are encoded as strings in the format "..." or "-".
             // The length of the string (number of dots) is used to determine the type of missing value.
-            if (buffer[0] == '"')
+            if (buffer[0] < '0')
             {
-                if (buffer[1] == '-') return new DecimalDataValue(0, DataValueType.Nill);
-                return new DecimalDataValue(0, (DataValueType)(len - stringDelimiterOffset));
-            }
-            else if (buffer[0] < '0')
-            {
+                if (buffer[0] == '"')
+                {
+                    if (buffer[1] == '-') return new DecimalDataValue(0, DataValueType.Nill);
+                    return new DecimalDataValue(0, (DataValueType)(len - stringDelimiterOffset));
+                }
                 if (buffer[0] == '-')
+                {
                     if (len == 1) return new DecimalDataValue(0, DataValueType.Nill);
-                    else return new(FastParseDecimalDangerous(buffer, len), DataValueType.Exists);
+                    return new(FastParseDecimalDangerous(buffer, len), DataValueType.Exists);
+                }
                 return new DecimalDataValue(0, (DataValueType)len);
             }
             else
@@ -98,16 +102,18 @@ namespace Px.Utils.PxFile.Data
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double FastParseUnsafeDoubleDangerous(char[] buffer, int len, double[] missingValueEncodings)
         {
-            if (buffer[0] == '"')
+            if (buffer[0] < '0')
             {
-                if (buffer[1] == '-') return missingValueEncodings[0];
-                return missingValueEncodings[len - stringDelimiterOffset];
-            }
-            else if (buffer[0] < '0')
-            {
-                if (buffer[0] == '-')
+                if (buffer[0] == '"')
+                {
+                    if (buffer[1] == '-') return missingValueEncodings[0];
+                    return missingValueEncodings[len - stringDelimiterOffset];
+                }
+                else if (buffer[0] == '-')
+                {
                     if (len == 1) return missingValueEncodings[0];
-                    else return FastParseDoubleDangerous(buffer, len);
+                    return FastParseDoubleDangerous(buffer, len);
+                }
                 return missingValueEncodings[len];
             }
             else
