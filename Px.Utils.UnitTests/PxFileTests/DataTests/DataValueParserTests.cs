@@ -1141,16 +1141,103 @@ namespace PxFileTests.DataTests
             // Assert
             Assert.AreEqual(DataValueType.Empty, result.Type);
         }
-
+        
         [TestMethod]
-        public void ParseDoubleDataValueMissingCodeWithoutQuotesThrows()
+        public void ParseDoubleDataValueNillSymbolWithoutQuotesReturnsNillValueType()
         {
             // Arrange
-            char[] buffer = ['.', '.', '.', '.',];
+            char[] buffer = ['-'];
+            int len = 1;
+
+            // Act
+            DoubleDataValue result = DataValueParsers.ParseDoubleDataValue(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.Nill, result.Type);
+        }
+
+        [TestMethod]
+        public void ParseDoubleDataValueMissingSymbolWithoutQuotesReturnsMissingValueType()
+        {
+            // Arrange
+            char[] buffer = ['.'];
+            int len = 1;
+
+            // Act
+            DoubleDataValue result = DataValueParsers.ParseDoubleDataValue(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.Missing, result.Type);
+        }
+
+        [TestMethod]
+        public void ParseDoubleDataValueCanNotRepresentSymbolWithoutQuotesReturnsCanNotRepresentValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.'];
+            int len = 2;
+
+            // Act
+            DoubleDataValue result = DataValueParsers.ParseDoubleDataValue(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.CanNotRepresent, result.Type);
+        }
+
+        [TestMethod]
+        public void ParseDoubleDataValueConfidentialSymbollWithoutQuotesReturnsConfidentialValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.'];
+            int len = 3;
+
+            // Act
+            DoubleDataValue result = DataValueParsers.ParseDoubleDataValue(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.Confidential, result.Type);
+        }
+
+        [TestMethod]
+        public void ParseDoubleDataValueNotAcquiredSymbollWithoutQuotesReturnsNotAcquiredValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.'];
             int len = 4;
 
             // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseDoubleDataValue(buffer, len));
+            DoubleDataValue result = DataValueParsers.ParseDoubleDataValue(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.NotAcquired, result.Type);
+        }
+
+        [TestMethod]
+        public void ParseDoubleDataValueNotAskedSymbollWithoutQuotesReturnsNotAskedValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.', '.'];
+            int len = 5;
+
+            // Act
+            DoubleDataValue result = DataValueParsers.ParseDoubleDataValue(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.NotAsked, result.Type);
+        }
+
+        [TestMethod]
+        public void ParseDoubleDataValueEmptySymbolWithoutQuotesReturnsEmptyValueType()
+        {
+            // Arrange
+            char[] buffer = ['.', '.', '.', '.', '.', '.'];
+            int len = 6;
+
+            // Act
+            DoubleDataValue result = DataValueParsers.ParseDoubleDataValue(buffer, len);
+
+            // Assert
+            Assert.AreEqual(DataValueType.Empty, result.Type);
         }
 
         [TestMethod]

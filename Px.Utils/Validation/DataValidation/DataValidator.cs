@@ -249,20 +249,13 @@ namespace Px.Utils.Validation.DataValidation
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool CurrentEntryIsNumber()
         {
-            if (_currentEntry[0] < '0')
+            if (_currentEntry[0] <= '.') // Characters that can start a valid missing value code are ", - or . which are are "smaller or equal to" .
             {
-                if (_currentEntry[0] == '"') return false;
-                else if (_currentEntry[0] == '-')
-                {
-                    if (_currentEntry.Count == 1) return false;
-                    else return true;
-                }
+                if (_currentEntry[0] == '-') return _currentEntry.Count > 1; // Dodge negative numbers
                 return false;
             }
-            else
-            {
-                return true;
-            }
+
+            return true;
         }
 
         private void ResetValidator()
