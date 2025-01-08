@@ -24,7 +24,6 @@ namespace Px.Utils.Validation.DataValidation
         private readonly List<IDataValidator> _dataSeparatorValidators = [];
 
         private EntryType _currentEntryType = EntryType.Unknown;
-        private byte _stringDelimeter;
         private List<byte> _currentEntry = [];
         private int _lineNumber = 1;
         private int _charPosition;
@@ -138,7 +137,6 @@ namespace Px.Utils.Validation.DataValidation
         {
             ValidationFeedback validationFeedbacks = [];
             byte endOfData = (byte)_conf.Symbols.EntrySeparator;
-            _stringDelimeter = (byte)_conf.Symbols.Value.StringDelimeter;
             _currentEntry = new(_streamBufferSize);
             byte[] buffer = new byte[_streamBufferSize];
             int bytesRead = 0;
@@ -198,10 +196,11 @@ namespace Px.Utils.Validation.DataValidation
             }
             else
             {
+                // OBS: All valid numbers end with number char (_currentEntry[^1] > '.')
                 List<IDataValidator> validators = _currentEntryType switch
                 {
                     EntryType.DataItemSeparator => _dataSeparatorValidators,
-                    EntryType.DataItem => CurrentEntryIsNumber() ? _dataNumValidators : _dataStringValidators,
+                    EntryType.DataItem => _currentEntry[^1] > '.' ? _dataNumValidators : _dataStringValidators,
                     _ => _commonValidators
                 };
 
@@ -244,18 +243,6 @@ namespace Px.Utils.Validation.DataValidation
                 _currentRowLength = 0;
                 _charPosition = 0;
             }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool CurrentEntryIsNumber()
-        {
-            if (_currentEntry[0] <= '.') // Characters that can start a valid missing value code are ", - or . which are are "smaller or equal to" .
-            {
-                if (_currentEntry[0] == '-') return _currentEntry.Count > 1; // Dodge negative numbers
-                return false;
-            }
-
-            return true;
         }
 
         private void ResetValidator()

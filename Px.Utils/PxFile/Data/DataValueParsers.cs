@@ -23,7 +23,7 @@ namespace Px.Utils.PxFile.Data
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DoubleDataValue FastParseDoubleDataValueDangerous(char[] buffer, int len)
         {
-            if(IsNumber(buffer, len))
+            if (buffer[len - 1] > '.') // When the last char is a number, the value is a number
             {
                 return new DoubleDataValue(FastParseDoubleDangerous(buffer, len), DataValueType.Exists);
             }
@@ -48,7 +48,8 @@ namespace Px.Utils.PxFile.Data
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DecimalDataValue FastParseDecimalDataValueDangerous(char[] buffer, int len)
         {
-            if (IsNumber(buffer, len))
+            if (buffer[len - 1] > '.') // When the last char is a number, the value is a number
+
             {
                 return new DecimalDataValue(FastParseDecimalDangerous(buffer, len), DataValueType.Exists);
             }
@@ -84,7 +85,8 @@ namespace Px.Utils.PxFile.Data
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double FastParseUnsafeDoubleDangerous(char[] buffer, int len, double[] missingValueEncodings)
         {
-            if (IsNumber(buffer, len))
+            if (buffer[len - 1] > '.') // When the last char is a number, the value is a number
+
             {
                 return FastParseDoubleDangerous(buffer, len);
             }
@@ -178,10 +180,10 @@ namespace Px.Utils.PxFile.Data
             {
                 if (buffer[0] == '"')
                 {
-                    return ParseEnclosedUnsafeDouble(buffer, len, missingValueEncodings);
+                    return EncodeMissingEnclosedUnsafeDouble(buffer, len, missingValueEncodings);
                 }
 
-                return ParseUnenclosedUnsafeDouble(buffer, len, missingValueEncodings);
+                return EncodeMissingUnenclosedUnsafeDouble(buffer, len, missingValueEncodings);
             }
         }
 
@@ -213,7 +215,7 @@ namespace Px.Utils.PxFile.Data
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static double ParseEnclosedUnsafeDouble(char[] buffer, int len, double[] missingValueEncodings)
+        private static double EncodeMissingEnclosedUnsafeDouble(char[] buffer, int len, double[] missingValueEncodings)
         {
             if (buffer[len - 1] != '"' || len < missingDataEntryMinLength || len > missingDataEntryMaxLength)
             {
@@ -230,7 +232,7 @@ namespace Px.Utils.PxFile.Data
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static double ParseUnenclosedUnsafeDouble(char[] buffer, int len, double[] missingValueEncodings)
+        private static double EncodeMissingUnenclosedUnsafeDouble(char[] buffer, int len, double[] missingValueEncodings)
         {
             if (buffer[0] == '-' && len == 1)
             {
@@ -335,18 +337,6 @@ namespace Px.Utils.PxFile.Data
             }
             if (buffer[0] == '-') return -n / decimalPowersOf10[len - decimalPosition];
             else return n / decimalPowersOf10[len - decimalPosition];
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsNumber(char[] buffer, int len)
-        {
-            if (buffer[0] <= '.') // Characters that can start a valid missing value code are ", - or . which are are "smaller or equal to" .
-            {
-                if (buffer[0] == '-') return len > 1; // Dodge negative numbers
-                return false;
-            }
-
-            return true;
         }
     }
 }
