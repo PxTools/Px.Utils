@@ -113,7 +113,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
-        public void ReadDoubleDataValuesValidIntegersAndUnenclosedMissingRetuurnsCorrectDoubleDataValues()
+        public void ReadDoubleDataValuesValidIntegersAndUnenclosedMissingReturnsCorrectDoubleDataValues()
         {
 
             // Arrange
