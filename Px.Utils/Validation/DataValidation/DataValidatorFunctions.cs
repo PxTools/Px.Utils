@@ -14,7 +14,14 @@ namespace Px.Utils.Validation.DataValidation
             PxFileConfiguration.Default.Tokens.DataValues.DataIsNotAvailable,
             PxFileConfiguration.Default.Tokens.DataValues.DataHasNotBeenAsked,
             PxFileConfiguration.Default.Tokens.DataValues.Missing6,
-            PxFileConfiguration.Default.Tokens.DataValues.DataIsNone
+            PxFileConfiguration.Default.Tokens.DataValues.DataIsNone,
+            PxFileConfiguration.Default.Tokens.DataValues.DataIsMissing.Trim('"'), // Allows for missing codes without string delimeters
+            PxFileConfiguration.Default.Tokens.DataValues.DataCategoryNotApplicable.Trim('"'),
+            PxFileConfiguration.Default.Tokens.DataValues.DataIsConfidential.Trim('"'),
+            PxFileConfiguration.Default.Tokens.DataValues.DataIsNotAvailable.Trim('"'),
+            PxFileConfiguration.Default.Tokens.DataValues.DataHasNotBeenAsked.Trim('"'),
+            PxFileConfiguration.Default.Tokens.DataValues.Missing6.Trim('"'),
+            PxFileConfiguration.Default.Tokens.DataValues.DataIsNone.Trim('"'),
         ];
 
         /// <summary>

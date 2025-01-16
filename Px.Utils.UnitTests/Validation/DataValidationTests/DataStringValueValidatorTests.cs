@@ -16,6 +16,13 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         [DataRow("\".....\"")]
         [DataRow("\"......\"")]
         [DataRow("\"-\"")]
+        [DataRow(".")]
+        [DataRow("..")]
+        [DataRow("...")]
+        [DataRow("....")]
+        [DataRow(".....")]
+        [DataRow("......")]
+        [DataRow("-")]
         public void AllowedStrings(string allowedValue)
         {
             DataStringValidator validator = new();
@@ -30,12 +37,11 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         [DataRow("\"...")]
         [DataRow("...\"")]
         [DataRow("\"\"")]
-        [DataRow("...")]
+        [DataRow(" ... ")]
         [DataRow("foo")]
         [DataRow("\"foo\"")]
         [DataRow("\".......\"")]
         [DataRow("\"--\"")]
-        [DataRow("-")]
         public void NotAllowedStringValue(string notAllowedValue)
         {
             DataStringValidator validator = new();

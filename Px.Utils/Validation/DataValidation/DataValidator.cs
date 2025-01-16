@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 using Px.Utils.PxFile;
 using Px.Utils.Validation.DatabaseValidation;
 
@@ -23,7 +24,6 @@ namespace Px.Utils.Validation.DataValidation
         private readonly List<IDataValidator> _dataSeparatorValidators = [];
 
         private EntryType _currentEntryType = EntryType.Unknown;
-        private byte _stringDelimeter;
         private List<byte> _currentEntry = [];
         private int _lineNumber = 1;
         private int _charPosition;
@@ -137,7 +137,6 @@ namespace Px.Utils.Validation.DataValidation
         {
             ValidationFeedback validationFeedbacks = [];
             byte endOfData = (byte)_conf.Symbols.EntrySeparator;
-            _stringDelimeter = (byte)_conf.Symbols.Value.StringDelimeter;
             _currentEntry = new(_streamBufferSize);
             byte[] buffer = new byte[_streamBufferSize];
             int bytesRead = 0;
@@ -185,6 +184,7 @@ namespace Px.Utils.Validation.DataValidation
             return validationFeedbacks;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void HandleEntryTypeChange(ref ValidationFeedback validationFeedbacks)
         {
             if (_currentEntryType == EntryType.Unknown && (_lineNumber > 1 || _charPosition > 0))
@@ -196,10 +196,11 @@ namespace Px.Utils.Validation.DataValidation
             }
             else
             {
+                // OBS: All valid numbers end with number char (_currentEntry[^1] > '.')
                 List<IDataValidator> validators = _currentEntryType switch
                 {
                     EntryType.DataItemSeparator => _dataSeparatorValidators,
-                    EntryType.DataItem => _currentEntry[0] == _stringDelimeter ? _dataStringValidators : _dataNumValidators,
+                    EntryType.DataItem => _currentEntry[^1] > '.' ? _dataNumValidators : _dataStringValidators,
                     _ => _commonValidators
                 };
 
@@ -220,6 +221,7 @@ namespace Px.Utils.Validation.DataValidation
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void HandleNonSeparatorType(ref ValidationFeedback validationFeedbacks)
         {
             if (_currentCharacterType == EntryType.DataItem)

@@ -31,6 +31,26 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         }
 
         [TestMethod]
+        public void TestValidateWithoutMissingCodeDelimetersReturnsWithoutErrors()
+        {
+            using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_VALID_DATA_WITHOUT_MISISNG_CODE_DELIMETERS));
+            stream.Seek(6, 0);
+            DataValidator validator = new(5, 4, 1);
+
+            ValidationFeedback validationFeedbacks = validator.Validate(stream, "foo", Encoding.UTF8).FeedbackItems;
+
+            foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
+            {
+                foreach (ValidationFeedbackValue instance in validationFeedback.Value)
+                {
+                    Logger.LogMessage($"Line {instance.Line}, Char {instance.Character}: "
+                        + $"{validationFeedback.Key.Rule} {instance.AdditionalInfo}");
+                }
+            }
+            Assert.AreEqual(0, validationFeedbacks.Count);
+        }
+
+        [TestMethod]
         public async Task TestValidateAsyncWithoutErrors()
         {
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_VALID_DATA));
@@ -49,7 +69,27 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                 }
             }
             Assert.AreEqual(0, validationFeedbacks.Count);
+        }
 
+        [TestMethod]
+        public async Task TestValidateAsyncWithoutMissingCodeDelimetersReturnsWithoutErrors()
+        {
+            using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.SIMPLE_VALID_DATA_WITHOUT_MISISNG_CODE_DELIMETERS));
+            stream.Seek(6, 0);
+            DataValidator validator = new(5, 4, 1);
+
+            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8);
+            ValidationFeedback validationFeedbacks = result.FeedbackItems;
+
+            foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
+            {
+                foreach (ValidationFeedbackValue instance in validationFeedback.Value)
+                {
+                    Logger.LogMessage($"Line {instance.Line}, Char {instance.Character}: "
+                        + $"{validationFeedback.Key.Rule} {instance.AdditionalInfo}");
+                }
+            }
+            Assert.AreEqual(0, validationFeedbacks.Count);
         }
 
         [TestMethod]
