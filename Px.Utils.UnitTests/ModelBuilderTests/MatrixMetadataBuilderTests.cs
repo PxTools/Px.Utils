@@ -374,6 +374,32 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("PRECISION"));
         }
 
+        [TestMethod]
+        public void MultiLangContentDimensionAdditionalPropertiesTest()
+        {
+            ContentDimension? contentDimension = (ContentDimension?)Actual_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            Assert.IsNotNull(contentDimension);
+            Assert.AreEqual(3, contentDimension.Values.Count);
+            foreach (ContentDimensionValue value in contentDimension.Values)
+            {
+                Assert.IsTrue(value.AdditionalProperties.ContainsKey("VALUENOTE"));
+                Assert.IsInstanceOfType<MultilanguageStringProperty>(value.AdditionalProperties["VALUENOTE"]);
+            }
+        }
+
+        [TestMethod]
+        public void SingleLangContentDimensionAdditionalPropertiesTest()
+        {
+            ContentDimension? contentDimension = (ContentDimension?)Actual_1Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
+            Assert.IsNotNull(contentDimension);
+            Assert.AreEqual(3, contentDimension.Values.Count);
+            foreach (ContentDimensionValue value in contentDimension.Values)
+            {
+                Assert.IsTrue(value.AdditionalProperties.ContainsKey("VALUENOTE"));
+                Assert.IsInstanceOfType<StringProperty>(value.AdditionalProperties["VALUENOTE"]);
+            }
+        }
+
         #endregion
 
         #region Time Dimension Tests
