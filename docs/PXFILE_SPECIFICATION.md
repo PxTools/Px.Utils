@@ -111,15 +111,15 @@ Whitespace characters are not significant in the value outside of ```"``` separa
 Some keywords have special value types. These are described in the following sections.
 
 #### DATA
-- The value of the DATA entry is a list of values that can be either string or number.
+- The value of the DATA entry is a list of values that can be either a missing value code or a number.
 - The list items are separated by a space (ASCII hex ```20```) or tab (ASCII hex ```09```).
 - The data list can be split into multiple lines
 - Each line must end with a space or tab character (ASCII hex ```20```) or (ASCII hex ```09```).
 - Only one kind of separator can be used in the same list.
 - The number values are subject to the same rules as the number value type.
-- The strings have a limited set of contents that are allowed: one to six dots ```.``` that mark missing values or hyphen ```-``` that marks exact zero.
+- The missing values have a limited set of contents that are allowed: one to six dots ```.``` that mark missing values or hyphen ```-``` that marks exact zero.
 	- List of allowed strings: ```.```, ```..```, ```...```, ```....```, ```.....```, ```......```, ```-```.
-- The strings must be marked by ```"``` characters.
+- The missing values are not handled as normal strings, so they can be marked by ```"``` characters but it is not mandatory.
 
 ##### TIMEVAL
 - Timeval has two value types unique to the entry:
