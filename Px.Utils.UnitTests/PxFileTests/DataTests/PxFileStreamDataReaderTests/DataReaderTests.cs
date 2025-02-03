@@ -113,6 +113,58 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
         }
 
         [TestMethod]
+        public void ReadDoubleDataValuesValidIntegersAndUnenclosedMissingReturnsCorrectDoubleDataValues()
+        {
+
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8_20DATAVALUES_WITH_UNENCLOSED_MISSING);
+            using Stream stream = new MemoryStream(data);
+            using PxFileStreamDataReader reader = new(stream);
+            DoubleDataValue[] targetBuffer = new DoubleDataValue[21];
+            DoubleDataValue canary = new(123.456, DataValueType.Exists);
+            targetBuffer[^1] = canary;
+
+            // Act
+            MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
+            MatrixMap matrixMap = new(
+            [
+                new DimensionMap("var0", ["var0_val0", "var0_val1"]),
+                new DimensionMap("var1", ["var1_val0", "var1_val1"]),
+                new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
+            ]);
+            reader.ReadDoubleDataValues(targetBuffer, 0, testMeta, matrixMap);
+
+            // Assert
+            DoubleDataValue[] expexted =
+            [
+                new(0.0, DataValueType.Missing),
+                new(1.00, DataValueType.Exists),
+                new(0.0, DataValueType.Missing),
+                new(3.00, DataValueType.Exists),
+                new(0.0, DataValueType.Missing),
+                new(5.00, DataValueType.Exists),
+                new(0.0, DataValueType.Missing),
+                new(7.00, DataValueType.Exists),
+                new(0.0, DataValueType.Missing),
+                new(9.00, DataValueType.Exists),
+                new(0.0, DataValueType.Confidential),
+                new(11.00, DataValueType.Exists),
+                new(0.0, DataValueType.Confidential),
+                new(13.00, DataValueType.Exists),
+                new(0.0, DataValueType.Confidential),
+                new(15.00, DataValueType.Exists),
+                new(0.0, DataValueType.Confidential),
+                new(17.00, DataValueType.Exists),
+                new(0.0, DataValueType.Confidential),
+                new(19.00, DataValueType.Exists),
+                canary
+            ];
+            // The canary in the expected checks against overwrites
+
+            CollectionAssert.AreEqual(expexted, targetBuffer);
+        }
+
+        [TestMethod]
         public void ReadEveryOtherDoubleDataValueFrom1stRowValidIntegersReturnsCorrectDoubleDataValues()
         {
             // Arrange

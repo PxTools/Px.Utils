@@ -23,18 +23,18 @@ namespace Px.Utils.PxFile.Data
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DoubleDataValue FastParseDoubleDataValueDangerous(char[] buffer, int len)
         {
-            // All special/missing values are encoded as strings in the format "..." or "-".
-            // The length of the string (number of dots) is used to determine the type of missing value.
+            if (buffer[len - 1] > '.') // When the last char is a number, the value is a number
+            {
+                return new DoubleDataValue(FastParseDoubleDangerous(buffer, len), DataValueType.Exists);
+            }
+
             if (buffer[0] == '"')
             {
                 if (buffer[1] == '-') return new DoubleDataValue(0, DataValueType.Nill);
                 return new DoubleDataValue(0, (DataValueType)(len - stringDelimiterOffset));
             }
-            else
-            {
-                double value = FastParseDoubleDangerous(buffer, len);
-                return new DoubleDataValue(value, DataValueType.Exists);
-            }
+            if (buffer[0] == '-') return new DoubleDataValue(0, DataValueType.Nill);
+            return new DoubleDataValue(0, (DataValueType)(len));
         }
 
         /// <summary>
@@ -48,18 +48,19 @@ namespace Px.Utils.PxFile.Data
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DecimalDataValue FastParseDecimalDataValueDangerous(char[] buffer, int len)
         {
-            // All special/missing values are encoded as strings in the format "..." or "-".
-            // The length of the string (number of dots) is used to determine the type of missing value.
+            if (buffer[len - 1] > '.') // When the last char is a number, the value is a number
+
+            {
+                return new DecimalDataValue(FastParseDecimalDangerous(buffer, len), DataValueType.Exists);
+            }
+
             if (buffer[0] == '"')
             {
                 if (buffer[1] == '-') return new DecimalDataValue(0, DataValueType.Nill);
                 return new DecimalDataValue(0, (DataValueType)(len - stringDelimiterOffset));
             }
-            else
-            {
-                decimal value = FastParseDecimalDangerous(buffer, len);
-                return new (value, DataValueType.Exists);
-            }
+            if (buffer[0] == '-') return new DecimalDataValue(0, DataValueType.Nill);
+            return new DecimalDataValue(0, (DataValueType)(len));
         }
 
         /// <summary>
@@ -84,15 +85,19 @@ namespace Px.Utils.PxFile.Data
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double FastParseUnsafeDoubleDangerous(char[] buffer, int len, double[] missingValueEncodings)
         {
+            if (buffer[len - 1] > '.') // When the last char is a number, the value is a number
+
+            {
+                return FastParseDoubleDangerous(buffer, len);
+            }
+
             if (buffer[0] == '"')
             {
                 if (buffer[1] == '-') return missingValueEncodings[0];
                 return missingValueEncodings[len - stringDelimiterOffset];
             }
-            else
-            {
-                return FastParseDoubleDangerous(buffer, len);
-            }
+            if (buffer[0] == '-') return missingValueEncodings[0];
+            return missingValueEncodings[len];
         }
 
         /// <summary>
@@ -111,21 +116,12 @@ namespace Px.Utils.PxFile.Data
             }
             else
             {
-                if (buffer[0] != '"' || buffer[len - 1] != '"' || len < missingDataEntryMinLength || len > missingDataEntryMaxLength)
+                if (buffer[0] == '"')
                 {
-                    throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
+                    return new(0, ParseEnclosedMissingDataType(buffer, len));
                 }
 
-                if (buffer[1] == '-') return new DoubleDataValue(0.0, DataValueType.Nill);
-
-                int dots = 0;
-                while (dots < len - stringDelimiterOffset)
-                {
-                    if (buffer[dots + 1] == '.') dots++;
-                    else throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
-                }
-
-                return new DoubleDataValue(double.NaN, (DataValueType)dots);
+                return new(0, ParseUnenclosedMissingDataType(buffer, len));
             }
         }
 
@@ -145,21 +141,12 @@ namespace Px.Utils.PxFile.Data
             }
             else
             {
-                if (buffer[0] != '"' || buffer[len - 1] != '"' || len < missingDataEntryMinLength || len > missingDataEntryMaxLength)
+                if (buffer[0] == '"')
                 {
-                    throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
+                    return new(decimal.Zero, ParseEnclosedMissingDataType(buffer, len));
                 }
 
-                if (buffer[1] == '-') return new DecimalDataValue(decimal.Zero, DataValueType.Nill);
-
-                int dots = 0;
-                while (dots < len - stringDelimiterOffset)
-                {
-                    if (buffer[dots + 1] == '.') dots++;
-                    else throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
-                }
-
-                return new DecimalDataValue(decimal.Zero, (DataValueType)dots);
+                return new(decimal.Zero, ParseUnenclosedMissingDataType(buffer, len));
             }
         }
 
@@ -191,22 +178,87 @@ namespace Px.Utils.PxFile.Data
             }
             else
             {
-                if (buffer[0] != '"' || buffer[len - 1] != '"' || len < missingDataEntryMinLength || len > missingDataEntryMaxLength)
+                if (buffer[0] == '"')
                 {
-                    throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
+                    return EncodeMissingEnclosedUnsafeDouble(buffer, len, missingValueEncodings);
                 }
 
-                if (buffer[1] == '-') return missingValueEncodings[0];
-
-                int dots = 0;
-                while (dots < len - stringDelimiterOffset)
-                {
-                    if (buffer[dots + 1] == '.') dots++;
-                    else throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
-                }
-
-                return missingValueEncodings[dots];
+                return EncodeMissingUnenclosedUnsafeDouble(buffer, len, missingValueEncodings);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static DataValueType ParseEnclosedMissingDataType(char[] buffer, int len)
+        {
+            if (buffer[len - 1] != '"' || len < missingDataEntryMinLength || len > missingDataEntryMaxLength)
+            {
+                throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
+            }
+
+            if (buffer[1] == '-')
+            {
+                return DataValueType.Nill;
+            }
+
+            return (DataValueType)CountDots(buffer, 1, len - stringDelimiterOffset);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static DataValueType ParseUnenclosedMissingDataType(char[] buffer, int len)
+        {
+            if (buffer[0] == '-' && len == 1)
+            {
+                return DataValueType.Nill;
+            }
+
+            return (DataValueType)CountDots(buffer, 0, len);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static double EncodeMissingEnclosedUnsafeDouble(char[] buffer, int len, double[] missingValueEncodings)
+        {
+            if (buffer[len - 1] != '"' || len < missingDataEntryMinLength || len > missingDataEntryMaxLength)
+            {
+                throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, len)}");
+            }
+
+            if (buffer[1] == '-')
+            {
+                return missingValueEncodings[0];
+            }
+
+            int dots = CountDots(buffer, 1, len - stringDelimiterOffset);
+            return missingValueEncodings[dots];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static double EncodeMissingUnenclosedUnsafeDouble(char[] buffer, int len, double[] missingValueEncodings)
+        {
+            if (buffer[0] == '-' && len == 1)
+            {
+                return missingValueEncodings[0];
+            }
+
+            int dots = CountDots(buffer, 0, len);
+            return missingValueEncodings[dots];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int CountDots(char[] buffer, int offset, int end)
+        {
+            int dots = 0;
+            for (int i = 0; i < end; i++)
+            {
+                if (buffer[i + offset] == '.')
+                {
+                    dots++;
+                }
+                else
+                {
+                    throw new ArgumentException($"Invalid symbol found when parsing data values {new string(buffer, 0, end)}");
+                }
+            }
+            return dots;
         }
 
         private static readonly double[] doublePowersOf10 =

@@ -96,9 +96,9 @@ namespace Px.Utils.Operations
         /// <typeparam name="TData">Type of the data values in the matrix, must implement 
         /// <see cref="IAdditionOperators{TSelf, TOther, TResult}"/> and <see cref="IAdditiveIdentity{TSelf, TResult}"/></typeparam>
         /// <param name="input">The source matrix for the operation</param>
-        /// <param name="targetMap">Defines the values to wich the constant will be added.</param>
-        /// <param name="valueToAdd">The contant to be added.</param>
-        /// <returns>A new <see cref="Matrix{TData}"/> object that contais the results of the additions.</returns>
+        /// <param name="targetMap">Defines the values to which the constant will be added.</param>
+        /// <param name="valueToAdd">The constant to be added.</param>
+        /// <returns>A new <see cref="Matrix{TData}"/> object that contains the results of the additions.</returns>
         public async static Task<Matrix<TData>> AddConstantToSubsetAsync<TData>(this Task<Matrix<TData>> input, IMatrixMap targetMap, TData valueToAdd)
             where TData : IAdditionOperators<TData, TData, TData>, IAdditiveIdentity<TData, TData>
         {
