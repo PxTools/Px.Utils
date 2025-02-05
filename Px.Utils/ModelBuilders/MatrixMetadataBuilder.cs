@@ -159,17 +159,27 @@ namespace Px.Utils.ModelBuilders
             if (TryGetEntries(entries, timeValIdentifierKey, langs, out Dictionary<MetadataEntryKey, string>? timeValEntries, dimensionNameToTest))
             {
                 string timeValValueString = timeValEntries.Values.First();
+                if (!timeValValueString.StartsWith(_conf.Tokens.Time.TimeIntervalIndicator, StringComparison.InvariantCulture))
+                {
+                    throw new ArgumentException($"Invalid time value string {timeValValueString}");
+                }
                 List<string> timeValList = ValueParserUtilities.GetTimeValValueList(timeValValueString, _conf);
-
+                MetaProperty timeValProperty = timeValList.Count > 0 ? 
+                    new StringListProperty(timeValList) : 
+                    new StringProperty(ValueParserUtilities.GetTimeValValueRangeString(timeValValueString, _conf));
                 timeDimension = new(
                     code: GetDimensionCode(entries, langs, dimensionNameToTest),
                     name: dimensionNameToTest,
-                    additionalProperties: new() { { timeValIdentifierKey, new StringListProperty(timeValList) } },
+                    additionalProperties: new() { { timeValIdentifierKey, timeValProperty } },
                     values: GetDimensionValues(entries, langs, dimensionNameToTest),
                     interval: ValueParserUtilities.ParseTimeIntervalFromTimeVal(timeValValueString, _conf)
                     );
 
                 foreach (MetadataEntryKey key in timeValEntries.Keys) entries.Remove(key);
+                if (TryGetEntries(entries, dimensionTypeKey, langs, out Dictionary<MetadataEntryKey, string>? dimTypeEntries, dimensionNameToTest))
+                {
+                    foreach (MetadataEntryKey key in dimTypeEntries.Keys) entries.Remove(key);
+                }
                 return true;
             }
             else if (TryGetEntries(entries, dimensionTypeKey, langs, out Dictionary<MetadataEntryKey, string>? dimTypeEntries, dimensionNameToTest) &&
@@ -226,20 +236,25 @@ namespace Px.Utils.ModelBuilders
         {
             string code = GetDimensionCode(entries, langs, dimensionName);
             ContentValueList values = BuildContentDimensionValues(entries, langs, dimensionName);
-            // Table level UNIT, SHOWDECIMALS and DECIMALS properties are not needed after building the content dimension, so they're removed here
-            if (TryGetEntries(entries, _conf.Tokens.KeyWords.Units, langs, out Dictionary<MetadataEntryKey, string>? unitEntries))
-            {
-                foreach (MetadataEntryKey key in unitEntries.Keys) entries.Remove(key);
-            }
-            if (TryGetEntries(entries, _conf.Tokens.KeyWords.Decimals, langs, out Dictionary<MetadataEntryKey, string>? decimalEntries))
-            {
-                foreach (MetadataEntryKey key in decimalEntries.Keys) entries.Remove(key);
-            }
-            if (TryGetEntries(entries, _conf.Tokens.KeyWords.ShowDecimals, langs, out Dictionary<MetadataEntryKey, string>? showDecimalEntries))
-            {
-                foreach (MetadataEntryKey key in showDecimalEntries.Keys) entries.Remove(key);
-            }
+            // Table level UNIT, PRECISION and DECIMALS properties are not needed after building the content dimension, so they're removed here
+            string[] keywords = [
+                _conf.Tokens.KeyWords.Units,
+                _conf.Tokens.KeyWords.Precision,
+                _conf.Tokens.KeyWords.Decimals
+            ];
+            RemoveEntries(entries, langs, keywords);
             return new ContentDimension(code, dimensionName, [], values);
+        }
+
+        private static void RemoveEntries(Dictionary<MetadataEntryKey, string> entries, PxFileLanguages langs, string[] tokens)
+        {
+            foreach (string token in tokens)
+            {
+                if (TryGetEntries(entries, token, langs, out Dictionary<MetadataEntryKey, string>? foundEntries))
+                {
+                    foreach (MetadataEntryKey key in foundEntries.Keys) entries.Remove(key);
+                }
+            }
         }
 
         private void AddAdditionalPropertiesToDimensions(

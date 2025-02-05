@@ -104,7 +104,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
             MultilanguageString unit,
             DateTime lastUpdated,
             int precision)
-            : base(dimensionValue.Code, dimensionValue.Name, dimensionValue.IsVirtual)
+            : base(dimensionValue.Code, dimensionValue.Name, dimensionValue.IsVirtual, dimensionValue.AdditionalProperties)
         {
             Unit = unit;
             LastUpdated = lastUpdated;
