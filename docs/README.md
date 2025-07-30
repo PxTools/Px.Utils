@@ -296,7 +296,7 @@ Values of dimensions can be summed or multiplied together to new values. If the 
 If we sum the row0 dimension's values 1 and 2 together to form a new value "rowSum", the resulting matrix will look like this:
 
 |        | col0-0 |        | col0-1 |        | col0-2 |        |
-|        |--------|--------|--------|--------|--------|--------|
+|--------|--------|--------|--------|--------|--------|--------|
 |        | col1-0 | col1-1 | col1-0 | col1-1 | col1-0 | col1-1 |
 | row0-0 |   0    |   1    |   2    |   3    |   4    |   5    |
 | row0-1 |   6    |   7    |   8    |   9    |   10   |   11   |
@@ -359,7 +359,7 @@ Also has an asyncronous variant ```DivideSubsetBySelectedValueAsync()```
 If the original matrix has the following structure:
 
 |        | col0-0 |        | col0-1 |        | col0-2 |        |
-|        |--------|--------|--------|--------|--------|--------|
+|--------|--------|--------|--------|--------|--------|--------|
 |        | col1-0 | col1-1 | col1-0 | col1-1 | col1-0 | col1-1 |
 | row0-0 |   0    |   1    |   2    |   3    |   4    |   5    |
 | row0-1 |   6    |   7    |   8    |   9    |   10   |   11   |
@@ -369,7 +369,7 @@ If the original matrix has the following structure:
 And we divide row dimension values row0-1 and row0-2 by rowSum the resulting matrix will look like this:
 
 |        | col0-0 |        | col0-1 |        | col0-2 |        |
-|        |--------|--------|--------|--------|--------|--------|
+|--------|--------|--------|--------|--------|--------|--------|
 |        | col1-0 | col1-1 | col1-0 | col1-1 | col1-0 | col1-1 |
 | row0-0 |   0    |   1    |   2    |   3    |   4    |   5    |
 | row0-1 |  0.33  |  0.35  |  0.36  |  0.38  |  0.39  |  0.41  |
