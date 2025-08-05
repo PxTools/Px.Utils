@@ -36,8 +36,8 @@
         }
 
         /// <summary>
-        /// Checks if the other map contains the same dimensions and values as this map in the same order.
-        /// The other map can contain values that are not found in this map.
+        /// Checks if the other map contains the dimensions and values of this map in the same order.
+        /// The dimensions of the other map can contain values that are not found in this map.
         /// </summary>
         /// <returns>True if all of the values are found in the correct order.</returns>
         public static bool IsSubmapOf(this IMatrixMap thisMap, IMatrixMap other)
@@ -45,21 +45,42 @@
             if(thisMap.DimensionMaps.Count != other.DimensionMaps.Count) return false;
             for (int i = 0; i < thisMap.DimensionMaps.Count; i++)
             {
-                if (other.DimensionMaps[i].Code != thisMap.DimensionMaps[i].Code) return false;
-                int sourceIndex = 0;
-                for (int j = 0; j < thisMap.DimensionMaps[i].ValueCodes.Count; j++)
+                if (!thisMap.DimensionMaps[i].IsSubmapOf(other.DimensionMaps[i]))
                 {
-                    bool found = false;
-                    for(int k = sourceIndex; k < other.DimensionMaps[i].ValueCodes.Count; k++)
-                    {
-                        if (other.DimensionMaps[i].ValueCodes[k] == thisMap.DimensionMaps[i].ValueCodes[j])
-                        {
-                            sourceIndex = k + 1;
-                            found = true;
-                            break;
-                        }
-                    }
-                    if(!found) return false;
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if this map contains the dimensions and values of the other map in the same order.
+        /// The dimension of this map can contain values that are not found in the other map.
+        /// </summary>
+        /// <returns>True if all values are found in the correct order.</returns>
+        public static bool IsSupermapOf(this IMatrixMap thisMap, IMatrixMap other)
+        {
+            return other.IsSubmapOf(thisMap);
+        }
+
+        /// <summary>
+        /// Determines whether the current <see cref="IMatrixMap"/> is identical to the specified <paramref
+        /// name="other"/> map.
+        /// </summary>
+        /// <remarks>Two <see cref="IMatrixMap"/> instances are considered identical if they have the same
+        /// number of dimension mappings and each corresponding dimension mapping is also identical.</remarks>
+        /// <returns>
+        /// <see langword="true"/> if the current map is identical to the specified map, including all dimension
+        /// mappings; otherwise, <see langword="false"/>.
+        /// </returns>
+        public static bool IsIdenticalMapTo(this IMatrixMap thisMap, IMatrixMap other)
+        {
+            if (thisMap.DimensionMaps.Count != other.DimensionMaps.Count) return false;
+            for (int i = 0; i < thisMap.DimensionMaps.Count; i++)
+            {
+                if (!thisMap.DimensionMaps[i].IsIdenticalMapTo(other.DimensionMaps[i]))
+                {
+                    return false;
                 }
             }
             return true;
