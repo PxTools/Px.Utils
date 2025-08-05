@@ -92,11 +92,11 @@ Behaviour of the reader and builder objects can be changed with ```PxFileConfigu
 #### ```Matrix<TData>```
 Consists of ```IReadOnlyMatrixMetadata Metadata``` and ```TData[] Data```. This is the topmost level of the structure. The order of the data points is determined by the metadata in the following way:
 
-| dim0-val0 || dim0-val1 || dim0-val2 ||
-|-----------|-----------|-----------|-----------|-----------|-----------|
+| dim0-val0 |          | dim0-val1 |          | dim0-val2 |          |
+|-----------|----------|-----------|----------|-----------|----------|
 | dim1-val0 | dim1-val1| dim1-val0 | dim1-val1| dim1-val0 | dim1-val1|
 | dim2-val0 | dim2-val0| dim2-val0 | dim2-val0| dim2-val0 | dim2-val0|
-| 0 | 1 | 2 | 3 | 4 | 5 |
+|     0     |     1    |     2     |     3    |     4     |     5    |
 
 In this example, the dim0 is the first dimension in the dimension list of the metadata. And val0 is the first value in each dimension. Dim2 has only one value, so it does not affect the order of the data points (in other words if the length of the dimension is one, it has no impact on the volume of the data cube).
 Example: If we choose the second value from dim0 (index 1) and the first value from dim1 (index 0), the data index is 2 (We can only choose val0 from dim2).
@@ -119,6 +119,26 @@ It creates a new mutable deep copy of the matrix that have the structure defined
 #### ```MatrixMap : IMatrixMap```
 This is a minimal way to represent the structure of the metadata. Does not contain any other information than the dimension and dimension value codes.
 The ```IReadOnlyMatrixMetadata``` also implements the ```IMatrixMap``` interface.
+
+##### Extension methods
+IMatrixMap offers the following extension methods:
+
+```GetSize(this IMatrixMap matrixMap)``` 
+Returns the size of the matrix map, which is the product of the amounts of values for each dimension in the map.
+
+```CollapseDimension(this IMatrixMap matrixMap, string dimensionCode, string valueCode)```
+Collapses a selected dimension to a single value and returns a new matrix map with the collapsed dimension. The valueCode is the code of the value to collapse to.
+
+```IsSubmapOf(this IMatrixMap matrixMap, IMatrixMap other)```
+Checks if the current matrix map is a submap of the other matrix map. Returns true if the other map contains all the dimensions and their values from the current map in the same order, false otherwise.
+
+```IsSupermapOf(this IMatrixMap matrixMap, IMatrixMap other)```
+Checks if the current matrix map is a supermap of the other matrix map. Returns true if the current map contains all the dimensions and their values from the other map in the same order, false otherwise.
+
+```IsIdenticalTo(this IMatrixMap matrixMap, IMatrixMap other)```
+Checks if the current matrix map is identical to the other matrix map. Returns true if both maps contain the same dimensions and their values in the same order, false otherwise.
+
+Note that individual dimension maps ```IDimensionMap, DimensionMap``` also contain the ```IsSubmapOf()```, ```IsSupermapOf()``` and ```IsIdenticalTo()``` methods that can be used to compare the dimension maps.
 
 #### ```MatrixMetadata : IReadOnlyMatrixMetadata```
 Represents the table level metadata of the px file. Contains the dimension list and the language information. 
@@ -266,22 +286,22 @@ The database needs to contain alias files for each language used in the database
 
 Values of dimensions can be summed or multiplied together to new values. If the original matrix has the following structure:
 
-|| col0-0 || col0-1 || col0-2 ||
-||-----------|-----------|-----------|-----------|-----------|-----------|
-|| col1-0 | col1-1| col1-0 | col1-1| col1-0 | col1-1 |
-|row0-0| 0 | 1 | 2 | 3 | 4 | 5 |
-|row0-1| 6 | 7 | 8 | 9 | 10 | 11 |
-|row0-2| 12 | 13 | 14 | 15 | 16 | 17 |
+|        | col0-0 |        | col0-1 |        | col0-2 |        |
+|--------|--------|--------|--------|--------|--------|--------|
+|        | col1-0 | col1-1 | col1-0 | col1-1 | col1-0 | col1-1 |
+| row0-0 |   0    |   1    |   2    |   3    |   4    |   5    |
+| row0-1 |   6    |   7    |   8    |   9    |   10   |   11   |
+| row0-2 |   12   |   13   |   14   |   15   |   16   |   17   |
 
 If we sum the row0 dimension's values 1 and 2 together to form a new value "rowSum", the resulting matrix will look like this:
 
-|| col0-0 || col0-1 || col0-2 ||
-||-----------|-----------|-----------|-----------|-----------|-----------|
-|| col1-0 | col1-1| col1-0 | col1-1| col1-0 | col1-1 |
-|row0-0| 0 | 1 | 2 | 3 | 4 | 5 |
-|row0-1| 6 | 7 | 8 | 9 | 10 | 11 |
-|row0-2| 12 | 13 | 14 | 15 | 16 | 17 |
-|rowSum | 18 | 20 | 22 | 24 | 26 | 28 |
+|        | col0-0 |        | col0-1 |        | col0-2 |        |
+|--------|--------|--------|--------|--------|--------|--------|
+|        | col1-0 | col1-1 | col1-0 | col1-1 | col1-0 | col1-1 |
+| row0-0 |   0    |   1    |   2    |   3    |   4    |   5    |
+| row0-1 |   6    |   7    |   8    |   9    |   10   |   11   |
+| row0-2 |   12   |   13   |   14   |   15   |   16   |   17   |
+| rowSum |   18   |   20   |   22   |   24   |   26   |   28   |
 
 #### Sum
 ```SumToNewValue<TData>()``` computes sums of datapoints defined by a subset of values from a given dimension.
@@ -338,23 +358,23 @@ Also has an asyncronous variant ```DivideSubsetBySelectedValueAsync()```
 
 If the original matrix has the following structure:
 
-|| col0-0 || col0-1 || col0-2 ||
-||-----------|-----------|-----------|-----------|-----------|-----------|
-|| col1-0 | col1-1| col1-0 | col1-1| col1-0 | col1-1 |
-|row0-0| 0 | 1 | 2 | 3 | 4 | 5 |
-|row0-1| 6 | 7 | 8 | 9 | 10 | 11 |
-|row0-2| 12 | 13 | 14 | 15 | 16 | 17 |
-|rowSum | 18 | 20 | 22 | 24 | 26 | 28 |
+|        | col0-0 |        | col0-1 |        | col0-2 |        |
+|--------|--------|--------|--------|--------|--------|--------|
+|        | col1-0 | col1-1 | col1-0 | col1-1 | col1-0 | col1-1 |
+| row0-0 |   0    |   1    |   2    |   3    |   4    |   5    |
+| row0-1 |   6    |   7    |   8    |   9    |   10   |   11   |
+| row0-2 |   12   |   13   |   14   |   15   |   16   |   17   |
+| rowSum |   18   |   20   |   22   |   24   |   26   |   28   |
 
 And we divide row dimension values row0-1 and row0-2 by rowSum the resulting matrix will look like this:
 
-|| col0-0 || col0-1 || col0-2 ||
-||-----------|-----------|-----------|-----------|-----------|-----------|
-|| col1-0 | col1-1| col1-0 | col1-1| col1-0 | col1-1 |
-|row0-0| 0 | 1 | 2 | 3 | 4 | 5 |
-|row0-1| 0.33 | 0.35 | 0.36 | 0.38 | 0.39 | 0.41 |
-|row0-2| 0.67 | 0.65 | 0.64 | 0.63 | 0.61 | 0.59 |
-|rowSum | 18 | 20 | 22 | 24 | 26 | 28 |
+|        | col0-0 |        | col0-1 |        | col0-2 |        |
+|--------|--------|--------|--------|--------|--------|--------|
+|        | col1-0 | col1-1 | col1-0 | col1-1 | col1-0 | col1-1 |
+| row0-0 |   0    |   1    |   2    |   3    |   4    |   5    |
+| row0-1 |  0.33  |  0.35  |  0.36  |  0.38  |  0.39  |  0.41  |
+| row0-2 |  0.67  |  0.65  |  0.64  |  0.63  |  0.61  |  0.59  |
+| rowSum |   18   |   20   |   22   |   24   |   26   |   28   |
 
 ##### Example
 ```csharp
