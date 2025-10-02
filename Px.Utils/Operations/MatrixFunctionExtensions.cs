@@ -30,8 +30,10 @@ namespace Px.Utils.Operations
                 : CopyMetaAndInsertValue(input.Metadata, sourceMap.Code, newValue, valueIndex);
 
             IMatrixMap resultOnlyMap = newMeta.CollapseDimension(sourceMap.Code, newValue.Code);
-            TData[] outData = new TData[input.Metadata.GetSize() + resultOnlyMap.GetSize()];
-            
+            long arraySize = input.Metadata.GetSizeLong() + resultOnlyMap.GetSizeLong();
+            if (arraySize > int.MaxValue) throw new InvalidOperationException("Resulting matrix size exceeds maximum array size.");
+            TData[] outData = new TData[(int)arraySize];
+
             // Initialize the output matrix with the identity value
             for (int i = 0; i < outData.Length; i++) outData[i] = functionIdentity; 
 

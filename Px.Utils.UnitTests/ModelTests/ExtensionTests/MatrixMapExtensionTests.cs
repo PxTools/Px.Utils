@@ -593,6 +593,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
         #region GetSize
 
         [TestMethod]
+        [Obsolete("GetSize() method is marked obsolete.")]
         public void GetSizeWithValidMapReturnsCorrectSize()
         {
             // Arrange
@@ -609,6 +610,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
         }
 
         [TestMethod]
+        [Obsolete("GetSize() method is marked obsolete.")]
         public void GetSizeWithZeroSizedDimensionReturnsZero()
         {
             // Arrange
@@ -626,9 +628,171 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
 
         #endregion
 
+        #region GetSizeLong
+
+        [TestMethod]
+        public void GetSizeLongWithValidMapReturnsCorrectSize()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions = [
+                new DimensionMap("11", ["aa11", "bb11", "cc11"]),
+                new DimensionMap("22", ["aa22", "bb22"]),
+                new DimensionMap("33", ["aa33"])
+            ];
+
+            MatrixMap map = new(dimensions);
+
+            // Act and Assert (3 * 2 * 1 = 6)
+            Assert.AreEqual(6L, map.GetSizeLong());
+        }
+
+        [TestMethod]
+        public void GetSizeLongWithZeroSizedDimensionReturnsZero()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions = [
+                new DimensionMap("11", ["aa11", "bb11", "cc11"]),
+                new DimensionMap("22", []),
+                new DimensionMap("33", ["aa33"])
+            ];
+
+            MatrixMap map = new(dimensions);
+
+            // Act and Assert (x * 0 = 0)
+            Assert.AreEqual(0L, map.GetSizeLong());
+        }
+
+        [TestMethod]
+        public void GetSizeLongWithSingleDimensionReturnsCorrectSize()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions = [
+                new DimensionMap("11", ["aa11", "bb11", "cc11", "dd11", "ee11"])
+            ];
+
+            MatrixMap map = new(dimensions);
+
+            // Act and Assert
+            Assert.AreEqual(5L, map.GetSizeLong());
+        }
+
+        [TestMethod]
+        public void GetSizeLongWithEmptyMapReturnsOne()
+        {
+            // Arrange
+            MatrixMap map = new([]);
+
+            // Act and Assert
+            Assert.AreEqual(1L, map.GetSizeLong());
+        }
+
+        [TestMethod]
+        public void GetSizeLongWithLargeDimensionsReturnsCorrectSize()
+        {
+            // Arrange - Create dimensions that would result in a large number
+            List<IDimensionMap> dimensions = [
+                new DimensionMap("dim1", Enumerable.Range(0, 100).Select(i => $"val{i}").ToList()),
+                new DimensionMap("dim2", Enumerable.Range(0, 50).Select(i => $"val{i}").ToList()),
+                new DimensionMap("dim3", Enumerable.Range(0, 10).Select(i => $"val{i}").ToList())
+            ];
+
+            MatrixMap map = new(dimensions);
+
+            // Act and Assert (100 * 50 * 10 = 50,000)
+            Assert.AreEqual(50000L, map.GetSizeLong());
+        }
+
+        [TestMethod]
+        public void GetSizeLongWithVeryLargeDimensionsHandlesLongRange()
+        {
+            // Arrange - Create dimensions that would overflow int but fit in long
+            // This simulates a case where GetSize() would fail but GetSizeLong() should work
+            List<IDimensionMap> dimensions = [
+                new DimensionMap("dim1", Enumerable.Range(0, 1000).Select(i => $"val{i}").ToList()),
+                new DimensionMap("dim2", Enumerable.Range(0, 1000).Select(i => $"val{i}").ToList()),
+                new DimensionMap("dim3", Enumerable.Range(0, 5).Select(i => $"val{i}").ToList())
+            ];
+
+            MatrixMap map = new(dimensions);
+
+            // Act and Assert (1000 * 1000 * 5 = 5,000,000)
+            Assert.AreEqual(5000000L, map.GetSizeLong());
+        }
+
+        [TestMethod]
+        public void GetSizeLongWithOneDimensionOfSizeOneReturnsCorrectSize()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions = [
+                new DimensionMap("dim1", ["val1"]),
+                new DimensionMap("dim2", ["val1", "val2", "val3"]),
+                new DimensionMap("dim3", ["val1", "val2"])
+            ];
+
+            MatrixMap map = new(dimensions);
+
+            // Act and Assert (1 * 3 * 2 = 6)
+            Assert.AreEqual(6L, map.GetSizeLong());
+        }
+
+        [TestMethod]
+        public void GetSizeLongWithMultipleDimensionsOfSizeOneReturnsOne()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions = [
+                new DimensionMap("dim1", ["val1"]),
+                new DimensionMap("dim2", ["val1"]),
+                new DimensionMap("dim3", ["val1"])
+            ];
+
+            MatrixMap map = new(dimensions);
+
+            // Act and Assert (1 * 1 * 1 = 1)
+            Assert.AreEqual(1L, map.GetSizeLong());
+        }
+
+        [TestMethod]
+        public void GetSizeLongWithManySmallDimensionsReturnsCorrectSize()
+        {
+            // Arrange - Test with many dimensions with small sizes
+            List<IDimensionMap> dimensions = [
+                new DimensionMap("dim1", ["val1", "val2"]),
+                new DimensionMap("dim2", ["val1", "val2"]),
+                new DimensionMap("dim3", ["val1", "val2"]),
+                new DimensionMap("dim4", ["val1", "val2"]),
+                new DimensionMap("dim5", ["val1", "val2"])
+            ];
+
+            MatrixMap map = new(dimensions);
+
+            // Act and Assert (2^5 = 32)
+            Assert.AreEqual(32L, map.GetSizeLong());
+        }
+
+        [TestMethod]
+        public void GetSizeLongReturnsLongType()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions = [
+                new DimensionMap("dim1", ["val1", "val2"]),
+                new DimensionMap("dim2", ["val1", "val2", "val3"])
+            ];
+
+            MatrixMap map = new(dimensions);
+
+            // Act
+            var result = map.GetSizeLong();
+
+            // Assert - Verify return type is long
+            Assert.IsInstanceOfType<long>(result);
+            Assert.AreEqual(6L, result);
+        }
+
+        #endregion
+
         #region CollapseDimension
 
-                [TestMethod]
+        [TestMethod]
         public void CollapseDimensionWithValidMapReturnsCollapsedMap()
         {
             // Arrange
@@ -644,7 +808,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
             IMatrixMap collapsedMap = map.CollapseDimension("22", "foo");
 
             // Assert
-            Assert.AreEqual(9, collapsedMap.GetSize()); // 3 * 1 * 3 = 9
+            Assert.AreEqual(9L, collapsedMap.GetSizeLong()); // 3 * 1 * 3 = 9
             Assert.AreEqual(1, collapsedMap.DimensionMaps[1].ValueCodes.Count);
             Assert.AreEqual("foo", collapsedMap.DimensionMaps[1].ValueCodes[0]);
         }

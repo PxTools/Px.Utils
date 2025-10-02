@@ -23,7 +23,7 @@ namespace Px.Utils.TestingApp.Commands
 
         private IMatrixMap? Target { get; set; }
 
-        private int _numberOfCells = 1000000;
+        private long _numberOfCells = 1000000L;
 
         private static readonly string[] cellFlags = ["-c", "-cells"];
 
@@ -45,7 +45,7 @@ namespace Px.Utils.TestingApp.Commands
             Encoding encoding = reader.GetEncoding(fileStream);
             fileStream.Seek(0, SeekOrigin.Begin);
 
-            List<KeyValuePair<string, string>> entries = reader.ReadMetadata(fileStream, encoding).ToList();
+            List<KeyValuePair<string, string>> entries = [.. reader.ReadMetadata(fileStream, encoding)];
             MatrixMetadataBuilder builder = new();
             MetaData = builder.Build(entries);
         }
@@ -55,7 +55,10 @@ namespace Px.Utils.TestingApp.Commands
             if(MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            DoubleDataValue[] buffer = new DoubleDataValue[Target.GetSize()];
+            int arraySize = Target.GetSizeLong() > int.MaxValue
+                ? throw new InvalidOperationException("Target size exceeds maximum array size.")
+                : (int)Target.GetSizeLong();
+            DoubleDataValue[] buffer = new DoubleDataValue[arraySize];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
@@ -68,7 +71,10 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            DecimalDataValue[] buffer = new DecimalDataValue[Target.GetSize()];
+            int arraySize = Target.GetSizeLong() > int.MaxValue
+                ? throw new InvalidOperationException("Target size exceeds maximum array size.")
+                : (int)Target.GetSizeLong();
+            DecimalDataValue[] buffer = new DecimalDataValue[arraySize];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
@@ -81,7 +87,10 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            double[] buffer = new double[Target.GetSize()];
+            int arraySize = Target.GetSizeLong() > int.MaxValue
+                ? throw new InvalidOperationException("Target size exceeds maximum array size.")
+                : (int)Target.GetSizeLong();
+            double[] buffer = new double[arraySize];
             double[] missingValueEncodings = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
@@ -95,7 +104,10 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            DoubleDataValue[] buffer = new DoubleDataValue[Target.GetSize()];
+            int arraySize = Target.GetSizeLong() > int.MaxValue
+                ? throw new InvalidOperationException("Target size exceeds maximum array size.")
+                : (int)Target.GetSizeLong();
+            DoubleDataValue[] buffer = new DoubleDataValue[arraySize];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
@@ -108,7 +120,10 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            DecimalDataValue[] buffer = new DecimalDataValue[Target.GetSize()];
+            int arraySize = Target.GetSizeLong() > int.MaxValue
+                ? throw new InvalidOperationException("Target size exceeds maximum array size.")
+                : (int)Target.GetSizeLong();
+            DecimalDataValue[] buffer = new DecimalDataValue[arraySize];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
@@ -121,7 +136,10 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            double[] buffer = new double[Target.GetSize()];
+            int arraySize = Target.GetSizeLong() > int.MaxValue
+                ? throw new InvalidOperationException("Target size exceeds maximum array size.")
+                : (int)Target.GetSizeLong();
+            double[] buffer = new double[arraySize];
             double[] missingValueEncodings = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
@@ -136,34 +154,33 @@ namespace Px.Utils.TestingApp.Commands
 
             foreach (string key in Parameters.Keys)
             {
-                if (cellFlags.Contains(key) && !int.TryParse(Parameters[key][0], out _numberOfCells))
+                if (cellFlags.Contains(key) && !long.TryParse(Parameters[key][0], out _numberOfCells))
                 {
                     throw new ArgumentException($"Invalid argument {key} {string.Join(' ', Parameters[key])}");
                 }
             }
         }
 
-        private static IMatrixMap GenerateBenchmarkTargetMap(IMatrixMap complete, int targetSize)
+        private static IMatrixMap GenerateBenchmarkTargetMap(IMatrixMap complete, long targetSize)
         {
-            int size = complete.GetSize();
+            long size = complete.GetSizeLong();
             if (size < targetSize) return complete;
 
             List<IDimensionMap> sortedDimensions = [.. complete.DimensionMaps];
             while (size > targetSize)
             {
                 sortedDimensions = [.. sortedDimensions.OrderByDescending(x => x.ValueCodes.Count)];
-                var valCodes = sortedDimensions[0].ValueCodes;
-                sortedDimensions[0] = new DimensionMap(sortedDimensions[0].Code, valCodes.Skip(1).ToList());
-                size = sortedDimensions.Aggregate(1, (acc, x) => acc * x.ValueCodes.Count);
+                IReadOnlyList<string> valCodes = sortedDimensions[0].ValueCodes;
+                sortedDimensions[0] = new DimensionMap(sortedDimensions[0].Code, [.. valCodes.Skip(1)]);
+                size = sortedDimensions.Aggregate(1L, (acc, x) => acc * x.ValueCodes.Count);
             }
 
-            List<IDimensionMap> dimList = complete.DimensionMaps
+            List<IDimensionMap> dimList = [.. complete.DimensionMaps
                 .Select(dim => dim.Code)
                 .Select(dimCode => new DimensionMap(
                     dimCode,
                     [.. sortedDimensions.First(dim => dim.Code == dimCode).ValueCodes]))
-                .Cast<IDimensionMap>()
-                .ToList();
+                .Cast<IDimensionMap>()];
 
             return new MatrixMap(dimList);
         }
