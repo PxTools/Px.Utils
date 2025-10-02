@@ -45,7 +45,7 @@ namespace Px.Utils.TestingApp.Commands
             Encoding encoding = reader.GetEncoding(fileStream);
             fileStream.Seek(0, SeekOrigin.Begin);
 
-            List<KeyValuePair<string, string>> entries = reader.ReadMetadata(fileStream, encoding).ToList();
+            List<KeyValuePair<string, string>> entries = [.. reader.ReadMetadata(fileStream, encoding)];
             MatrixMetadataBuilder builder = new();
             MetaData = builder.Build(entries);
         }
@@ -55,7 +55,7 @@ namespace Px.Utils.TestingApp.Commands
             if(MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            DoubleDataValue[] buffer = new DoubleDataValue[Target.GetSize()];
+            DoubleDataValue[] buffer = new DoubleDataValue[Target.GetSizeLong()];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
@@ -68,7 +68,7 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            DecimalDataValue[] buffer = new DecimalDataValue[Target.GetSize()];
+            DecimalDataValue[] buffer = new DecimalDataValue[Target.GetSizeLong()];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
@@ -81,7 +81,7 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            double[] buffer = new double[Target.GetSize()];
+            double[] buffer = new double[Target.GetSizeLong()];
             double[] missingValueEncodings = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
@@ -95,7 +95,7 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            DoubleDataValue[] buffer = new DoubleDataValue[Target.GetSize()];
+            DoubleDataValue[] buffer = new DoubleDataValue[Target.GetSizeLong()];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
@@ -108,7 +108,7 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            DecimalDataValue[] buffer = new DecimalDataValue[Target.GetSize()];
+            DecimalDataValue[] buffer = new DecimalDataValue[Target.GetSizeLong()];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             using PxFileStreamDataReader reader = new(stream);
@@ -121,7 +121,7 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            double[] buffer = new double[Target.GetSize()];
+            double[] buffer = new double[Target.GetSizeLong()];
             double[] missingValueEncodings = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
@@ -145,7 +145,7 @@ namespace Px.Utils.TestingApp.Commands
 
         private static IMatrixMap GenerateBenchmarkTargetMap(IMatrixMap complete, int targetSize)
         {
-            int size = complete.GetSize();
+            long size = complete.GetSizeLong();
             if (size < targetSize) return complete;
 
             List<IDimensionMap> sortedDimensions = [.. complete.DimensionMaps];
@@ -157,13 +157,12 @@ namespace Px.Utils.TestingApp.Commands
                 size = sortedDimensions.Aggregate(1, (acc, x) => acc * x.ValueCodes.Count);
             }
 
-            List<IDimensionMap> dimList = complete.DimensionMaps
+            List<IDimensionMap> dimList = [.. complete.DimensionMaps
                 .Select(dim => dim.Code)
                 .Select(dimCode => new DimensionMap(
                     dimCode,
                     [.. sortedDimensions.First(dim => dim.Code == dimCode).ValueCodes]))
-                .Cast<IDimensionMap>()
-                .ToList();
+                .Cast<IDimensionMap>()];
 
             return new MatrixMap(dimList);
         }
