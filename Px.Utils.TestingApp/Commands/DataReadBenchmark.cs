@@ -171,7 +171,7 @@ namespace Px.Utils.TestingApp.Commands
             {
                 sortedDimensions = [.. sortedDimensions.OrderByDescending(x => x.ValueCodes.Count)];
                 IReadOnlyList<string> valCodes = sortedDimensions[0].ValueCodes;
-                sortedDimensions[0] = new DimensionMap(sortedDimensions[0].Code, valCodes.Skip(1).ToList());
+                sortedDimensions[0] = new DimensionMap(sortedDimensions[0].Code, [.. valCodes.Skip(1)]);
                 size = sortedDimensions.Aggregate(1L, (acc, x) => acc * x.ValueCodes.Count);
             }
 

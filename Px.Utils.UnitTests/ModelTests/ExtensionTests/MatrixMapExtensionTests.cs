@@ -808,7 +808,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
             IMatrixMap collapsedMap = map.CollapseDimension("22", "foo");
 
             // Assert
-            Assert.AreEqual(9, collapsedMap.GetSizeLong()); // 3 * 1 * 3 = 9
+            Assert.AreEqual(9L, collapsedMap.GetSizeLong()); // 3 * 1 * 3 = 9
             Assert.AreEqual(1, collapsedMap.DimensionMaps[1].ValueCodes.Count);
             Assert.AreEqual("foo", collapsedMap.DimensionMaps[1].ValueCodes[0]);
         }
