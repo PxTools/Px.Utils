@@ -7,7 +7,7 @@
         /// </summary>
         /// <param name="matrixMap">The matrix map.</param>
         /// <returns>Total number of cells in the matrix described by the matrix map.</returns>
-        [Obsolete("Use GetSizeULong() instead. This method can overflow with really large tables.")]
+        [Obsolete("Use GetSizeLong() instead. This method can overflow with really large tables.")]
         public static int GetSize(this IMatrixMap matrixMap)
         {
             int numberOfCells = 1;
