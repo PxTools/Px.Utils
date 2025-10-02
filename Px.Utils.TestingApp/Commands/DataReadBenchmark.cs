@@ -23,7 +23,7 @@ namespace Px.Utils.TestingApp.Commands
 
         private IMatrixMap? Target { get; set; }
 
-        private int _numberOfCells = 1000000;
+        private long _numberOfCells = 1000000L;
 
         private static readonly string[] cellFlags = ["-c", "-cells"];
 
@@ -154,14 +154,14 @@ namespace Px.Utils.TestingApp.Commands
 
             foreach (string key in Parameters.Keys)
             {
-                if (cellFlags.Contains(key) && !int.TryParse(Parameters[key][0], out _numberOfCells))
+                if (cellFlags.Contains(key) && !long.TryParse(Parameters[key][0], out _numberOfCells))
                 {
                     throw new ArgumentException($"Invalid argument {key} {string.Join(' ', Parameters[key])}");
                 }
             }
         }
 
-        private static IMatrixMap GenerateBenchmarkTargetMap(IMatrixMap complete, int targetSize)
+        private static IMatrixMap GenerateBenchmarkTargetMap(IMatrixMap complete, long targetSize)
         {
             long size = complete.GetSizeLong();
             if (size < targetSize) return complete;
@@ -170,9 +170,9 @@ namespace Px.Utils.TestingApp.Commands
             while (size > targetSize)
             {
                 sortedDimensions = [.. sortedDimensions.OrderByDescending(x => x.ValueCodes.Count)];
-                var valCodes = sortedDimensions[0].ValueCodes;
+                IReadOnlyList<string> valCodes = sortedDimensions[0].ValueCodes;
                 sortedDimensions[0] = new DimensionMap(sortedDimensions[0].Code, valCodes.Skip(1).ToList());
-                size = sortedDimensions.Aggregate(1, (acc, x) => acc * x.ValueCodes.Count);
+                size = sortedDimensions.Aggregate(1L, (acc, x) => acc * x.ValueCodes.Count);
             }
 
             List<IDimensionMap> dimList = [.. complete.DimensionMaps
