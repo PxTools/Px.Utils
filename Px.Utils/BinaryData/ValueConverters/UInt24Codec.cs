@@ -168,16 +168,15 @@ namespace Px.Utils.BinaryData.ValueConverters
         {
             if (value >= SentinelStart)
             {
-                uint offset = value - SentinelStart;
-                return offset switch
+                return value switch
                 {
-                    0 => DataValueType.Missing,
-                    1 => DataValueType.CanNotRepresent,
-                    2 => DataValueType.Confidential,
-                    3 => DataValueType.NotAcquired,
-                    4 => DataValueType.NotAsked,
-                    5 => DataValueType.Empty,
-                    6 => DataValueType.Nill,
+                    Missing => DataValueType.Missing,
+                    CanNotRepresent => DataValueType.CanNotRepresent,
+                    Confidential => DataValueType.Confidential,
+                    NotAcquired => DataValueType.NotAcquired,
+                    NotAsked => DataValueType.NotAsked,
+                    Empty => DataValueType.Empty,
+                    Nill => DataValueType.Nill,
                     _ => DataValueType.Exists
                 };
             }
