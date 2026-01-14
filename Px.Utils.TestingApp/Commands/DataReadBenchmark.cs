@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models.Metadata;
+using Px.Utils.Models.Metadata;
 using Px.Utils.Models.Metadata.ExtensionMethods;
 using Px.Utils.PxFile.Data;
 using Px.Utils.ModelBuilders;
@@ -55,9 +55,9 @@ namespace Px.Utils.TestingApp.Commands
             if(MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            int arraySize = Target.GetSizeLong() > int.MaxValue
+            int arraySize = Target.GetSize() > int.MaxValue
                 ? throw new InvalidOperationException("Target size exceeds maximum array size.")
-                : (int)Target.GetSizeLong();
+                : (int)Target.GetSize();
             DoubleDataValue[] buffer = new DoubleDataValue[arraySize];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
@@ -71,9 +71,9 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            int arraySize = Target.GetSizeLong() > int.MaxValue
+            int arraySize = Target.GetSize() > int.MaxValue
                 ? throw new InvalidOperationException("Target size exceeds maximum array size.")
-                : (int)Target.GetSizeLong();
+                : (int)Target.GetSize();
             DecimalDataValue[] buffer = new DecimalDataValue[arraySize];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
@@ -87,9 +87,9 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            int arraySize = Target.GetSizeLong() > int.MaxValue
+            int arraySize = Target.GetSize() > int.MaxValue
                 ? throw new InvalidOperationException("Target size exceeds maximum array size.")
-                : (int)Target.GetSizeLong();
+                : (int)Target.GetSize();
             double[] buffer = new double[arraySize];
             double[] missingValueEncodings = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
 
@@ -104,9 +104,9 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            int arraySize = Target.GetSizeLong() > int.MaxValue
+            int arraySize = Target.GetSize() > int.MaxValue
                 ? throw new InvalidOperationException("Target size exceeds maximum array size.")
-                : (int)Target.GetSizeLong();
+                : (int)Target.GetSize();
             DoubleDataValue[] buffer = new DoubleDataValue[arraySize];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
@@ -120,9 +120,9 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            int arraySize = Target.GetSizeLong() > int.MaxValue
+            int arraySize = Target.GetSize() > int.MaxValue
                 ? throw new InvalidOperationException("Target size exceeds maximum array size.")
-                : (int)Target.GetSizeLong();
+                : (int)Target.GetSize();
             DecimalDataValue[] buffer = new DecimalDataValue[arraySize];
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
@@ -136,9 +136,9 @@ namespace Px.Utils.TestingApp.Commands
             if (MetaData is null) throw new InvalidOperationException(metadataNotFoundMessage);
             Target = GenerateBenchmarkTargetMap(MetaData, _numberOfCells);
 
-            int arraySize = Target.GetSizeLong() > int.MaxValue
+            int arraySize = Target.GetSize() > int.MaxValue
                 ? throw new InvalidOperationException("Target size exceeds maximum array size.")
-                : (int)Target.GetSizeLong();
+                : (int)Target.GetSize();
             double[] buffer = new double[arraySize];
             double[] missingValueEncodings = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
 
@@ -163,7 +163,7 @@ namespace Px.Utils.TestingApp.Commands
 
         private static IMatrixMap GenerateBenchmarkTargetMap(IMatrixMap complete, long targetSize)
         {
-            long size = complete.GetSizeLong();
+            long size = complete.GetSize();
             if (size < targetSize) return complete;
 
             List<IDimensionMap> sortedDimensions = [.. complete.DimensionMaps];

@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models;
+using Px.Utils.Models;
 using Px.Utils.Models.Metadata;
 using Px.Utils.Models.Metadata.Dimensions;
 using Px.Utils.Models.Metadata.ExtensionMethods;
@@ -30,7 +30,7 @@ namespace Px.Utils.Operations
                 : CopyMetaAndInsertValue(input.Metadata, sourceMap.Code, newValue, valueIndex);
 
             IMatrixMap resultOnlyMap = newMeta.CollapseDimension(sourceMap.Code, newValue.Code);
-            long arraySize = input.Metadata.GetSizeLong() + resultOnlyMap.GetSizeLong();
+            long arraySize = input.Metadata.GetSize() + resultOnlyMap.GetSize();
             if (arraySize > int.MaxValue) throw new InvalidOperationException("Resulting matrix size exceeds maximum array size.");
             TData[] outData = new TData[(int)arraySize];
 
