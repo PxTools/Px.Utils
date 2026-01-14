@@ -12,7 +12,8 @@ on:
 
 jobs:
  sonar:
-    permissions: read-all
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
 
     steps:
