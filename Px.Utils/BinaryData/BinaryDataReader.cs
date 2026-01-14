@@ -60,10 +60,10 @@ namespace Px.Utils.BinaryData
         /// <param name="bufferMap">The target shape and ordering for writing into the output buffer.</param>
         /// <param name="buffer">The flat buffer where decoded <see cref="DoubleDataValue"/>s are written following <paramref name="bufferMap"/> ordering.</param>
         /// <param name="ct">Cancellation token.</param>
-        public async Task ReadByChunk(AsyncChunkProvider provider, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct)
+        public async Task ReadByChunkAsync(AsyncChunkProvider provider, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct)
         {
             if (!readMap.IsSubmapOf(blobMap)) throw new ArgumentException("The blob does not contain the entire target set.");
-            if (!readMap.IsSubmapOf(bufferMap)) throw new ArgumentException("Can not write the entire target set into the provided buffer.");
+            if (!readMap.IsSubmapOf(bufferMap)) throw new ArgumentException($"Can not write the entire target set into the provided {nameof(buffer)}.");
 
             int[][] blobIndices = GetSubIndices(readMap, blobMap);
             int[][] bufferIndices = GetSubIndices(readMap, bufferMap);
@@ -149,24 +149,24 @@ namespace Px.Utils.BinaryData
         /// <param name="bufferMap">The target shape and ordering for writing into the output buffer.</param>
         /// <param name="buffer">The flat buffer where decoded <see cref="DoubleDataValue"/>s are written following <paramref name="bufferMap"/> ordering.</param>
         /// <param name="ct">Cancellation token.</param>
-        public async Task ReadFromStream(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct)
+        public async Task ReadFromStreamAsync(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct)
         {
             if (!readMap.IsSubmapOf(blobMap)) throw new ArgumentException("The blob does not contain the entire target set.");
-            if (!readMap.IsSubmapOf(bufferMap)) throw new ArgumentException("Can not write the entire target set into the provided buffer.");
+            if (!readMap.IsSubmapOf(bufferMap)) throw new ArgumentException($"Can not write the entire target set into the provided {nameof(buffer)}.");
 
             if (source.CanSeek)
             {
-                await ReadFromSeekableStream(source, readMap, blobMap, bufferMap, buffer, ct);
+                await ReadFromSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, ct);
                 return;
             }
 
-            await ReadFromNonSeekableStream(source, readMap, blobMap, bufferMap, buffer, ct);
+            await ReadFromNonSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, ct);
         }
 
         /// <summary>
         /// Reads target values from a seekable stream using windowed I/O. Computes index mappings and manages internal buffers.
         /// </summary>
-        private async Task ReadFromSeekableStream(
+        private async Task ReadFromSeekableStreamAsync(
             Stream source,
             IMatrixMap readMap,
             IMatrixMap blobMap,
@@ -244,7 +244,7 @@ namespace Px.Utils.BinaryData
 
                 if (total < windowSizeBytes)
                 {
-                    throw new EndOfStreamException("Could not read the requested number of bytes from source stream.");
+                    throw new EndOfStreamException("Could not read the requested number of bytes from stream.");
                 }
 
                 ReadOnlySpan<byte> span = mem.Span[..windowSizeBytes];
@@ -271,7 +271,7 @@ namespace Px.Utils.BinaryData
         /// <summary>
         /// Reads target values from a non-seekable stream using sequential, aligned chunking and internal buffers.
         /// </summary>
-        private async Task ReadFromNonSeekableStream(
+        private async Task ReadFromNonSeekableStreamAsync(
             Stream source,
             IMatrixMap readMap,
             IMatrixMap blobMap,

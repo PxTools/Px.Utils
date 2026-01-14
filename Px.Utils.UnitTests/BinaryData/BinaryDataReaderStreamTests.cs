@@ -61,7 +61,7 @@ namespace Px.Utils.UnitTests.BinaryData
 
             CountingSeekableStream stream = new(blob);
             BinaryDataReader<UInt32Codec> reader = new(16);
-            await reader.ReadFromStream(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
             stream.CompleteCurrentWindow();
 
             Assert.AreEqual(16, stream.SeekOffsets.Count);
@@ -92,7 +92,7 @@ namespace Px.Utils.UnitTests.BinaryData
 
             CountingSeekableStream stream = new(blob);
             BinaryDataReader<UInt32Codec> reader = new(32);
-            await reader.ReadFromStream(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
             stream.CompleteCurrentWindow();
 
             Assert.IsTrue(stream.SeekOffsets.Count >= 1);
@@ -122,7 +122,7 @@ namespace Px.Utils.UnitTests.BinaryData
 
             CountingSeekableStream stream = new(blob);
             BinaryDataReader<UInt32Codec> reader = new(4096, 1024 * 1024);
-            await reader.ReadFromStream(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
             stream.CompleteCurrentWindow();
 
             Assert.AreEqual(1, stream.SeekOffsets.Count);
@@ -150,7 +150,7 @@ namespace Px.Utils.UnitTests.BinaryData
 
             CountingSeekableStream stream = new(blob);
             BinaryDataReader<UInt32Codec> reader = new(4096, 8);
-            await reader.ReadFromStream(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
             stream.CompleteCurrentWindow();
 
             int expectedCalls = 64 / 4;
@@ -181,7 +181,7 @@ namespace Px.Utils.UnitTests.BinaryData
 
             CountingSeekableStream stream = new(blob);
             BinaryDataReader<UInt16Codec> reader = new();
-            await reader.ReadFromStream(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
             stream.CompleteCurrentWindow();
 
             Assert.AreEqual(1, stream.SeekOffsets.Count);
@@ -210,7 +210,7 @@ namespace Px.Utils.UnitTests.BinaryData
 
             CountingSeekableStream stream = new(blob);
             BinaryDataReader<UInt32Codec> reader = new();
-            await reader.ReadFromStream(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
             stream.CompleteCurrentWindow();
 
             Assert.IsTrue(stream.SeekOffsets.Count >= 1);
@@ -242,7 +242,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new();
             await Assert.ThrowsExactlyAsync<OperationCanceledException>(async () =>
             {
-                await reader.ReadFromStream(stream, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[4]), cts.Token);
+                await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[4]), cts.Token);
             });
         }
 
@@ -261,7 +261,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new();
             await Assert.ThrowsExactlyAsync<EndOfStreamException>(async () =>
             {
-                await reader.ReadFromStream(stream, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[2]), CancellationToken.None);
+                await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[2]), CancellationToken.None);
             });
         }
 
@@ -280,7 +280,7 @@ namespace Px.Utils.UnitTests.BinaryData
 
             using NonSeekableReadOnlyStream stream = new(blob);
             BinaryDataReader<UInt32Codec> reader = new(16);
-            await reader.ReadFromStream(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             for (int i = 0; i < 64; i++)
             {
@@ -303,7 +303,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new(64);
             await Assert.ThrowsExactlyAsync<EndOfStreamException>(async () =>
             {
-                await reader.ReadFromStream(stream, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[4]), CancellationToken.None);
+                await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[4]), CancellationToken.None);
             });
         }
 
@@ -320,7 +320,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new(64);
             await Assert.ThrowsExactlyAsync<EndOfStreamException>(async () =>
             {
-                await reader.ReadFromStream(stream, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[1]), CancellationToken.None);
+                await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[1]), CancellationToken.None);
             });
         }
 
@@ -341,7 +341,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new(16);
             await Assert.ThrowsExactlyAsync<OperationCanceledException>(async () =>
             {
-                await reader.ReadFromStream(stream, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[2]), cts.Token);
+                await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[2]), cts.Token);
             });
         }
 
@@ -362,7 +362,7 @@ namespace Px.Utils.UnitTests.BinaryData
 
             using NonSeekableReadOnlyStream stream = new(blob);
             BinaryDataReader<UInt32Codec> reader = new();
-            await reader.ReadFromStream(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             int[] expectedBufferPositions = [6, 8, 11, 13];
             double[] expectedValues = [6, 8, 11, 13];

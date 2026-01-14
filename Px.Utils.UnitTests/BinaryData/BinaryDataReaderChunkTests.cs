@@ -73,7 +73,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new(16);
             BinaryDataReader<UInt32Codec>.AsyncChunkProvider provider = MakeProvider<UInt32Codec>(blob, calls);
 
-            await reader.ReadByChunk(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             Assert.AreEqual(16, calls.Count);
             for (int i = 0; i < calls.Count; i++)
@@ -105,7 +105,7 @@ namespace Px.Utils.UnitTests.BinaryData
             List<(long offset, long length)> calls = [];
             BinaryDataReader<UInt32Codec>.AsyncChunkProvider provider = MakeProvider<UInt32Codec>(blob, calls);
 
-            await reader.ReadByChunk(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             Assert.IsTrue(calls.Count >= 1);
             Assert.AreEqual(256, calls[0].offset);
@@ -140,7 +140,7 @@ namespace Px.Utils.UnitTests.BinaryData
             Memory<DoubleDataValue> buffer = new(dst);
 
             BinaryDataReader<UInt32Codec> reader = new(4096, 1024 * 1024);
-            await reader.ReadByChunk(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             Assert.AreEqual(1, calls.Count);
             Assert.AreEqual(0, calls[0].offset);
@@ -174,7 +174,7 @@ namespace Px.Utils.UnitTests.BinaryData
             Memory<DoubleDataValue> buffer = new(dst);
 
             BinaryDataReader<UInt32Codec> reader = new(4096, 8);
-            await reader.ReadByChunk(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             int expectedCalls = 64 / 4;
             Assert.AreEqual(expectedCalls, calls.Count);
@@ -206,7 +206,7 @@ namespace Px.Utils.UnitTests.BinaryData
             List<(long offset, long length)> calls = [];
             BinaryDataReader<UInt32Codec>.AsyncChunkProvider provider = MakeProvider<UInt32Codec>(blob, calls);
             BinaryDataReader<UInt32Codec> reader = new();
-            await reader.ReadByChunk(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             Assert.AreEqual(1, calls.Count);
             Assert.AreEqual(0, calls[0].offset);
@@ -235,7 +235,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec>.AsyncChunkProvider provider = MakeProvider<UInt32Codec>(blob, calls);
 
             BinaryDataReader<UInt32Codec> reader = new();
-            await reader.ReadByChunk(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             Assert.AreEqual(1, calls.Count);
             Assert.AreEqual(44, calls[0].offset);
@@ -268,7 +268,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec>.AsyncChunkProvider provider = MakeProvider<UInt32Codec>(blob, calls);
 
             BinaryDataReader<UInt32Codec> reader = new();
-            await reader.ReadByChunk(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             Assert.AreEqual(1, calls.Count);
             Assert.AreEqual(0, calls[0].offset);
@@ -297,7 +297,7 @@ namespace Px.Utils.UnitTests.BinaryData
             List<(long offset, long length)> calls = [];
             BinaryDataReader<UInt32Codec>.AsyncChunkProvider provider = MakeProvider<UInt32Codec>(blob, calls);
             BinaryDataReader<UInt32Codec> reader = new();
-            await reader.ReadByChunk(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             Assert.AreEqual(1, calls.Count);
             Assert.AreEqual(24, calls[0].offset);
@@ -328,7 +328,7 @@ namespace Px.Utils.UnitTests.BinaryData
             List<(long offset, long length)> calls = [];
             BinaryDataReader<UInt16Codec>.AsyncChunkProvider provider = MakeProvider<UInt16Codec>(blob, calls);
             BinaryDataReader<UInt16Codec> reader = new();
-            await reader.ReadByChunk(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             Assert.AreEqual(1, calls.Count);
             Assert.AreEqual(0, calls[0].offset);
@@ -367,7 +367,7 @@ namespace Px.Utils.UnitTests.BinaryData
             List<(long offset, long length)> calls = [];
             BinaryDataReader<UInt32Codec>.AsyncChunkProvider provider = MakeProvider<UInt32Codec>(blob, calls);
             BinaryDataReader<UInt32Codec> reader = new();
-            await reader.ReadByChunk(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             Assert.AreEqual(1, calls.Count);
             Assert.AreEqual(0, calls[0].offset);
@@ -396,7 +396,7 @@ namespace Px.Utils.UnitTests.BinaryData
             List<(long offset, long length)> calls = [];
             BinaryDataReader<UInt32Codec>.AsyncChunkProvider provider = MakeProvider<UInt32Codec>(blob, calls);
             BinaryDataReader<UInt32Codec> reader = new();
-            await reader.ReadByChunk(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             Assert.AreEqual(1, calls.Count);
             Assert.AreEqual(8, calls[0].offset);
@@ -428,7 +428,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new();
             await Assert.ThrowsExactlyAsync<TaskCanceledException>(async () =>
             {
-                await reader.ReadByChunk(provider, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[4]), cts.Token);
+                await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[4]), cts.Token);
             });
         }
 
@@ -452,7 +452,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new();
             await Assert.ThrowsExactlyAsync<EndOfStreamException>(async () =>
             {
-                await reader.ReadByChunk(provider, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[2]), CancellationToken.None);
+                await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[2]), CancellationToken.None);
             });
         }
     }
