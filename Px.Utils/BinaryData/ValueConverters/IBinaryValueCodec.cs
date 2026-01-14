@@ -25,6 +25,11 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// </remarks>
         void Write(ReadOnlySpan<DoubleDataValue> input, Stream output);
 
+        /// <summary>
+        /// Reads a single value from a little-endian byte span and decodes it using the codec's binary format.
+        /// </summary>
+        /// <param name="bytes">A span of bytes containing exactly one encoded value for this codec.</param>
+        /// <returns>The decoded <see cref="DoubleDataValue"/>.</returns>
         static abstract DoubleDataValue ReadOne(ReadOnlySpan<byte> bytes);
 
         /// <summary>
@@ -37,6 +42,11 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// </remarks>
         void Read(ReadOnlySpan<byte> input, Span<DoubleDataValue> output);
 
+        /// <summary>
+        /// Reads a single value from a little-endian byte span and decodes it to a <see cref="DecimalDataValue"/> using the codec's binary format.
+        /// </summary>
+        /// <param name="bytes">A span of bytes containing exactly one encoded value for this codec.</param>
+        /// <returns>The decoded <see cref="DecimalDataValue"/>.</returns>
         static abstract DecimalDataValue ReadOneAsDecimal(ReadOnlySpan<byte> bytes);
 
         /// <summary>

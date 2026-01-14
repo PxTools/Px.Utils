@@ -6,8 +6,16 @@ using Px.Utils.Models.Data.DataValue;
 
 namespace Px.Utils.BinaryData.ValueConverters
 {
+    /// <summary>
+    /// Codec for reading and writing 64-bit floating point values with sentinel-based <see cref="DataValueType"/> mapping.
+    /// Uses the sequence of smallest positive subnormal bit patterns as sentinels and preserves the exact bit pattern when writing.
+    /// </summary>
+    /// <param name="bufferBytes">The size of the internal write buffer in bytes. The minimum effective size is <c>sizeof(double)</c>.</param>
     public sealed class DoubleCodec(int bufferBytes = 64 * 1024) : IBinaryValueCodec
     {
+        /// <summary>
+        /// Gets the number of bytes per encoded value for this codec.
+        /// </summary>
         public static int ByteCount => sizeof(double);
 
         // Use contiguous smallest positive subnormals by bit pattern for double
@@ -90,6 +98,12 @@ namespace Px.Utils.BinaryData.ValueConverters
                 : new DecimalDataValue(0, type);
         }
 
+        /// <summary>
+        /// Writes a span of <see cref="DoubleDataValue"/> entries to the output stream using 64-bit little-endian encoding of double.
+        /// Values with non-<see cref="DataValueType.Exists"/> types are mapped to reserved sentinel bit patterns.
+        /// </summary>
+        /// <param name="input">Input values to encode.</param>
+        /// <param name="output">Destination stream to write to.</param>
         public void Write(ReadOnlySpan<DoubleDataValue> input, Stream output)
         {
             ArgumentNullException.ThrowIfNull(output);
@@ -123,6 +137,11 @@ namespace Px.Utils.BinaryData.ValueConverters
             }
         }
 
+        /// <summary>
+        /// Reads 64-bit little-endian encoded double values from input bytes into a span of <see cref="DoubleDataValue"/>.
+        /// </summary>
+        /// <param name="input">Source bytes to decode.</param>
+        /// <param name="output">Destination span for decoded values.</param>
         public void Read(ReadOnlySpan<byte> input, Span<DoubleDataValue> output)
         {
             const int elemSize = sizeof(double);
@@ -133,6 +152,11 @@ namespace Px.Utils.BinaryData.ValueConverters
             }
         }
 
+        /// <summary>
+        /// Reads 64-bit little-endian encoded double values from input bytes into a span of <see cref="DecimalDataValue"/>.
+        /// </summary>
+        /// <param name="input">Source bytes to decode.</param>
+        /// <param name="output">Destination span for decoded values.</param>
         public void Read(ReadOnlySpan<byte> input, Span<DecimalDataValue> output)
         {
             const int elemSize = sizeof(double);
