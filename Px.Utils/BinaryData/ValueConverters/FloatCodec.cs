@@ -14,14 +14,21 @@ namespace Px.Utils.BinaryData.ValueConverters
         public static int ByteCount => sizeof(float);
 
         // Use contiguous smallest positive subnormals by bit pattern
-        internal const int SentinelBitsStart = 0x00000001; // next after 0x00000000
-        private static readonly float Missing = BitConverter.Int32BitsToSingle(SentinelBitsStart);
-        private static readonly float CanNotRepresent = BitConverter.Int32BitsToSingle(SentinelBitsStart + 1);
-        private static readonly float Confidential = BitConverter.Int32BitsToSingle(SentinelBitsStart + 2);
-        private static readonly float NotAcquired = BitConverter.Int32BitsToSingle(SentinelBitsStart + 3);
-        private static readonly float NotAsked = BitConverter.Int32BitsToSingle(SentinelBitsStart + 4);
-        private static readonly float Empty = BitConverter.Int32BitsToSingle(SentinelBitsStart + 5);
-        private static readonly float Nill = BitConverter.Int32BitsToSingle(SentinelBitsStart + 6);
+        private const int MissingSentinelBits = 0x00000001;
+        private const int CanNotRepresentSentinelBits = MissingSentinelBits + 1;
+        private const int ConfidentialSentinelBits = MissingSentinelBits + 2;
+        private const int NotAcquiredSentinelBits = MissingSentinelBits + 3;
+        private const int NotAskedSentinelBits = MissingSentinelBits + 4;
+        private const int EmptySentinelBits = MissingSentinelBits + 5;
+        private const int NillSentinelBits = MissingSentinelBits + 6;
+
+        private static readonly float Missing = BitConverter.Int32BitsToSingle(MissingSentinelBits);
+        private static readonly float CanNotRepresent = BitConverter.Int32BitsToSingle(CanNotRepresentSentinelBits);
+        private static readonly float Confidential = BitConverter.Int32BitsToSingle(ConfidentialSentinelBits);
+        private static readonly float NotAcquired = BitConverter.Int32BitsToSingle(NotAcquiredSentinelBits);
+        private static readonly float NotAsked = BitConverter.Int32BitsToSingle(NotAskedSentinelBits);
+        private static readonly float Empty = BitConverter.Int32BitsToSingle(EmptySentinelBits);
+        private static readonly float Nill = BitConverter.Int32BitsToSingle(NillSentinelBits);
 
         private readonly int _bufferBytes = Math.Max(sizeof(float), bufferBytes);
 
@@ -142,18 +149,17 @@ namespace Px.Utils.BinaryData.ValueConverters
         private static DataValueType MapFrom(float value)
         {
             int bits = BitConverter.SingleToInt32Bits(value);
-            if (bits >= SentinelBitsStart && bits <= SentinelBitsStart + 6)
+            if (bits >= MissingSentinelBits && bits <= MissingSentinelBits + 6)
             {
-                int offset = bits - SentinelBitsStart;
-                return offset switch
+                return bits switch
                 {
-                    0 => DataValueType.Missing,
-                    1 => DataValueType.CanNotRepresent,
-                    2 => DataValueType.Confidential,
-                    3 => DataValueType.NotAcquired,
-                    4 => DataValueType.NotAsked,
-                    5 => DataValueType.Empty,
-                    6 => DataValueType.Nill,
+                    MissingSentinelBits => DataValueType.Missing,
+                    CanNotRepresentSentinelBits => DataValueType.CanNotRepresent,
+                    ConfidentialSentinelBits => DataValueType.Confidential,
+                    NotAcquiredSentinelBits => DataValueType.NotAcquired,
+                    NotAskedSentinelBits => DataValueType.NotAsked,
+                    EmptySentinelBits => DataValueType.Empty,
+                    NillSentinelBits => DataValueType.Nill,
                     _ => DataValueType.Exists
                 };
             }

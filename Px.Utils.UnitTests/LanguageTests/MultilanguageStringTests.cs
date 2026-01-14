@@ -1,5 +1,6 @@
 using Px.Utils.Exceptions;
 using Px.Utils.Language;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LanguageTests
 {
@@ -174,10 +175,11 @@ namespace LanguageTests
         }
 
         [TestMethod]
+        [SuppressMessage("Usage", "MSTEST0037:Use proper 'Assert' methods", Justification = "This tests the Equals implementation of MLS")]
         public void EqualsTestNullIsNotEqual()
         {
             MultilanguageString first = new([new("a", "test_value_a"), new("b", "test_value_b")]);
-            Assert.IsNotNull(first);
+            Assert.AreNotEqual(null, first);
         }
 
         [TestMethod]
