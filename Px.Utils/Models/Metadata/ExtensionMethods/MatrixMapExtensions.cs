@@ -9,7 +9,7 @@ namespace Px.Utils.Models.Metadata.ExtensionMethods
         /// <returns>Total number of cells in the matrix described by the matrix map.</returns>
         public static long GetSize(this IMatrixMap matrixMap)
         {
-            int numberOfCells = 1;
+            long numberOfCells = 1;
             foreach (IDimensionMap dimensionMap in matrixMap.DimensionMaps)
             {
                 numberOfCells *= dimensionMap.ValueCodes.Count;
