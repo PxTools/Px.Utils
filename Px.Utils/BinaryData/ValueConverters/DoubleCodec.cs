@@ -19,14 +19,21 @@ namespace Px.Utils.BinaryData.ValueConverters
         public static int ByteCount => sizeof(double);
 
         // Use contiguous smallest positive subnormals by bit pattern for double
-        internal const long SentinelBitsStart = 0x0000000000000001L;
-        private static readonly double Missing = BitConverter.Int64BitsToDouble(SentinelBitsStart);
-        private static readonly double CanNotRepresent = BitConverter.Int64BitsToDouble(SentinelBitsStart + 1L);
-        private static readonly double Confidential = BitConverter.Int64BitsToDouble(SentinelBitsStart + 2L);
-        private static readonly double NotAcquired = BitConverter.Int64BitsToDouble(SentinelBitsStart + 3L);
-        private static readonly double NotAsked = BitConverter.Int64BitsToDouble(SentinelBitsStart + 4L);
-        private static readonly double Empty = BitConverter.Int64BitsToDouble(SentinelBitsStart + 5L);
-        private static readonly double Nill = BitConverter.Int64BitsToDouble(SentinelBitsStart + 6L);
+        private const long MissingSentinelBits = 0x0000000000000001L;
+        private const long CanNotRepresentSentinelBits = MissingSentinelBits + 1L;
+        private const long ConfidentialSentinelBits = MissingSentinelBits + 2L;
+        private const long NotAcquiredSentinelBits = MissingSentinelBits + 3L;
+        private const long NotAskedSentinelBits = MissingSentinelBits + 4L;
+        private const long EmptySentinelBits = MissingSentinelBits + 5L;
+        private const long NillSentinelBits = MissingSentinelBits + 6L;
+
+        private static readonly double Missing = BitConverter.Int64BitsToDouble(MissingSentinelBits);
+        private static readonly double CanNotRepresent = BitConverter.Int64BitsToDouble(CanNotRepresentSentinelBits);
+        private static readonly double Confidential = BitConverter.Int64BitsToDouble(ConfidentialSentinelBits);
+        private static readonly double NotAcquired = BitConverter.Int64BitsToDouble(NotAcquiredSentinelBits);
+        private static readonly double NotAsked = BitConverter.Int64BitsToDouble(NotAskedSentinelBits);
+        private static readonly double Empty = BitConverter.Int64BitsToDouble(EmptySentinelBits);
+        private static readonly double Nill = BitConverter.Int64BitsToDouble(NillSentinelBits);
 
         private readonly int _bufferBytes = Math.Max(sizeof(double), bufferBytes);
 
@@ -48,18 +55,17 @@ namespace Px.Utils.BinaryData.ValueConverters
         private static DataValueType MapFrom(double value)
         {
             long bits = BitConverter.DoubleToInt64Bits(value);
-            if (bits >= SentinelBitsStart && bits <= SentinelBitsStart + 6L)
+            if (bits >= MissingSentinelBits && bits <= NillSentinelBits)
             {
-                long offset = bits - SentinelBitsStart;
-                return offset switch
+                return bits switch
                 {
-                    0L => DataValueType.Missing,
-                    1L => DataValueType.CanNotRepresent,
-                    2L => DataValueType.Confidential,
-                    3L => DataValueType.NotAcquired,
-                    4L => DataValueType.NotAsked,
-                    5L => DataValueType.Empty,
-                    6L => DataValueType.Nill,
+                    MissingSentinelBits => DataValueType.Missing,
+                    CanNotRepresentSentinelBits => DataValueType.CanNotRepresent,
+                    ConfidentialSentinelBits => DataValueType.Confidential,
+                    NotAcquiredSentinelBits => DataValueType.NotAcquired,
+                    NotAskedSentinelBits => DataValueType.NotAsked,
+                    EmptySentinelBits => DataValueType.Empty,
+                    NillSentinelBits => DataValueType.Nill,
                     _ => DataValueType.Exists
                 };
             }
@@ -69,12 +75,12 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <summary>
         /// Reads a single double-based data value from an 8-byte little-endian buffer.
         /// </summary>
-        /// <param name="input8Bytes">A span containing at least 8 bytes (little-endian) representing a double.</param>
+        /// <param name="bytes">A span containing at least 8 bytes (little-endian) representing a double.</param>
         /// <returns>The decoded <see cref="DoubleDataValue"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DoubleDataValue ReadOne(ReadOnlySpan<byte> input8Bytes)
+        public static DoubleDataValue ReadOne(ReadOnlySpan<byte> bytes)
         {
-            long bits = BinaryPrimitives.ReadInt64LittleEndian(input8Bytes);
+            long bits = BinaryPrimitives.ReadInt64LittleEndian(bytes);
             double value = BitConverter.Int64BitsToDouble(bits);
             DataValueType type = MapFrom(value);
             return type == DataValueType.Exists
@@ -85,12 +91,12 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <summary>
         /// Reads a single double-based data value from an 8-byte little-endian buffer and converts to decimal.
         /// </summary>
-        /// <param name="input8Bytes">A span containing at least 8 bytes (little-endian) representing a double.</param>
+        /// <param name="bytes">A span containing at least 8 bytes (little-endian) representing a double.</param>
         /// <returns>The decoded <see cref="DecimalDataValue"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DecimalDataValue ReadOneAsDecimal(ReadOnlySpan<byte> input8Bytes)
+        public static DecimalDataValue ReadOneAsDecimal(ReadOnlySpan<byte> bytes)
         {
-            long bits = BinaryPrimitives.ReadInt64LittleEndian(input8Bytes);
+            long bits = BinaryPrimitives.ReadInt64LittleEndian(bytes);
             double value = BitConverter.Int64BitsToDouble(bits);
             DataValueType type = MapFrom(value);
             return type == DataValueType.Exists

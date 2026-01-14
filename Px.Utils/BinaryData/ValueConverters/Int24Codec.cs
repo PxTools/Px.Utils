@@ -83,14 +83,14 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <summary>
         /// Reads a single 24-bit little-endian encoded signed value into a <see cref="DoubleDataValue"/>.
         /// </summary>
-        /// <param name="input3Bytes">A span containing at least 3 bytes (little-endian) representing a signed 24-bit value.</param>
+        /// <param name="bytes">A span containing at least 3 bytes (little-endian) representing a signed 24-bit value.</param>
         /// <returns>The decoded <see cref="DoubleDataValue"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DoubleDataValue ReadOne(ReadOnlySpan<byte> input3Bytes)
+        public static DoubleDataValue ReadOne(ReadOnlySpan<byte> bytes)
         {
-            int b0 = input3Bytes[0];
-            int b1 = input3Bytes[1] << 8;
-            int b2 = input3Bytes[2] << 16;
+            int b0 = bytes[0];
+            int b1 = bytes[1] << 8;
+            int b2 = bytes[2] << 16;
             int value = b0 | b1 | b2;
             if ((value & 0x00800000) != 0)
             {
@@ -105,14 +105,14 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <summary>
         /// Reads a single 24-bit little-endian encoded signed value into a <see cref="DecimalDataValue"/>.
         /// </summary>
-        /// <param name="input3Bytes">A span containing at least 3 bytes (little-endian) representing a signed 24-bit value.</param>
+        /// <param name="bytes">A span containing at least 3 bytes (little-endian) representing a signed 24-bit value.</param>
         /// <returns>The decoded <see cref="DecimalDataValue"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DecimalDataValue ReadOneAsDecimal(ReadOnlySpan<byte> input3Bytes)
+        public static DecimalDataValue ReadOneAsDecimal(ReadOnlySpan<byte> bytes)
         {
-            int b0 = input3Bytes[0];
-            int b1 = input3Bytes[1] << 8;
-            int b2 = input3Bytes[2] << 16;
+            int b0 = bytes[0];
+            int b1 = bytes[1] << 8;
+            int b2 = bytes[2] << 16;
             int value = b0 | b1 | b2;
             if ((value & 0x00800000) != 0)
             {

@@ -78,12 +78,12 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <summary>
         /// Reads a single 16-bit little-endian encoded value into a <see cref="DoubleDataValue"/>.
         /// </summary>
-        /// <param name="input2Bytes">A span containing at least 2 bytes (little-endian) representing a UInt16.</param>
+        /// <param name="bytes">A span containing at least 2 bytes (little-endian) representing a UInt16.</param>
         /// <returns>The decoded <see cref="DoubleDataValue"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DoubleDataValue ReadOne(ReadOnlySpan<byte> input2Bytes)
+        public static DoubleDataValue ReadOne(ReadOnlySpan<byte> bytes)
         {
-            ushort value = BinaryPrimitives.ReadUInt16LittleEndian(input2Bytes);
+            ushort value = BinaryPrimitives.ReadUInt16LittleEndian(bytes);
             DataValueType type = MapFrom(value);
             return type == DataValueType.Exists
                 ? new DoubleDataValue(value, DataValueType.Exists)
@@ -93,12 +93,12 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <summary>
         /// Reads a single 16-bit little-endian encoded value into a <see cref="DecimalDataValue"/>.
         /// </summary>
-        /// <param name="input2Bytes">A span containing at least 2 bytes (little-endian) representing a UInt16.</param>
+        /// <param name="bytes">A span containing at least 2 bytes (little-endian) representing a UInt16.</param>
         /// <returns>The decoded <see cref="DecimalDataValue"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DecimalDataValue ReadOneAsDecimal(ReadOnlySpan<byte> input2Bytes)
+        public static DecimalDataValue ReadOneAsDecimal(ReadOnlySpan<byte> bytes)
         {
-            ushort value = BinaryPrimitives.ReadUInt16LittleEndian(input2Bytes);
+            ushort value = BinaryPrimitives.ReadUInt16LittleEndian(bytes);
             DataValueType type = MapFrom(value);
             return type == DataValueType.Exists
                 ? new DecimalDataValue(value, DataValueType.Exists)

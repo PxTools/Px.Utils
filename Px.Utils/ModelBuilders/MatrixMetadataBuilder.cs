@@ -1,4 +1,4 @@
-﻿using Px.Utils.Language;
+using Px.Utils.Language;
 using Px.Utils.Models.Metadata.Dimensions;
 using Px.Utils.Models.Metadata.Enums;
 using Px.Utils.Models.Metadata.ExtensionMethods;
@@ -121,12 +121,12 @@ namespace Px.Utils.ModelBuilders
             // Because we dont remove the stub or heading entries they are automatically added as additional properties.
             ContentDimension? maybeCd = GetContentDimensionIfAvailable(entries, langs);
 
-            List<Dimension> dimensions = dimensionNames.Select(name =>
+            List<Dimension> dimensions = [.. dimensionNames.Select(name =>
                 {
                     if (maybeCd is not null && name.Equals(maybeCd.Name)) return maybeCd;
                     else if (TestIfTimeAndBuild(entries, langs, name, out TimeDimension? timeDim)) return timeDim;
                     else return BuildDimension(entries, langs, name);
-                }).ToList();
+                })];
 
             MatrixMetadata meta = new(langs.DefaultLanguage, langs.AvailableLanguages, dimensions, []);
             AddAdditionalPropertiesToMatrixMetadata(meta, entries, langs);
@@ -512,10 +512,9 @@ namespace Px.Utils.ModelBuilders
             List<string> availableLangs = [defaultLang];
             if (entries.TryGetValue(availableLangsKey, out string? availableLangsString))
             {
-                availableLangs = availableLangsString
+                availableLangs = [.. availableLangsString
                     .Split(_listSeparator)
-                    .Select(s => s.Trim().Trim(_stringDelimeter))
-                    .ToList();
+                    .Select(s => s.Trim().Trim(_stringDelimeter))];
                 entries.Remove(availableLangsKey);
             }
 

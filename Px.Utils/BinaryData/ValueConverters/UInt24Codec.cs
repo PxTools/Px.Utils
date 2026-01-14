@@ -84,14 +84,14 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <summary>
         /// Reads a single 24-bit little-endian encoded unsigned value into a <see cref="DoubleDataValue"/>.
         /// </summary>
-        /// <param name="input3Bytes">A span containing at least 3 bytes (little-endian) representing an unsigned 24-bit value.</param>
+        /// <param name="bytes">A span containing at least 3 bytes (little-endian) representing an unsigned 24-bit value.</param>
         /// <returns>The decoded <see cref="DoubleDataValue"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DoubleDataValue ReadOne(ReadOnlySpan<byte> input3Bytes)
+        public static DoubleDataValue ReadOne(ReadOnlySpan<byte> bytes)
         {
-            uint b0 = input3Bytes[0];
-            uint b1 = (uint)input3Bytes[1] << 8;
-            uint b2 = (uint)input3Bytes[2] << 16;
+            uint b0 = bytes[0];
+            uint b1 = (uint)bytes[1] << 8;
+            uint b2 = (uint)bytes[2] << 16;
             uint value = b0 | b1 | b2;
             DataValueType type = MapFrom(value);
             return type == DataValueType.Exists
@@ -102,14 +102,14 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <summary>
         /// Reads a single 24-bit little-endian encoded unsigned value into a <see cref="DecimalDataValue"/>.
         /// </summary>
-        /// <param name="input3Bytes">A span containing at least 3 bytes (little-endian) representing an unsigned 24-bit value.</param>
+        /// <param name="bytes">A span containing at least 3 bytes (little-endian) representing an unsigned 24-bit value.</param>
         /// <returns>The decoded <see cref="DecimalDataValue"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DecimalDataValue ReadOneAsDecimal(ReadOnlySpan<byte> input3Bytes)
+        public static DecimalDataValue ReadOneAsDecimal(ReadOnlySpan<byte> bytes)
         {
-            uint b0 = input3Bytes[0];
-            uint b1 = (uint)input3Bytes[1] << 8;
-            uint b2 = (uint)input3Bytes[2] << 16;
+            uint b0 = bytes[0];
+            uint b1 = (uint)bytes[1] << 8;
+            uint b2 = (uint)bytes[2] << 16;
             uint value = b0 | b1 | b2;
             DataValueType type = MapFrom(value);
             return type == DataValueType.Exists

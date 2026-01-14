@@ -237,7 +237,7 @@ namespace Px.Utils.BinaryData
                 while (total < windowSizeBytes)
                 {
                     ct.ThrowIfCancellationRequested();
-                    int read = await source.ReadAsync(mem.Slice(total, windowSizeBytes - total), ct);
+                    int read = await source.ReadAsync(mem[total..windowSizeBytes], ct);
                     if (read == 0) break;
                     total += read;
                 }

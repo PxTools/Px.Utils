@@ -99,9 +99,9 @@ namespace Px.Utils.UnitTests.BinaryData
             byte[] blob = EncodeWithUInt32(sourceValues);
 
             DoubleDataValue[] dst = new DoubleDataValue[total];
-            Memory<DoubleDataValue> buffer = new Memory<DoubleDataValue>(dst);
+            Memory<DoubleDataValue> buffer = new(dst);
 
-            BinaryDataReader<UInt32Codec> reader = new BinaryDataReader<UInt32Codec>(32);
+            BinaryDataReader<UInt32Codec> reader = new(32);
             List<(long offset, long length)> calls = [];
             BinaryDataReader<UInt32Codec>.AsyncChunkProvider provider = MakeProvider<UInt32Codec>(blob, calls);
 
@@ -154,21 +154,21 @@ namespace Px.Utils.UnitTests.BinaryData
         [TestMethod]
         public async Task ReadByChunkMergeCapLowSplitsIntoManyWindows()
         {
-            MatrixMap blobMap = BuildMap(["d0_0"], ["d1_0"], Enumerable.Range(0, 64).Select(i => $"d2_{i}").ToArray());
-            MatrixMap readMap = BuildMap(["d0_0"], ["d1_0"], Enumerable.Range(0, 64).Where(i => i % 4 == 0).Select(i => $"d2_{i}").ToArray());
+            MatrixMap blobMap = BuildMap(["d0_0"], ["d1_0"], [.. Enumerable.Range(0, 64).Select(i => $"d2_{i}")]);
+            MatrixMap readMap = BuildMap(["d0_0"], ["d1_0"], [.. Enumerable.Range(0, 64).Where(i => i % 4 == 0).Select(i => $"d2_{i}")]);
             MatrixMap bufferMap = blobMap;
 
             int total = 64;
             DoubleDataValue[] sourceValues = MakeSequence(total);
             byte[] blob = EncodeWithUInt32(sourceValues);
 
-            List<(long offset, long length)> calls = new();
-            BinaryDataReader<UInt32Codec>.AsyncChunkProvider provider = (offset, length, ct) =>
+            List<(long offset, long length)> calls = [];
+            Task<Stream> provider(long offset, long length, CancellationToken ct)
             {
                 calls.Add((offset, length));
                 Stream stream = new MemoryStream(blob, (int)offset, (int)length, writable: false);
                 return Task.FromResult(stream);
-            };
+            }
 
             DoubleDataValue[] dst = new DoubleDataValue[total];
             Memory<DoubleDataValue> buffer = new(dst);
@@ -253,8 +253,8 @@ namespace Px.Utils.UnitTests.BinaryData
         [TestMethod]
         public async Task ReadByChunkSparseButWithinWindowUsesSingleProviderCall()
         {
-            MatrixMap blobMap = BuildMap(["d0_0"], ["d1_0"], Enumerable.Range(0, 32).Select(i => $"d2_{i}").ToArray());
-            MatrixMap readMap = BuildMap(["d0_0"], ["d1_0"], Enumerable.Range(0, 32).Where(i => i % 2 == 0).Select(i => $"d2_{i}").ToArray());
+            MatrixMap blobMap = BuildMap(["d0_0"], ["d1_0"], [.. Enumerable.Range(0, 32).Select(i => $"d2_{i}")]);
+            MatrixMap readMap = BuildMap(["d0_0"], ["d1_0"], [.. Enumerable.Range(0, 32).Where(i => i % 2 == 0).Select(i => $"d2_{i}")]);
             MatrixMap bufferMap = blobMap;
 
             int total = 32;

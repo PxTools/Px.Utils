@@ -65,12 +65,12 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <summary>
         /// Reads a single 32-bit little-endian encoded float value into a <see cref="DoubleDataValue"/>.
         /// </summary>
-        /// <param name="input4Bytes">A span containing at least 4 bytes (little-endian) representing a float.</param>
+        /// <param name="bytes">A span containing at least 4 bytes (little-endian) representing a float.</param>
         /// <returns>The decoded <see cref="DoubleDataValue"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DoubleDataValue ReadOne(ReadOnlySpan<byte> input4Bytes)
+        public static DoubleDataValue ReadOne(ReadOnlySpan<byte> bytes)
         {
-            int bits = BinaryPrimitives.ReadInt32LittleEndian(input4Bytes);
+            int bits = BinaryPrimitives.ReadInt32LittleEndian(bytes);
             float value = BitConverter.Int32BitsToSingle(bits);
             DataValueType type = MapFrom(value);
             return type == DataValueType.Exists
@@ -81,12 +81,12 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <summary>
         /// Reads a single 32-bit little-endian encoded float value into a <see cref="DecimalDataValue"/>.
         /// </summary>
-        /// <param name="input4Bytes">A span containing at least 4 bytes (little-endian) representing a float.</param>
+        /// <param name="bytes">A span containing at least 4 bytes (little-endian) representing a float.</param>
         /// <returns>The decoded <see cref="DecimalDataValue"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DecimalDataValue ReadOneAsDecimal(ReadOnlySpan<byte> input4Bytes)
+        public static DecimalDataValue ReadOneAsDecimal(ReadOnlySpan<byte> bytes)
         {
-            int bits = BinaryPrimitives.ReadInt32LittleEndian(input4Bytes);
+            int bits = BinaryPrimitives.ReadInt32LittleEndian(bytes);
             float value = BitConverter.Int32BitsToSingle(bits);
             DataValueType type = MapFrom(value);
             return type == DataValueType.Exists
