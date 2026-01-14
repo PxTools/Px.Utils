@@ -1,8 +1,8 @@
-using System.Buffers;
-using System.Buffers.Binary;
-using System.Runtime.CompilerServices;
-using Px.Utils.Models.Data;
 using Px.Utils.Models.Data.DataValue;
+using Px.Utils.Models.Data;
+using System.Buffers.Binary;
+using System.Buffers;
+using System.Runtime.CompilerServices;
 
 namespace Px.Utils.BinaryData.ValueConverters
 {
@@ -149,7 +149,7 @@ namespace Px.Utils.BinaryData.ValueConverters
         private static DataValueType MapFrom(float value)
         {
             int bits = BitConverter.SingleToInt32Bits(value);
-            if (bits >= MissingSentinelBits && bits <= MissingSentinelBits + 6)
+            if (bits >= MissingSentinelBits && bits <= NillSentinelBits)
             {
                 return bits switch
                 {

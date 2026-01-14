@@ -21,6 +21,11 @@ namespace Px.Utils.BinaryData.ValueConverters
         private const int Empty = SentinelStart + 5;
         private const int Nill = SentinelStart + 6; // 0x007FFFFF (signed top in 24-bit)
 
+        private const int SignBitMask24 = 0x00800000;
+        private const int SignExtensionMask32 = unchecked((int)0xFF000000);
+        private const int Shift8 = 8;
+        private const int Shift16 = 16;
+
         private readonly int _bufferBytes = Math.Max(3, bufferBytes);
 
         /// <summary>
@@ -89,12 +94,12 @@ namespace Px.Utils.BinaryData.ValueConverters
         public static DoubleDataValue ReadOne(ReadOnlySpan<byte> bytes)
         {
             int b0 = bytes[0];
-            int b1 = bytes[1] << 8;
-            int b2 = bytes[2] << 16;
+            int b1 = bytes[1] << Shift8;
+            int b2 = bytes[2] << Shift16;
             int value = b0 | b1 | b2;
-            if ((value & 0x00800000) != 0)
+            if ((value & SignBitMask24) != 0)
             {
-                value |= unchecked((int)0xFF000000);
+                value |= SignExtensionMask32;
             }
             DataValueType type = MapFrom(value);
             return type == DataValueType.Exists
@@ -111,12 +116,12 @@ namespace Px.Utils.BinaryData.ValueConverters
         public static DecimalDataValue ReadOneAsDecimal(ReadOnlySpan<byte> bytes)
         {
             int b0 = bytes[0];
-            int b1 = bytes[1] << 8;
-            int b2 = bytes[2] << 16;
+            int b1 = bytes[1] << Shift8;
+            int b2 = bytes[2] << Shift16;
             int value = b0 | b1 | b2;
-            if ((value & 0x00800000) != 0)
+            if ((value & SignBitMask24) != 0)
             {
-                value |= unchecked((int)0xFF000000);
+                value |= SignExtensionMask32;
             }
             DataValueType type = MapFrom(value);
             return type == DataValueType.Exists
@@ -173,16 +178,15 @@ namespace Px.Utils.BinaryData.ValueConverters
         {
             if (value >= SentinelStart)
             {
-                int offset = value - SentinelStart;
-                return offset switch
+                return value switch
                 {
-                    0 => DataValueType.Missing,
-                    1 => DataValueType.CanNotRepresent,
-                    2 => DataValueType.Confidential,
-                    3 => DataValueType.NotAcquired,
-                    4 => DataValueType.NotAsked,
-                    5 => DataValueType.Empty,
-                    6 => DataValueType.Nill,
+                    Missing => DataValueType.Missing,
+                    CanNotRepresent => DataValueType.CanNotRepresent,
+                    Confidential => DataValueType.Confidential,
+                    NotAcquired => DataValueType.NotAcquired,
+                    NotAsked => DataValueType.NotAsked,
+                    Empty => DataValueType.Empty,
+                    Nill => DataValueType.Nill,
                     _ => DataValueType.Exists
                 };
             }
