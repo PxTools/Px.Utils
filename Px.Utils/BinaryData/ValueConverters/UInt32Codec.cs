@@ -13,7 +13,7 @@ namespace Px.Utils.BinaryData.ValueConverters
     {
         public static int ByteCount => sizeof(uint);
 
-        public const uint SentinelStart = uint.MaxValue - 6u;
+        internal const uint SentinelStart = uint.MaxValue - 6u;
         private const uint Missing = SentinelStart;
         private const uint CanNotRepresent = SentinelStart + 1u;
         private const uint Confidential = SentinelStart + 2u;
@@ -22,7 +22,8 @@ namespace Px.Utils.BinaryData.ValueConverters
         private const uint Empty = SentinelStart + 5u;
         private const uint Nill = SentinelStart + 6u; // uint.MaxValue
 
-        private readonly int _bufferBytes = Math.Max(sizeof(uint), bufferBytes);
+        private const int ElementSize = sizeof(uint);
+        private readonly int _bufferBytes = Math.Max(ElementSize, bufferBytes);
 
 
         /// <summary>
@@ -34,17 +35,16 @@ namespace Px.Utils.BinaryData.ValueConverters
         {
             ArgumentNullException.ThrowIfNull(output);
 
-            const int elemSize = sizeof(uint);
             byte[] buffer = ArrayPool<byte>.Shared.Rent(_bufferBytes);
             try
             {
-                int maxElems = Math.Max(1, buffer.Length / elemSize);
+                int maxElems = Math.Max(1, buffer.Length / ElementSize);
                 int i = 0;
                 int count = input.Length;
                 while (i < count)
                 {
                     int elements = Math.Min(count - i, maxElems);
-                    Span<byte> span = buffer.AsSpan(0, elements * elemSize);
+                    Span<byte> span = buffer.AsSpan(0, elements * ElementSize);
                     for (int j = 0; j < elements; j++)
                     {
                         DoubleDataValue dv = input[i + j];
@@ -62,9 +62,9 @@ namespace Px.Utils.BinaryData.ValueConverters
                         {
                             value = MapTo(dv.Type);
                         }
-                        BinaryPrimitives.WriteUInt32LittleEndian(span.Slice(j * elemSize, elemSize), value);
+                        BinaryPrimitives.WriteUInt32LittleEndian(span.Slice(j * ElementSize, ElementSize), value);
                     }
-                    output.Write(buffer, 0, elements * elemSize);
+                    output.Write(buffer, 0, elements * ElementSize);
                     i += elements;
                 }
             }
@@ -111,11 +111,10 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <param name="output">Destination span for decoded values.</param>
         public void Read(ReadOnlySpan<byte> input, Span<DoubleDataValue> output)
         {
-            const int elemSize = sizeof(uint);
-            int count = Math.Min(input.Length / elemSize, output.Length);
+            int count = Math.Min(input.Length / ElementSize, output.Length);
             for (int i = 0; i < count; i++)
             {
-                output[i] = ReadOne(input.Slice(i * elemSize, elemSize));
+                output[i] = ReadOne(input.Slice(i * ElementSize, ElementSize));
             }
         }
 
@@ -126,11 +125,10 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <param name="output">Destination span for decoded values.</param>
         public void Read(ReadOnlySpan<byte> input, Span<DecimalDataValue> output)
         {
-            const int elemSize = sizeof(uint);
-            int count = Math.Min(input.Length / elemSize, output.Length);
+            int count = Math.Min(input.Length / ElementSize, output.Length);
             for (int i = 0; i < count; i++)
             {
-                output[i] = ReadOneAsDecimal(input.Slice(i * elemSize, elemSize));
+                output[i] = ReadOneAsDecimal(input.Slice(i * ElementSize, ElementSize));
             }
         }
 
@@ -153,16 +151,15 @@ namespace Px.Utils.BinaryData.ValueConverters
         {
             if (value >= SentinelStart)
             {
-                uint offset = value - SentinelStart;
-                return offset switch
+                return value switch
                 {
-                    0u => DataValueType.Missing,
-                    1u => DataValueType.CanNotRepresent,
-                    2u => DataValueType.Confidential,
-                    3u => DataValueType.NotAcquired,
-                    4u => DataValueType.NotAsked,
-                    5u => DataValueType.Empty,
-                    6u => DataValueType.Nill,
+                    Missing => DataValueType.Missing,
+                    CanNotRepresent => DataValueType.CanNotRepresent,
+                    Confidential => DataValueType.Confidential,
+                    NotAcquired => DataValueType.NotAcquired,
+                    NotAsked => DataValueType.NotAsked,
+                    Empty => DataValueType.Empty,
+                    Nill => DataValueType.Nill,
                     _ => DataValueType.Exists
                 };
             }

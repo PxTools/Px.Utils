@@ -22,7 +22,8 @@ namespace Px.Utils.BinaryData.ValueConverters
         private const int Empty = SentinelStart + 5;
         private const int Nill = SentinelStart + 6; // int.MaxValue
 
-        private readonly int _bufferBytes = Math.Max(sizeof(int), bufferBytes);
+        private const int ElementSize = sizeof(int);
+        private readonly int _bufferBytes = Math.Max(ElementSize, bufferBytes);
 
         /// <summary>
         /// Writes a span of <see cref="DoubleDataValue"/> entries to the output stream using 32-bit little-endian encoding.
@@ -33,17 +34,16 @@ namespace Px.Utils.BinaryData.ValueConverters
         {
             ArgumentNullException.ThrowIfNull(output);
 
-            const int elemSize = sizeof(int);
             byte[] buffer = ArrayPool<byte>.Shared.Rent(_bufferBytes);
             try
             {
-                int maxElems = Math.Max(1, buffer.Length / elemSize);
+                int maxElems = Math.Max(1, buffer.Length / ElementSize);
                 int i = 0;
                 int count = input.Length;
                 while (i < count)
                 {
                     int elements = Math.Min(count - i, maxElems);
-                    Span<byte> span = buffer.AsSpan(0, elements * elemSize);
+                    Span<byte> span = buffer.AsSpan(0, elements * ElementSize);
                     for (int j = 0; j < elements; j++)
                     {
                         DoubleDataValue dv = input[i + j];
@@ -60,9 +60,9 @@ namespace Px.Utils.BinaryData.ValueConverters
                         {
                             value = MapTo(dv.Type);
                         }
-                        BinaryPrimitives.WriteInt32LittleEndian(span.Slice(j * elemSize, elemSize), value);
+                        BinaryPrimitives.WriteInt32LittleEndian(span.Slice(j * ElementSize, ElementSize), value);
                     }
-                    output.Write(buffer, 0, elements * elemSize);
+                    output.Write(buffer, 0, elements * ElementSize);
                     i += elements;
                 }
             }
@@ -109,11 +109,10 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <param name="output">Destination span for decoded values.</param>
         public void Read(ReadOnlySpan<byte> input, Span<DoubleDataValue> output)
         {
-            const int elemSize = sizeof(int);
-            int count = Math.Min(input.Length / elemSize, output.Length);
+            int count = Math.Min(input.Length / ElementSize, output.Length);
             for (int i = 0; i < count; i++)
             {
-                output[i] = ReadOne(input.Slice(i * elemSize, elemSize));
+                output[i] = ReadOne(input.Slice(i * ElementSize, ElementSize));
             }
         }
 
@@ -124,11 +123,10 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <param name="output">Destination span for decoded values.</param>
         public void Read(ReadOnlySpan<byte> input, Span<DecimalDataValue> output)
         {
-            const int elemSize = sizeof(int);
-            int count = Math.Min(input.Length / elemSize, output.Length);
+            int count = Math.Min(input.Length / ElementSize, output.Length);
             for (int i = 0; i < count; i++)
             {
-                output[i] = ReadOneAsDecimal(input.Slice(i * elemSize, elemSize));
+                output[i] = ReadOneAsDecimal(input.Slice(i * ElementSize, ElementSize));
             }
         }
 
