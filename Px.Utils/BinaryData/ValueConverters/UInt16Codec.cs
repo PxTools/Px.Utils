@@ -1,15 +1,14 @@
-using System.Buffers;
+using Px.Utils.Models.Data.DataValue;
+using Px.Utils.Models.Data;
 using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
-using Px.Utils.Models.Data;
-using Px.Utils.Models.Data.DataValue;
 
 namespace Px.Utils.BinaryData.ValueConverters
 {
     /// <summary>
     /// Codec for reading and writing 16-bit unsigned integer values with sentinel-based <see cref="DataValueType"/> mapping.
     /// </summary>
-    public sealed class UInt16Codec(int bufferBytes = 64 * 1024) : IBinaryValueCodec
+    public sealed class UInt16Codec : BinaryValueCodecBase, IBinaryValueCodec
     {
         public static int ByteCount => sizeof(ushort);
 
@@ -24,55 +23,14 @@ namespace Px.Utils.BinaryData.ValueConverters
         private const ushort Nill = SentinelStart + 6; // 65535
 
         private const int ElementSize = sizeof(ushort);
-        private readonly int _bufferBytes = Math.Max(ElementSize, bufferBytes);
 
         /// <summary>
-        /// Writes a span of <see cref="DoubleDataValue"/> entries to the output stream using 16-bit little-endian encoding.
+        /// Initializes a new instance of the <see cref="UInt16Codec"/> class with the specified buffer size.
         /// </summary>
-        /// <param name="input">Input values to encode.</param>
-        /// <param name="output">Destination stream to write to.</param>
-        public void Write(ReadOnlySpan<DoubleDataValue> input, Stream output)
+        /// <param name="bufferBytes">The size of the buffer in bytes. Default is 64KB.</param>
+        public UInt16Codec(int bufferBytes = 64 * 1024)
+            : base(ElementSize, bufferBytes)
         {
-            ArgumentNullException.ThrowIfNull(output);
-
-            byte[] buffer = ArrayPool<byte>.Shared.Rent(_bufferBytes);
-            try
-            {
-                int maxElems = Math.Max(1, buffer.Length / ElementSize);
-                int i = 0;
-                int count = input.Length;
-                while (i < count)
-                {
-                    int elements = Math.Min(count - i, maxElems);
-                    Span<byte> span = buffer.AsSpan(0, elements * ElementSize);
-                    for (int j = 0; j < elements; j++)
-                    {
-                        DoubleDataValue dv = input[i + j];
-                        ushort value;
-                        if (dv.Type == DataValueType.Exists)
-                        {
-                            double v = dv.UnsafeValue;
-                            value = v < 0 ? (ushort)0 : (ushort)Math.Round(v);
-                            if (value >= SentinelStart)
-                            {
-                                // Values colliding with sentinel range cannot be represented in this codec
-                                value = MapTo(DataValueType.CanNotRepresent);
-                            }
-                        }
-                        else
-                        {
-                            value = MapTo(dv.Type);
-                        }
-                        BinaryPrimitives.WriteUInt16LittleEndian(span.Slice(j * ElementSize, ElementSize), value);
-                    }
-                    output.Write(buffer, 0, elements * ElementSize);
-                    i += elements;
-                }
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
         }
 
         /// <summary>
@@ -133,6 +91,38 @@ namespace Px.Utils.BinaryData.ValueConverters
             }
         }
 
+        /// <summary>
+        /// Encodes and writes a <see cref="DoubleDataValue"/> to the buffer at the specified offset using 16-bit little-endian encoding.
+        /// If the value type is <see cref="DataValueType.Exists"/>, it is rounded and encoded as a 16-bit unsigned integer, unless it collides with the sentinel range,
+        /// in which case it is mapped to <see cref="DataValueType.CanNotRepresent"/>. Otherwise, the value is mapped to its corresponding sentinel.
+        /// </summary>
+        /// <param name="buffer">The buffer to write to.</param>
+        /// <param name="offset">The offset in the buffer.</param>
+        /// <param name="value">The value to encode and write.</param>
+        protected override void WriteEncodedValue(Span<byte> buffer, int offset, DoubleDataValue value)
+        {
+            ushort usValue;
+            if (value.Type == DataValueType.Exists)
+            {
+                double v = value.UnsafeValue;
+                usValue = v < 0 ? (ushort)0 : (ushort)Math.Round(v);
+                if (usValue >= SentinelStart)
+                {
+                    usValue = MapTo(DataValueType.CanNotRepresent);
+                }
+            }
+            else
+            {
+                usValue = MapTo(value.Type);
+            }
+            BinaryPrimitives.WriteUInt16LittleEndian(buffer.Slice(offset, ElementSize), usValue);
+        }
+
+        /// <summary>
+        /// Maps a <see cref="DataValueType"/> to its corresponding sentinel value for this codec.
+        /// </summary>
+        /// <param name="type">The <see cref="DataValueType"/> to map.</param>
+        /// <returns>The corresponding sentinel value as a <see cref="ushort"/>.</returns>
         private static ushort MapTo(DataValueType type)
         {
             return type switch
@@ -148,6 +138,11 @@ namespace Px.Utils.BinaryData.ValueConverters
             };
         }
 
+        /// <summary>
+        /// Maps a sentinel value to its corresponding <see cref="DataValueType"/> for this codec.
+        /// </summary>
+        /// <param name="value">The sentinel value to map.</param>
+        /// <returns>The corresponding <see cref="DataValueType"/>.</returns>
         private static DataValueType MapFrom(ushort value)
         {
             if (value >= SentinelStart)

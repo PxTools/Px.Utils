@@ -1,15 +1,21 @@
-using System.Buffers;
-using System.Runtime.CompilerServices;
-using Px.Utils.Models.Data;
 using Px.Utils.Models.Data.DataValue;
+using Px.Utils.Models.Data;
+using System.Runtime.CompilerServices;
 
 namespace Px.Utils.BinaryData.ValueConverters
 {
     /// <summary>
     /// Codec for reading and writing 24-bit unsigned integer values with sentinel-based <see cref="DataValueType"/> mapping.
     /// </summary>
-    public sealed class UInt24Codec(int bufferBytes = 64 * 1024) : IBinaryValueCodec
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="UInt24Codec"/> class.
+    /// </remarks>
+    /// <param name="bufferBytes">The size of the internal write buffer in bytes. The minimum effective size is 3.</param>
+    public sealed class UInt24Codec(int bufferBytes = 64 * 1024) : BinaryValueCodecBase(ElementSize, bufferBytes), IBinaryValueCodec
     {
+        /// <summary>
+        /// Gets the number of bytes per encoded value for this codec.
+        /// </summary>
         public static int ByteCount => ElementSize;
 
         internal const uint SentinelStart = 16777209u; // 0x00FFFFF9
@@ -25,65 +31,6 @@ namespace Px.Utils.BinaryData.ValueConverters
         private const int Shift8 = 8;
         private const int Shift16 = 16;
         private const byte ByteMask = 0xFF;
-
-        private readonly int _bufferBytes = Math.Max(ElementSize, bufferBytes);
-
-        /// <summary>
-        /// Writes a span of <see cref="DoubleDataValue"/> entries to the output stream using 24-bit little-endian encoding.
-        /// </summary>
-        /// <param name="input">Input values to encode.</param>
-        /// <param name="output">Destination stream to write to.</param>
-        public void Write(ReadOnlySpan<DoubleDataValue> input, Stream output)
-        {
-            ArgumentNullException.ThrowIfNull(output);
-
-            byte[] buffer = ArrayPool<byte>.Shared.Rent(_bufferBytes);
-            try
-            {
-                int maxElems = Math.Max(1, buffer.Length / ElementSize);
-                int i = 0;
-                int count = input.Length;
-                while (i < count)
-                {
-                    int elements = Math.Min(count - i, maxElems);
-                    int totalBytes = elements * ElementSize;
-                    Span<byte> span = buffer.AsSpan(0, totalBytes);
-
-                    for (int j = 0; j < elements; j++)
-                    {
-                        DoubleDataValue dv = input[i + j];
-                        uint value;
-                        if (dv.Type == DataValueType.Exists)
-                        {
-                            double v = dv.UnsafeValue;
-                            value = v < 0 ? 0u : (uint)Math.Round(v);
-                            if (value >= SentinelStart)
-                            {
-                                value = MapTo(DataValueType.CanNotRepresent);
-                            }
-                        }
-                        else
-                        {
-                            value = MapTo(dv.Type);
-                        }
-
-                        unchecked
-                        {
-                            span[j * ElementSize + 0] = (byte)(value & ByteMask);
-                            span[j * ElementSize + 1] = (byte)((value >> Shift8) & ByteMask);
-                            span[j * ElementSize + 2] = (byte)((value >> Shift16) & ByteMask);
-                        }
-                    }
-
-                    output.Write(buffer, 0, totalBytes);
-                    i += elements;
-                }
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
-        }
 
         /// <summary>
         /// Reads a single 24-bit little-endian encoded unsigned value into a <see cref="DoubleDataValue"/>.
@@ -149,6 +96,43 @@ namespace Px.Utils.BinaryData.ValueConverters
             }
         }
 
+        /// <summary>
+        /// Encodes and writes a <see cref="DoubleDataValue"/> to the buffer at the specified offset using 24-bit little-endian encoding.
+        /// If the value type is <see cref="DataValueType.Exists"/>, it is rounded and encoded as a 24-bit unsigned integer, unless it collides with the sentinel range,
+        /// in which case it is mapped to <see cref="DataValueType.CanNotRepresent"/>. Otherwise, the value is mapped to its corresponding sentinel.
+        /// </summary>
+        /// <param name="buffer">The buffer to write to.</param>
+        /// <param name="offset">The offset in the buffer.</param>
+        /// <param name="value">The value to encode and write.</param>
+        protected override void WriteEncodedValue(Span<byte> buffer, int offset, DoubleDataValue value)
+        {
+            uint uiValue;
+            if (value.Type == DataValueType.Exists)
+            {
+                double v = value.UnsafeValue;
+                uiValue = v < 0 ? 0u : (uint)Math.Round(v);
+                if (uiValue >= SentinelStart)
+                {
+                    uiValue = MapTo(DataValueType.CanNotRepresent);
+                }
+            }
+            else
+            {
+                uiValue = MapTo(value.Type);
+            }
+            unchecked
+            {
+                buffer[offset + 0] = (byte)(uiValue & ByteMask);
+                buffer[offset + 1] = (byte)((uiValue >> Shift8) & ByteMask);
+                buffer[offset + 2] = (byte)((uiValue >> Shift16) & ByteMask);
+            }
+        }
+
+        /// <summary>
+        /// Maps a <see cref="DataValueType"/> to its corresponding sentinel value for this codec.
+        /// </summary>
+        /// <param name="type">The <see cref="DataValueType"/> to map.</param>
+        /// <returns>The corresponding sentinel value as a <see cref="uint"/>.</returns>
         private static uint MapTo(DataValueType type)
         {
             return type switch
@@ -164,6 +148,11 @@ namespace Px.Utils.BinaryData.ValueConverters
             };
         }
 
+        /// <summary>
+        /// Maps a sentinel value to its corresponding <see cref="DataValueType"/> for this codec.
+        /// </summary>
+        /// <param name="value">The sentinel value to map.</param>
+        /// <returns>The corresponding <see cref="DataValueType"/>.</returns>
         private static DataValueType MapFrom(uint value)
         {
             if (value >= SentinelStart)

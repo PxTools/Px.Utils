@@ -1,7 +1,6 @@
 using Px.Utils.Models.Data.DataValue;
 using Px.Utils.Models.Data;
 using System.Buffers.Binary;
-using System.Buffers;
 using System.Runtime.CompilerServices;
 
 namespace Px.Utils.BinaryData.ValueConverters
@@ -9,11 +8,14 @@ namespace Px.Utils.BinaryData.ValueConverters
     /// <summary>
     /// Codec for reading and writing 32-bit floating point values with sentinel-based <see cref="DataValueType"/> mapping.
     /// </summary>
-    public sealed class FloatCodec(int bufferBytes = 64 * 1024) : IBinaryValueCodec
+    /// <param name="bufferBytes">The size of the internal write buffer in bytes. The minimum effective size is <c>sizeof(float)</c>.</param>
+    public sealed class FloatCodec(int bufferBytes = 64 * 1024) : BinaryValueCodecBase(ElementSize, bufferBytes), IBinaryValueCodec
     {
+        /// <summary>
+        /// Gets the number of bytes per encoded value for this codec.
+        /// </summary>
         public static int ByteCount => sizeof(float);
 
-        // Use contiguous smallest positive subnormals by bit pattern
         private const int MissingSentinelBits = 0x00000001;
         private const int CanNotRepresentSentinelBits = MissingSentinelBits + 1;
         private const int ConfidentialSentinelBits = MissingSentinelBits + 2;
@@ -31,43 +33,6 @@ namespace Px.Utils.BinaryData.ValueConverters
         private static readonly float Nill = BitConverter.Int32BitsToSingle(NillSentinelBits);
 
         private const int ElementSize = sizeof(float);
-        private readonly int _bufferBytes = Math.Max(ElementSize, bufferBytes);
-
-        /// <summary>
-        /// Writes a span of <see cref="DoubleDataValue"/> entries to the output stream using 32-bit little-endian encoding of float.
-        /// </summary>
-        /// <param name="input">Input values to encode.</param>
-        /// <param name="output">Destination stream to write to.</param>
-        public void Write(ReadOnlySpan<DoubleDataValue> input, Stream output)
-        {
-            ArgumentNullException.ThrowIfNull(output);
-
-            byte[] buffer = ArrayPool<byte>.Shared.Rent(_bufferBytes);
-            try
-            {
-                int maxElems = Math.Max(1, buffer.Length / ElementSize);
-                int i = 0;
-                int count = input.Length;
-                while (i < count)
-                {
-                    int elements = Math.Min(count - i, maxElems);
-                    Span<byte> span = buffer.AsSpan(0, elements * ElementSize);
-                    for (int j = 0; j < elements; j++)
-                    {
-                        DoubleDataValue dv = input[i + j];
-                        float value = dv.Type == DataValueType.Exists ? (float)dv.UnsafeValue : MapTo(dv.Type);
-                        int bits = BitConverter.SingleToInt32Bits(value);
-                        BinaryPrimitives.WriteInt32LittleEndian(span.Slice(j * ElementSize, ElementSize), bits);
-                    }
-                    output.Write(buffer, 0, elements * ElementSize);
-                    i += elements;
-                }
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
-        }
 
         /// <summary>
         /// Reads a single 32-bit little-endian encoded float value into a <see cref="DoubleDataValue"/>.
@@ -129,6 +94,26 @@ namespace Px.Utils.BinaryData.ValueConverters
             }
         }
 
+        /// <summary>
+        /// Encodes and writes a <see cref="DoubleDataValue"/> to the buffer at the specified offset using 32-bit little-endian encoding.
+        /// If the value type is <see cref="DataValueType.Exists"/>, it is cast and encoded as a 32-bit float, unless it collides with the sentinel range,
+        /// in which case it is mapped to <see cref="DataValueType.CanNotRepresent"/>. Otherwise, the value is mapped to its corresponding sentinel.
+        /// </summary>
+        /// <param name="buffer">The buffer to write to.</param>
+        /// <param name="offset">The offset in the buffer.</param>
+        /// <param name="value">The value to encode and write.</param>
+        protected override void WriteEncodedValue(Span<byte> buffer, int offset, DoubleDataValue value)
+        {
+            float fValue = value.Type == DataValueType.Exists ? (float)value.UnsafeValue : MapTo(value.Type);
+            int bits = BitConverter.SingleToInt32Bits(fValue);
+            BinaryPrimitives.WriteInt32LittleEndian(buffer.Slice(offset, ElementSize), bits);
+        }
+
+        /// <summary>
+        /// Maps a <see cref="DataValueType"/> to its corresponding sentinel value for this codec.
+        /// </summary>
+        /// <param name="type">The <see cref="DataValueType"/> to map.</param>
+        /// <returns>The corresponding sentinel value as a <see cref="float"/>.</returns>
         private static float MapTo(DataValueType type)
         {
             return type switch
@@ -144,6 +129,11 @@ namespace Px.Utils.BinaryData.ValueConverters
             };
         }
 
+        /// <summary>
+        /// Maps a sentinel value to its corresponding <see cref="DataValueType"/> for this codec.
+        /// </summary>
+        /// <param name="value">The sentinel value to map.</param>
+        /// <returns>The corresponding <see cref="DataValueType"/>.</returns>
         private static DataValueType MapFrom(float value)
         {
             int bits = BitConverter.SingleToInt32Bits(value);
