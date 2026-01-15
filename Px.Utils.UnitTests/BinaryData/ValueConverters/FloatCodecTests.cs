@@ -64,7 +64,7 @@ namespace Px.Utils.UnitTests.BinaryData.ValueConverters
         public void ReadDecimalExistsRoundtrip()
         {
             FloatCodec codec = new();
-            DecimalDataValue[] output = new DecimalDataValue[4];
+            DecimalDataValue[] output = new DecimalDataValue[3];
             using MemoryStream ms = new();
             DoubleDataValue[] input = [
                 new DoubleDataValue(0.0, DataValueType.Exists),
@@ -74,7 +74,7 @@ namespace Px.Utils.UnitTests.BinaryData.ValueConverters
             codec.Write(input, ms);
             ReadOnlySpan<byte> bytes = ms.ToArray();
             codec.Read(bytes, output);
-            Assert.AreEqual(4, output.Length);
+            Assert.AreEqual(3, output.Length);
             Assert.AreEqual(DataValueType.Exists, output[0].Type);
             Assert.IsTrue(Math.Abs(output[0].UnsafeValue - 0.0m) <= 0.0001m);
             Assert.AreEqual(DataValueType.Exists, output[1].Type);
