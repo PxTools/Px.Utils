@@ -1,0 +1,175 @@
+using Px.Utils.Models.Data.DataValue;
+using Px.Utils.Models.Data;
+using System.Runtime.CompilerServices;
+
+namespace Px.Utils.BinaryData.ValueConverters
+{
+    /// <summary>
+    /// Codec for reading and writing 24-bit unsigned integer values with sentinel-based <see cref="DataValueType"/> mapping.
+    /// </summary>
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="UInt24Codec"/> class.
+    /// </remarks>
+    /// <param name="bufferBytes">The size of the internal write buffer in bytes. The minimum effective size is 3.</param>
+    public sealed class UInt24Codec(int bufferBytes = 64 * 1024) : BinaryValueCodecBase(ElementSize, bufferBytes), IBinaryValueCodec
+    {
+        /// <summary>
+        /// Gets the number of bytes per encoded value for this codec.
+        /// </summary>
+        public static int ByteCount => ElementSize;
+
+        internal const uint SentinelStart = 16777209u; // 0x00FFFFF9
+        private const uint Missing = SentinelStart;
+        private const uint CanNotRepresent = SentinelStart + 1;
+        private const uint Confidential = SentinelStart + 2;
+        private const uint NotAcquired = SentinelStart + 3;
+        private const uint NotAsked = SentinelStart + 4;
+        private const uint Empty = SentinelStart + 5;
+        private const uint Nill = SentinelStart + 6; // 0x00FFFFFF
+
+        private const int ElementSize = 3;
+        private const int Shift8 = 8;
+        private const int Shift16 = 16;
+        private const byte ByteMask = 0xFF;
+
+        /// <summary>
+        /// Reads a single 24-bit little-endian encoded unsigned value into a <see cref="DoubleDataValue"/>.
+        /// </summary>
+        /// <param name="bytes">A span containing at least 3 bytes (little-endian) representing an unsigned 24-bit value.</param>
+        /// <returns>The decoded <see cref="DoubleDataValue"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleDataValue ReadOne(ReadOnlySpan<byte> bytes)
+        {
+            uint b0 = bytes[0];
+            uint b1 = (uint)bytes[1] << Shift8;
+            uint b2 = (uint)bytes[2] << Shift16;
+            uint value = b0 | b1 | b2;
+            DataValueType type = MapFrom(value);
+            return type == DataValueType.Exists
+                ? new DoubleDataValue(value, DataValueType.Exists)
+                : new DoubleDataValue(0, type);
+        }
+
+        /// <summary>
+        /// Reads a single 24-bit little-endian encoded unsigned value into a <see cref="DecimalDataValue"/>.
+        /// </summary>
+        /// <param name="bytes">A span containing at least 3 bytes (little-endian) representing an unsigned 24-bit value.</param>
+        /// <returns>The decoded <see cref="DecimalDataValue"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DecimalDataValue ReadOneAsDecimal(ReadOnlySpan<byte> bytes)
+        {
+            uint b0 = bytes[0];
+            uint b1 = (uint)bytes[1] << Shift8;
+            uint b2 = (uint)bytes[2] << Shift16;
+            uint value = b0 | b1 | b2;
+            DataValueType type = MapFrom(value);
+            return type == DataValueType.Exists
+                ? new DecimalDataValue(value, DataValueType.Exists)
+                : new DecimalDataValue(0, type);
+        }
+
+        /// <summary>
+        /// Reads 24-bit little-endian encoded values from input bytes into a span of <see cref="DoubleDataValue"/>.
+        /// </summary>
+        /// <param name="input">Source bytes to decode.</param>
+        /// <param name="output">Destination span for decoded values.</param>
+        public void Read(ReadOnlySpan<byte> input, Span<DoubleDataValue> output)
+        {
+            int count = Math.Min(input.Length / ElementSize, output.Length);
+            for (int i = 0; i < count; i++)
+            {
+                output[i] = ReadOne(input.Slice(i * ElementSize, ElementSize));
+            }
+        }
+
+        /// <summary>
+        /// Reads 24-bit little-endian encoded values from input bytes into a span of <see cref="DecimalDataValue"/>.
+        /// </summary>
+        /// <param name="input">Source bytes to decode.</param>
+        /// <param name="output">Destination span for decoded values.</param>
+        public void Read(ReadOnlySpan<byte> input, Span<DecimalDataValue> output)
+        {
+            int count = Math.Min(input.Length / ElementSize, output.Length);
+            for (int i = 0; i < count; i++)
+            {
+                output[i] = ReadOneAsDecimal(input.Slice(i * ElementSize, ElementSize));
+            }
+        }
+
+        /// <summary>
+        /// Encodes and writes a <see cref="DoubleDataValue"/> to the buffer at the specified offset using 24-bit little-endian encoding.
+        /// If the value type is <see cref="DataValueType.Exists"/>, it is rounded and encoded as a 24-bit unsigned integer, unless it collides with the sentinel range,
+        /// in which case it is mapped to <see cref="DataValueType.CanNotRepresent"/>. Otherwise, the value is mapped to its corresponding sentinel.
+        /// </summary>
+        /// <param name="buffer">The buffer to write to.</param>
+        /// <param name="offset">The offset in the buffer.</param>
+        /// <param name="value">The value to encode and write.</param>
+        protected override void WriteEncodedValue(Span<byte> buffer, int offset, DoubleDataValue value)
+        {
+            uint uiValue;
+            if (value.Type == DataValueType.Exists)
+            {
+                double v = value.UnsafeValue;
+                uiValue = v < 0 ? 0u : (uint)Math.Round(v);
+                if (uiValue >= SentinelStart)
+                {
+                    uiValue = MapTo(DataValueType.CanNotRepresent);
+                }
+            }
+            else
+            {
+                uiValue = MapTo(value.Type);
+            }
+            unchecked
+            {
+                buffer[offset + 0] = (byte)(uiValue & ByteMask);
+                buffer[offset + 1] = (byte)((uiValue >> Shift8) & ByteMask);
+                buffer[offset + 2] = (byte)((uiValue >> Shift16) & ByteMask);
+            }
+        }
+
+        /// <summary>
+        /// Maps a <see cref="DataValueType"/> to its corresponding sentinel value for this codec.
+        /// </summary>
+        /// <param name="type">The <see cref="DataValueType"/> to map.</param>
+        /// <returns>The corresponding sentinel value as a <see cref="uint"/>.</returns>
+        private static uint MapTo(DataValueType type)
+        {
+            return type switch
+            {
+                DataValueType.Missing => Missing,
+                DataValueType.CanNotRepresent => CanNotRepresent,
+                DataValueType.Confidential => Confidential,
+                DataValueType.NotAcquired => NotAcquired,
+                DataValueType.NotAsked => NotAsked,
+                DataValueType.Empty => Empty,
+                DataValueType.Nill => Nill,
+                _ => throw new ArgumentOutOfRangeException(nameof(type))
+            };
+        }
+
+        /// <summary>
+        /// Maps a sentinel value to its corresponding <see cref="DataValueType"/> for this codec.
+        /// </summary>
+        /// <param name="value">The sentinel value to map.</param>
+        /// <returns>The corresponding <see cref="DataValueType"/>.</returns>
+        private static DataValueType MapFrom(uint value)
+        {
+            if (value >= SentinelStart)
+            {
+                return value switch
+                {
+                    Missing => DataValueType.Missing,
+                    CanNotRepresent => DataValueType.CanNotRepresent,
+                    Confidential => DataValueType.Confidential,
+                    NotAcquired => DataValueType.NotAcquired,
+                    NotAsked => DataValueType.NotAsked,
+                    Empty => DataValueType.Empty,
+                    Nill => DataValueType.Nill,
+                    _ => DataValueType.Exists
+                };
+            }
+            return DataValueType.Exists;
+        }
+    }
+}

@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models;
+using Px.Utils.Models;
 using Px.Utils.Models.Metadata;
 using Px.Utils.Operations;
 
@@ -106,7 +106,7 @@ namespace Px.Utils.UnitTests.OperationsTests
         {
             MatrixMetadata meta = TestModelBuilder.BuildTestMetadata([3,3,3]);
             double[] testData = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-            Matrix<double> matrixTask = new Matrix<double>(meta, testData);
+            Matrix<double> matrixTask = new(meta, testData);
 
             IMatrixMap targetMap = new MatrixMap([
                 new DimensionMap("var0", ["var0_val0", "var0_val2"]),

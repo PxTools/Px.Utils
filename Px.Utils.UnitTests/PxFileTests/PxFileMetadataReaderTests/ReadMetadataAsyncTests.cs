@@ -1,9 +1,9 @@
-﻿using System.Text;
+using System.Text;
 using PxFileTests.Fixtures;
 using Px.Utils.Exceptions;
 using Px.Utils.PxFile.Metadata;
 
-namespace PxFileTests.reader.ests
+namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
 {
     [TestClass]
     public class ReadMetadataAsyncTests
@@ -20,7 +20,7 @@ namespace PxFileTests.reader.ests
             Encoding encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
             IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding);
-            IList<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
+            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
 
             // Assert
             Assert.AreEqual(8, metadataList.Count);
@@ -62,7 +62,7 @@ namespace PxFileTests.reader.ests
             Encoding encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
             IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding);
-            IList<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
+            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
 
             // Assert
             Assert.AreEqual(8, metadataList.Count);
@@ -105,7 +105,7 @@ namespace PxFileTests.reader.ests
             Encoding encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
             IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding);
-            IList<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
+            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
 
             // Assert
             Assert.AreEqual(8, metadataList.Count);
@@ -147,7 +147,7 @@ namespace PxFileTests.reader.ests
             Encoding encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
             IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding, 28);
-            IList<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
+            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
 
             // Assert
             Assert.AreEqual(8, metadataList.Count);
@@ -206,7 +206,7 @@ namespace PxFileTests.reader.ests
             Encoding encoding = await reader.GetEncodingAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
             IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding);
-            IList<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
+            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
 
             // Assert
             Assert.AreEqual(8, metadataList.Count);

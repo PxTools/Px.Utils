@@ -1,5 +1,6 @@
-﻿using Px.Utils.Exceptions;
+using Px.Utils.Exceptions;
 using Px.Utils.Language;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LanguageTests
 {
@@ -58,7 +59,7 @@ namespace LanguageTests
         public void CopyAndAddTestAddingExistingTranslationThrows()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd("a", "test_value_a"));
+            Assert.ThrowsExactly<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd("a", "test_value_a"));
 
             // Test that the original multilanguage string is not modified
             Assert.AreEqual("test_value_a", multilanguageString["a"]);
@@ -69,7 +70,7 @@ namespace LanguageTests
         public void CopyAndAddTestAddingExistingTranslationWithDifferentValueThrows()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd("a", "test_value_b"));
+            Assert.ThrowsExactly<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd("a", "test_value_b"));
 
             // Test that the original multilanguage string is not modified
             Assert.AreEqual("test_value_a", multilanguageString["a"]);
@@ -95,7 +96,7 @@ namespace LanguageTests
         public void CopyAndAddTestAddingMultipleTranslationsWithExistingTranslationThrows()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd([new("a", "test_value_a"), new("b", "test_value_b")]));
+            Assert.ThrowsExactly<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd([new("a", "test_value_a"), new("b", "test_value_b")]));
 
             // Test that the original multilanguage string is not modified
             Assert.AreEqual("test_value_a", multilanguageString["a"]);
@@ -106,7 +107,7 @@ namespace LanguageTests
         public void CopyAndAddTestAddingMultipleTranslationsWithExistingTranslationWithDifferentValueThrows()
         {
             MultilanguageString multilanguageString = new("a", "test_value_a");
-            Assert.ThrowsException<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd([new("a", "test_value_b"), new("b", "test_value_b")]));
+            Assert.ThrowsExactly<TranslationAlreadyDefinedException>(() => multilanguageString.CopyAndAdd([new("a", "test_value_b"), new("b", "test_value_b")]));
 
             // Test that the original multilanguage string is not modified
             Assert.AreEqual("test_value_a", multilanguageString["a"]);
@@ -174,6 +175,7 @@ namespace LanguageTests
         }
 
         [TestMethod]
+        [SuppressMessage("Usage", "MSTEST0037:Use proper 'Assert' methods", Justification = "This tests the Equals implementation of MLS")]
         public void EqualsTestNullIsNotEqual()
         {
             MultilanguageString first = new([new("a", "test_value_a"), new("b", "test_value_b")]);

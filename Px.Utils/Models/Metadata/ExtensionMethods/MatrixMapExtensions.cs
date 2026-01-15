@@ -1,4 +1,4 @@
-﻿namespace Px.Utils.Models.Metadata.ExtensionMethods
+namespace Px.Utils.Models.Metadata.ExtensionMethods
 {
     public static class MatrixMapExtensions
     {
@@ -7,23 +7,7 @@
         /// </summary>
         /// <param name="matrixMap">The matrix map.</param>
         /// <returns>Total number of cells in the matrix described by the matrix map.</returns>
-        [Obsolete("Use GetSizeLong() instead. This method can overflow with really large tables.")]
-        public static int GetSize(this IMatrixMap matrixMap)
-        {
-            int numberOfCells = 1;
-            foreach (IDimensionMap dimensionMap in matrixMap.DimensionMaps)
-            {
-                numberOfCells *= dimensionMap.ValueCodes.Count;
-            }
-            return numberOfCells;
-        }
-
-        /// <summary>
-        /// Returns the total number of cells in the matrix described by the matrix map.
-        /// </summary>
-        /// <param name="matrixMap">The matrix map.</param>
-        /// <returns>Total number of cells in the matrix described by the matrix map.</returns>
-        public static long GetSizeLong(this IMatrixMap matrixMap)
+        public static long GetSize(this IMatrixMap matrixMap)
         {
             long numberOfCells = 1;
             foreach (IDimensionMap dimensionMap in matrixMap.DimensionMaps)

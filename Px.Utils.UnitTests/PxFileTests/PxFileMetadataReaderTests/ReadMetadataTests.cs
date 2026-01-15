@@ -1,7 +1,8 @@
-﻿using System.Text;
+using System.Text;
 using PxFileTests.Fixtures;
 using Px.Utils.Exceptions;
 using Px.Utils.PxFile.Metadata;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
 {
@@ -19,7 +20,7 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             // Act
             Encoding encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IList<KeyValuePair<string, string>> metadata = reader.ReadMetadata(stream, encoding).ToList();
+            List<KeyValuePair<string, string>> metadata = [.. reader.ReadMetadata(stream, encoding)];
 
             // Assert
             Assert.AreEqual(8, metadata.Count);
@@ -60,7 +61,7 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             // Act
             Encoding encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IList<KeyValuePair<string, string>> metadata = reader.ReadMetadata(stream, encoding).ToList();
+            List<KeyValuePair<string, string>> metadata = [.. reader.ReadMetadata(stream, encoding)];
 
             // Assert
             Assert.AreEqual(8, metadata.Count);
@@ -102,7 +103,7 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             // Act
             Encoding encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IList<KeyValuePair<string, string>> metadata = reader.ReadMetadata(stream, encoding).ToList();
+            List<KeyValuePair<string, string>> metadata = [.. reader.ReadMetadata(stream, encoding)];
 
             // Assert
             Assert.AreEqual(8, metadata.Count);
@@ -143,7 +144,7 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             // Act
             Encoding encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IList<KeyValuePair<string, string>> metadata = reader.ReadMetadata(stream, encoding, 28).ToList();
+            List<KeyValuePair<string, string>> metadata = [.. reader.ReadMetadata(stream, encoding, 28)];
 
             // Assert
             Assert.AreEqual(8, metadata.Count);
@@ -174,6 +175,7 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
         }
 
         [TestMethod]
+        [SuppressMessage("Performance", "CA1806:Do not ignore method results", Justification = "ToList() is called to iterate trough the collection.")]
         public void ReadMetadataCalledWithBrokenUTF8ThrowsInvalidPxFileMetadataException()
         {
             // Arrange
@@ -183,7 +185,7 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
 
             // Act + Assert
             stream.Seek(0, SeekOrigin.Begin);
-            Assert.ThrowsException<InvalidPxFileMetadataException>(() => reader.ReadMetadata(stream, Encoding.UTF8).ToList());
+            Assert.ThrowsExactly<InvalidPxFileMetadataException>(() => reader.ReadMetadata(stream, Encoding.UTF8).ToList());
         }
 
         [TestMethod]
@@ -197,7 +199,7 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             // Act
             Encoding encoding = reader.GetEncoding(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            IList<KeyValuePair<string, string>> metadata = reader.ReadMetadata(stream, encoding).ToList();
+            List<KeyValuePair<string, string>> metadata = [.. reader.ReadMetadata(stream, encoding)];
 
             // Assert
             Assert.AreEqual(8, metadata.Count);
