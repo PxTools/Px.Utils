@@ -11,12 +11,12 @@ namespace Px.Utils.BinaryData.ValueConverters
     /// Initializes a new instance of the <see cref="UInt24Codec"/> class.
     /// </remarks>
     /// <param name="bufferBytes">The size of the internal write buffer in bytes. The minimum effective size is 3.</param>
-    public sealed class UInt24Codec(int bufferBytes = 64 * 1024) : BinaryValueCodecBase(ElementSize, bufferBytes), IBinaryValueCodec
+    public sealed class UInt24Codec(int bufferBytes = 64 * 1024) : BinaryValueCodecBase(ByteCount, bufferBytes), IBinaryValueCodec
     {
         /// <summary>
         /// Gets the number of bytes per encoded value for this codec.
         /// </summary>
-        public static int ByteCount => ElementSize;
+        public static int ByteCount => 3;
 
         internal const uint SentinelStart = 16777209u; // 0x00FFFFF9
         private const uint Missing = SentinelStart;
@@ -27,7 +27,6 @@ namespace Px.Utils.BinaryData.ValueConverters
         private const uint Empty = SentinelStart + 5;
         private const uint Nill = SentinelStart + 6; // 0x00FFFFFF
 
-        private const int ElementSize = 3;
         private const int Shift8 = 8;
         private const int Shift16 = 16;
         private const byte ByteMask = 0xFF;
@@ -75,10 +74,10 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <param name="output">Destination span for decoded values.</param>
         public void Read(ReadOnlySpan<byte> input, Span<DoubleDataValue> output)
         {
-            int count = Math.Min(input.Length / ElementSize, output.Length);
+            int count = Math.Min(input.Length / ByteCount, output.Length);
             for (int i = 0; i < count; i++)
             {
-                output[i] = ReadOne(input.Slice(i * ElementSize, ElementSize));
+                output[i] = ReadOne(input.Slice(i * ByteCount, ByteCount));
             }
         }
 
@@ -89,10 +88,10 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <param name="output">Destination span for decoded values.</param>
         public void Read(ReadOnlySpan<byte> input, Span<DecimalDataValue> output)
         {
-            int count = Math.Min(input.Length / ElementSize, output.Length);
+            int count = Math.Min(input.Length / ByteCount, output.Length);
             for (int i = 0; i < count; i++)
             {
-                output[i] = ReadOneAsDecimal(input.Slice(i * ElementSize, ElementSize));
+                output[i] = ReadOneAsDecimal(input.Slice(i * ByteCount, ByteCount));
             }
         }
 
