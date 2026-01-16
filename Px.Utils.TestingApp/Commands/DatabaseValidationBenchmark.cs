@@ -1,4 +1,4 @@
-﻿using Px.Utils.Validation.DatabaseValidation;
+using Px.Utils.Validation.DatabaseValidation;
 
 namespace Px.Utils.TestingApp.Commands
 {
@@ -49,9 +49,9 @@ namespace Px.Utils.TestingApp.Commands
             TestFilePath = path;
         }
 
-        protected override void OneTimeBenchmarkSetup()
+        protected override async Task OneTimeBenchmarkSetupAsync()
         {
-            base.OneTimeBenchmarkSetup();
+            await base.OneTimeBenchmarkSetupAsync();
 
             validator = new(TestFilePath, new LocalFileSystem());
         }

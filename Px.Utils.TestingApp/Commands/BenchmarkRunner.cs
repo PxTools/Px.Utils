@@ -1,4 +1,4 @@
-﻿namespace Px.Utils.TestingApp.Commands
+namespace Px.Utils.TestingApp.Commands
 {
     internal sealed class BenchmarkRunner : Command
     {
@@ -15,6 +15,8 @@
             _benchmarks.Add("file-validation", new PxFileValidationBenchmark());
             _benchmarks.Add("computation", new ComputationBenchmark());
             _benchmarks.Add("database-validation", new DatabaseValidationBenchmark());
+            _benchmarks.Add("binary-read", new BinaryReadBenchmark());
+            _benchmarks.Add("binary-write", new BinaryWriteBenchmark());
         }
 
         internal override string Help

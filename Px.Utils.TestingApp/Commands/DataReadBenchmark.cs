@@ -36,9 +36,9 @@ namespace Px.Utils.TestingApp.Commands
             ParameterFlags.Add(cellFlags);
         }
 
-        protected override void OneTimeBenchmarkSetup()
+        protected override async Task OneTimeBenchmarkSetupAsync()
         {
-            base.OneTimeBenchmarkSetup();
+            await base.OneTimeBenchmarkSetupAsync();
 
             using FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileMetadataReader reader = new();
