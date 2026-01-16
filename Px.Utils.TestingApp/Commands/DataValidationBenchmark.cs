@@ -1,4 +1,4 @@
-﻿using Px.Utils.PxFile;
+using Px.Utils.PxFile;
 using Px.Utils.PxFile.Data;
 using Px.Utils.Validation.DataValidation;
 using Px.Utils.PxFile.Metadata;
@@ -37,8 +37,10 @@ namespace Px.Utils.TestingApp.Commands
             encoding = Encoding.UTF8;
         }
 
-        protected override void OneTimeBenchmarkSetup()
+        protected override async Task OneTimeBenchmarkSetupAsync()
         {
+            await base.OneTimeBenchmarkSetupAsync();
+
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileMetadataReader reader = new();
             encoding = reader.GetEncoding(stream);
@@ -56,7 +58,7 @@ namespace Px.Utils.TestingApp.Commands
             DataValidator validator = new(expectedCols, expectedRows, 0);
             validator.Validate(stream, TestFilePath, encoding);
         }
-        
+
         private async Task ValidateDataBenchmarksAsync()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
@@ -104,7 +106,7 @@ namespace Px.Utils.TestingApp.Commands
             {
                 Console.WriteLine("Invalid number of columns, please enter a valid integer");
                 colsInput = Console.ReadLine() ?? "";
-            }   
+            }
             expectedCols = colsValue;
         }
     }

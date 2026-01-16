@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Px.Utils.TestingApp.Commands
@@ -124,9 +124,9 @@ namespace Px.Utils.TestingApp.Commands
                 inputs = [];
             }
 
-            Parameters = GroupParameters(inputs ?? [], ParameterFlags.SelectMany(x => x).ToList());
+            Parameters = GroupParameters(inputs ?? [], [.. ParameterFlags.SelectMany(x => x)]);
             SetRunParameters();
-            OneTimeBenchmarkSetup();
+            OneTimeBenchmarkSetupAsync().Wait();
 
             // synchronous validation
             RunBenchmarks(BenchmarkFunctions);
@@ -179,7 +179,7 @@ namespace Px.Utils.TestingApp.Commands
         /// <summary>
         /// Setup method for the benchmark. Called before running the benchmarks. Marked as virtual to allow for custom setup in derived classes.
         /// </summary>
-        protected virtual void OneTimeBenchmarkSetup()
+        protected virtual async Task OneTimeBenchmarkSetupAsync()
         {
             Results.Clear();
             processesCompleted = 0;
