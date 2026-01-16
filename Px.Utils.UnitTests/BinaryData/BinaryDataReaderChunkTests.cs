@@ -455,5 +455,47 @@ namespace Px.Utils.UnitTests.BinaryData
                 await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[2]), CancellationToken.None);
             });
         }
+
+        [TestMethod]
+        public async Task ReadByChunkRespectsHeaderLengthOnOffsetsAndValues()
+        {
+            MatrixMap blobMap = BuildMap(["d0_0"], ["d1_0"], [.. Enumerable.Range(0, 16).Select(i => $"d2_{i}")]);
+            MatrixMap readMap = blobMap;
+            MatrixMap bufferMap = blobMap;
+
+            int total = 16;
+            DoubleDataValue[] sourceValues = MakeSequence(total);
+            byte[] payload = EncodeWithUInt32(sourceValues);
+
+            // Prepend header bytes
+            int headerLength = 12;
+            byte[] header = new byte[headerLength];
+            byte[] blob = new byte[header.Length + payload.Length];
+            Array.Copy(header, 0, blob, 0, header.Length);
+            Array.Copy(payload, 0, blob, header.Length, payload.Length);
+
+            DoubleDataValue[] dst = new DoubleDataValue[total];
+            Memory<DoubleDataValue> buffer = new(dst);
+
+            List<(long offset, long length)> calls = [];
+            BinaryDataReader<UInt32Codec>.AsyncChunkProvider provider = MakeProvider<UInt32Codec>(blob, calls);
+
+            // With max window size of 16 bytes and 4 bytes/value, we expect 4 windows
+            BinaryDataReader<UInt32Codec> reader = new(16, null, headerLength);
+            await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+
+            int expectedWindows = total / UInt32Codec.ByteCount; // 16 values * 4 bytes/value => 64 bytes total; 16-byte windows => 4 windows
+            Assert.AreEqual(expectedWindows, calls.Count);
+            for (int i = 0; i < calls.Count; i++)
+            {
+                Assert.AreEqual(headerLength + (i * 16), calls[i].offset);
+            }
+
+            for (int i = 0; i < total; i++)
+            {
+                Assert.AreEqual(DataValueType.Exists, dst[i].Type);
+                Assert.AreEqual((double)i, dst[i].UnsafeValue);
+            }
+        }
     }
 }

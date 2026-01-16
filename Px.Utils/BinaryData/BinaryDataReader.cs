@@ -25,13 +25,15 @@ namespace Px.Utils.BinaryData
         private const long DEFAULT_MERGE_CAP_BYTES = 64 * 1024;
         private readonly long _maxWindowSizeBytes;
         private readonly long _mergeCapBytes;
+        private readonly long _headerLengthBytes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryDataReader{TCodec}"/> class.
         /// </summary>
         /// <param name="maxWindowSizeBytes">Optional maximum window size in bytes to use when reading chunks. Defaults to 1 MiB.</param>
         /// <param name="mergeCapBytes">Optional maximum gap, in bytes, allowed between consecutive targets to merge them into the same window. Defaults to 64 KiB.</param>
-        public BinaryDataReader([Range(1, long.MaxValue)] long? maxWindowSizeBytes = null, [Range(1, long.MaxValue)] long? mergeCapBytes = null)
+        /// <param name="headerLengthBytes">Optional header length in bytes. The tightly packed values start after this offset from the beginning. Defaults to 0.</param>
+        public BinaryDataReader([Range(1, long.MaxValue)] long? maxWindowSizeBytes = null, [Range(1, long.MaxValue)] long? mergeCapBytes = null, [Range(0, long.MaxValue)] long? headerLengthBytes = null)
         {
             int bytesPerValue = TCodec.ByteCount;
 
@@ -48,6 +50,12 @@ namespace Px.Utils.BinaryData
                 throw new ArgumentOutOfRangeException(nameof(mergeCapBytes), "Value must be greater than or equal to the codec byte count.");
             }
             _mergeCapBytes = mergeValue;
+
+            _headerLengthBytes = headerLengthBytes.GetValueOrDefault(0);
+            if (_headerLengthBytes < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(headerLengthBytes), "Header length must be non-negative.");
+            }
         }
 
         /// <summary>
@@ -88,7 +96,7 @@ namespace Px.Utils.BinaryData
                 ct.ThrowIfCancellationRequested();
 
                 long startWindowLinearIndx = GetNthIndex(readIndex, blobIndices, blobRcsp);
-                long windowOffset = startWindowLinearIndx * bytesPerValue;
+                long windowOffset = _headerLengthBytes + (startWindowLinearIndx * bytesPerValue);
 
                 int readTargetsInWindow = 1;
                 Array.Copy(readIndex, probeIndex, readIndexLength);
@@ -205,7 +213,7 @@ namespace Px.Utils.BinaryData
                 ct.ThrowIfCancellationRequested();
 
                 long startWindowLinearIndx = GetNthIndex(readIndex, blobIndices, blobRcsp);
-                long windowOffset = startWindowLinearIndx * bytesPerValue;
+                long windowOffset = _headerLengthBytes + (startWindowLinearIndx * bytesPerValue);
 
                 int readTargetsInWindow = 1;
                 Array.Copy(readIndex, probeIndex, readIndex.Length);
@@ -233,19 +241,7 @@ namespace Px.Utils.BinaryData
                 int windowSizeBytes = checked((int)((endWindowLinearIndx - startWindowLinearIndx + 1) * bytesPerValue));
 
                 source.Seek(windowOffset, SeekOrigin.Begin);
-                int total = 0;
-                while (total < windowSizeBytes)
-                {
-                    ct.ThrowIfCancellationRequested();
-                    int read = await source.ReadAsync(mem[total..windowSizeBytes], ct);
-                    if (read == 0) break;
-                    total += read;
-                }
-
-                if (total < windowSizeBytes)
-                {
-                    throw new EndOfStreamException("Could not read the requested number of bytes from stream.");
-                }
+                await source.ReadExactlyAsync(mem[..windowSizeBytes], ct);
 
                 ReadOnlySpan<byte> span = mem.Span[..windowSizeBytes];
 
@@ -297,12 +293,29 @@ namespace Px.Utils.BinaryData
             using IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent(chunkSize);
             Memory<byte> mem = owner.Memory[..chunkSize];
 
-            long chunkBase = 0;
+            // Skip header bytes for non-seekable stream
+            if (_headerLengthBytes > 0)
+            {
+                long remaining = _headerLengthBytes;
+                while (remaining > 0)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    int toRead = (int)Math.Min(remaining, mem.Length);
+                    int read = await source.ReadAsync(mem[..toRead], ct);
+                    if (read == 0)
+                    {
+                        throw new EndOfStreamException("Unexpected end of stream while skipping header.");
+                    }
+                    remaining -= read;
+                }
+            }
+
+            long chunkBase = _headerLengthBytes;
             int readFromChunk = 0;
             int processed = 0;
 
             int[] readIndex = new int[readMap.DimensionMaps.Count];
-            long nextReadLinearByteIndex = GetNthIndex(readIndex, blobIndices, blobRcsp) * bytesPerValue;
+            long nextReadLinearByteIndex = (GetNthIndex(readIndex, blobIndices, blobRcsp) * bytesPerValue) + _headerLengthBytes;
 
             while (processed < readMapSize)
             {
@@ -338,7 +351,7 @@ namespace Px.Utils.BinaryData
 
                     RotateToNextIndex(readIndex, readDimSizes);
                     processed++;
-                    nextReadLinearByteIndex = GetNthIndex(readIndex, blobIndices, blobRcsp) * bytesPerValue;
+                    nextReadLinearByteIndex = (GetNthIndex(readIndex, blobIndices, blobRcsp) * bytesPerValue) + _headerLengthBytes;
                 }
 
                 chunkBase = chunkEnd;
@@ -357,15 +370,7 @@ namespace Px.Utils.BinaryData
             try
             {
                 await using Stream stream = await provider(offset, size, ct);
-                int total = 0;
-                while (total < size)
-                {
-                    int read = await stream.ReadAsync(mem[total..], ct);
-                    if (read == 0) break;
-                    total += read;
-                }
-
-                if (total < size) throw new EndOfStreamException("Could not read the requested number of bytes from blob storage.");
+                await stream.ReadExactlyAsync(mem, ct);
                 return owner;
             }
             catch
