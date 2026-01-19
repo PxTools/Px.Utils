@@ -16,7 +16,7 @@ namespace Px.Utils.TestingApp.Commands
     internal sealed class BinaryWriteBenchmark : FileBenchmark
     {
         internal override string Help =>
-            "Reads PX files and generates binary blob files for benchmarking binary data reading." + Environment.NewLine +
+            "Benchmarks building binary files from Px file data." + Environment.NewLine +
             "\t-f, -file: Path to the PX file to process (required)." + Environment.NewLine +
             "\t-d, -dims: Comma-separated list of dimension codes to split data by (default: use content dimension)." + Environment.NewLine +
             "\t-o, -output: Output directory for .pxb files (default: temp directory, auto-cleanup)." + Environment.NewLine +
@@ -153,7 +153,6 @@ namespace Px.Utils.TestingApp.Commands
             }
             finally
             {
-                // Cleanup temporary files if user didn't specify output directory
                 if (!_userSpecifiedOutput)
                 {
                     CleanupTemporaryFiles();
@@ -167,17 +166,14 @@ namespace Px.Utils.TestingApp.Commands
 
             try
             {
-                // Create collapsed matrix map for this split
                 IMatrixMap collapsedMap = _metadata;
                 foreach ((string dimCode, string valueCode) in split.DimensionValues)
                 {
                     collapsedMap = collapsedMap.CollapseDimension(dimCode, valueCode);
                 }
 
-                // Read data using PxFileStreamDataReader
                 int dataSize = (int)collapsedMap.GetSize();
                 if (dataSize == 0) return null;
-
                 DoubleDataValue[] dataBuffer = new DoubleDataValue[dataSize];
 
                 using FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
@@ -191,7 +187,6 @@ namespace Px.Utils.TestingApp.Commands
 
                 string codecName = codecType.ToString().Replace("Codec", "");
 
-                // Generate blob using selected codec
                 string fileName = GenerateBlobFileName(split, codecName);
                 string fullPath = Path.Combine(_outputDirectory, fileName);
                 long fileSize;
@@ -249,7 +244,6 @@ namespace Px.Utils.TestingApp.Commands
         {
             List<BlobGenerationInfo> generatedBlobs = [];
 
-            // Read and build metadata
             using FileStream fileStream = new(pxFilePath, FileMode.Open, FileAccess.Read);
             PxFileMetadataReader metadataReader = new();
             Encoding encoding = metadataReader.GetEncoding(fileStream);
@@ -274,7 +268,6 @@ namespace Px.Utils.TestingApp.Commands
                 }
             }
 
-            // Generate splits and create blobs
             List<DimensionSplit> splits = GenerateDimensionSplits(metadata, actualSplitDimensions);
             Directory.CreateDirectory(outputDirectory);
 
@@ -308,7 +301,6 @@ namespace Px.Utils.TestingApp.Commands
         {
             try
             {
-                // Create collapsed matrix map
                 IMatrixMap collapsedMap = metadata;
                 foreach ((string dimCode, string valueCode) in split.DimensionValues)
                 {
@@ -331,7 +323,6 @@ namespace Px.Utils.TestingApp.Commands
 
                 string codecName = codecType.ToString().Replace("Codec", "");
 
-                // Generate blob file
                 string fileName = $"{Path.GetFileNameWithoutExtension(pxFilePath)}_{string.Join("_", split.DimensionValues.Select(dv => $"{dv.DimCode}-{dv.ValueCode}"))}_{codecName}.pxb";
                 string fullPath = Path.Combine(outputDirectory, fileName);
 
@@ -357,10 +348,8 @@ namespace Px.Utils.TestingApp.Commands
         {
             List<DimensionSplit> splits = [];
 
-            // Get all value combinations for the split dimensions
+            // Get all value combinations for the split dimensions and generate splits based on cartesian product
             List<IReadOnlyDimension> splitDims = [.. metadata.Dimensions.Where(d => splitDimCodes.Contains(d.Code))];
-
-            // Generate cartesian product of dimension values
             IEnumerable<IEnumerable<(string DimCode, string ValueCode)>> combinations =
                 CartesianProduct(splitDims.Select(dim =>
                     dim.Values.Select(val => (dim.Code, val.Code))));

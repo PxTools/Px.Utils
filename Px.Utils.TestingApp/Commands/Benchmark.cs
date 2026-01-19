@@ -126,7 +126,7 @@ namespace Px.Utils.TestingApp.Commands
 
             Parameters = GroupParameters(inputs ?? [], [.. ParameterFlags.SelectMany(x => x)]);
             SetRunParameters();
-            OneTimeBenchmarkSetupAsync().Wait();
+            OneTimeBenchmarkSetupAsync().GetAwaiter().GetResult();
 
             // synchronous validation
             RunBenchmarks(BenchmarkFunctions);

@@ -342,24 +342,21 @@ namespace Px.Utils.TestingApp.Commands
                 return blobMap;
             }
 
-            // Sort by value count ascending
+            // Sort by value count ascending and create new dimension maps with sparse selection
             List<IDimensionMap> sortedNonSplitDims = [.. nonSplitDims.OrderBy(dm => dm.ValueCodes.Count)];
-
-            // Create new dimension maps with sparse selection
             List<DimensionMap> newDimMaps = [];
-
             foreach (IDimensionMap dimMap in blobMap.DimensionMaps)
             {
                 int indexInNonSplit = sortedNonSplitDims.FindIndex(dm => dm.Code == dimMap.Code);
 
                 if (indexInNonSplit == -1)
                 {
-                    // This is a split dimension, keep all values
+                    // Keep all values from split dimensions
                     newDimMaps.Add(new DimensionMap(dimMap));
                 }
                 else if (indexInNonSplit == sortedNonSplitDims.Count - 1)
                 {
-                    // Last (largest) dimension: pick every other value
+                    // Pick every other value from the largest non-split dimension
                     List<string> selectedValues = [];
                     for (int i = 0; i < dimMap.ValueCodes.Count; i += 2)
                     {
@@ -369,7 +366,7 @@ namespace Px.Utils.TestingApp.Commands
                 }
                 else
                 {
-                    // Other dimensions: pick last value
+                    // Pick only the last value from other non-split dimensions
                     string selectedValue = dimMap.ValueCodes[^1];
                     newDimMaps.Add(new DimensionMap(dimMap.Code, [selectedValue]));
                 }
