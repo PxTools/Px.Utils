@@ -11,8 +11,7 @@ using System.Text;
 namespace Px.Utils.TestingApp.Commands
 {
     /// <summary>
-    /// Benchmarks binary data writing by reading PX files and generating binary blob files (.pxb) 
-    /// using DoubleCodec with parallel processing for comprehensive benchmarking. TODO: Use codec sniffer to select codec per dimension type when implemented.
+    /// Benchmarks binary data writing by reading PX files and generating binary blob files (.pxb) with parallel processing for comprehensive benchmarking.
     /// </summary>
     internal sealed class BinaryWriteBenchmark : FileBenchmark
     {
@@ -185,14 +184,20 @@ namespace Px.Utils.TestingApp.Commands
                 using PxFileStreamDataReader dataReader = new(fileStream);
                 dataReader.ReadDoubleDataValues(dataBuffer, 0, collapsedMap, _metadata);
 
-                // Generate blob using DoubleCodec
-                string fileName = GenerateBlobFileName(split, "Double");
+                BinaryValueCodecSelector selector = new();
+                selector.Process(dataBuffer);
+                BinaryValueCodecType codecType = selector.GetCodecType();
+                IBinaryValueCodec codec = selector.CreateCodec();
+
+                string codecName = codecType.ToString().Replace("Codec", "");
+
+                // Generate blob using selected codec
+                string fileName = GenerateBlobFileName(split, codecName);
                 string fullPath = Path.Combine(_outputDirectory, fileName);
                 long fileSize;
 
                 using (FileStream outputStream = new(fullPath, FileMode.Create, FileAccess.Write))
                 {
-                    DoubleCodec codec = new();
                     codec.Write(dataBuffer, outputStream);
                     await outputStream.FlushAsync(ct);
                     fileSize = outputStream.Length;
@@ -203,7 +208,7 @@ namespace Px.Utils.TestingApp.Commands
                     fullPath,
                     dataSize,
                     fileSize,
-                    "Double",
+                    codecType,
                     collapsedMap,
                     split
                  );
@@ -319,17 +324,23 @@ namespace Px.Utils.TestingApp.Commands
                 using PxFileStreamDataReader dataReader = new(fileStream);
                 dataReader.ReadDoubleDataValues(dataBuffer, 0, collapsedMap, metadata);
 
+                BinaryValueCodecSelector selector = new();
+                selector.Process(dataBuffer);
+                BinaryValueCodecType codecType = selector.GetCodecType();
+                IBinaryValueCodec codec = selector.CreateCodec();
+
+                string codecName = codecType.ToString().Replace("Codec", "");
+
                 // Generate blob file
-                string fileName = $"{Path.GetFileNameWithoutExtension(pxFilePath)}_{string.Join("_", split.DimensionValues.Select(dv => $"{dv.DimCode}-{dv.ValueCode}"))}_Double.pxb";
+                string fileName = $"{Path.GetFileNameWithoutExtension(pxFilePath)}_{string.Join("_", split.DimensionValues.Select(dv => $"{dv.DimCode}-{dv.ValueCode}"))}_{codecName}.pxb";
                 string fullPath = Path.Combine(outputDirectory, fileName);
 
                 using FileStream outputStream = new(fullPath, FileMode.Create, FileAccess.Write);
-                DoubleCodec codec = new();
                 codec.Write(dataBuffer, outputStream);
                 await outputStream.FlushAsync(ct);
                 long fileSize = outputStream.Length;
 
-                return new BlobGenerationInfo(fileName, fullPath, dataSize, fileSize, "Double", collapsedMap, split);
+                return new BlobGenerationInfo(fileName, fullPath, dataSize, fileSize, codecType, collapsedMap, split);
             }
             catch (OperationCanceledException)
             {
@@ -348,11 +359,6 @@ namespace Px.Utils.TestingApp.Commands
 
             // Get all value combinations for the split dimensions
             List<IReadOnlyDimension> splitDims = [.. metadata.Dimensions.Where(d => splitDimCodes.Contains(d.Code))];
-
-            if (splitDims.Count == 0)
-            {
-                throw new ArgumentException("No valid split dimensions found in metadata.");
-            }
 
             // Generate cartesian product of dimension values
             IEnumerable<IEnumerable<(string DimCode, string ValueCode)>> combinations =
@@ -393,8 +399,10 @@ namespace Px.Utils.TestingApp.Commands
             string FullPath,
             int ValueCount,
             long FileSizeBytes,
-            string CodecName,
+            BinaryValueCodecType CodecType,
             IMatrixMap MatrixMap,
-            DimensionSplit Split);
+            DimensionSplit Split)
+        {
+        }
     }
 }

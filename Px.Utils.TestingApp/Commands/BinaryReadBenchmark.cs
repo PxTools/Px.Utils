@@ -85,7 +85,7 @@ namespace Px.Utils.TestingApp.Commands
                 Console.WriteLine($"Generated {_blobFiles.Count} blob files for benchmarking:");
                 foreach (BinaryWriteBenchmark.BlobGenerationInfo blob in _blobFiles)
                 {
-                    Console.WriteLine($"  {blob.FileName}: {blob.CodecName}, {blob.FileSizeBytes:N0} bytes, {blob.ValueCount:N0} values");
+                    Console.WriteLine($"  {blob.FileName}: {blob.CodecType}, {blob.FileSizeBytes:N0} bytes, {blob.ValueCount:N0} values");
                 }
             }
             catch (Exception ex)
@@ -107,7 +107,7 @@ namespace Px.Utils.TestingApp.Commands
                         .Split(',', StringSplitOptions.RemoveEmptyEntries)
                         .Select(s => s.Trim())];
                 }
-                else if (windowFlags.Contains(key) && 
+                else if (windowFlags.Contains(key) &&
                     Parameters[key].Count > 0 &&
                     !long.TryParse(Parameters[key][0], out _windowSizeBytes))
                 {
@@ -170,15 +170,14 @@ namespace Px.Utils.TestingApp.Commands
             {
                 await ReadBlobWithCodecAsync(blobFile, GenerateReadAllMap, (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
-                    Task<Stream> ChunkProviderAsync(long offset, long length, CancellationToken ct)
+                    Func<long, long, CancellationToken, Task<Stream>> chunkProvider = (offset, length, ct) =>
                     {
-                        FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read,4096, FileOptions.Asynchronous);
+                        FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
                         stream.Seek(offset, SeekOrigin.Begin);
                         return Task.FromResult<Stream>(stream);
-                    }
+                    };
 
-                    BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
-                    return reader.ReadByChunkAsync(ChunkProviderAsync, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                    return CreateReaderAndReadByChunkAsync(blobFile.CodecType, chunkProvider, readMap, blobMap, bufferMap, bufferMemory);
                 });
             }));
         }
@@ -189,15 +188,14 @@ namespace Px.Utils.TestingApp.Commands
             {
                 await ReadBlobWithCodecAsync(blobFile, b => GenerateReadLastMap(b), (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
-                    Task<Stream> ChunkProviderAsync(long offset, long length, CancellationToken ct)
+                    Func<long, long, CancellationToken, Task<Stream>> chunkProvider = (offset, length, ct) =>
                     {
-                        FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read,4096, FileOptions.Asynchronous);
+                        FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
                         stream.Seek(offset, SeekOrigin.Begin);
                         return Task.FromResult<Stream>(stream);
-                    }
+                    };
 
-                    BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
-                    return reader.ReadByChunkAsync(ChunkProviderAsync, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                    return CreateReaderAndReadByChunkAsync(blobFile.CodecType, chunkProvider, readMap, blobMap, bufferMap, bufferMemory);
                 });
             }));
         }
@@ -208,15 +206,14 @@ namespace Px.Utils.TestingApp.Commands
             {
                 await ReadBlobWithCodecAsync(blobFile, b => GenerateReadSparseMap(b), (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
-                    Task<Stream> ChunkProviderAsync(long offset, long length, CancellationToken ct)
+                    Func<long, long, CancellationToken, Task<Stream>> chunkProvider = (offset, length, ct) =>
                     {
-                        FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read,4096, FileOptions.Asynchronous);
+                        FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
                         stream.Seek(offset, SeekOrigin.Begin);
                         return Task.FromResult<Stream>(stream);
-                    }
+                    };
 
-                    BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
-                    return reader.ReadByChunkAsync(ChunkProviderAsync, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                    return CreateReaderAndReadByChunkAsync(blobFile.CodecType, chunkProvider, readMap, blobMap, bufferMap, bufferMemory);
                 });
             }));
         }
@@ -228,8 +225,7 @@ namespace Px.Utils.TestingApp.Commands
                 await ReadBlobWithCodecAsync(blobFile, GenerateReadAllMap, async (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
                     using FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
-                    BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
-                    await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                    await CreateReaderAndReadFromStreamAsync(blobFile.CodecType, stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
                 });
             }));
         }
@@ -241,8 +237,7 @@ namespace Px.Utils.TestingApp.Commands
                 await ReadBlobWithCodecAsync(blobFile, b => GenerateReadLastMap(b), async (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
                     using FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
-                    BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
-                    await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                    await CreateReaderAndReadFromStreamAsync(blobFile.CodecType, stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
                 });
             }));
         }
@@ -254,8 +249,7 @@ namespace Px.Utils.TestingApp.Commands
                 await ReadBlobWithCodecAsync(blobFile, b => GenerateReadSparseMap(b), async (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
                     using FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
-                    BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
-                    await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                    await CreateReaderAndReadFromStreamAsync(blobFile.CodecType, stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
                 });
             }));
         }
@@ -266,7 +260,7 @@ namespace Px.Utils.TestingApp.Commands
             {
                 await ReadBlobWithCodecAsync(blobFile, GenerateReadAllMap, async (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
-                    await ReadNonSeekableAsync(blobFile.FullPath, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                    await ReadNonSeekableAsync(blobFile.FullPath, blobFile.CodecType, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
                 });
             }));
         }
@@ -277,7 +271,7 @@ namespace Px.Utils.TestingApp.Commands
             {
                 await ReadBlobWithCodecAsync(blobFile, b => GenerateReadLastMap(b), async (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
-                    await ReadNonSeekableAsync(blobFile.FullPath, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                    await ReadNonSeekableAsync(blobFile.FullPath, blobFile.CodecType, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
                 });
             }));
         }
@@ -288,7 +282,7 @@ namespace Px.Utils.TestingApp.Commands
             {
                 await ReadBlobWithCodecAsync(blobFile, b => GenerateReadSparseMap(b), async (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
-                    await ReadNonSeekableAsync(blobFile.FullPath, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                    await ReadNonSeekableAsync(blobFile.FullPath, blobFile.CodecType, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
                 });
             }));
         }
@@ -400,6 +394,7 @@ namespace Px.Utils.TestingApp.Commands
 
         private async Task ReadNonSeekableAsync(
             string blobPath,
+            BinaryValueCodecType codecType,
             IMatrixMap readMap,
             IMatrixMap blobMap,
             IMatrixMap bufferMap,
@@ -408,10 +403,62 @@ namespace Px.Utils.TestingApp.Commands
         {
             byte[] fileData = await File.ReadAllBytesAsync(blobPath, ct);
 
-            BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
-
             using NonSeekableReadOnlyStream stream = new(fileData);
-            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct);
+            await CreateReaderAndReadFromStreamAsync(codecType, stream, readMap, blobMap, bufferMap, bufferMemory, ct);
+        }
+
+        private Task CreateReaderAndReadByChunkAsync(
+            BinaryValueCodecType codecType,
+            Func<long, long, CancellationToken, Task<Stream>> provider,
+            IMatrixMap readMap,
+            IMatrixMap blobMap,
+            IMatrixMap bufferMap,
+            Memory<DoubleDataValue> bufferMemory)
+        {
+            return codecType switch
+            {
+                BinaryValueCodecType.UInt16Codec => new BinaryDataReader<UInt16Codec>(_windowSizeBytes, _mergeCapBytes)
+                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
+                BinaryValueCodecType.Int16Codec => new BinaryDataReader<Int16Codec>(_windowSizeBytes, _mergeCapBytes)
+                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
+                BinaryValueCodecType.UInt24Codec => new BinaryDataReader<UInt24Codec>(_windowSizeBytes, _mergeCapBytes)
+                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
+                BinaryValueCodecType.Int24Codec => new BinaryDataReader<Int24Codec>(_windowSizeBytes, _mergeCapBytes)
+                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
+                BinaryValueCodecType.UInt32Codec => new BinaryDataReader<UInt32Codec>(_windowSizeBytes, _mergeCapBytes)
+                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
+                BinaryValueCodecType.Int32Codec => new BinaryDataReader<Int32Codec>(_windowSizeBytes, _mergeCapBytes)
+                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
+                BinaryValueCodecType.FloatCodec => new BinaryDataReader<FloatCodec>(_windowSizeBytes, _mergeCapBytes)
+                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
+                BinaryValueCodecType.DoubleCodec => new BinaryDataReader<DoubleCodec>(_windowSizeBytes, _mergeCapBytes)
+                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
+                _ => new BinaryDataReader<DoubleCodec>(_windowSizeBytes, _mergeCapBytes)
+                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None)
+            };
+        }
+
+        private Task CreateReaderAndReadFromStreamAsync(
+            BinaryValueCodecType codecType,
+            Stream stream,
+            IMatrixMap readMap,
+            IMatrixMap blobMap,
+            IMatrixMap bufferMap,
+            Memory<DoubleDataValue> bufferMemory,
+            CancellationToken ct)
+        {
+            return codecType switch
+            {
+                BinaryValueCodecType.UInt16Codec => new BinaryDataReader<UInt16Codec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
+                BinaryValueCodecType.Int16Codec => new BinaryDataReader<Int16Codec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
+                BinaryValueCodecType.UInt24Codec => new BinaryDataReader<UInt24Codec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
+                BinaryValueCodecType.Int24Codec => new BinaryDataReader<Int24Codec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
+                BinaryValueCodecType.UInt32Codec => new BinaryDataReader<UInt32Codec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
+                BinaryValueCodecType.Int32Codec => new BinaryDataReader<Int32Codec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
+                BinaryValueCodecType.FloatCodec => new BinaryDataReader<FloatCodec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
+                BinaryValueCodecType.DoubleCodec => new BinaryDataReader<DoubleCodec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
+                _ => new BinaryDataReader<DoubleCodec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct)
+            };
         }
 
         private sealed class NonSeekableReadOnlyStream(ReadOnlyMemory<byte> data) : Stream
