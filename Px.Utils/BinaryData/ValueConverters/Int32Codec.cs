@@ -15,7 +15,7 @@ namespace Px.Utils.BinaryData.ValueConverters
     public sealed class Int32Codec(int bufferBytes = 64 * 1024) : BinaryValueCodecBase(ByteCount, bufferBytes), IBinaryValueCodec
     {
         /// <summary>
-        /// Gets the number of bytes per encoded value for this codec.
+        /// The number of bytes per encoded value for this codec.
         /// </summary>
         public const int ByteCount = sizeof(int);
         static int IBinaryValueCodec.ByteCount => ByteCount;
