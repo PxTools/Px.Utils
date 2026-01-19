@@ -179,10 +179,11 @@ namespace Px.Utils.TestingApp.Commands
         /// <summary>
         /// Setup method for the benchmark. Called before running the benchmarks. Marked as virtual to allow for custom setup in derived classes.
         /// </summary>
-        protected virtual async Task OneTimeBenchmarkSetupAsync()
+        protected virtual Task OneTimeBenchmarkSetupAsync()
         {
             Results.Clear();
             processesCompleted = 0;
+            return Task.CompletedTask;
         }
 
         protected void RunBenchmarks(Action[] functions)
