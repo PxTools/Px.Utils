@@ -17,6 +17,8 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// </summary>
         public const double IntegerThreshold = 1e-9;
 
+        private const double Int24MinExactValue = -8388608.0; // -2^23
+
         private bool _any;
         private bool _allIntegers = true;
         private double _minValue = double.PositiveInfinity;
@@ -93,7 +95,7 @@ namespace Px.Utils.BinaryData.ValueConverters
                     return BinaryValueCodecType.UInt24Codec;
                 }
 
-                if (_minValue >= -8388608.0 && _maxValue < Int24Codec.SentinelStart)
+                if (_minValue >= Int24MinExactValue && _maxValue < Int24Codec.SentinelStart)
                 {
                     return BinaryValueCodecType.Int24Codec;
                 }
@@ -151,18 +153,13 @@ namespace Px.Utils.BinaryData.ValueConverters
             }
 
             double v = input.UnsafeValue;
+            if (!double.IsFinite(v))
+            {
+                return false;
+            }
+
             float f = (float)v;
-            if (double.IsNaN(v) || double.IsInfinity(v))
-            {
-                return false;
-            }
-
-            if ((double)f != v)
-            {
-                return false;
-            }
-
-            return true;
+            return (double)f == v;
         }
     }
 }

@@ -33,7 +33,10 @@ namespace Px.Utils.BinaryData
         /// <param name="maxWindowSizeBytes">Optional maximum window size in bytes to use when reading chunks. Defaults to 1 MiB.</param>
         /// <param name="mergeCapBytes">Optional maximum gap, in bytes, allowed between consecutive targets to merge them into the same window. Defaults to 64 KiB.</param>
         /// <param name="headerLengthBytes">Optional header length in bytes. The tightly packed values start after this offset from the beginning. Defaults to 0.</param>
-        public BinaryDataReader([Range(1, long.MaxValue)] long? maxWindowSizeBytes = null, [Range(1, long.MaxValue)] long? mergeCapBytes = null, [Range(0, long.MaxValue)] long? headerLengthBytes = null)
+        public BinaryDataReader(
+            [Range(1, long.MaxValue)] long? maxWindowSizeBytes = null,
+            [Range(1, long.MaxValue)] long? mergeCapBytes = null,
+            [Range(0, long.MaxValue)] long? headerLengthBytes = null)
         {
             int bytesPerValue = TCodec.ByteCount;
 
