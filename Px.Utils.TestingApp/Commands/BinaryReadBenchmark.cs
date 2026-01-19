@@ -2,7 +2,7 @@ using Px.Utils.BinaryData;
 using Px.Utils.BinaryData.ValueConverters;
 using Px.Utils.Models.Data.DataValue;
 using Px.Utils.Models.Metadata;
-using System.IO.Pipes;
+using Px.Utils.Models.Metadata.ExtensionMethods;
 
 namespace Px.Utils.TestingApp.Commands
 {
@@ -17,10 +17,10 @@ namespace Px.Utils.TestingApp.Commands
             "Benchmarks binary data reading performance by generating and testing .pxb blob files." + Environment.NewLine +
             "\t-f, -file: Path to the PX file to process (required)." + Environment.NewLine +
             "\t-d, -dims: Comma-separated list of dimension codes to split data by (default: use content dimension)." + Environment.NewLine +
-            "\t-w, -window: Maximum window size in bytes (default: 1MB)." + Environment.NewLine +
-            "\t-m, -merge: Maximum merge gap in bytes (default: 64KB)." + Environment.NewLine +
-            "\t-o, -output: Directory for .pxb files (default: temp directory, auto-cleanup)." + Environment.NewLine +
-            "\t-iter: Number of iterations to run (default: 10).";
+            "\t-w, -window: Maximum window size in bytes (default:1MB)." + Environment.NewLine +
+            "\t-m, -merge: Maximum merge gap in bytes (default:64KB)." + Environment.NewLine +
+            "\t-o, -output: Directory for .pxb files (default: temp directory)." + Environment.NewLine +
+            "\t-iter: Number of iterations to run (default:10).";
 
         internal override string Description => "Benchmarks BinaryDataReader performance with self-generated blob files.";
 
@@ -36,15 +36,20 @@ namespace Px.Utils.TestingApp.Commands
         private static readonly string[] outputFlags = ["-o", "-output"];
 
         private readonly List<BinaryWriteBenchmark.BlobGenerationInfo> _blobFiles = [];
-        private string _tempBlobDirectory = "";
 
         internal BinaryReadBenchmark()
         {
             BenchmarkFunctions = [];
             BenchmarkFunctionsAsync = [
-                RunChunkBasedReadBenchmarksAsync,
-                RunSeekableStreamReadBenchmarksAsync,
-                RunNonSeekableStreamReadBenchmarksAsync
+                RunChunkBasedReadAllBenchmarksAsync,
+                RunChunkBasedReadLastBenchmarksAsync,
+                RunChunkBasedReadSparseBenchmarksAsync,
+                RunSeekableStreamReadAllBenchmarksAsync,
+                RunSeekableStreamReadLastBenchmarksAsync,
+                RunSeekableStreamReadSparseBenchmarksAsync,
+                RunNonSeekableStreamReadAllBenchmarksAsync,
+                RunNonSeekableStreamReadLastBenchmarksAsync,
+                RunNonSeekableStreamReadSparseBenchmarksAsync
             ];
 
             ParameterFlags.Add(dimsFlags);
@@ -59,20 +64,10 @@ namespace Px.Utils.TestingApp.Commands
 
             if (!_userSpecifiedOutput)
             {
-                _tempBlobDirectory = Path.Combine(Path.GetTempPath(), $"pxbench_{Guid.NewGuid():N}");
-                _outputDirectory = _tempBlobDirectory;
+                _outputDirectory = Path.Combine(Path.GetTempPath(), $"pxbench_{Guid.NewGuid():N}");
             }
 
             Directory.CreateDirectory(_outputDirectory);
-
-            if (_userSpecifiedOutput)
-            {
-                Console.WriteLine("Files will be preserved in user-specified directory.");
-            }
-            else
-            {
-                Console.WriteLine("Temporary files will be deleted after benchmarking.");
-            }
 
             try
             {
@@ -91,11 +86,6 @@ namespace Px.Utils.TestingApp.Commands
                 foreach (BinaryWriteBenchmark.BlobGenerationInfo blob in _blobFiles)
                 {
                     Console.WriteLine($"  {blob.FileName}: {blob.CodecName}, {blob.FileSizeBytes:N0} bytes, {blob.ValueCount:N0} values");
-                }
-
-                if (_blobFiles.Count == 0)
-                {
-                    throw new InvalidOperationException("No blob files were generated for benchmarking.");
                 }
             }
             catch (Exception ex)
@@ -117,19 +107,17 @@ namespace Px.Utils.TestingApp.Commands
                         .Split(',', StringSplitOptions.RemoveEmptyEntries)
                         .Select(s => s.Trim())];
                 }
-                else if (windowFlags.Contains(key) && Parameters[key].Count > 0)
+                else if (windowFlags.Contains(key) && 
+                    Parameters[key].Count > 0 &&
+                    !long.TryParse(Parameters[key][0], out _windowSizeBytes))
                 {
-                    if (!long.TryParse(Parameters[key][0], out _windowSizeBytes))
-                    {
-                        throw new ArgumentException($"Invalid window size: {Parameters[key][0]}");
-                    }
+                    throw new ArgumentException($"Invalid window size: {Parameters[key][0]}");
                 }
-                else if (mergeFlags.Contains(key) && Parameters[key].Count > 0)
+                else if (mergeFlags.Contains(key) &&
+                    Parameters[key].Count > 0 &&
+                    !long.TryParse(Parameters[key][0], out _mergeCapBytes))
                 {
-                    if (!long.TryParse(Parameters[key][0], out _mergeCapBytes))
-                    {
-                        throw new ArgumentException($"Invalid merge gap: {Parameters[key][0]}");
-                    }
+                    throw new ArgumentException($"Invalid merge gap: {Parameters[key][0]}");
                 }
                 else if (outputFlags.Contains(key) && Parameters[key].Count > 0)
                 {
@@ -176,113 +164,326 @@ namespace Px.Utils.TestingApp.Commands
             }
         }
 
-        private async Task RunChunkBasedReadBenchmarksAsync()
+        private async Task RunChunkBasedReadAllBenchmarksAsync()
         {
-            if (_blobFiles.Count == 0)
-            {
-                throw new InvalidOperationException("No blob files available for benchmarking. Setup may have failed.");
-            }
-
             await Task.WhenAll(_blobFiles.Select(async blobFile =>
             {
-                await ReadBlobWithCodecAsync(blobFile, async (readMap, blobMap, bufferMap, bufferMemory) =>
+                await ReadBlobWithCodecAsync(blobFile, GenerateReadAllMap, (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
-                    async Task<Stream> ChunkProviderAsync(long offset, long length, CancellationToken ct)
+                    Task<Stream> ChunkProviderAsync(long offset, long length, CancellationToken ct)
                     {
-                        FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
+                        FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read,4096, FileOptions.Asynchronous);
                         stream.Seek(offset, SeekOrigin.Begin);
-                        return stream;
+                        return Task.FromResult<Stream>(stream);
                     }
 
                     BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
-                    await reader.ReadByChunkAsync(ChunkProviderAsync, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                    return reader.ReadByChunkAsync(ChunkProviderAsync, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
                 });
             }));
-
-            CleanupTemporaryFiles();
         }
 
-        private async Task RunSeekableStreamReadBenchmarksAsync()
+        private async Task RunChunkBasedReadLastBenchmarksAsync()
         {
-            if (_blobFiles.Count == 0)
-            {
-                throw new InvalidOperationException("No blob files available for benchmarking. Setup may have failed.");
-            }
-
             await Task.WhenAll(_blobFiles.Select(async blobFile =>
             {
-                await ReadBlobWithCodecAsync(blobFile, async (readMap, blobMap, bufferMap, bufferMemory) =>
+                await ReadBlobWithCodecAsync(blobFile, b => GenerateReadLastMap(b), (readMap, blobMap, bufferMap, bufferMemory) =>
+                {
+                    Task<Stream> ChunkProviderAsync(long offset, long length, CancellationToken ct)
+                    {
+                        FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read,4096, FileOptions.Asynchronous);
+                        stream.Seek(offset, SeekOrigin.Begin);
+                        return Task.FromResult<Stream>(stream);
+                    }
+
+                    BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
+                    return reader.ReadByChunkAsync(ChunkProviderAsync, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                });
+            }));
+        }
+
+        private async Task RunChunkBasedReadSparseBenchmarksAsync()
+        {
+            await Task.WhenAll(_blobFiles.Select(async blobFile =>
+            {
+                await ReadBlobWithCodecAsync(blobFile, b => GenerateReadSparseMap(b), (readMap, blobMap, bufferMap, bufferMemory) =>
+                {
+                    Task<Stream> ChunkProviderAsync(long offset, long length, CancellationToken ct)
+                    {
+                        FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read,4096, FileOptions.Asynchronous);
+                        stream.Seek(offset, SeekOrigin.Begin);
+                        return Task.FromResult<Stream>(stream);
+                    }
+
+                    BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
+                    return reader.ReadByChunkAsync(ChunkProviderAsync, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                });
+            }));
+        }
+
+        private async Task RunSeekableStreamReadAllBenchmarksAsync()
+        {
+            await Task.WhenAll(_blobFiles.Select(async blobFile =>
+            {
+                await ReadBlobWithCodecAsync(blobFile, GenerateReadAllMap, async (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
                     using FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
                     BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
                     await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
                 });
             }));
-
-            CleanupTemporaryFiles();
         }
 
-        private async Task RunNonSeekableStreamReadBenchmarksAsync()
+        private async Task RunSeekableStreamReadLastBenchmarksAsync()
         {
-            if (_blobFiles.Count == 0)
-            {
-                throw new InvalidOperationException("No blob files available for benchmarking. Setup may have failed.");
-            }
-
             await Task.WhenAll(_blobFiles.Select(async blobFile =>
             {
-                await ReadBlobWithCodecAsync(blobFile, async (readMap, blobMap, bufferMap, bufferMemory) =>
+                await ReadBlobWithCodecAsync(blobFile, b => GenerateReadLastMap(b), async (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
-                    byte[] fileData = await File.ReadAllBytesAsync(blobFile.FullPath);
-
-                    using AnonymousPipeServerStream pipeServer = new(PipeDirection.Out);
-                    using AnonymousPipeClientStream pipeClient = new(PipeDirection.In, pipeServer.GetClientHandleAsString());
-
-                    Task writeTask = Task.Run(async () =>
-                    {
-                        await pipeServer.WriteAsync(fileData, CancellationToken.None);
-                        pipeServer.Close();
-                    });
-
+                    using FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
                     BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
-                    await reader.ReadFromStreamAsync(pipeClient, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
-
-                    await writeTask;
+                    await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
                 });
             }));
+        }
 
-            CleanupTemporaryFiles();
+        private async Task RunSeekableStreamReadSparseBenchmarksAsync()
+        {
+            await Task.WhenAll(_blobFiles.Select(async blobFile =>
+            {
+                await ReadBlobWithCodecAsync(blobFile, b => GenerateReadSparseMap(b), async (readMap, blobMap, bufferMap, bufferMemory) =>
+                {
+                    using FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
+                    BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
+                    await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                });
+            }));
+        }
+
+        private async Task RunNonSeekableStreamReadAllBenchmarksAsync()
+        {
+            await Task.WhenAll(_blobFiles.Select(async blobFile =>
+            {
+                await ReadBlobWithCodecAsync(blobFile, GenerateReadAllMap, async (readMap, blobMap, bufferMap, bufferMemory) =>
+                {
+                    await ReadNonSeekableAsync(blobFile.FullPath, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                });
+            }));
+        }
+
+        private async Task RunNonSeekableStreamReadLastBenchmarksAsync()
+        {
+            await Task.WhenAll(_blobFiles.Select(async blobFile =>
+            {
+                await ReadBlobWithCodecAsync(blobFile, b => GenerateReadLastMap(b), async (readMap, blobMap, bufferMap, bufferMemory) =>
+                {
+                    await ReadNonSeekableAsync(blobFile.FullPath, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                });
+            }));
+        }
+
+        private async Task RunNonSeekableStreamReadSparseBenchmarksAsync()
+        {
+            await Task.WhenAll(_blobFiles.Select(async blobFile =>
+            {
+                await ReadBlobWithCodecAsync(blobFile, b => GenerateReadSparseMap(b), async (readMap, blobMap, bufferMap, bufferMemory) =>
+                {
+                    await ReadNonSeekableAsync(blobFile.FullPath, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                });
+            }));
+        }
+
+        /// <summary>
+        /// Generates a ReadAll matrix map - reads all values.
+        /// </summary>
+        private static IMatrixMap GenerateReadAllMap(BinaryWriteBenchmark.BlobGenerationInfo blobFile)
+        {
+            return blobFile.MatrixMap;
+        }
+
+        /// <summary>
+        /// Generates a ReadLast matrix map - picks the last value from the last non-split dimension.
+        /// </summary>
+        private static IMatrixMap GenerateReadLastMap(BinaryWriteBenchmark.BlobGenerationInfo blobFile)
+        {
+            IMatrixMap blobMap = blobFile.MatrixMap;
+            List<string> splitDimCodes = [.. blobFile.Split.DimensionValues.Select(dv => dv.DimCode)];
+            List<IDimensionMap> nonSplitDims = [.. blobMap.DimensionMaps.Where(dm => !splitDimCodes.Contains(dm.Code))];
+
+            if (nonSplitDims.Count == 0)
+            {
+                return blobMap;
+            }
+
+            // Pick the last dimension from non-split dimensions and create new dimension maps with only the last value from the last dimension
+            IDimensionMap lastDim = nonSplitDims[^1];
+            List<DimensionMap> newDimMaps = [];
+            foreach (IDimensionMap dimMap in blobMap.DimensionMaps)
+            {
+                if (dimMap.Code == lastDim.Code)
+                {
+                    // Take only the last value
+                    newDimMaps.Add(new DimensionMap(dimMap.Code, [dimMap.ValueCodes[^1]]));
+                }
+                else
+                {
+                    newDimMaps.Add(new DimensionMap(dimMap));
+                }
+            }
+
+            return new MatrixMap([.. newDimMaps]);
+        }
+
+        /// <summary>
+        /// Generates a ReadSparse matrix map - creates sparse reading pattern across non-split dimensions.
+        /// </summary>
+        private static IMatrixMap GenerateReadSparseMap(BinaryWriteBenchmark.BlobGenerationInfo blobFile)
+        {
+            IMatrixMap blobMap = blobFile.MatrixMap;
+            List<string> splitDimCodes = [.. blobFile.Split.DimensionValues.Select(dv => dv.DimCode)];
+            List<IDimensionMap> nonSplitDims = [.. blobMap.DimensionMaps.Where(dm => !splitDimCodes.Contains(dm.Code))];
+
+            if (nonSplitDims.Count == 0)
+            {
+                return blobMap;
+            }
+
+            // Sort by value count ascending
+            List<IDimensionMap> sortedNonSplitDims = [.. nonSplitDims.OrderBy(dm => dm.ValueCodes.Count)];
+
+            // Create new dimension maps with sparse selection
+            List<DimensionMap> newDimMaps = [];
+
+            foreach (IDimensionMap dimMap in blobMap.DimensionMaps)
+            {
+                int indexInNonSplit = sortedNonSplitDims.FindIndex(dm => dm.Code == dimMap.Code);
+
+                if (indexInNonSplit == -1)
+                {
+                    // This is a split dimension, keep all values
+                    newDimMaps.Add(new DimensionMap(dimMap));
+                }
+                else if (indexInNonSplit == sortedNonSplitDims.Count - 1)
+                {
+                    // Last (largest) dimension: pick every other value
+                    List<string> selectedValues = [];
+                    for (int i = 0; i < dimMap.ValueCodes.Count; i += 2)
+                    {
+                        selectedValues.Add(dimMap.ValueCodes[i]);
+                    }
+                    newDimMaps.Add(new DimensionMap(dimMap.Code, selectedValues));
+                }
+                else
+                {
+                    // Other dimensions: pick last value
+                    string selectedValue = dimMap.ValueCodes[^1];
+                    newDimMaps.Add(new DimensionMap(dimMap.Code, [selectedValue]));
+                }
+            }
+
+            return new MatrixMap([.. newDimMaps]);
         }
 
         private static async Task ReadBlobWithCodecAsync(
             BinaryWriteBenchmark.BlobGenerationInfo blobFile,
+            Func<BinaryWriteBenchmark.BlobGenerationInfo, IMatrixMap> mapGenerator,
             Func<IMatrixMap, IMatrixMap, IMatrixMap, Memory<DoubleDataValue>, Task> benchmarkAction)
         {
             IMatrixMap blobMap = blobFile.MatrixMap;
-            IMatrixMap readMap = blobMap;
-            IMatrixMap bufferMap = blobMap;
-
-            DoubleDataValue[] buffer = new DoubleDataValue[blobFile.ValueCount];
+            IMatrixMap readMap = mapGenerator(blobFile);
+            IMatrixMap bufferMap = readMap;
+            int bufferSize = (int)readMap.GetSize();
+            DoubleDataValue[] buffer = new DoubleDataValue[bufferSize];
             Memory<DoubleDataValue> bufferMemory = new(buffer);
-
             await benchmarkAction(readMap, blobMap, bufferMap, bufferMemory);
         }
 
-        private void CleanupTemporaryFiles()
+        private async Task ReadNonSeekableAsync(
+            string blobPath,
+            IMatrixMap readMap,
+            IMatrixMap blobMap,
+            IMatrixMap bufferMap,
+            Memory<DoubleDataValue> bufferMemory,
+            CancellationToken ct)
         {
-            if (!_userSpecifiedOutput && !string.IsNullOrEmpty(_tempBlobDirectory))
+            byte[] fileData = await File.ReadAllBytesAsync(blobPath, ct);
+
+            BinaryDataReader<DoubleCodec> reader = new(_windowSizeBytes, _mergeCapBytes);
+
+            using NonSeekableReadOnlyStream stream = new(fileData);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct);
+        }
+
+        private sealed class NonSeekableReadOnlyStream(ReadOnlyMemory<byte> data) : Stream
+        {
+            private readonly Stream _inner = new MemoryStream(data.ToArray(), writable: false);
+
+            public override bool CanRead => true;
+
+            public override bool CanSeek => false;
+
+            public override bool CanWrite => false;
+
+            public override long Length => throw new NotSupportedException();
+
+            public override long Position
             {
-                try
+                get => throw new NotSupportedException();
+                set => throw new NotSupportedException();
+            }
+
+            public override void Flush()
+            {
+            }
+
+            public override Task FlushAsync(CancellationToken cancellationToken)
+            {
+                return Task.CompletedTask;
+            }
+
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                return _inner.Read(buffer, offset, count);
+            }
+
+            public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+            {
+                return _inner.ReadAsync(buffer, cancellationToken);
+            }
+
+            public override long Seek(long offset, SeekOrigin origin)
+            {
+                throw new NotSupportedException();
+            }
+
+            public override void SetLength(long value)
+            {
+                throw new NotSupportedException();
+            }
+
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                throw new NotSupportedException();
+            }
+
+            public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+            {
+                throw new NotSupportedException();
+            }
+
+            public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+            {
+                throw new NotSupportedException();
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                if (disposing)
                 {
-                    if (Directory.Exists(_tempBlobDirectory))
-                    {
-                        Directory.Delete(_tempBlobDirectory, true);
-                    }
+                    _inner.Dispose();
                 }
-                catch
-                {
-                    Console.WriteLine("Warning: Failed to delete temporary blob files.");
-                }
+
+                base.Dispose(disposing);
             }
         }
     }
