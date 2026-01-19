@@ -12,12 +12,13 @@ namespace Px.Utils.BinaryData.ValueConverters
     /// Initializes a new instance of the <see cref="Int32Codec"/> class.
     /// </remarks>
     /// <param name="bufferBytes">The size of the internal write buffer in bytes. The minimum effective size is 4.</param>
-    public sealed class Int32Codec(int bufferBytes = 64 * 1024) : BinaryValueCodecBase(ElementSize, bufferBytes), IBinaryValueCodec
+    public sealed class Int32Codec(int bufferBytes = 64 * 1024) : BinaryValueCodecBase(ByteCount, bufferBytes), IBinaryValueCodec
     {
         /// <summary>
-        /// Gets the number of bytes per encoded value for this codec.
+        /// The number of bytes per encoded value for this codec.
         /// </summary>
-        public static int ByteCount => sizeof(int);
+        public const int ByteCount = sizeof(int);
+        static int IBinaryValueCodec.ByteCount => ByteCount;
 
         internal const int SentinelStart = int.MaxValue - 6;
         private const int Missing = SentinelStart;
@@ -27,8 +28,6 @@ namespace Px.Utils.BinaryData.ValueConverters
         private const int NotAsked = SentinelStart + 4;
         private const int Empty = SentinelStart + 5;
         private const int Nill = SentinelStart + 6; // int.MaxValue
-
-        private const int ElementSize = sizeof(int);
 
         /// <summary>
         /// Reads a single 32-bit little-endian encoded value into a <see cref="DoubleDataValue"/>.
@@ -67,10 +66,10 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <param name="output">Destination span for decoded values.</param>
         public void Read(ReadOnlySpan<byte> input, Span<DoubleDataValue> output)
         {
-            int count = Math.Min(input.Length / ElementSize, output.Length);
+            int count = Math.Min(input.Length / ByteCount, output.Length);
             for (int i = 0; i < count; i++)
             {
-                output[i] = ReadOne(input.Slice(i * ElementSize, ElementSize));
+                output[i] = ReadOne(input.Slice(i * ByteCount, ByteCount));
             }
         }
 
@@ -81,10 +80,10 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <param name="output">Destination span for decoded values.</param>
         public void Read(ReadOnlySpan<byte> input, Span<DecimalDataValue> output)
         {
-            int count = Math.Min(input.Length / ElementSize, output.Length);
+            int count = Math.Min(input.Length / ByteCount, output.Length);
             for (int i = 0; i < count; i++)
             {
-                output[i] = ReadOneAsDecimal(input.Slice(i * ElementSize, ElementSize));
+                output[i] = ReadOneAsDecimal(input.Slice(i * ByteCount, ByteCount));
             }
         }
 
@@ -111,7 +110,7 @@ namespace Px.Utils.BinaryData.ValueConverters
             {
                 iValue = MapTo(value.Type);
             }
-            BinaryPrimitives.WriteInt32LittleEndian(buffer.Slice(offset, ElementSize), iValue);
+            BinaryPrimitives.WriteInt32LittleEndian(buffer.Slice(offset, ByteCount), iValue);
         }
 
         /// <summary>

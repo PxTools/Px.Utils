@@ -6,12 +6,11 @@ namespace Px.Utils.BinaryData.ValueConverters
     /// <summary>
     /// Base class for binary value codecs with shared write logic.
     /// </summary>
-    /// <param name="elementSize">The size in bytes of each encoded element.</param>
+    /// <param name="byteCount">The size in bytes of each encoded element.</param>
     /// <param name="bufferBytes">The buffer size in bytes.</param>
-    public abstract class BinaryValueCodecBase(int elementSize, int bufferBytes)
+    public abstract class BinaryValueCodecBase(int byteCount, int bufferBytes)
     {
-        private readonly int _elementSize = elementSize;
-        private readonly int _bufferBytes = Math.Max(elementSize, bufferBytes);
+        private readonly int _bufferBytes = Math.Max(byteCount, bufferBytes);
         private const int MinElementsPerChunk = 1;
 
         /// <summary>
@@ -26,18 +25,18 @@ namespace Px.Utils.BinaryData.ValueConverters
             byte[] buffer = ArrayPool<byte>.Shared.Rent(_bufferBytes);
             try
             {
-                int maxElems = Math.Max(MinElementsPerChunk, buffer.Length / _elementSize);
+                int maxElems = Math.Max(MinElementsPerChunk, buffer.Length / byteCount);
                 int i = 0;
                 int count = input.Length;
                 while (i < count)
                 {
                     int elements = Math.Min(count - i, maxElems);
-                    int totalBytes = elements * _elementSize;
+                    int totalBytes = elements * byteCount;
                     Span<byte> span = buffer.AsSpan(0, totalBytes);
 
                     for (int j = 0; j < elements; j++)
                     {
-                        WriteEncodedValue(span, j * _elementSize, input[i + j]);
+                        WriteEncodedValue(span, j * byteCount, input[i + j]);
                     }
 
                     output.Write(buffer, 0, totalBytes);

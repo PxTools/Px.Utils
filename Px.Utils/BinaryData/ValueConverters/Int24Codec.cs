@@ -7,9 +7,13 @@ namespace Px.Utils.BinaryData.ValueConverters
     /// <summary>
     /// Codec for reading and writing 24-bit signed integer values with sentinel-based <see cref="DataValueType"/> mapping.
     /// </summary>
-    public sealed class Int24Codec(int bufferBytes = 64 * 1024) : BinaryValueCodecBase(ElementSize, bufferBytes), IBinaryValueCodec
+    public sealed class Int24Codec(int bufferBytes = 64 * 1024) : BinaryValueCodecBase(ByteCount, bufferBytes), IBinaryValueCodec
     {
-        public static int ByteCount => ElementSize;
+        /// <summary>
+        /// The number of bytes per encoded value for this codec.
+        /// </summary>
+        public const int ByteCount = 3;
+        static int IBinaryValueCodec.ByteCount => ByteCount;
 
         internal const int SentinelStart = 8388601; // 0x00800009 relative start in 24-bit signed range top
         private const int Missing = SentinelStart;
@@ -20,7 +24,6 @@ namespace Px.Utils.BinaryData.ValueConverters
         private const int Empty = SentinelStart + 5;
         private const int Nill = SentinelStart + 6; // 0x007FFFFF (signed top in 24-bit)
 
-        private const int ElementSize = 3;
         private const int SignBitMask24 = 0x00800000;
         private const int SignExtensionMask32 = unchecked((int)0xFF000000);
         private const int Shift8 = 8;
@@ -78,10 +81,10 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <param name="output">Destination span for decoded values.</param>
         public void Read(ReadOnlySpan<byte> input, Span<DoubleDataValue> output)
         {
-            int count = Math.Min(input.Length / ElementSize, output.Length);
+            int count = Math.Min(input.Length / ByteCount, output.Length);
             for (int i = 0; i < count; i++)
             {
-                output[i] = ReadOne(input.Slice(i * ElementSize, ElementSize));
+                output[i] = ReadOne(input.Slice(i * ByteCount, ByteCount));
             }
         }
 
@@ -92,10 +95,10 @@ namespace Px.Utils.BinaryData.ValueConverters
         /// <param name="output">Destination span for decoded values.</param>
         public void Read(ReadOnlySpan<byte> input, Span<DecimalDataValue> output)
         {
-            int count = Math.Min(input.Length / ElementSize, output.Length);
+            int count = Math.Min(input.Length / ByteCount, output.Length);
             for (int i = 0; i < count; i++)
             {
-                output[i] = ReadOneAsDecimal(input.Slice(i * ElementSize, ElementSize));
+                output[i] = ReadOneAsDecimal(input.Slice(i * ByteCount, ByteCount));
             }
         }
 

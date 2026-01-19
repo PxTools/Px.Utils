@@ -373,5 +373,70 @@ namespace Px.Utils.UnitTests.BinaryData
                 Assert.AreEqual(expectedValues[i], dst[pos].UnsafeValue);
             }
         }
+
+        [TestMethod]
+        public async Task ReadFromStreamSeekableRespectsHeaderLengthOnSeeksAndValues()
+        {
+            MatrixMap blobMap = BuildMap(["d0_0"], ["d1_0"], [.. Enumerable.Range(0, 16).Select(i => $"d2_{i}")]);
+            MatrixMap readMap = blobMap;
+            MatrixMap bufferMap = blobMap;
+
+            int total = 16;
+            DoubleDataValue[] sourceValues = MakeSequence(total);
+            byte[] payload = EncodeWithUInt32(sourceValues);
+
+            int headerLength = 12;
+            byte[] header = new byte[headerLength];
+            byte[] blob = new byte[header.Length + payload.Length];
+            Array.Copy(header, 0, blob, 0, header.Length);
+            Array.Copy(payload, 0, blob, header.Length, payload.Length);
+
+            DoubleDataValue[] dst = new DoubleDataValue[total];
+            Memory<DoubleDataValue> buffer = new(dst);
+
+            CountingSeekableStream stream = new(blob);
+            BinaryDataReader<UInt32Codec> reader = new(64, null, headerLength);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+            stream.CompleteCurrentWindow();
+
+            Assert.AreEqual(1, stream.SeekOffsets.Count);
+            Assert.AreEqual(headerLength, stream.SeekOffsets[0]);
+            for (int i = 0; i < total; i++)
+            {
+                Assert.AreEqual(DataValueType.Exists, dst[i].Type);
+                Assert.AreEqual((double)i, dst[i].UnsafeValue);
+            }
+        }
+
+        [TestMethod]
+        public async Task ReadFromStreamNonSeekableRespectsHeaderLengthSkipsAndValues()
+        {
+            MatrixMap blobMap = BuildMap(["d0_0"], ["d1_0"], [.. Enumerable.Range(0, 16).Select(i => $"d2_{i}")]);
+            MatrixMap readMap = blobMap;
+            MatrixMap bufferMap = blobMap;
+
+            int total = 16;
+            DoubleDataValue[] sourceValues = MakeSequence(total);
+            byte[] payload = EncodeWithUInt32(sourceValues);
+
+            int headerLength = 8;
+            byte[] header = new byte[headerLength];
+            byte[] blob = new byte[header.Length + payload.Length];
+            Array.Copy(header, 0, blob, 0, header.Length);
+            Array.Copy(payload, 0, blob, header.Length, payload.Length);
+
+            DoubleDataValue[] dst = new DoubleDataValue[total];
+            Memory<DoubleDataValue> buffer = new(dst);
+
+            using NonSeekableReadOnlyStream stream = new(blob);
+            BinaryDataReader<UInt32Codec> reader = new(64, null, headerLength);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
+
+            for (int i = 0; i < total; i++)
+            {
+                Assert.AreEqual(DataValueType.Exists, dst[i].Type);
+                Assert.AreEqual((double)i, dst[i].UnsafeValue);
+            }
+        }
     }
 }
