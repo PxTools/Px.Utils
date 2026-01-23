@@ -178,7 +178,7 @@ namespace Px.Utils.TestingApp.Commands
 
                 using FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
                 using PxFileStreamDataReader dataReader = new(fileStream);
-                dataReader.ReadDoubleDataValues(dataBuffer, 0, collapsedMap, _metadata);
+                await dataReader.ReadDoubleDataValuesAsync(dataBuffer, 0, collapsedMap, _metadata, ct);
 
                 BinaryValueCodecSelector selector = new();
                 selector.Process(dataBuffer);
@@ -354,7 +354,7 @@ namespace Px.Utils.TestingApp.Commands
                 CartesianProduct(splitDims.Select(dim =>
                     dim.Values.Select(val => (dim.Code, val.Code))));
 
-            foreach (var combination in combinations)
+            foreach (IEnumerable<(string DimCode, string ValueCode)> combination in combinations)
             {
                 splits.Add(new DimensionSplit([.. combination]));
             }

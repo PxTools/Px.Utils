@@ -161,7 +161,7 @@ namespace Px.Utils.TestingApp.Commands
             }
         }
 
-        private static IMatrixMap GenerateBenchmarkTargetMap(IMatrixMap complete, long targetSize)
+        internal static IMatrixMap GenerateBenchmarkTargetMap(IMatrixMap complete, long targetSize)
         {
             long size = complete.GetSize();
             if (size < targetSize) return complete;
