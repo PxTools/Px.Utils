@@ -1,8 +1,13 @@
 using Px.Utils.BinaryData;
 using Px.Utils.BinaryData.ValueConverters;
+using Px.Utils.Models.Data;
 using Px.Utils.Models.Data.DataValue;
 using Px.Utils.Models.Metadata;
+using Px.Utils.Models.Metadata.Dimensions;
 using Px.Utils.Models.Metadata.ExtensionMethods;
+using Px.Utils.ModelBuilders;
+using Px.Utils.PxFile.Metadata;
+using System.Text;
 
 namespace Px.Utils.TestingApp.Commands
 {
@@ -20,6 +25,7 @@ namespace Px.Utils.TestingApp.Commands
             "\t-w, -window: Maximum window size in bytes (default:1MB)." + Environment.NewLine +
             "\t-m, -merge: Maximum merge gap in bytes (default:64KB)." + Environment.NewLine +
             "\t-o, -output: Directory for .pxb files (default: temp directory)." + Environment.NewLine +
+            "\t-c, -cells: Approximate number of cells to read (default:1000000)." + Environment.NewLine +
             "\t-iter: Number of iterations to run (default:10).";
 
         internal override string Description => "Benchmarks BinaryDataReader performance with self-generated blob files.";
@@ -29,13 +35,17 @@ namespace Px.Utils.TestingApp.Commands
         private long _mergeCapBytes = 64 * 1024; // 64KB
         private string _outputDirectory = Path.GetTempPath();
         private bool _userSpecifiedOutput;
+        private long _numberOfCells = 1000000L;
 
         private static readonly string[] dimsFlags = ["-d", "-dims"];
         private static readonly string[] windowFlags = ["-w", "-window"];
         private static readonly string[] mergeFlags = ["-m", "-merge"];
         private static readonly string[] outputFlags = ["-o", "-output"];
+        private static readonly string[] cellFlags = ["-c", "-cells"];
 
         private readonly List<BinaryWriteBenchmark.BlobGenerationInfo> _blobFiles = [];
+        private IMatrixMap? _globalTargetMap;
+        private IReadOnlyMatrixMetadata? _metadata;
 
         internal BinaryReadBenchmark()
         {
@@ -56,6 +66,7 @@ namespace Px.Utils.TestingApp.Commands
             ParameterFlags.Add(windowFlags);
             ParameterFlags.Add(mergeFlags);
             ParameterFlags.Add(outputFlags);
+            ParameterFlags.Add(cellFlags);
         }
 
         protected override async Task OneTimeBenchmarkSetupAsync()
@@ -71,6 +82,15 @@ namespace Px.Utils.TestingApp.Commands
 
             try
             {
+                using FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
+                PxFileMetadataReader metadataReader = new();
+                Encoding encoding = metadataReader.GetEncoding(fileStream);
+                fileStream.Seek(0, SeekOrigin.Begin);
+
+                List<KeyValuePair<string, string>> entries = [.. metadataReader.ReadMetadata(fileStream, encoding)];
+                MatrixMetadataBuilder builder = new();
+                _metadata = builder.Build(entries);
+
                 Console.WriteLine("Generating test blob files...");
 
                 List<BinaryWriteBenchmark.BlobGenerationInfo> generatedBlobs =
@@ -87,6 +107,9 @@ namespace Px.Utils.TestingApp.Commands
                 {
                     Console.WriteLine($"  {blob.FileName}: {blob.CodecType}, {blob.FileSizeBytes:N0} bytes, {blob.ValueCount:N0} values");
                 }
+
+                _globalTargetMap = DataReadBenchmark.GenerateBenchmarkTargetMap(_metadata, _numberOfCells);
+                Console.WriteLine($"Global target map generated: {_globalTargetMap.GetSize()} cells to read across all blobs.");
             }
             catch (Exception ex)
             {
@@ -123,6 +146,12 @@ namespace Px.Utils.TestingApp.Commands
                 {
                     _outputDirectory = Parameters[key][0];
                     _userSpecifiedOutput = true;
+                }
+                else if (cellFlags.Contains(key) &&
+                    Parameters[key].Count > 0 &&
+                    !long.TryParse(Parameters[key][0], out _numberOfCells))
+                {
+                    throw new ArgumentException($"Invalid number of cells: {Parameters[key][0]}");
                 }
             }
         }
@@ -162,6 +191,13 @@ namespace Px.Utils.TestingApp.Commands
                 _outputDirectory = outputInput;
                 _userSpecifiedOutput = true;
             }
+
+            Console.WriteLine("Enter approximate number of cells to read (default: 1000000):");
+            string cellsInput = Console.ReadLine() ?? "";
+            if (!string.IsNullOrEmpty(cellsInput) && long.TryParse(cellsInput, out long cells))
+            {
+                _numberOfCells = cells;
+            }
         }
 
         private async Task RunChunkBasedReadAllBenchmarksAsync()
@@ -184,21 +220,37 @@ namespace Px.Utils.TestingApp.Commands
 
         private async Task RunChunkBasedReadLastBenchmarksAsync()
         {
+            if (_globalTargetMap == null)
+            {
+                throw new InvalidOperationException("Global target map not initialized.");
+            }
+
             await Task.WhenAll(_blobFiles.Select(async blobFile =>
             {
-                await ReadBlobWithCodecAsync(blobFile, b => GenerateReadLastMap(b), (readMap, blobMap, bufferMap, bufferMemory) =>
+                IMatrixMap blobMap = blobFile.MatrixMap;
+                IMatrixMap readMap = GenerateReadLastMap(blobFile);
+                
+                // Skip blobs with empty read maps (no values to read from this blob)
+                if (readMap.DimensionMaps.Count == 0 || readMap.GetSize() == 0)
                 {
-                    Func<long, long, CancellationToken, Task<Stream>> chunkProvider = (offset, length, ct) =>
-                    {
-                        FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
-                        stream.Seek(offset, SeekOrigin.Begin);
-                        return Task.FromResult<Stream>(stream);
-                    };
+                    return;
+                }
+                
+                IMatrixMap bufferMap = readMap;
+                int bufferSize = (int)readMap.GetSize();
+                DoubleDataValue[] buffer = new DoubleDataValue[bufferSize];
+                Memory<DoubleDataValue> bufferMemory = new(buffer);
 
-                    return CreateReaderAndReadByChunkAsync(blobFile.CodecType, chunkProvider, readMap, blobMap, bufferMap, bufferMemory);
-                });
+                Func<long, long, CancellationToken, Task<Stream>> chunkProvider = (offset, length, ct) =>
+                {
+                    FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
+                    stream.Seek(offset, SeekOrigin.Begin);
+                    return Task.FromResult<Stream>(stream);
+                };
+
+                await CreateReaderAndReadByChunkAsync(blobFile.CodecType, chunkProvider, readMap, blobMap, bufferMap, bufferMemory);
             }));
-        }
+            }
 
         private async Task RunChunkBasedReadSparseBenchmarksAsync()
         {
@@ -232,13 +284,29 @@ namespace Px.Utils.TestingApp.Commands
 
         private async Task RunSeekableStreamReadLastBenchmarksAsync()
         {
+            if (_globalTargetMap == null)
+            {
+                throw new InvalidOperationException("Global target map not initialized.");
+            }
+
             await Task.WhenAll(_blobFiles.Select(async blobFile =>
             {
-                await ReadBlobWithCodecAsync(blobFile, b => GenerateReadLastMap(b), async (readMap, blobMap, bufferMap, bufferMemory) =>
+                IMatrixMap blobMap = blobFile.MatrixMap;
+                IMatrixMap readMap = GenerateReadLastMap(blobFile);
+                
+                // Skip blobs with empty read maps (no values to read from this blob)
+                if (readMap.DimensionMaps.Count == 0 || readMap.GetSize() == 0)
                 {
-                    using FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
-                    await CreateReaderAndReadFromStreamAsync(blobFile.CodecType, stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
-                });
+                    return;
+                }
+                
+                IMatrixMap bufferMap = readMap;
+                int bufferSize = (int)readMap.GetSize();
+                DoubleDataValue[] buffer = new DoubleDataValue[bufferSize];
+                Memory<DoubleDataValue> bufferMemory = new(buffer);
+
+                using FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
+                await CreateReaderAndReadFromStreamAsync(blobFile.CodecType, stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
             }));
         }
 
@@ -267,12 +335,28 @@ namespace Px.Utils.TestingApp.Commands
 
         private async Task RunNonSeekableStreamReadLastBenchmarksAsync()
         {
+            if (_globalTargetMap == null)
+            {
+                throw new InvalidOperationException("Global target map not initialized.");
+            }
+
             await Task.WhenAll(_blobFiles.Select(async blobFile =>
             {
-                await ReadBlobWithCodecAsync(blobFile, b => GenerateReadLastMap(b), async (readMap, blobMap, bufferMap, bufferMemory) =>
+                IMatrixMap blobMap = blobFile.MatrixMap;
+                IMatrixMap readMap = GenerateReadLastMap(blobFile);
+                
+                // Skip blobs with empty read maps (no values to read from this blob)
+                if (readMap.DimensionMaps.Count == 0 || readMap.GetSize() == 0)
                 {
-                    await ReadNonSeekableAsync(blobFile.FullPath, blobFile.CodecType, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
-                });
+                    return;
+                }
+                
+                IMatrixMap bufferMap = readMap;
+                int bufferSize = (int)readMap.GetSize();
+                DoubleDataValue[] buffer = new DoubleDataValue[bufferSize];
+                Memory<DoubleDataValue> bufferMemory = new(buffer);
+
+                await ReadNonSeekableAsync(blobFile.FullPath, blobFile.CodecType, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
             }));
         }
 
@@ -296,36 +380,27 @@ namespace Px.Utils.TestingApp.Commands
         }
 
         /// <summary>
-        /// Generates a ReadLast matrix map - picks the last value from the last non-split dimension.
+        /// Generates a ReadLast matrix map for a specific blob by intersecting the global target map
+        /// with the blob's matrix map. This ensures all blobs read the same subset of the full matrix,
+        /// and that the returned map is a valid submap of the blob's map.
         /// </summary>
-        private static IMatrixMap GenerateReadLastMap(BinaryWriteBenchmark.BlobGenerationInfo blobFile)
+        private IMatrixMap GenerateReadLastMap(BinaryWriteBenchmark.BlobGenerationInfo blobFile)
         {
-            IMatrixMap blobMap = blobFile.MatrixMap;
-            List<string> splitDimCodes = [.. blobFile.Split.DimensionValues.Select(dv => dv.DimCode)];
-            List<IDimensionMap> nonSplitDims = [.. blobMap.DimensionMaps.Where(dm => !splitDimCodes.Contains(dm.Code))];
-
-            if (nonSplitDims.Count == 0)
+            if (_globalTargetMap == null)
             {
-                return blobMap;
+                throw new InvalidOperationException("Global target map not initialized.");
             }
 
-            // Pick the last dimension from non-split dimensions and create new dimension maps with only the last value from the last dimension
-            IDimensionMap lastDim = nonSplitDims[^1];
-            List<DimensionMap> newDimMaps = [];
-            foreach (IDimensionMap dimMap in blobMap.DimensionMaps)
+            // Use IntersectionMap to get common values between global target and blob map
+            IMatrixMap intersectedMap = _globalTargetMap.IntersectionMap(blobFile.MatrixMap);
+
+            // Check if any dimension has no common values (empty intersection)
+            if (intersectedMap.DimensionMaps.Any(dim => dim.ValueCodes.Count == 0))
             {
-                if (dimMap.Code == lastDim.Code)
-                {
-                    // Take only the last value
-                    newDimMaps.Add(new DimensionMap(dimMap.Code, [dimMap.ValueCodes[^1]]));
-                }
-                else
-                {
-                    newDimMaps.Add(new DimensionMap(dimMap));
-                }
+                return new MatrixMap([]);
             }
 
-            return new MatrixMap([.. newDimMaps]);
+            return intersectedMap;
         }
 
         /// <summary>
@@ -382,6 +457,13 @@ namespace Px.Utils.TestingApp.Commands
         {
             IMatrixMap blobMap = blobFile.MatrixMap;
             IMatrixMap readMap = mapGenerator(blobFile);
+            
+            // Skip blobs with empty read maps (no values to read from this blob)
+            if (readMap.DimensionMaps.Count == 0 || readMap.GetSize() == 0)
+            {
+                return;
+            }
+            
             IMatrixMap bufferMap = readMap;
             int bufferSize = (int)readMap.GetSize();
             DoubleDataValue[] buffer = new DoubleDataValue[bufferSize];

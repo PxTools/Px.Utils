@@ -732,6 +732,291 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
 
         #endregion
 
+        #region IntersectionMap
+
+        [TestMethod]
+        public void IntersectionMapWithIdenticalMapsReturnsIdenticalMap()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions = [
+                new DimensionMap("11", ["aa11", "bb11", "cc11"]),
+                new DimensionMap("22", ["aa22", "bb22"]),
+                new DimensionMap("33", ["aa33", "bb33", "cc33"])
+            ];
+
+            MatrixMap map1 = new(dimensions);
+            MatrixMap map2 = new(dimensions);
+
+            // Act
+            IMatrixMap result = map1.IntersectionMap(map2);
+
+            // Assert
+            Assert.IsTrue(result.IsIdenticalMapTo(map1));
+        }
+
+        [TestMethod]
+        public void IntersectionMapWithPartialOverlapReturnsCommonValues()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions1 = [
+                new DimensionMap("11", ["aa11", "bb11", "cc11"]),
+                new DimensionMap("22", ["aa22", "bb22", "cc22"]),
+                new DimensionMap("33", ["aa33", "bb33"])
+            ];
+
+            List<IDimensionMap> dimensions2 = [
+                new DimensionMap("11", ["bb11", "cc11", "dd11"]),
+                new DimensionMap("22", ["aa22", "cc22"]),
+                new DimensionMap("33", ["aa33", "bb33", "cc33"])
+            ];
+
+            MatrixMap map1 = new(dimensions1);
+            MatrixMap map2 = new(dimensions2);
+
+            // Act
+            IMatrixMap result = map1.IntersectionMap(map2);
+
+            // Assert
+            Assert.AreEqual(3, result.DimensionMaps.Count);
+            Assert.AreEqual(2, result.DimensionMaps[0].ValueCodes.Count); // bb11, cc11
+            Assert.AreEqual(2, result.DimensionMaps[1].ValueCodes.Count); // aa22, cc22
+            Assert.AreEqual(2, result.DimensionMaps[2].ValueCodes.Count); // aa33, bb33
+            CollectionAssert.AreEqual(new List<string> { "bb11", "cc11" }, result.DimensionMaps[0].ValueCodes.ToList());
+        }
+
+        [TestMethod]
+        public void IntersectionMapWithNoCommonValuesReturnsEmptyDimensions()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions1 = [
+                new DimensionMap("11", ["aa11", "bb11"]),
+                new DimensionMap("22", ["aa22", "bb22"])
+            ];
+
+            List<IDimensionMap> dimensions2 = [
+                new DimensionMap("11", ["cc11", "dd11"]),
+                new DimensionMap("22", ["cc22", "dd22"])
+            ];
+
+            MatrixMap map1 = new(dimensions1);
+            MatrixMap map2 = new(dimensions2);
+
+            // Act
+            IMatrixMap result = map1.IntersectionMap(map2);
+
+            // Assert
+            Assert.AreEqual(2, result.DimensionMaps.Count);
+            Assert.AreEqual(0, result.DimensionMaps[0].ValueCodes.Count);
+            Assert.AreEqual(0, result.DimensionMaps[1].ValueCodes.Count);
+        }
+
+        [TestMethod]
+        public void IntersectionMapPreservesOrderFromFirstMap()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions1 = [
+                new DimensionMap("11", ["aa11", "bb11", "cc11", "dd11"])
+            ];
+
+            List<IDimensionMap> dimensions2 = [
+                new DimensionMap("11", ["dd11", "bb11", "aa11"]) // Different order
+            ];
+
+            MatrixMap map1 = new(dimensions1);
+            MatrixMap map2 = new(dimensions2);
+
+            // Act
+            IMatrixMap result = map1.IntersectionMap(map2);
+
+            // Assert - Should preserve order from map1
+            CollectionAssert.AreEqual(new List<string> { "aa11", "bb11", "dd11" }, result.DimensionMaps[0].ValueCodes.ToList());
+        }
+
+        [TestMethod]
+        public void IntersectionMapWithDifferentDimensionCountThrows()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions1 = [
+                new DimensionMap("11", ["aa11", "bb11"]),
+                new DimensionMap("22", ["aa22", "bb22"])
+            ];
+
+            List<IDimensionMap> dimensions2 = [
+                new DimensionMap("11", ["aa11", "bb11"])
+            ];
+
+            MatrixMap map1 = new(dimensions1);
+            MatrixMap map2 = new(dimensions2);
+
+            // Act
+            Assert.ThrowsExactly<InvalidOperationException>(() => _ = map1.IntersectionMap(map2));
+        }
+
+        [TestMethod]
+        public void IntersectionMapWithDifferentDimensionCodesThrows()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions1 = [
+                new DimensionMap("11", ["aa11", "bb11"]),
+                new DimensionMap("22", ["aa22", "bb22"])
+            ];
+
+            List<IDimensionMap> dimensions2 = [
+                new DimensionMap("11", ["aa11", "bb11"]),
+                new DimensionMap("33", ["aa33", "bb33"]) // Different code
+            ];
+
+            MatrixMap map1 = new(dimensions1);
+            MatrixMap map2 = new(dimensions2);
+
+            // Act
+            Assert.ThrowsExactly<InvalidOperationException>(() => _ = map1.IntersectionMap(map2));
+        }
+
+        #endregion
+
+        #region UnionMap
+
+        [TestMethod]
+        public void UnionMapWithIdenticalMapsReturnsIdenticalMap()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions = [
+                new DimensionMap("11", ["aa11", "bb11", "cc11"]),
+                new DimensionMap("22", ["aa22", "bb22"]),
+                new DimensionMap("33", ["aa33", "bb33", "cc33"])
+            ];
+
+            MatrixMap map1 = new(dimensions);
+            MatrixMap map2 = new(dimensions);
+
+            // Act
+            IMatrixMap result = map1.UnionMap(map2);
+
+            // Assert
+            Assert.IsTrue(result.IsIdenticalMapTo(map1));
+        }
+
+        [TestMethod]
+        public void UnionMapWithPartialOverlapCombinesAllValues()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions1 = [
+                new DimensionMap("11", ["aa11", "bb11"]),
+                new DimensionMap("22", ["aa22", "bb22"])
+            ];
+
+            List<IDimensionMap> dimensions2 = [
+                new DimensionMap("11", ["bb11", "cc11"]),
+                new DimensionMap("22", ["cc22", "dd22"])
+            ];
+
+            MatrixMap map1 = new(dimensions1);
+            MatrixMap map2 = new(dimensions2);
+
+            // Act
+            IMatrixMap result = map1.UnionMap(map2);
+
+            // Assert
+            Assert.AreEqual(2, result.DimensionMaps.Count);
+            Assert.AreEqual(3, result.DimensionMaps[0].ValueCodes.Count); // aa11, bb11, cc11
+            Assert.AreEqual(4, result.DimensionMaps[1].ValueCodes.Count); // aa22, bb22, cc22, dd22
+            CollectionAssert.AreEqual(new List<string> { "aa11", "bb11", "cc11" }, result.DimensionMaps[0].ValueCodes.ToList());
+            CollectionAssert.AreEqual(new List<string> { "aa22", "bb22", "cc22", "dd22" }, result.DimensionMaps[1].ValueCodes.ToList());
+        }
+
+        [TestMethod]
+        public void UnionMapWithNoOverlapCombinesAllValues()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions1 = [
+                new DimensionMap("11", ["aa11", "bb11"]),
+                new DimensionMap("22", ["aa22"])
+            ];
+
+            List<IDimensionMap> dimensions2 = [
+                new DimensionMap("11", ["cc11", "dd11"]),
+                new DimensionMap("22", ["bb22", "cc22"])
+            ];
+
+            MatrixMap map1 = new(dimensions1);
+            MatrixMap map2 = new(dimensions2);
+
+            // Act
+            IMatrixMap result = map1.UnionMap(map2);
+
+            // Assert
+            Assert.AreEqual(2, result.DimensionMaps.Count);
+            Assert.AreEqual(4, result.DimensionMaps[0].ValueCodes.Count); // aa11, bb11, cc11, dd11
+            Assert.AreEqual(3, result.DimensionMaps[1].ValueCodes.Count); // aa22, bb22, cc22
+        }
+
+        [TestMethod]
+        public void UnionMapPreservesOrderWithFirstMapValuesFirst()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions1 = [
+                new DimensionMap("11", ["cc11", "aa11"])
+            ];
+
+            List<IDimensionMap> dimensions2 = [
+                new DimensionMap("11", ["bb11", "aa11", "dd11"]) // aa11 is common
+            ];
+
+            MatrixMap map1 = new(dimensions1);
+            MatrixMap map2 = new(dimensions2);
+
+            // Act
+            IMatrixMap result = map1.UnionMap(map2);
+
+            // Assert - Should have map1 values first, then new values from map2
+            CollectionAssert.AreEqual(new List<string> { "cc11", "aa11", "bb11", "dd11" }, result.DimensionMaps[0].ValueCodes.ToList());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void UnionMapWithDifferentDimensionCountThrows()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions1 = [
+                new DimensionMap("11", ["aa11", "bb11"]),
+                new DimensionMap("22", ["aa22", "bb22"])
+            ];
+
+            List<IDimensionMap> dimensions2 = [
+                new DimensionMap("11", ["aa11", "bb11"])
+            ];
+
+            MatrixMap map1 = new(dimensions1);
+            MatrixMap map2 = new(dimensions2);
+
+            // Act
+            _ = map1.UnionMap(map2);
+        }
+
+        [TestMethod]
+        public void UnionMapWithDifferentDimensionCodesThrows()
+        {
+            // Arrange
+            List<IDimensionMap> dimensions1 = [
+                new DimensionMap("11", ["aa11", "bb11"]),
+                new DimensionMap("22", ["aa22", "bb22"])
+            ];
+
+            List<IDimensionMap> dimensions2 = [
+                new DimensionMap("11", ["aa11", "bb11"]),
+                new DimensionMap("33", ["aa33", "bb33"]) // Different code
+            ];
+
+            MatrixMap map1 = new(dimensions1);
+            MatrixMap map2 = new(dimensions2);
+
+            // Act
+            Assert.ThrowsExactly<InvalidOperationException>(() => _ = map1.UnionMap(map2));
+        }
+
+        #endregion
+
         #region CollapseDimension
 
         [TestMethod]

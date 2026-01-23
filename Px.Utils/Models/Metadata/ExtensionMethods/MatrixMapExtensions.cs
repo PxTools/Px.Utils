@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Px.Utils.Models.Metadata.ExtensionMethods
 {
     public static class MatrixMapExtensions
@@ -84,6 +86,74 @@ namespace Px.Utils.Models.Metadata.ExtensionMethods
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Returns a union <see cref="IMatrixMap"/> of this map and other map that contains all values of each of them
+        /// </summary>
+        /// <remarks>Intended use of this extension method assumes that both maps are of the same base group.</remarks>
+        /// <exception cref="InvalidOperationException">Thrown if either map contains dimensions not included in the other map.</exception>
+        /// <returns>Combined union map with all values from both maps.</returns>
+        public static IMatrixMap UnionMap(this IMatrixMap thisMap, IMatrixMap other)
+        {
+            if (thisMap.DimensionMaps.Count != other.DimensionMaps.Count)
+            {
+                throw new InvalidOperationException("Maps must have the same number of dimensions.");
+            }
+
+            List<IDimensionMap> unionDimensions = [];
+
+            for (int i = 0; i < thisMap.DimensionMaps.Count; i++)
+            {
+                IDimensionMap thisDim = thisMap.DimensionMaps[i];
+                IDimensionMap otherDim = other.DimensionMaps[i];
+
+                if (thisDim.Code != otherDim.Code)
+                {
+                    throw new InvalidOperationException($"Dimension codes at position {i} do not match: '{thisDim.Code}' vs '{otherDim.Code}'.");
+                }
+
+                // Combine all values preserving order: first from thisMap, then new ones from other
+                List<string> allValues = [.. thisDim.ValueCodes];
+                allValues.AddRange(otherDim.ValueCodes.Where(valueCode => !allValues.Contains(valueCode)));
+                unionDimensions.Add(new DimensionMap(thisDim.Code, allValues));
+            }
+
+            return new MatrixMap(unionDimensions);
+        }
+
+        ///<summary>
+        /// Returns an intersection <see cref="IMatrixMap"/> of this map and other map that contains only the common values of each of them
+        /// </summary>
+        /// <remarks>Intended use of this extension method assumes that both maps are of the same base group.</remarks>
+        /// <exception cref="InvalidOperationException">Thrown if either map contains dimensions not included in the other map.</exception>
+        /// <returns>Combined intersection map with only the common values from both maps.</returns>
+        public static IMatrixMap IntersectionMap(this IMatrixMap thisMap, IMatrixMap other)
+        {
+            if (thisMap.DimensionMaps.Count != other.DimensionMaps.Count)
+            {
+                throw new InvalidOperationException("Maps must have the same number of dimensions.");
+            }
+
+            List<IDimensionMap> intersectedDimensions = [];
+
+            for (int i = 0; i < thisMap.DimensionMaps.Count; i++)
+            {
+                IDimensionMap thisDim = thisMap.DimensionMaps[i];
+                IDimensionMap otherDim = other.DimensionMaps[i];
+
+                if (thisDim.Code != otherDim.Code)
+                {
+                    throw new InvalidOperationException($"Dimension codes at position {i} do not match: '{thisDim.Code}' vs '{otherDim.Code}'.");
+                }
+
+                // Find common values preserving order from thisMap
+                List<string> commonValues = [];
+                commonValues.AddRange(thisDim.ValueCodes.Where(valueCode => otherDim.ValueCodes.Contains(valueCode)));
+                intersectedDimensions.Add(new DimensionMap(thisDim.Code, commonValues));
+            }
+
+            return new MatrixMap(intersectedDimensions);
         }
 
         /// <summary>
