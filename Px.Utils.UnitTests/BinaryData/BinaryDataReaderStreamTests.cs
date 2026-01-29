@@ -59,20 +59,20 @@ namespace Px.Utils.UnitTests.BinaryData
             DoubleDataValue[] dst = new DoubleDataValue[total];
             Memory<DoubleDataValue> buffer = new(dst);
 
-            CountingSeekableStream stream = new(blob);
+            using CountingSeekableStream stream = new(blob);
             BinaryDataReader<UInt32Codec> reader = new(16);
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
-            stream.CompleteCurrentWindow();
 
-            Assert.AreEqual(16, stream.SeekOffsets.Count);
+            // With a window size of 16 bytes and each UInt32 value being 4 bytes, we expect 4 values per window.
+            Assert.AreEqual(0, stream.SeekOffsets.Count, "No seek calls expected. Data is fully sequential.");
             for (int i = 0; i < stream.SeekOffsets.Count; i++)
             {
-                Assert.AreEqual(i * 16, stream.SeekOffsets[i]);
+                Assert.AreEqual(i * 16, stream.SeekOffsets[i], "Seek offset mismatch at index " + i);
             }
             for (int i = 0; i < total; i++)
             {
-                Assert.AreEqual(DataValueType.Exists, dst[i].Type);
-                Assert.AreEqual((double)i, dst[i].UnsafeValue);
+                Assert.AreEqual(DataValueType.Exists, dst[i].Type, "Data value type mismatch at index " + i);
+                Assert.AreEqual((double)i, dst[i].UnsafeValue, "Data value mismatch at index " + i);
             }
         }
 
@@ -90,10 +90,9 @@ namespace Px.Utils.UnitTests.BinaryData
             DoubleDataValue[] dst = new DoubleDataValue[total];
             Memory<DoubleDataValue> buffer = new(dst);
 
-            CountingSeekableStream stream = new(blob);
+            using CountingSeekableStream stream = new(blob);
             BinaryDataReader<UInt32Codec> reader = new(32);
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
-            stream.CompleteCurrentWindow();
 
             Assert.IsTrue(stream.SeekOffsets.Count >= 1);
             Assert.AreEqual(256, stream.SeekOffsets[0]);
@@ -120,13 +119,11 @@ namespace Px.Utils.UnitTests.BinaryData
             DoubleDataValue[] dst = new DoubleDataValue[total];
             Memory<DoubleDataValue> buffer = new(dst);
 
-            CountingSeekableStream stream = new(blob);
+            using CountingSeekableStream stream = new(blob);
             BinaryDataReader<UInt32Codec> reader = new(4096, 1024 * 1024);
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
-            stream.CompleteCurrentWindow();
 
-            Assert.AreEqual(1, stream.SeekOffsets.Count);
-            Assert.AreEqual(0, stream.SeekOffsets[0]);
+            Assert.AreEqual(0, stream.SeekOffsets.Count, "No seek calls expected.");
             for (int i = 0; i < total; i += 4)
             {
                 Assert.AreEqual(DataValueType.Exists, dst[i].Type);
@@ -137,8 +134,8 @@ namespace Px.Utils.UnitTests.BinaryData
         [TestMethod]
         public async Task ReadFromStreamSeekableMergeCapLowSplitsIntoManyWindows()
         {
-            MatrixMap blobMap = BuildMap(["d0_0"], ["d1_0"], Enumerable.Range(0, 64).Select(i => $"d2_{i}").ToArray());
-            MatrixMap readMap = BuildMap(["d0_0"], ["d1_0"], Enumerable.Range(0, 64).Where(i => i % 4 == 0).Select(i => $"d2_{i}").ToArray());
+            MatrixMap blobMap = BuildMap(["d0_0"], ["d1_0"], [.. Enumerable.Range(0, 64).Select(i => $"d2_{i}")]);
+            MatrixMap readMap = BuildMap(["d0_0"], ["d1_0"], [.. Enumerable.Range(0, 64).Where(i => i % 4 == 0).Select(i => $"d2_{i}")]);
             MatrixMap bufferMap = blobMap;
 
             int total = 64;
@@ -148,26 +145,29 @@ namespace Px.Utils.UnitTests.BinaryData
             DoubleDataValue[] dst = new DoubleDataValue[total];
             Memory<DoubleDataValue> buffer = new(dst);
 
-            CountingSeekableStream stream = new(blob);
+            using CountingSeekableStream stream = new(blob);
             BinaryDataReader<UInt32Codec> reader = new(4096, 8);
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
-            stream.CompleteCurrentWindow();
 
-            int expectedCalls = 64 / 4;
-            Assert.AreEqual(expectedCalls, stream.SeekOffsets.Count);
+            int expectedCalls = (64 / 4) - 1; // With relative seek, first window requires no seek; subsequent windows require relative gap seeks
+            Assert.AreEqual(expectedCalls, stream.SeekOffsets.Count, "Expected number of seek calls mismatch.");
+
+            // Each selected target is 4 values apart (16 bytes). Each window reads 1 value (4 bytes) due to low merge cap.
+            // Therefore the relative seek to the next window is 16 - 4 = 12 bytes for each transition.
             for (int i = 0; i < stream.SeekOffsets.Count; i++)
             {
-                Assert.AreEqual(i * 16, stream.SeekOffsets[i]);
+                Assert.AreEqual(12, stream.SeekOffsets[i], "Seek offset mismatch at index " + i);
             }
+
             for (int i = 0; i < total; i += 4)
             {
-                Assert.AreEqual(DataValueType.Exists, dst[i].Type);
-                Assert.AreEqual((double)i, dst[i].UnsafeValue);
+                Assert.AreEqual(DataValueType.Exists, dst[i].Type, "Data value type mismatch at index " + i);
+                Assert.AreEqual((double)i, dst[i].UnsafeValue, "Data value mismatch at index " + i);
             }
         }
 
         [TestMethod]
-        public async Task ReadFromStreamSeekableDifferentCodecUInt16WritesAllValues()
+        public async Task ReadFromStreamSeekableCodecUInt16WritesAllValues()
         {
             MatrixMap blobMap = BuildMap(["d0_0", "d0_1"], ["d1_0"], ["d2_0", "d2_1", "d2_2"]);
             MatrixMap readMap = blobMap;
@@ -179,17 +179,15 @@ namespace Px.Utils.UnitTests.BinaryData
             DoubleDataValue[] dst = new DoubleDataValue[6];
             Memory<DoubleDataValue> buffer = new(dst);
 
-            CountingSeekableStream stream = new(blob);
+            using CountingSeekableStream stream = new(blob);
             BinaryDataReader<UInt16Codec> reader = new();
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
-            stream.CompleteCurrentWindow();
 
-            Assert.AreEqual(1, stream.SeekOffsets.Count);
-            Assert.AreEqual(0, stream.SeekOffsets[0]);
+            Assert.AreEqual(0, stream.SeekOffsets.Count, "No seek calls expected.");
             for (int i = 0; i < 6; i++)
             {
-                Assert.AreEqual(DataValueType.Exists, dst[i].Type);
-                Assert.AreEqual((double)i, dst[i].UnsafeValue);
+                Assert.AreEqual(DataValueType.Exists, dst[i].Type, "Data value type mismatch at index " + i);
+                Assert.AreEqual((double)i, dst[i].UnsafeValue, "Data value mismatch at index " + i);
             }
         }
 
@@ -201,17 +199,17 @@ namespace Px.Utils.UnitTests.BinaryData
             MatrixMap blobMap = BuildMap(["d0_0"], ["d1_0", "d1_1", "d1_2"], ["d2_0", "d2_1", "d2_2", "d2_3", "d2_4"]);
             MatrixMap bufferMap = baseMap;
 
-            int blobTotal = 2 * 3 * 5;
+            int blobTotal = 1 * 3 * 5;
             DoubleDataValue[] sourceValues = MakeSequence(blobTotal);
             byte[] blob = EncodeWithUInt32(sourceValues);
 
-            DoubleDataValue[] dst = new DoubleDataValue[blobTotal];
+            int sourceTotal = 2 * 3 * 5;
+            DoubleDataValue[] dst = new DoubleDataValue[sourceTotal];
             Memory<DoubleDataValue> buffer = new(dst);
 
-            CountingSeekableStream stream = new(blob);
+            using CountingSeekableStream stream = new(blob);
             BinaryDataReader<UInt32Codec> reader = new();
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
-            stream.CompleteCurrentWindow();
 
             Assert.IsTrue(stream.SeekOffsets.Count >= 1);
             Assert.AreEqual(24, stream.SeekOffsets[0]);
@@ -235,7 +233,7 @@ namespace Px.Utils.UnitTests.BinaryData
             DoubleDataValue[] sourceValues = MakeSequence(4);
             byte[] blob = EncodeWithUInt32(sourceValues);
 
-            CountingSeekableStream stream = new(blob);
+            using CountingSeekableStream stream = new(blob);
             CancellationTokenSource cts = new();
             cts.Cancel();
 
@@ -257,7 +255,7 @@ namespace Px.Utils.UnitTests.BinaryData
             byte[] full = EncodeWithUInt32(sourceValues);
             byte[] truncated = full.Take(6).ToArray();
 
-            CountingSeekableStream stream = new(truncated);
+            using CountingSeekableStream stream = new(truncated);
             BinaryDataReader<UInt32Codec> reader = new();
             await Assert.ThrowsExactlyAsync<EndOfStreamException>(async () =>
             {
@@ -397,7 +395,6 @@ namespace Px.Utils.UnitTests.BinaryData
             CountingSeekableStream stream = new(blob);
             BinaryDataReader<UInt32Codec> reader = new(64, null, headerLength);
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
-            stream.CompleteCurrentWindow();
 
             Assert.AreEqual(1, stream.SeekOffsets.Count);
             Assert.AreEqual(headerLength, stream.SeekOffsets[0]);

@@ -85,5 +85,55 @@ namespace Px.Utils.Models.Metadata.ExtensionMethods
             }
             return true;
         }
+
+        /// <summary>
+        /// Computes index mappings from the <paramref name="subMap"/> to the current (super) map for each dimension.
+        /// </summary>
+        /// <param name="thisMap">The super map that contains all dimensions and values.</param>
+        /// <param name="subMap">The sub map whose value codes exist in the same order within the super map.</param>
+        /// <returns>
+        /// A jagged array where each element corresponds to a dimension; for each dimension it contains an array of
+        /// indices mapping the position of each value in <paramref name="subMap"/> to its index in the corresponding
+        /// dimension of <paramref name="thisMap"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the number of dimensions differs between <paramref name="subMap"/> and <paramref name="thisMap"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method assumes that <paramref name="subMap"/> is a valid submap of <paramref name="thisMap"/>,
+        /// meaning that for every dimension, the sequence of value codes in <paramref name="subMap"/> appears in the
+        /// same order within the corresponding dimension of <paramref name="thisMap"/>. If a value from
+        /// <paramref name="subMap"/> does not exist in <paramref name="thisMap"/>, the behavior is undefined.
+        /// Consider validating with <see cref="IsSubmapOf(IMatrixMap, IMatrixMap)"/> before calling.
+        /// </remarks>
+        public static int[][] GetIndicesOfSubmap(this IMatrixMap thisMap, IMatrixMap subMap)
+        {
+            if (subMap.DimensionMaps.Count != thisMap.DimensionMaps.Count)
+            {
+                throw new ArgumentException("Number of dimensions differ between source and target maps, index mapping can not be computed.");
+            }
+
+            int[][] result = new int[subMap.DimensionMaps.Count][];
+
+            for (int dimIndx = 0; dimIndx < subMap.DimensionMaps.Count; dimIndx++)
+            {
+                IReadOnlyList<string> subDimCodes = subMap.DimensionMaps[dimIndx].ValueCodes;
+                IReadOnlyList<string> superDimCodes = thisMap.DimensionMaps[dimIndx].ValueCodes;
+
+                int subValIndex = 0;
+                int[] valIndices = new int[subDimCodes.Count];
+                for (int superValIndex = 0; superValIndex < superDimCodes.Count; superValIndex++)
+                {
+                    if (subDimCodes[subValIndex] == superDimCodes[superValIndex])
+                    {
+                        valIndices[subValIndex] = superValIndex;
+                        subValIndex++;
+                        if (subValIndex >= subDimCodes.Count) break;
+                    }
+                }
+                result[dimIndx] = valIndices;
+            }
+            return result;
+        }
     }
 }

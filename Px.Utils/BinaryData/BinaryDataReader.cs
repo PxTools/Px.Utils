@@ -11,16 +11,8 @@ namespace Px.Utils.BinaryData
     /// Provides windowed I/O helpers for reading binary-encoded matrix data and decoding values using the given <typeparamref name="TCodec"/>.
     /// Supports both chunk-based providers and contiguous streams (seekable and non-seekable).
     /// </summary>
-    public class BinaryDataReader<TCodec> where TCodec : IBinaryValueCodec
+    public sealed class BinaryDataReader<TCodec> : BinaryDataReader where TCodec : IBinaryValueCodec
     {
-        /// <summary>
-        /// Asynchronous chunk provider that returns a readable <see cref="Stream"/> for the requested window of the blob.
-        /// </summary>
-        /// <param name="offset">Byte offset into the blob.</param>
-        /// <param name="length">Requested number of bytes.</param>
-        /// <param name="ct">Cancellation token.</param>
-        public delegate Task<Stream> AsyncChunkProvider(long offset, long length, CancellationToken ct);
-
         private const long DEFAULT_MAX_WINDOW_SIZE_BYTES = 1 * 1024 * 1024;
         private const long DEFAULT_MERGE_CAP_BYTES = 64 * 1024;
         private readonly long _maxWindowSizeBytes;
@@ -71,13 +63,13 @@ namespace Px.Utils.BinaryData
         /// <param name="bufferMap">The target shape and ordering for writing into the output buffer.</param>
         /// <param name="buffer">The flat buffer where decoded <see cref="DoubleDataValue"/>s are written following <paramref name="bufferMap"/> ordering.</param>
         /// <param name="ct">Cancellation token.</param>
-        public async Task ReadByChunkAsync(AsyncChunkProvider provider, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct)
+        public override async Task ReadByChunkAsync(AsyncChunkProvider provider, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct)
         {
             if (!readMap.IsSubmapOf(blobMap)) throw new ArgumentException("The blob does not contain the entire target set.");
             if (!readMap.IsSubmapOf(bufferMap)) throw new ArgumentException($"Can not write the entire target set into the provided {nameof(buffer)}.");
 
-            int[][] blobIndices = GetSubIndices(readMap, blobMap);
-            int[][] bufferIndices = GetSubIndices(readMap, bufferMap);
+            int[][] blobIndices = blobMap.GetIndicesOfSubmap(readMap);
+            int[][] bufferIndices = bufferMap.GetIndicesOfSubmap(readMap);
 
             int[] readDimSizes = [.. readMap.DimensionMaps.Select(d => d.ValueCodes.Count)];
 
@@ -160,7 +152,7 @@ namespace Px.Utils.BinaryData
         /// <param name="bufferMap">The target shape and ordering for writing into the output buffer.</param>
         /// <param name="buffer">The flat buffer where decoded <see cref="DoubleDataValue"/>s are written following <paramref name="bufferMap"/> ordering.</param>
         /// <param name="ct">Cancellation token.</param>
-        public async Task ReadFromStreamAsync(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct)
+        public override async Task ReadFromStreamAsync(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct)
         {
             if (!readMap.IsSubmapOf(blobMap)) throw new ArgumentException("The blob does not contain the entire target set.");
             if (!readMap.IsSubmapOf(bufferMap)) throw new ArgumentException($"Can not write the entire target set into the provided {nameof(buffer)}.");
@@ -185,9 +177,8 @@ namespace Px.Utils.BinaryData
             Memory<DoubleDataValue> buffer,
             CancellationToken ct)
         {
-            int[][] blobIndices = GetSubIndices(readMap, blobMap);
-            int[][] bufferIndices = GetSubIndices(readMap, bufferMap);
-
+            int[][] blobIndices = blobMap.GetIndicesOfSubmap(readMap);
+            int[][] bufferIndices = bufferMap.GetIndicesOfSubmap(readMap);
             int[] readDimSizes = [.. readMap.DimensionMaps.Select(d => d.ValueCodes.Count)];
             int[] blobRcsp = GetReverseCumulativeSizeProduct(blobMap);
             int[] bufferRcsp = GetReverseCumulativeSizeProduct(bufferMap);
@@ -243,7 +234,9 @@ namespace Px.Utils.BinaryData
 
                 int windowSizeBytes = checked((int)((endWindowLinearIndx - startWindowLinearIndx + 1) * bytesPerValue));
 
-                source.Seek(windowOffset, SeekOrigin.Begin);
+                // Seek relative to current position to avoid assumptions about initial stream position
+                long relativeOffset = windowOffset - source.Position;
+                if (relativeOffset != 0) source.Seek(relativeOffset, SeekOrigin.Current);
                 await source.ReadExactlyAsync(mem[..windowSizeBytes], ct);
 
                 ReadOnlySpan<byte> span = mem.Span[..windowSizeBytes];
@@ -278,8 +271,8 @@ namespace Px.Utils.BinaryData
             Memory<DoubleDataValue> buffer,
             CancellationToken ct)
         {
-            int[][] blobIndices = GetSubIndices(readMap, blobMap);
-            int[][] bufferIndices = GetSubIndices(readMap, bufferMap);
+            int[][] blobIndices = blobMap.GetIndicesOfSubmap(readMap);
+            int[][] bufferIndices = bufferMap.GetIndicesOfSubmap(readMap);
             int[] readDimSizes = [.. readMap.DimensionMaps.Select(d => d.ValueCodes.Count)];
             int[] blobRcsp = GetReverseCumulativeSizeProduct(blobMap);
             int[] bufferRcsp = GetReverseCumulativeSizeProduct(bufferMap);
@@ -381,39 +374,6 @@ namespace Px.Utils.BinaryData
                 owner.Dispose();
                 throw;
             }
-        }
-
-        /// <summary>
-        /// Builds an index mapping from a sub map to a super map for each dimension.
-        /// </summary>
-        private static int[][] GetSubIndices(IMatrixMap sub, IMatrixMap super)
-        {
-            if (sub.DimensionMaps.Count != super.DimensionMaps.Count)
-            {
-                throw new ArgumentException("Number of dimensions differ between source and target maps, index mapping can not be computed.");
-            }
-
-            int[][] result = new int[sub.DimensionMaps.Count][];
-
-            for (int dimIndx = 0; dimIndx < sub.DimensionMaps.Count; dimIndx++)
-            {
-                IReadOnlyList<string> subDimCodes = sub.DimensionMaps[dimIndx].ValueCodes;
-                IReadOnlyList<string> superDimCodes = super.DimensionMaps[dimIndx].ValueCodes;
-
-                int subValIndex = 0;
-                int[] valIndices = new int[subDimCodes.Count];
-                for (int superValIndex = 0; superValIndex < superDimCodes.Count; superValIndex++)
-                {
-                    if (subDimCodes[subValIndex] == superDimCodes[superValIndex])
-                    {
-                        valIndices[subValIndex] = superValIndex;
-                        subValIndex++;
-                        if (subValIndex >= subDimCodes.Count) break;
-                    }
-                }
-                result[dimIndx] = valIndices;
-            }
-            return result;
         }
 
         /// <summary>
