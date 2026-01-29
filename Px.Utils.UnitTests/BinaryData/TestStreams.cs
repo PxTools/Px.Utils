@@ -7,6 +7,11 @@ namespace Px.Utils.UnitTests.BinaryData
 
         public List<long> SeekOffsets { get; } = [];
 
+        public long SeekForSetup(long offset, SeekOrigin origin)
+        {
+            return _inner.Seek(offset, origin);
+        }
+
         public override bool CanRead => true;
         public override bool CanSeek => true;
         public override bool CanWrite => false;
