@@ -159,11 +159,38 @@ namespace Px.Utils.BinaryData
 
             if (source.CanSeek)
             {
-                await ReadFromSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, ct);
+                await ReadFromSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, null, ct);
                 return;
             }
 
-            await ReadFromNonSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, ct);
+            await ReadFromNonSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, null, ct);
+        }
+
+        /// <summary>
+        /// Reads values defined by <paramref name="readMap"/> directly from a contiguous <see cref="Stream"/> using windowed I/O
+        /// and writes them into <paramref name="buffer"/> at positions defined by <paramref name="bufferMap"/>. Decoding is
+        /// performed using the codec <typeparamref name="TCodec"/>.
+        /// Note: seekable streams are supported; non-seekable streams use sequential, aligned chunking.
+        /// </summary>
+        /// <param name="source">The source stream containing the blob data.</param>
+        /// <param name="readMap">The selection of values to read from the blob.</param>
+        /// <param name="blobMap">The full shape and ordering of values in the blob.</param>
+        /// <param name="bufferMap">The target shape and ordering for writing into the output buffer.</param>
+        /// <param name="buffer">The flat buffer where decoded <see cref="DoubleDataValue"/>s are written following <paramref name="bufferMap"/> ordering.</param>
+        /// <param name="streamDataStartLinearIndex">Optional stream data start index. Defaults to null (interpreted as stream at beginning of header).</param>
+        /// <param name="ct">Cancellation token.</param>
+        public async Task ReadFromStreamAsync(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, long? streamDataStartLinearIndex, CancellationToken ct)
+        {
+            if (!readMap.IsSubmapOf(blobMap)) throw new ArgumentException("The blob does not contain the entire target set.");
+            if (!readMap.IsSubmapOf(bufferMap)) throw new ArgumentException($"Can not write the entire target set into the provided {nameof(buffer)}.");
+
+            if (source.CanSeek)
+            {
+                await ReadFromSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, streamDataStartLinearIndex, ct);
+                return;
+            }
+
+            await ReadFromNonSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, streamDataStartLinearIndex, ct);
         }
 
         /// <summary>
@@ -175,6 +202,7 @@ namespace Px.Utils.BinaryData
             IMatrixMap blobMap,
             IMatrixMap bufferMap,
             Memory<DoubleDataValue> buffer,
+            long? streamDataStartLinearIndex,
             CancellationToken ct)
         {
             int[][] blobIndices = blobMap.GetIndicesOfSubmap(readMap);
@@ -185,6 +213,24 @@ namespace Px.Utils.BinaryData
 
             long readMapSize = readMap.GetSize();
             int bytesPerValue = TCodec.ByteCount;
+
+            long absoluteDataStartOffset;
+            if (!streamDataStartLinearIndex.HasValue)
+            {
+                // Stream is positioned at the beginning of the header.
+                absoluteDataStartOffset = checked(source.Position + _headerLengthBytes);
+            }
+            else
+            {
+                if (streamDataStartLinearIndex.Value < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(streamDataStartLinearIndex), "Value must be non-negative.");
+                }
+
+                // Provided 0 means the stream is positioned at data index 0 (header already skipped).
+                // Provided N means the stream is positioned at data index N.
+                absoluteDataStartOffset = checked(source.Position - (streamDataStartLinearIndex.Value * bytesPerValue));
+            }
 
             int desiredLen = (int)_maxWindowSizeBytes;
             int chunkSize = desiredLen - (desiredLen % bytesPerValue);
@@ -207,7 +253,7 @@ namespace Px.Utils.BinaryData
                 ct.ThrowIfCancellationRequested();
 
                 long startWindowLinearIndx = GetNthIndex(readIndex, blobIndices, blobRcsp);
-                long windowOffset = _headerLengthBytes + (startWindowLinearIndx * bytesPerValue);
+                long windowOffset = absoluteDataStartOffset + (startWindowLinearIndx * bytesPerValue);
 
                 int readTargetsInWindow = 1;
                 Array.Copy(readIndex, probeIndex, readIndex.Length);
@@ -234,7 +280,7 @@ namespace Px.Utils.BinaryData
 
                 int windowSizeBytes = checked((int)((endWindowLinearIndx - startWindowLinearIndx + 1) * bytesPerValue));
 
-                // Seek relative to current position to avoid assumptions about initial stream position
+                // Seek relative to current position. Anchoring uses the provided stream-data-start index or assumes header start.
                 long relativeOffset = windowOffset - source.Position;
                 if (relativeOffset != 0) source.Seek(relativeOffset, SeekOrigin.Current);
                 await source.ReadExactlyAsync(mem[..windowSizeBytes], ct);
@@ -269,6 +315,7 @@ namespace Px.Utils.BinaryData
             IMatrixMap blobMap,
             IMatrixMap bufferMap,
             Memory<DoubleDataValue> buffer,
+            long? streamDataStartLinearIndex,
             CancellationToken ct)
         {
             int[][] blobIndices = blobMap.GetIndicesOfSubmap(readMap);
@@ -289,24 +336,40 @@ namespace Px.Utils.BinaryData
             using IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent(chunkSize);
             Memory<byte> mem = owner.Memory[..chunkSize];
 
-            // Skip header bytes for non-seekable stream
-            if (_headerLengthBytes > 0)
+            long chunkBase;
+
+            if (!streamDataStartLinearIndex.HasValue)
             {
-                long remaining = _headerLengthBytes;
-                while (remaining > 0)
+                // Stream is positioned at the beginning of the header.
+                if (_headerLengthBytes > 0)
                 {
-                    ct.ThrowIfCancellationRequested();
-                    int toRead = (int)Math.Min(remaining, mem.Length);
-                    int read = await source.ReadAsync(mem[..toRead], ct);
-                    if (read == 0)
+                    long remaining = _headerLengthBytes;
+                    while (remaining > 0)
                     {
-                        throw new EndOfStreamException("Unexpected end of stream while skipping header.");
+                        ct.ThrowIfCancellationRequested();
+                        int toRead = (int)Math.Min(remaining, mem.Length);
+                        int read = await source.ReadAsync(mem[..toRead], ct);
+                        if (read == 0)
+                        {
+                            throw new EndOfStreamException("Unexpected end of stream while skipping header.");
+                        }
+                        remaining -= read;
                     }
-                    remaining -= read;
                 }
+
+                chunkBase = _headerLengthBytes;
+            }
+            else
+            {
+                if (streamDataStartLinearIndex.Value < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(streamDataStartLinearIndex), "Value must be non-negative.");
+                }
+
+                // Stream is positioned at data index N (header already skipped). No skipping is performed.
+                chunkBase = _headerLengthBytes + (streamDataStartLinearIndex.Value * bytesPerValue);
             }
 
-            long chunkBase = _headerLengthBytes;
             int readFromChunk = 0;
             int processed = 0;
 
