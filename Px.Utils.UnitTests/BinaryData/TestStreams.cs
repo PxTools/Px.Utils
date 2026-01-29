@@ -1,24 +1,11 @@
 namespace Px.Utils.UnitTests.BinaryData
 {
-    internal sealed class CountingSeekableStream : Stream
+    internal sealed class CountingSeekableStream(byte[] data) : Stream
     {
-        private readonly MemoryStream _inner;
+        private readonly MemoryStream _inner = new(data, writable: false);
         private int _currentWindowBytes;
 
-        public List<long> SeekOffsets { get; } = new();
-
-        public CountingSeekableStream(byte[] data)
-        {
-            _inner = new MemoryStream(data, writable: false);
-        }
-
-        public void CompleteCurrentWindow()
-        {
-            if (_currentWindowBytes > 0)
-            {
-                _currentWindowBytes = 0;
-            }
-        }
+        public List<long> SeekOffsets { get; } = [];
 
         public override bool CanRead => true;
         public override bool CanSeek => true;
@@ -41,10 +28,7 @@ namespace Px.Utils.UnitTests.BinaryData
             {
                 _currentWindowBytes = 0;
             }
-            if (origin == SeekOrigin.Begin)
-            {
-                SeekOffsets.Add(offset);
-            }
+            SeekOffsets.Add(offset);
             return _inner.Seek(offset, origin);
         }
 
@@ -59,14 +43,9 @@ namespace Px.Utils.UnitTests.BinaryData
         }
     }
 
-    internal sealed class NonSeekableReadOnlyStream : Stream
+    internal sealed class NonSeekableReadOnlyStream(byte[] data) : Stream
     {
-        private readonly MemoryStream _inner;
-
-        public NonSeekableReadOnlyStream(byte[] data)
-        {
-            _inner = new MemoryStream(data, writable: false);
-        }
+        private readonly MemoryStream _inner = new(data, writable: false);
 
         public override bool CanRead => true;
         public override bool CanSeek => false;
