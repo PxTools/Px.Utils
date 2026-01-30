@@ -17,6 +17,12 @@ namespace Px.Utils.BinaryData
 
 
         /// <summary>
+        /// Gets the byte count of a single encoded data value for this reader.
+        /// </summary>
+        public abstract int ByteCount { get; }
+
+
+        /// <summary>
         /// Creates a <see cref="BinaryDataReader"/> instance specialized for the specified <paramref name="codecType"/>.
         /// </summary>
         /// <param name="codecType">The value codec that defines how binary values are decoded.</param>
@@ -47,5 +53,6 @@ namespace Px.Utils.BinaryData
 
         public abstract Task ReadByChunkAsync(AsyncChunkProvider provider, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct);
         public abstract Task ReadFromStreamAsync(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct);
+        public abstract Task ReadFromStreamAsync(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, long? streamDataPositionIndex, CancellationToken ct);
     }
 }

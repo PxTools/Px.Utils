@@ -462,7 +462,7 @@ namespace Px.Utils.UnitTests.BinaryData
             stream.SeekForSetup(prefixLength, SeekOrigin.Begin);
 
             BinaryDataReader<UInt32Codec> reader = new(64, null, headerLength);
-            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataStartLinearIndex: null, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex: null, CancellationToken.None);
 
             Assert.AreEqual(1, stream.SeekOffsets.Count);
             Assert.AreEqual(headerLength, stream.SeekOffsets[0]);
@@ -498,7 +498,7 @@ namespace Px.Utils.UnitTests.BinaryData
             stream.SeekForSetup(headerLength, SeekOrigin.Begin);
 
             BinaryDataReader<UInt32Codec> reader = new(64, null, headerLength);
-            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataStartLinearIndex: 0, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex: 0, CancellationToken.None);
 
             Assert.AreEqual(0, stream.SeekOffsets.Count, "Expected no seeks when stream is already at data start index 0.");
             for (int i = 0; i < total; i++)
@@ -533,7 +533,7 @@ namespace Px.Utils.UnitTests.BinaryData
             using NonSeekableReadOnlyStream stream = new(streamBytes);
 
             BinaryDataReader<UInt32Codec> reader = new(64, null, headerLength);
-            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataStartLinearIndex: 0, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex: 0, CancellationToken.None);
 
             for (int i = 0; i < total; i++)
             {
@@ -569,7 +569,7 @@ namespace Px.Utils.UnitTests.BinaryData
             stream.SeekForSetup(dataOffsetBytes, SeekOrigin.Begin);
 
             BinaryDataReader<UInt32Codec> reader = new(128, null, headerLength);
-            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataStartLinearIndex: dataIndex, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex: dataIndex, CancellationToken.None);
 
             Assert.AreEqual(0, stream.SeekOffsets.Count, "Expected no seeks when the stream is already positioned at the first requested item.");
 
@@ -608,7 +608,7 @@ namespace Px.Utils.UnitTests.BinaryData
             using NonSeekableReadOnlyStream stream = new(streamBytes);
 
             BinaryDataReader<UInt32Codec> reader = new(128, null, headerLength);
-            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataStartLinearIndex: dataIndex, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex: dataIndex, CancellationToken.None);
 
             for (int i = 8; i <= 10; i++)
             {
@@ -631,7 +631,7 @@ namespace Px.Utils.UnitTests.BinaryData
 
             await Assert.ThrowsExactlyAsync<ArgumentOutOfRangeException>(async () =>
             {
-                await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[1]), streamDataStartLinearIndex: -1, CancellationToken.None);
+                await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, new Memory<DoubleDataValue>(new DoubleDataValue[1]), streamDataPositionIndex: -1, CancellationToken.None);
             });
         }
 
@@ -662,7 +662,7 @@ namespace Px.Utils.UnitTests.BinaryData
             stream.SeekForSetup(streamOffsetBytes, SeekOrigin.Begin);
 
             BinaryDataReader<UInt32Codec> reader = new(128, null, headerLength);
-            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataStartLinearIndex: streamAtDataIndex, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex: streamAtDataIndex, CancellationToken.None);
 
             // First requested index is 12, so we must seek forward 4 values = 16 bytes.
             Assert.AreEqual(1, stream.SeekOffsets.Count);
@@ -699,7 +699,7 @@ namespace Px.Utils.UnitTests.BinaryData
             using NonSeekableReadOnlyStream stream = new(streamBytes);
 
             BinaryDataReader<UInt32Codec> reader = new(128, null, headerLength);
-            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataStartLinearIndex: streamAtDataIndex, CancellationToken.None);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex: streamAtDataIndex, CancellationToken.None);
 
             for (int i = 12; i <= 13; i++)
             {

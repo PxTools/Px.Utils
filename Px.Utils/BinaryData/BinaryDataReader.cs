@@ -19,6 +19,9 @@ namespace Px.Utils.BinaryData
         private readonly long _mergeCapBytes;
         private readonly long _headerLengthBytes;
 
+        /// <inheritdoc />
+        public override int ByteCount => TCodec.ByteCount;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryDataReader{TCodec}"/> class.
         /// </summary>
@@ -177,20 +180,20 @@ namespace Px.Utils.BinaryData
         /// <param name="blobMap">The full shape and ordering of values in the blob.</param>
         /// <param name="bufferMap">The target shape and ordering for writing into the output buffer.</param>
         /// <param name="buffer">The flat buffer where decoded <see cref="DoubleDataValue"/>s are written following <paramref name="bufferMap"/> ordering.</param>
-        /// <param name="streamDataStartLinearIndex">Optional stream data start index. Defaults to null (interpreted as stream at beginning of header).</param>
+        /// <param name="streamDataPositionIndex">Optional stream data start index. Defaults to null (interpreted as stream at beginning of header).</param>
         /// <param name="ct">Cancellation token.</param>
-        public async Task ReadFromStreamAsync(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, long? streamDataStartLinearIndex, CancellationToken ct)
+        public override async Task ReadFromStreamAsync(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, long? streamDataPositionIndex, CancellationToken ct)
         {
             if (!readMap.IsSubmapOf(blobMap)) throw new ArgumentException("The blob does not contain the entire target set.");
             if (!readMap.IsSubmapOf(bufferMap)) throw new ArgumentException($"Can not write the entire target set into the provided {nameof(buffer)}.");
 
             if (source.CanSeek)
             {
-                await ReadFromSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, streamDataStartLinearIndex, ct);
+                await ReadFromSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex, ct);
                 return;
             }
 
-            await ReadFromNonSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, streamDataStartLinearIndex, ct);
+            await ReadFromNonSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex, ct);
         }
 
         /// <summary>
