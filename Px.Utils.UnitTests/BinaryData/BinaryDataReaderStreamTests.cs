@@ -707,5 +707,34 @@ namespace Px.Utils.UnitTests.BinaryData
                 Assert.AreEqual((double)i, dst[i].UnsafeValue);
             }
         }
+
+        [TestMethod]
+        public async Task ReadFromStreamNonSeekableWithStreamAtDataIndexNAndFirstTargetBeforeNThrowsArgumentOutOfRange()
+        {
+            MatrixMap blobMap = BuildMap(["d0_0"], ["d1_0"], [.. Enumerable.Range(0, 16).Select(i => $"d2_{i}")]);
+            MatrixMap readMap = BuildMap(["d0_0"], ["d1_0"], ["d2_2", "d2_3"]);
+            MatrixMap bufferMap = blobMap;
+
+            const int total = 16;
+            DoubleDataValue[] sourceValues = MakeSequence(total);
+            byte[] payload = EncodeWithUInt32(sourceValues);
+
+            const int streamAtDataIndex = 8;
+            int payloadOffsetBytes = streamAtDataIndex * UInt32Codec.ByteCount;
+            byte[] streamBytes = payload[payloadOffsetBytes..];
+
+            DoubleDataValue[] dst = new DoubleDataValue[total];
+            Memory<DoubleDataValue> buffer = new(dst);
+
+            using NonSeekableReadOnlyStream stream = new(streamBytes);
+
+            const int headerLength = 0;
+            BinaryDataReader<UInt32Codec> reader = new(128, null, headerLength);
+
+            await Assert.ThrowsExactlyAsync<ArgumentOutOfRangeException>(async () =>
+            {
+                await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex: streamAtDataIndex, CancellationToken.None);
+            });
+        }
     }
 }
