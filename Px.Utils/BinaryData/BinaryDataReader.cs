@@ -186,6 +186,10 @@ namespace Px.Utils.BinaryData
         {
             if (!readMap.IsSubmapOf(blobMap)) throw new ArgumentException("The blob does not contain the entire target set.");
             if (!readMap.IsSubmapOf(bufferMap)) throw new ArgumentException($"Can not write the entire target set into the provided {nameof(buffer)}.");
+            if (streamDataPositionIndex.HasValue && streamDataPositionIndex.Value < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(streamDataPositionIndex), "Value must be non-negative.");
+            }
 
             if (source.CanSeek)
             {
@@ -225,11 +229,6 @@ namespace Px.Utils.BinaryData
             }
             else
             {
-                if (streamDataStartLinearIndex.Value < 0)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(streamDataStartLinearIndex), "Value must be non-negative.");
-                }
-
                 // Provided 0 means the stream is positioned at data index 0 (header already skipped).
                 // Provided N means the stream is positioned at data index N.
                 absoluteDataStartOffset = checked(source.Position - (streamDataStartLinearIndex.Value * bytesPerValue));
@@ -341,6 +340,21 @@ namespace Px.Utils.BinaryData
 
             long chunkBase;
 
+            int readFromChunk = 0;
+            int processed = 0;
+
+            int[] readIndex = new int[readMap.DimensionMaps.Count];
+            long firstTargetLinearIndex = GetNthIndex(readIndex, blobIndices, blobRcsp);
+
+            if (streamDataStartLinearIndex.HasValue && firstTargetLinearIndex < streamDataStartLinearIndex.Value)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(streamDataStartLinearIndex),
+                    $"The first target linear index ({firstTargetLinearIndex}) is smaller than the provided stream data start linear index ({streamDataStartLinearIndex.Value}).");
+            }
+
+            long nextReadLinearByteIndex = (firstTargetLinearIndex * bytesPerValue) + _headerLengthBytes;
+
             if (!streamDataStartLinearIndex.HasValue)
             {
                 // Stream is positioned at the beginning of the header.
@@ -364,20 +378,9 @@ namespace Px.Utils.BinaryData
             }
             else
             {
-                if (streamDataStartLinearIndex.Value < 0)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(streamDataStartLinearIndex), "Value must be non-negative.");
-                }
-
-                // Stream is positioned at data index N (header already skipped). No skipping is performed.
+                // Stream is positioned at data index N (header already skipped).
                 chunkBase = _headerLengthBytes + (streamDataStartLinearIndex.Value * bytesPerValue);
             }
-
-            int readFromChunk = 0;
-            int processed = 0;
-
-            int[] readIndex = new int[readMap.DimensionMaps.Count];
-            long nextReadLinearByteIndex = (GetNthIndex(readIndex, blobIndices, blobRcsp) * bytesPerValue) + _headerLengthBytes;
 
             while (processed < readMapSize)
             {

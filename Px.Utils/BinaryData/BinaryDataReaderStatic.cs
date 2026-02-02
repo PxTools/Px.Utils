@@ -5,6 +5,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Px.Utils.BinaryData
 {
+    /// <summary>
+    /// Base class for reading binary-encoded matrix data and decoding it into <see cref="DoubleDataValue"/> values.
+    /// </summary>
     public abstract class BinaryDataReader
     {
         /// <summary>
@@ -51,8 +54,45 @@ namespace Px.Utils.BinaryData
             };
         }
 
+        /// <summary>
+        /// Reads values defined by <paramref name="readMap"/> from a chunked blob and writes them into <paramref name="buffer"/>.
+        /// </summary>
+        /// <param name="provider">Chunk provider that returns a readable stream for the requested window.</param>
+        /// <param name="readMap">The selection of values to read from the blob.</param>
+        /// <param name="blobMap">The full shape and ordering of values in the blob.</param>
+        /// <param name="bufferMap">The target shape and ordering for writing into the output buffer.</param>
+        /// <param name="buffer">Destination buffer for decoded values.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>A task representing the asynchronous read operation.</returns>
         public abstract Task ReadByChunkAsync(AsyncChunkProvider provider, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct);
+
+        /// <summary>
+        /// Reads values defined by <paramref name="readMap"/> directly from a contiguous <see cref="Stream"/> and writes them into <paramref name="buffer"/>.
+        /// </summary>
+        /// <param name="source">Source stream containing the blob data.</param>
+        /// <param name="readMap">The selection of values to read from the blob.</param>
+        /// <param name="blobMap">The full shape and ordering of values in the blob.</param>
+        /// <param name="bufferMap">The target shape and ordering for writing into the output buffer.</param>
+        /// <param name="buffer">Destination buffer for decoded values.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>A task representing the asynchronous read operation.</returns>
         public abstract Task ReadFromStreamAsync(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct);
+
+        /// <summary>
+        /// Reads values defined by <paramref name="readMap"/> directly from a contiguous <see cref="Stream"/> and writes them into <paramref name="buffer"/>,
+        /// using <paramref name="streamDataPositionIndex"/> to indicate the current position of <paramref name="source"/> within the data region.
+        /// </summary>
+        /// <param name="source">Source stream containing the blob data.</param>
+        /// <param name="readMap">The selection of values to read from the blob.</param>
+        /// <param name="blobMap">The full shape and ordering of values in the blob.</param>
+        /// <param name="bufferMap">The target shape and ordering for writing into the output buffer.</param>
+        /// <param name="buffer">Destination buffer for decoded values.</param>
+        /// <param name="streamDataPositionIndex">
+        /// Optional start index in the data region indicating the current position of the stream.
+        /// A value of 0 means the stream is positioned at the first data value (header already skipped).
+        /// </param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>A task representing the asynchronous read operation.</returns>
         public abstract Task ReadFromStreamAsync(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, long? streamDataPositionIndex, CancellationToken ct);
     }
 }
