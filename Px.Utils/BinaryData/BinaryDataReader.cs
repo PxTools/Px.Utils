@@ -282,7 +282,7 @@ namespace Px.Utils.BinaryData
 
                 int windowSizeBytes = checked((int)((endWindowLinearIndx - startWindowLinearIndx + 1) * bytesPerValue));
 
-                // Seek relative to current position. Anchoring uses the provided stream-data-start index or assumes header start.
+                // Seek relative to current position.
                 long relativeOffset = windowOffset - source.Position;
                 if (relativeOffset != 0) source.Seek(relativeOffset, SeekOrigin.Current);
                 await source.ReadExactlyAsync(mem[..windowSizeBytes], ct);

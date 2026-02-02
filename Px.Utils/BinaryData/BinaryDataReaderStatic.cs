@@ -24,6 +24,7 @@ namespace Px.Utils.BinaryData
         /// <param name="offset">Byte offset into the blob.</param>
         /// <param name="length">Requested number of bytes.</param>
         /// <param name="ct">Cancellation token.</param>
+        /// <returns>A task that returns a readable <see cref="Stream"/> containing the requested window.</returns>
         public delegate Task<Stream> AsyncChunkProvider(long offset, long length, CancellationToken ct);
 
 

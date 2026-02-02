@@ -199,6 +199,9 @@ namespace Px.Utils.UnitTests.BinaryData
             MatrixMap blobMap = BuildMap(["d0_0"], ["d1_0", "d1_1", "d1_2"], ["d2_0", "d2_1", "d2_2", "d2_3", "d2_4"]);
             MatrixMap bufferMap = baseMap;
 
+            // Both source and buffer are subsets of the complete data.
+            // In this test case we use base map also as bubber map since identical map is also a valid submap.
+
             int blobTotal = 1 * 3 * 5;
             DoubleDataValue[] sourceValues = MakeSequence(blobTotal);
             byte[] blob = EncodeWithUInt32(sourceValues);
