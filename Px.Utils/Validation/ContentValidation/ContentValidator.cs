@@ -1,4 +1,4 @@
-﻿using Px.Utils.PxFile;
+using Px.Utils.PxFile;
 using Px.Utils.Validation.SyntaxValidation;
 using System.Text;
 
@@ -114,7 +114,8 @@ namespace Px.Utils.Validation.ContentValidation
             }
             return _dimensionValueNames
                 .Where(kvp => dimensionNames
-                .Contains(kvp.Key.Value)).Select(kvp => kvp.Value.Length)
+                .Contains(kvp.Key.Value) && kvp.Key.Key == lang)
+                .Select(kvp => kvp.Value.Length)
                 .Aggregate((a, b) => a * b);
         }
 

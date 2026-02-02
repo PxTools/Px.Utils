@@ -1,4 +1,4 @@
-﻿using Px.Utils.Validation.SyntaxValidation;
+using Px.Utils.Validation.SyntaxValidation;
 
 namespace Px.Utils.UnitTests.Validation.Fixtures
 {
@@ -518,6 +518,92 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_DIMENSIONVALUES =>
             [
                 valuesBarEntry,
+            ];
+
+        internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_SHARED_DIMENSION_NAMES_ACROSS_LANGUAGES =>
+            [
+                languagesEntry,
+                languageEntry,
+                new ValidationStructuredEntry(
+                    filename,
+                    new ValidationStructuredEntryKey("STUB"),
+                    "\"shared\", \"not-shared\"",
+                    1,
+                    [],
+                    1,
+                    Utils.Validation.ValueType.ListOfStrings),
+                new ValidationStructuredEntry(
+                    filename,
+                    new ValidationStructuredEntryKey("STUB", "en"),
+                    "\"shared\", \"not-shared-en\"",
+                    2,
+                    [],
+                    1,
+                    Utils.Validation.ValueType.ListOfStrings),
+                new ValidationStructuredEntry(
+                    filename,
+                    new ValidationStructuredEntryKey("HEADING"),
+                    "\"time\"",
+                    3,
+                    [],
+                    1,
+                    Utils.Validation.ValueType.ListOfStrings),
+                new ValidationStructuredEntry(
+                    filename,
+                    new ValidationStructuredEntryKey("HEADING", "en"),
+                    "\"time\"",
+                    4,
+                    [],
+                    1,
+                    Utils.Validation.ValueType.ListOfStrings),
+                new ValidationStructuredEntry(
+                    filename,
+                    new ValidationStructuredEntryKey("VALUES", null, "shared"),
+                    "a,b",
+                    5,
+                    [],
+                    1,
+                    Utils.Validation.ValueType.ListOfStrings),
+                new ValidationStructuredEntry(
+                    filename,
+                    new ValidationStructuredEntryKey("VALUES", "en", "shared"),
+                    "a-en,b-en",
+                    6,
+                    [],
+                    1,
+                    Utils.Validation.ValueType.ListOfStrings),
+                new ValidationStructuredEntry(
+                    filename,
+                    new ValidationStructuredEntryKey("VALUES", null, "not-shared"),
+                    "c,d",
+                    5,
+                    [],
+                    1,
+                    Utils.Validation.ValueType.ListOfStrings),
+                new ValidationStructuredEntry(
+                    filename,
+                    new ValidationStructuredEntryKey("VALUES", "en", "not-shared-en"),
+                    "c-en,d-en",
+                    6,
+                    [],
+                    1,
+                    Utils.Validation.ValueType.ListOfStrings),
+                new ValidationStructuredEntry(
+                    filename,
+                    new ValidationStructuredEntryKey("VALUES", null, "time"),
+                    "2000,2001,2002",
+                    7,
+                    [],
+                    1,
+                    Utils.Validation.ValueType.ListOfStrings),
+                new ValidationStructuredEntry(
+                    filename,
+                    new ValidationStructuredEntryKey("VALUES", "en", "time-en"),
+                    "2000,2001,2002",
+                    8,
+                    [],
+                    1,
+                    Utils.Validation.ValueType.ListOfStrings),
             ];
 
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_DUPLICATE_DIMENSION_VALUES =>
