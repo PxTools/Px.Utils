@@ -10,6 +10,14 @@ namespace Px.Utils.BinaryData
     /// </summary>
     public abstract class BinaryDataReader
     {
+        private const long MaxWindowSizeBytesMinValue = 1;
+        private const long MergeCapBytesMinValue = 1;
+        private const long HeaderLengthBytesMinValue = 0;
+
+        private const long MaxWindowSizeBytesMaxValue = long.MaxValue;
+        private const long MergeCapBytesMaxValue = long.MaxValue;
+        private const long HeaderLengthBytesMaxValue = long.MaxValue;
+
         /// <summary>
         /// Asynchronous chunk provider that returns a readable <see cref="Stream"/> for the requested window of the blob.
         /// </summary>
@@ -33,13 +41,32 @@ namespace Px.Utils.BinaryData
         /// <param name="mergeCapBytes">Optional maximum merge size in bytes for adjacent chunks; must be greater than or equal to 1 if specified.</param>
         /// <param name="headerLengthBytes">Optional header length in bytes to skip before the data region; must be greater than or equal to 0 if specified.</param>
         /// <returns>A <see cref="BinaryDataReader"/> specialized for the provided codec type.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="maxWindowSizeBytes"/>, <paramref name="mergeCapBytes"/>, or <paramref name="headerLengthBytes"/>
+        /// are outside of their allowed ranges.
+        /// </exception>
         /// <exception cref="NotSupportedException">Thrown when the specified <paramref name="codecType"/> is not supported.</exception>
         public static BinaryDataReader Create(
             BinaryValueCodecType codecType,
-            [Range(1, long.MaxValue)] long? maxWindowSizeBytes = null,
-            [Range(1, long.MaxValue)] long? mergeCapBytes = null,
-            [Range(0, long.MaxValue)] long? headerLengthBytes = null)
+            [Range(MaxWindowSizeBytesMinValue, MaxWindowSizeBytesMaxValue)] long? maxWindowSizeBytes = null,
+            [Range(MergeCapBytesMinValue, MergeCapBytesMaxValue)] long? mergeCapBytes = null,
+            [Range(HeaderLengthBytesMinValue, HeaderLengthBytesMaxValue)] long? headerLengthBytes = null)
         {
+            if (maxWindowSizeBytes is < MaxWindowSizeBytesMinValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maxWindowSizeBytes), maxWindowSizeBytes, $"Value must be greater than or equal to {MaxWindowSizeBytesMinValue}.");
+            }
+
+            if (mergeCapBytes is < MergeCapBytesMinValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(mergeCapBytes), mergeCapBytes, $"Value must be greater than or equal to {MergeCapBytesMinValue}.");
+            }
+
+            if (headerLengthBytes is < HeaderLengthBytesMinValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(headerLengthBytes), headerLengthBytes, $"Value must be greater than or equal to {HeaderLengthBytesMinValue}.");
+            }
+
             return codecType switch
             {
                 BinaryValueCodecType.UInt16Codec => new BinaryDataReader<UInt16Codec>(maxWindowSizeBytes, mergeCapBytes, headerLengthBytes),
