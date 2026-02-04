@@ -42,6 +42,87 @@ namespace Px.Utils.TestingApp.Commands
             ParameterFlags.Add(outputFlags);
         }
 
+        internal sealed record DimensionSplit(List<(string DimCode, string ValueCode)> DimensionValues);
+
+        internal sealed record BlobGenerationInfo(
+            string FileName,
+            string FullPath,
+            int ValueCount,
+            long FileSizeBytes,
+            BinaryValueCodecType CodecType,
+            IMatrixMap MatrixMap,
+            DimensionSplit Split)
+        {
+        }
+
+        /// <summary>
+        /// Public method to generate blob files for use by other benchmark classes.
+        /// </summary>
+        internal static async Task<List<BlobGenerationInfo>> GenerateBlobFilesAsync(
+            string pxFilePath,
+            string outputDirectory,
+            string[] splitDimensions,
+            CancellationToken ct = default)
+        {
+            List<BlobGenerationInfo> generatedBlobs = [];
+
+            using FileStream fileStream = new(pxFilePath, FileMode.Open, FileAccess.Read);
+            PxFileMetadataReader metadataReader = new();
+            Encoding encoding = metadataReader.GetEncoding(fileStream);
+            fileStream.Seek(0, SeekOrigin.Begin);
+
+            List<KeyValuePair<string, string>> entries = [.. metadataReader.ReadMetadata(fileStream, encoding)];
+            MatrixMetadataBuilder builder = new();
+            IReadOnlyMatrixMetadata metadata = builder.Build(entries);
+
+            // Use content dimension if no dimensions specified
+            string[] actualSplitDimensions = splitDimensions;
+            if (actualSplitDimensions.Length == 0)
+            {
+                ContentDimension? contentDim = metadata.GetContentDimension();
+                if (contentDim != null)
+                {
+                    actualSplitDimensions = [contentDim.Code];
+                }
+                else
+                {
+                    throw new InvalidOperationException("No content dimension found and no split dimensions specified.");
+                }
+            }
+
+            List<DimensionSplit> splits = GenerateDimensionSplits(metadata, actualSplitDimensions);
+            Directory.CreateDirectory(outputDirectory);
+
+            ParallelOptions parallelOptions = new()
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount,
+                CancellationToken = ct
+            };
+
+            await Parallel.ForEachAsync(splits, parallelOptions, async (split, token) =>
+            {
+                string splitSuffix = string.Join("_", split.DimensionValues.Select(dv => $"{dv.DimCode}-{dv.ValueCode}"));
+                BlobGenerationInfo? blobInfo = await GenerateBlobFileAsync(
+                    pxFilePath,
+                    outputDirectory,
+                    metadata,
+                    split,
+                    useAsyncReader: false,
+                    fileNameFactory: (codecName) => $"{Path.GetFileNameWithoutExtension(pxFilePath)}_{splitSuffix}_{codecName}.pxb",
+                    ct);
+
+                if (blobInfo != null)
+                {
+                    lock (generatedBlobs)
+                    {
+                        generatedBlobs.Add(blobInfo);
+                    }
+                }
+            });
+
+            return generatedBlobs;
+        }
+
         protected override async Task OneTimeBenchmarkSetupAsync()
         {
             await base.OneTimeBenchmarkSetupAsync();
@@ -141,7 +222,15 @@ namespace Px.Utils.TestingApp.Commands
 
                 await Parallel.ForEachAsync(splits, parallelOptions, async (split, ct) =>
                 {
-                    BlobGenerationInfo? blobInfo = await GenerateBinaryBlobForSplitAsync(split, ct);
+                    BlobGenerationInfo? blobInfo = await GenerateBlobFileAsync(
+                        TestFilePath,
+                        _outputDirectory,
+                        _metadata,
+                        split,
+                        useAsyncReader: true,
+                        fileNameFactory: (codecName) => GenerateBlobFileName(split, codecName),
+                        ct);
+
                     if (blobInfo != null)
                     {
                         lock (_generatedBlobs)
@@ -160,59 +249,55 @@ namespace Px.Utils.TestingApp.Commands
             }
         }
 
-        private async Task<BlobGenerationInfo?> GenerateBinaryBlobForSplitAsync(DimensionSplit split, CancellationToken ct)
+        private static async Task<BlobGenerationInfo?> GenerateBlobFileAsync(
+            string pxFilePath,
+            string outputDirectory,
+            IReadOnlyMatrixMetadata metadata,
+            DimensionSplit split,
+            bool useAsyncReader,
+            Func<string, string> fileNameFactory,
+            CancellationToken ct)
         {
-            if (_metadata == null) return null;
-
-            try
+            IMatrixMap collapsedMap = metadata;
+            foreach ((string dimCode, string valueCode) in split.DimensionValues)
             {
-                IMatrixMap collapsedMap = _metadata;
-                foreach ((string dimCode, string valueCode) in split.DimensionValues)
-                {
-                    collapsedMap = collapsedMap.CollapseDimension(dimCode, valueCode);
-                }
+                collapsedMap = collapsedMap.CollapseDimension(dimCode, valueCode);
+            }
 
-                int dataSize = (int)collapsedMap.GetSize();
-                if (dataSize == 0) return null;
-                DoubleDataValue[] dataBuffer = new DoubleDataValue[dataSize];
+            int dataSize = (int)collapsedMap.GetSize();
+            if (dataSize == 0) return null;
 
-                using FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
+            DoubleDataValue[] dataBuffer = new DoubleDataValue[dataSize];
+
+            using (FileStream fileStream = new(pxFilePath, FileMode.Open, FileAccess.Read))
+            {
                 using PxFileStreamDataReader dataReader = new(fileStream);
-                await dataReader.ReadDoubleDataValuesAsync(dataBuffer, 0, collapsedMap, _metadata, ct);
 
-                BinaryValueCodecSelector selector = new();
-                selector.Process(dataBuffer);
-                BinaryValueCodecType codecType = selector.GetCodecType();
-                IBinaryValueCodec codec = selector.CreateCodec();
-
-                string codecName = codecType.ToString().Replace("Codec", "");
-
-                string fileName = GenerateBlobFileName(split, codecName);
-                string fullPath = Path.Combine(_outputDirectory, fileName);
-                long fileSize;
-
-                using (FileStream outputStream = new(fullPath, FileMode.Create, FileAccess.Write))
+                if (useAsyncReader)
                 {
-                    codec.Write(dataBuffer, outputStream);
-                    await outputStream.FlushAsync(ct);
-                    fileSize = outputStream.Length;
+                    await dataReader.ReadDoubleDataValuesAsync(dataBuffer, 0, collapsedMap, metadata, ct);
                 }
+                else
+                {
+                    dataReader.ReadDoubleDataValues(dataBuffer, 0, collapsedMap, metadata);
+                }
+            }
 
-                return new BlobGenerationInfo(
-                    fileName,
-                    fullPath,
-                    dataSize,
-                    fileSize,
-                    codecType,
-                    collapsedMap,
-                    split
-                 );
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error generating blob for split {string.Join(",", split.DimensionValues.Select(dv => $"{dv.DimCode}={dv.ValueCode}"))}: {ex.Message}");
-                return null;
-            }
+            BinaryValueCodecSelector selector = new();
+            selector.Process(dataBuffer);
+            BinaryValueCodecType codecType = selector.GetCodecType();
+            IBinaryValueCodec codec = selector.CreateCodec();
+
+            string codecName = codecType.ToString().Replace("Codec", "");
+            string fileName = fileNameFactory(codecName);
+            string fullPath = Path.Combine(outputDirectory, fileName);
+
+            using FileStream outputStream = new(fullPath, FileMode.Create, FileAccess.Write);
+            codec.Write(dataBuffer, outputStream);
+            await outputStream.FlushAsync(ct);
+            long fileSize = outputStream.Length;
+
+            return new BlobGenerationInfo(fileName, fullPath, dataSize, fileSize, codecType, collapsedMap, split);
         }
 
         private void CleanupTemporaryFiles()
@@ -230,117 +315,6 @@ namespace Px.Utils.TestingApp.Commands
                 {
                     Console.WriteLine($"Warning: Could not delete {blob.FileName}: {ex.Message}");
                 }
-            }
-        }
-
-        /// <summary>
-        /// Public method to generate blob files for use by other benchmark classes.
-        /// </summary>
-        internal static async Task<List<BlobGenerationInfo>> GenerateBlobFilesAsync(
-            string pxFilePath,
-            string outputDirectory,
-            string[] splitDimensions,
-            CancellationToken ct = default)
-        {
-            List<BlobGenerationInfo> generatedBlobs = [];
-
-            using FileStream fileStream = new(pxFilePath, FileMode.Open, FileAccess.Read);
-            PxFileMetadataReader metadataReader = new();
-            Encoding encoding = metadataReader.GetEncoding(fileStream);
-            fileStream.Seek(0, SeekOrigin.Begin);
-
-            List<KeyValuePair<string, string>> entries = [.. metadataReader.ReadMetadata(fileStream, encoding)];
-            MatrixMetadataBuilder builder = new();
-            IReadOnlyMatrixMetadata metadata = builder.Build(entries);
-
-            // Use content dimension if no dimensions specified
-            string[] actualSplitDimensions = splitDimensions;
-            if (actualSplitDimensions.Length == 0)
-            {
-                ContentDimension? contentDim = metadata.GetContentDimension();
-                if (contentDim != null)
-                {
-                    actualSplitDimensions = [contentDim.Code];
-                }
-                else
-                {
-                    throw new InvalidOperationException("No content dimension found and no split dimensions specified.");
-                }
-            }
-
-            List<DimensionSplit> splits = GenerateDimensionSplits(metadata, actualSplitDimensions);
-            Directory.CreateDirectory(outputDirectory);
-
-            ParallelOptions parallelOptions = new()
-            {
-                MaxDegreeOfParallelism = Environment.ProcessorCount,
-                CancellationToken = ct
-            };
-
-            await Parallel.ForEachAsync(splits, parallelOptions, async (split, token) =>
-            {
-                BlobGenerationInfo? blobInfo = await GenerateSingleBlobAsync(pxFilePath, outputDirectory, metadata, split, token);
-                if (blobInfo != null)
-                {
-                    lock (generatedBlobs)
-                    {
-                        generatedBlobs.Add(blobInfo);
-                    }
-                }
-            });
-
-            return generatedBlobs;
-        }
-
-        private static async Task<BlobGenerationInfo?> GenerateSingleBlobAsync(
-            string pxFilePath,
-            string outputDirectory,
-            IReadOnlyMatrixMetadata metadata,
-            DimensionSplit split,
-            CancellationToken ct)
-        {
-            try
-            {
-                IMatrixMap collapsedMap = metadata;
-                foreach ((string dimCode, string valueCode) in split.DimensionValues)
-                {
-                    collapsedMap = collapsedMap.CollapseDimension(dimCode, valueCode);
-                }
-
-                int dataSize = (int)collapsedMap.GetSize();
-                if (dataSize == 0) return null;
-
-                DoubleDataValue[] dataBuffer = new DoubleDataValue[dataSize];
-
-                using FileStream fileStream = new(pxFilePath, FileMode.Open, FileAccess.Read);
-                using PxFileStreamDataReader dataReader = new(fileStream);
-                dataReader.ReadDoubleDataValues(dataBuffer, 0, collapsedMap, metadata);
-
-                BinaryValueCodecSelector selector = new();
-                selector.Process(dataBuffer);
-                BinaryValueCodecType codecType = selector.GetCodecType();
-                IBinaryValueCodec codec = selector.CreateCodec();
-
-                string codecName = codecType.ToString().Replace("Codec", "");
-
-                string fileName = $"{Path.GetFileNameWithoutExtension(pxFilePath)}_{string.Join("_", split.DimensionValues.Select(dv => $"{dv.DimCode}-{dv.ValueCode}"))}_{codecName}.pxb";
-                string fullPath = Path.Combine(outputDirectory, fileName);
-
-                using FileStream outputStream = new(fullPath, FileMode.Create, FileAccess.Write);
-                codec.Write(dataBuffer, outputStream);
-                await outputStream.FlushAsync(ct);
-                long fileSize = outputStream.Length;
-
-                return new BlobGenerationInfo(fileName, fullPath, dataSize, fileSize, codecType, collapsedMap, split);
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error generating blob: {ex.Message}");
-                return null;
             }
         }
 
@@ -379,19 +353,6 @@ namespace Px.Utils.TestingApp.Commands
             string splitSuffix = string.Join("_", split.DimensionValues.Select(dv => $"{dv.DimCode}-{dv.ValueCode}"));
 
             return $"{tablePrefix}_{splitSuffix}_{codecName}.pxb";
-        }
-
-        internal sealed record DimensionSplit(List<(string DimCode, string ValueCode)> DimensionValues);
-
-        internal sealed record BlobGenerationInfo(
-            string FileName,
-            string FullPath,
-            int ValueCount,
-            long FileSizeBytes,
-            BinaryValueCodecType CodecType,
-            IMatrixMap MatrixMap,
-            DimensionSplit Split)
-        {
         }
     }
 }
