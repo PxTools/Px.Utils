@@ -11,21 +11,16 @@ namespace Px.Utils.BinaryData
     /// Provides windowed I/O helpers for reading binary-encoded matrix data and decoding values using the given <typeparamref name="TCodec"/>.
     /// Supports both chunk-based providers and contiguous streams (seekable and non-seekable).
     /// </summary>
-    public class BinaryDataReader<TCodec> where TCodec : IBinaryValueCodec
+    public sealed class BinaryDataReader<TCodec> : BinaryDataReader where TCodec : IBinaryValueCodec
     {
-        /// <summary>
-        /// Asynchronous chunk provider that returns a readable <see cref="Stream"/> for the requested window of the blob.
-        /// </summary>
-        /// <param name="offset">Byte offset into the blob.</param>
-        /// <param name="length">Requested number of bytes.</param>
-        /// <param name="ct">Cancellation token.</param>
-        public delegate Task<Stream> AsyncChunkProvider(long offset, long length, CancellationToken ct);
-
         private const long DEFAULT_MAX_WINDOW_SIZE_BYTES = 1 * 1024 * 1024;
         private const long DEFAULT_MERGE_CAP_BYTES = 64 * 1024;
         private readonly long _maxWindowSizeBytes;
         private readonly long _mergeCapBytes;
         private readonly long _headerLengthBytes;
+
+        /// <inheritdoc />
+        public override int ByteCount => TCodec.ByteCount;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryDataReader{TCodec}"/> class.
@@ -71,13 +66,13 @@ namespace Px.Utils.BinaryData
         /// <param name="bufferMap">The target shape and ordering for writing into the output buffer.</param>
         /// <param name="buffer">The flat buffer where decoded <see cref="DoubleDataValue"/>s are written following <paramref name="bufferMap"/> ordering.</param>
         /// <param name="ct">Cancellation token.</param>
-        public async Task ReadByChunkAsync(AsyncChunkProvider provider, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct)
+        public override async Task ReadByChunkAsync(AsyncChunkProvider provider, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct)
         {
             if (!readMap.IsSubmapOf(blobMap)) throw new ArgumentException("The blob does not contain the entire target set.");
             if (!readMap.IsSubmapOf(bufferMap)) throw new ArgumentException($"Can not write the entire target set into the provided {nameof(buffer)}.");
 
-            int[][] blobIndices = GetSubIndices(readMap, blobMap);
-            int[][] bufferIndices = GetSubIndices(readMap, bufferMap);
+            int[][] blobIndices = blobMap.GetIndicesOfSubmap(readMap);
+            int[][] bufferIndices = bufferMap.GetIndicesOfSubmap(readMap);
 
             int[] readDimSizes = [.. readMap.DimensionMaps.Select(d => d.ValueCodes.Count)];
 
@@ -160,18 +155,49 @@ namespace Px.Utils.BinaryData
         /// <param name="bufferMap">The target shape and ordering for writing into the output buffer.</param>
         /// <param name="buffer">The flat buffer where decoded <see cref="DoubleDataValue"/>s are written following <paramref name="bufferMap"/> ordering.</param>
         /// <param name="ct">Cancellation token.</param>
-        public async Task ReadFromStreamAsync(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct)
+        public override async Task ReadFromStreamAsync(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, CancellationToken ct)
         {
             if (!readMap.IsSubmapOf(blobMap)) throw new ArgumentException("The blob does not contain the entire target set.");
             if (!readMap.IsSubmapOf(bufferMap)) throw new ArgumentException($"Can not write the entire target set into the provided {nameof(buffer)}.");
 
             if (source.CanSeek)
             {
-                await ReadFromSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, ct);
+                await ReadFromSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, null, ct);
                 return;
             }
 
-            await ReadFromNonSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, ct);
+            await ReadFromNonSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, null, ct);
+        }
+
+        /// <summary>
+        /// Reads values defined by <paramref name="readMap"/> directly from a contiguous <see cref="Stream"/> using windowed I/O
+        /// and writes them into <paramref name="buffer"/> at positions defined by <paramref name="bufferMap"/>. Decoding is
+        /// performed using the codec <typeparamref name="TCodec"/>.
+        /// Note: seekable streams are supported; non-seekable streams use sequential, aligned chunking.
+        /// </summary>
+        /// <param name="source">The source stream containing the blob data.</param>
+        /// <param name="readMap">The selection of values to read from the blob.</param>
+        /// <param name="blobMap">The full shape and ordering of values in the blob.</param>
+        /// <param name="bufferMap">The target shape and ordering for writing into the output buffer.</param>
+        /// <param name="buffer">The flat buffer where decoded <see cref="DoubleDataValue"/>s are written following <paramref name="bufferMap"/> ordering.</param>
+        /// <param name="streamDataPositionIndex">Optional stream data start index. Defaults to null (interpreted as stream at beginning of header).</param>
+        /// <param name="ct">Cancellation token.</param>
+        public override async Task ReadFromStreamAsync(Stream source, IMatrixMap readMap, IMatrixMap blobMap, IMatrixMap bufferMap, Memory<DoubleDataValue> buffer, long? streamDataPositionIndex, CancellationToken ct)
+        {
+            if (!readMap.IsSubmapOf(blobMap)) throw new ArgumentException("The blob does not contain the entire target set.");
+            if (!readMap.IsSubmapOf(bufferMap)) throw new ArgumentException($"Can not write the entire target set into the provided {nameof(buffer)}.");
+            if (streamDataPositionIndex.HasValue && streamDataPositionIndex.Value < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(streamDataPositionIndex), "Value must be non-negative.");
+            }
+
+            if (source.CanSeek)
+            {
+                await ReadFromSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex, ct);
+                return;
+            }
+
+            await ReadFromNonSeekableStreamAsync(source, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex, ct);
         }
 
         /// <summary>
@@ -183,17 +209,30 @@ namespace Px.Utils.BinaryData
             IMatrixMap blobMap,
             IMatrixMap bufferMap,
             Memory<DoubleDataValue> buffer,
+            long? streamDataStartLinearIndex,
             CancellationToken ct)
         {
-            int[][] blobIndices = GetSubIndices(readMap, blobMap);
-            int[][] bufferIndices = GetSubIndices(readMap, bufferMap);
-
+            int[][] blobIndices = blobMap.GetIndicesOfSubmap(readMap);
+            int[][] bufferIndices = bufferMap.GetIndicesOfSubmap(readMap);
             int[] readDimSizes = [.. readMap.DimensionMaps.Select(d => d.ValueCodes.Count)];
             int[] blobRcsp = GetReverseCumulativeSizeProduct(blobMap);
             int[] bufferRcsp = GetReverseCumulativeSizeProduct(bufferMap);
 
             long readMapSize = readMap.GetSize();
             int bytesPerValue = TCodec.ByteCount;
+
+            long absoluteDataStartOffset;
+            if (!streamDataStartLinearIndex.HasValue)
+            {
+                // Stream is positioned at the beginning of the header.
+                absoluteDataStartOffset = checked(source.Position + _headerLengthBytes);
+            }
+            else
+            {
+                // Provided 0 means the stream is positioned at data index 0 (header already skipped).
+                // Provided N means the stream is positioned at data index N.
+                absoluteDataStartOffset = checked(source.Position - (streamDataStartLinearIndex.Value * bytesPerValue));
+            }
 
             int desiredLen = (int)_maxWindowSizeBytes;
             int chunkSize = desiredLen - (desiredLen % bytesPerValue);
@@ -216,7 +255,7 @@ namespace Px.Utils.BinaryData
                 ct.ThrowIfCancellationRequested();
 
                 long startWindowLinearIndx = GetNthIndex(readIndex, blobIndices, blobRcsp);
-                long windowOffset = _headerLengthBytes + (startWindowLinearIndx * bytesPerValue);
+                long windowOffset = absoluteDataStartOffset + (startWindowLinearIndx * bytesPerValue);
 
                 int readTargetsInWindow = 1;
                 Array.Copy(readIndex, probeIndex, readIndex.Length);
@@ -243,7 +282,9 @@ namespace Px.Utils.BinaryData
 
                 int windowSizeBytes = checked((int)((endWindowLinearIndx - startWindowLinearIndx + 1) * bytesPerValue));
 
-                source.Seek(windowOffset, SeekOrigin.Begin);
+                // Seek relative to current position.
+                long relativeOffset = windowOffset - source.Position;
+                if (relativeOffset != 0) source.Seek(relativeOffset, SeekOrigin.Current);
                 await source.ReadExactlyAsync(mem[..windowSizeBytes], ct);
 
                 ReadOnlySpan<byte> span = mem.Span[..windowSizeBytes];
@@ -276,10 +317,11 @@ namespace Px.Utils.BinaryData
             IMatrixMap blobMap,
             IMatrixMap bufferMap,
             Memory<DoubleDataValue> buffer,
+            long? streamDataStartLinearIndex,
             CancellationToken ct)
         {
-            int[][] blobIndices = GetSubIndices(readMap, blobMap);
-            int[][] bufferIndices = GetSubIndices(readMap, bufferMap);
+            int[][] blobIndices = blobMap.GetIndicesOfSubmap(readMap);
+            int[][] bufferIndices = bufferMap.GetIndicesOfSubmap(readMap);
             int[] readDimSizes = [.. readMap.DimensionMaps.Select(d => d.ValueCodes.Count)];
             int[] blobRcsp = GetReverseCumulativeSizeProduct(blobMap);
             int[] bufferRcsp = GetReverseCumulativeSizeProduct(bufferMap);
@@ -296,29 +338,49 @@ namespace Px.Utils.BinaryData
             using IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent(chunkSize);
             Memory<byte> mem = owner.Memory[..chunkSize];
 
-            // Skip header bytes for non-seekable stream
-            if (_headerLengthBytes > 0)
-            {
-                long remaining = _headerLengthBytes;
-                while (remaining > 0)
-                {
-                    ct.ThrowIfCancellationRequested();
-                    int toRead = (int)Math.Min(remaining, mem.Length);
-                    int read = await source.ReadAsync(mem[..toRead], ct);
-                    if (read == 0)
-                    {
-                        throw new EndOfStreamException("Unexpected end of stream while skipping header.");
-                    }
-                    remaining -= read;
-                }
-            }
+            long chunkBase;
 
-            long chunkBase = _headerLengthBytes;
             int readFromChunk = 0;
             int processed = 0;
 
             int[] readIndex = new int[readMap.DimensionMaps.Count];
-            long nextReadLinearByteIndex = (GetNthIndex(readIndex, blobIndices, blobRcsp) * bytesPerValue) + _headerLengthBytes;
+            long firstTargetLinearIndex = GetNthIndex(readIndex, blobIndices, blobRcsp);
+
+            if (streamDataStartLinearIndex.HasValue && firstTargetLinearIndex < streamDataStartLinearIndex.Value)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(streamDataStartLinearIndex),
+                    $"The first target linear index ({firstTargetLinearIndex}) is smaller than the provided stream data start linear index ({streamDataStartLinearIndex.Value}).");
+            }
+
+            long nextReadLinearByteIndex = (firstTargetLinearIndex * bytesPerValue) + _headerLengthBytes;
+
+            if (!streamDataStartLinearIndex.HasValue)
+            {
+                // Stream is positioned at the beginning of the header.
+                if (_headerLengthBytes > 0)
+                {
+                    long remaining = _headerLengthBytes;
+                    while (remaining > 0)
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        int toRead = (int)Math.Min(remaining, mem.Length);
+                        int read = await source.ReadAsync(mem[..toRead], ct);
+                        if (read == 0)
+                        {
+                            throw new EndOfStreamException("Unexpected end of stream while skipping header.");
+                        }
+                        remaining -= read;
+                    }
+                }
+
+                chunkBase = _headerLengthBytes;
+            }
+            else
+            {
+                // Stream is positioned at data index N (header already skipped).
+                chunkBase = _headerLengthBytes + (streamDataStartLinearIndex.Value * bytesPerValue);
+            }
 
             while (processed < readMapSize)
             {
@@ -381,39 +443,6 @@ namespace Px.Utils.BinaryData
                 owner.Dispose();
                 throw;
             }
-        }
-
-        /// <summary>
-        /// Builds an index mapping from a sub map to a super map for each dimension.
-        /// </summary>
-        private static int[][] GetSubIndices(IMatrixMap sub, IMatrixMap super)
-        {
-            if (sub.DimensionMaps.Count != super.DimensionMaps.Count)
-            {
-                throw new ArgumentException("Number of dimensions differ between source and target maps, index mapping can not be computed.");
-            }
-
-            int[][] result = new int[sub.DimensionMaps.Count][];
-
-            for (int dimIndx = 0; dimIndx < sub.DimensionMaps.Count; dimIndx++)
-            {
-                IReadOnlyList<string> subDimCodes = sub.DimensionMaps[dimIndx].ValueCodes;
-                IReadOnlyList<string> superDimCodes = super.DimensionMaps[dimIndx].ValueCodes;
-
-                int subValIndex = 0;
-                int[] valIndices = new int[subDimCodes.Count];
-                for (int superValIndex = 0; superValIndex < superDimCodes.Count; superValIndex++)
-                {
-                    if (subDimCodes[subValIndex] == superDimCodes[superValIndex])
-                    {
-                        valIndices[subValIndex] = superValIndex;
-                        subValIndex++;
-                        if (subValIndex >= subDimCodes.Count) break;
-                    }
-                }
-                result[dimIndx] = valIndices;
-            }
-            return result;
         }
 
         /// <summary>

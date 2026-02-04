@@ -88,6 +88,33 @@ Behaviour of the reader and builder objects can be changed with ```PxFileConfigu
     MatrixMetadataBuilder builder = new(conf);
 ```
 
+### Binary data reading
+
+Px.Utils includes a windowed binary data reader that can efficiently decode tightly packed numeric matrix data from either:
+
+- A contiguous `Stream` (seekable or non-seekable)
+- A chunk provider (`BinaryDataReader.AsyncChunkProvider`) that can return a `Stream` for a requested byte window
+
+Binary decoding is defined by **codecs** (`IBinaryValueCodec`). A codec specifies:
+
+- The encoded byte width (`ByteCount`)
+- How to decode and encode values
+
+Supported codec types (see `BinaryValueCodecType`):
+
+- `UInt16Codec`, `Int16Codec`
+- `UInt24Codec`, `Int24Codec`
+- `UInt32Codec`, `Int32Codec`
+- `FloatCodec`, `DoubleCodec`
+
+To create a reader dynamically, use `BinaryDataReader.Create(codecType, ...)`. To use a strongly typed reader, use `BinaryDataReader<TCodec>`.
+
+Readers support configurable windowing:
+
+- `maxWindowSizeBytes` controls the maximum number of bytes read per window
+- `mergeCapBytes` controls how large a gap between targets can be and still be merged into one window
+- `headerLengthBytes` specifies a header prefix to skip before the packed values begin
+
 ### Metadata models
 #### ```Matrix<TData>```
 Consists of ```IReadOnlyMatrixMetadata Metadata``` and ```TData[] Data```. This is the topmost level of the structure. The order of the data points is determined by the metadata in the following way:
@@ -330,7 +357,7 @@ The method also has an asyncronous variant ```SumToNewValueAsync<TData>()```.
 #### Multiplication
 ```MultiplyToNewValue<TData>()``` computes products of datapoints defined by a subset of values from a given dimension.
 The method takes a new dimension value as a parameter that will define the resulting values.
-The method also has an asyncronous variant ```MultiplyToNewValueAsync<TData>()```.  
+The method also has an asyncronous variant ```MultiplyToNewValueAsync<TData>()```.
 
 ##### Example
 ```csharp

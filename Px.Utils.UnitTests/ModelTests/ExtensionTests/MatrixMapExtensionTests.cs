@@ -756,5 +756,76 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
         }
 
         #endregion
+
+        #region GetIndicesOfSubmap
+
+        [TestMethod]
+        public void GetIndicesOfSubmapWithValidSubmapReturnsCorrectIndices()
+        {
+            List<IDimensionMap> superDimensions = [
+                new DimensionMap("11", ["aa11", "bb11", "cc11"]),
+
+                new DimensionMap("22", ["aa22", "bb22", "cc22"]),
+                new DimensionMap("33", ["aa33", "bb33", "cc33", "dd33"]),
+            ];
+            MatrixMap superMap = new(superDimensions);
+
+            List<IDimensionMap> subDimensions = [
+                new DimensionMap("11", ["aa11", "cc11"]), // indices 0,2
+                new DimensionMap("22", ["bb22"]),           // index 1
+                new DimensionMap("33", ["bb33", "dd33"])   // indices 1,3
+            ];
+            MatrixMap subMap = new(subDimensions);
+
+            int[][] indices = superMap.GetIndicesOfSubmap(subMap);
+            int[][] expected =
+            [
+                [0, 2],
+                [1],
+                [1, 3]
+            ];
+
+            CollectionAssert.AreEqual(expected[0], indices[0]);
+            CollectionAssert.AreEqual(expected[1], indices[1]);
+            CollectionAssert.AreEqual(expected[2], indices[2]);
+        }
+
+        [TestMethod]
+        public void GetIndicesOfSubmapSubmapEqualsSupermapReturnsIdentityIndices()
+        {
+            List<IDimensionMap> dimensions = [
+                new DimensionMap("11", ["aa11", "bb11"]),
+                new DimensionMap("22", ["aa22"])
+            ];
+            MatrixMap map = new(dimensions);
+
+            int[][] indices = map.GetIndicesOfSubmap(map);
+            int[][] expected =
+            [
+                [0, 1],
+                [0]
+            ];
+
+            CollectionAssert.AreEqual(expected[0], indices[0]);
+            CollectionAssert.AreEqual(expected[1], indices[1]);
+        }
+
+        [TestMethod]
+        public void GetIndicesOfSubmapDimensionCountMismatchThrowsArgumentException()
+        {
+            List<IDimensionMap> superDimensions = [
+                new DimensionMap("11", ["aa11", "bb11", "cc11"]),
+                new DimensionMap("22", ["aa22", "bb22"])
+            ];
+            MatrixMap superMap = new(superDimensions);
+
+            List<IDimensionMap> subDimensions = [
+                new DimensionMap("11", ["aa11", "bb11", "cc11"]) // missing second dimension
+            ];
+            MatrixMap subMap = new(subDimensions);
+
+            Assert.ThrowsExactly<ArgumentException>(() => superMap.GetIndicesOfSubmap(subMap));
+        }
+        #endregion
     }
 }

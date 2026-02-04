@@ -4,7 +4,7 @@ namespace Px.Utils.BinaryData.ValueConverters
     /// Enumeration of supported binary value codec types.
     /// Explicit integer values start from 1 to allow stable mapping.
     /// </summary>
-    public enum BinaryValueCodecType
+    public enum BinaryValueCodecType : uint
     {
         UInt16Codec = 1,
         Int16Codec = 2,
