@@ -1,4 +1,4 @@
-﻿using Px.Utils.Validation.ContentValidation;
+using Px.Utils.Validation.ContentValidation;
 using Px.Utils.Validation.SyntaxValidation;
 using System.Text;
 
@@ -20,9 +20,9 @@ namespace Px.Utils.TestingApp.Commands
             BenchmarkFunctions = [ValidateContentBenchmark];
         }
 
-        protected override void OneTimeBenchmarkSetup()
+        protected override async Task OneTimeBenchmarkSetupAsync()
         {
-            base.OneTimeBenchmarkSetup();
+            await base.OneTimeBenchmarkSetupAsync();
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             stream.Seek(0, SeekOrigin.Begin);

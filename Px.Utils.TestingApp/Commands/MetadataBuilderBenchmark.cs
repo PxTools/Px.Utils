@@ -1,4 +1,3 @@
-﻿
 using Px.Utils.ModelBuilders;
 using Px.Utils.PxFile.Metadata;
 using System.Text;
@@ -20,10 +19,10 @@ namespace Px.Utils.TestingApp.Commands
             _metaEntries = [];
         }
 
-        protected override void OneTimeBenchmarkSetup()
+        protected override async Task OneTimeBenchmarkSetupAsync()
         {
-            base.OneTimeBenchmarkSetup();
-            FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
+            await base.OneTimeBenchmarkSetupAsync();
+            using FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileMetadataReader reader = new();
             Encoding encoding = reader.GetEncoding(fileStream);
             fileStream.Seek(0, SeekOrigin.Begin);

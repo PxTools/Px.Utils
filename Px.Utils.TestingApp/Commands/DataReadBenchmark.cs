@@ -36,9 +36,9 @@ namespace Px.Utils.TestingApp.Commands
             ParameterFlags.Add(cellFlags);
         }
 
-        protected override void OneTimeBenchmarkSetup()
+        protected override async Task OneTimeBenchmarkSetupAsync()
         {
-            base.OneTimeBenchmarkSetup();
+            await base.OneTimeBenchmarkSetupAsync();
 
             using FileStream fileStream = new(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileMetadataReader reader = new();
@@ -161,7 +161,7 @@ namespace Px.Utils.TestingApp.Commands
             }
         }
 
-        private static IMatrixMap GenerateBenchmarkTargetMap(IMatrixMap complete, long targetSize)
+        internal static IMatrixMap GenerateBenchmarkTargetMap(IMatrixMap complete, long targetSize)
         {
             long size = complete.GetSize();
             if (size < targetSize) return complete;
