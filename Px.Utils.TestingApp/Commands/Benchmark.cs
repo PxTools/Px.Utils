@@ -114,7 +114,7 @@ namespace Px.Utils.TestingApp.Commands
             }
         }
 
-        internal override void Run(bool batchMode, List<string>? inputs = null)
+        internal override async Task Run(bool batchMode, List<string>? inputs = null)
         {
             if (inputs?.Count == 1 && inputs[0] == "help")
             {
@@ -126,13 +126,13 @@ namespace Px.Utils.TestingApp.Commands
 
             Parameters = GroupParameters(inputs ?? [], [.. ParameterFlags.SelectMany(x => x)]);
             SetRunParameters();
-            OneTimeBenchmarkSetupAsync().GetAwaiter().GetResult();
+            await OneTimeBenchmarkSetupAsync();
 
             // synchronous validation
             RunBenchmarks(BenchmarkFunctions);
 
             // async validation
-            RunBenchmarksAsync(BenchmarkFunctionsAsync).Wait();
+            await RunBenchmarksAsync(BenchmarkFunctionsAsync);
         }
 
         protected virtual void SetRunParameters()
