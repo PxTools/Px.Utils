@@ -195,7 +195,7 @@ namespace Px.Utils.TestingApp.Commands
         {
             await Task.WhenAll(_blobFiles.Select(async blobFile =>
             {
-                await ReadBlobWithCodecAsync(blobFile, GenerateReadAllMap, (readMap, blobMap, bufferMap, bufferMemory) =>
+                await ReadBlobWithCodecAsync(blobFile, _metadata!, GenerateReadAllMap, (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
                     Func<long, long, CancellationToken, Task<Stream>> chunkProvider = (offset, length, ct) =>
                     {
@@ -204,7 +204,8 @@ namespace Px.Utils.TestingApp.Commands
                         return Task.FromResult<Stream>(stream);
                     };
 
-                    return CreateReaderAndReadByChunkAsync(blobFile.CodecType, chunkProvider, readMap, blobMap, bufferMap, bufferMemory);
+                    BinaryDataReader reader = BinaryDataReader.Create(blobFile.CodecType, _windowSizeBytes, _mergeCapBytes);
+                    return reader.ReadByChunkAsync((offset, length, ct) => chunkProvider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
                 });
             }));
         }
@@ -212,7 +213,6 @@ namespace Px.Utils.TestingApp.Commands
         private async Task RunChunkBasedReadLastBenchmarksAsync()
         {   
             IMatrixMap? targetMap = DataReadBenchmark.GenerateBenchmarkTargetMap(_metadata!, _numberOfCells);
-            Console.WriteLine($"Global target map generated: {targetMap.GetSize()} cells to read across all blobs.");
 
             await Task.WhenAll(_blobFiles.Select(async blobFile =>
             {
@@ -225,8 +225,7 @@ namespace Px.Utils.TestingApp.Commands
                     return;
                 }
                 
-                IMatrixMap bufferMap = readMap;
-                int bufferSize = (int)readMap.GetSize();
+                int bufferSize = (int)targetMap.GetSize();
                 DoubleDataValue[] buffer = new DoubleDataValue[bufferSize];
                 Memory<DoubleDataValue> bufferMemory = new(buffer);
 
@@ -237,7 +236,8 @@ namespace Px.Utils.TestingApp.Commands
                     return Task.FromResult<Stream>(stream);
                 };
 
-                await CreateReaderAndReadByChunkAsync(blobFile.CodecType, chunkProvider, readMap, blobMap, bufferMap, bufferMemory);
+                BinaryDataReader reader = BinaryDataReader.Create(blobFile.CodecType, _windowSizeBytes, _mergeCapBytes);
+                await reader.ReadByChunkAsync((offset, length, ct) => chunkProvider(offset, length, ct), readMap, blobMap, targetMap, bufferMemory, CancellationToken.None);
             }));
             }
 
@@ -245,10 +245,11 @@ namespace Px.Utils.TestingApp.Commands
         {
             await Task.WhenAll(_blobFiles.Select(async blobFile =>
             {
-                await ReadBlobWithCodecAsync(blobFile, GenerateReadAllMap, async (readMap, blobMap, bufferMap, bufferMemory) =>
+                await ReadBlobWithCodecAsync(blobFile, _metadata!, GenerateReadAllMap, async (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
                     using FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
-                    await CreateReaderAndReadFromStreamAsync(blobFile.CodecType, stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                    BinaryDataReader reader = BinaryDataReader.Create(blobFile.CodecType, _windowSizeBytes, _mergeCapBytes);
+                    await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
                 });
             }));
         }
@@ -256,7 +257,6 @@ namespace Px.Utils.TestingApp.Commands
         private async Task RunSeekableStreamReadLastBenchmarksAsync()
         {
             IMatrixMap? targetMap = DataReadBenchmark.GenerateBenchmarkTargetMap(_metadata!, _numberOfCells);
-            Console.WriteLine($"Global target map generated: {targetMap.GetSize()} cells to read across all blobs.");
 
             await Task.WhenAll(_blobFiles.Select(async blobFile =>
             {
@@ -269,13 +269,13 @@ namespace Px.Utils.TestingApp.Commands
                     return;
                 }
                 
-                IMatrixMap bufferMap = readMap;
-                int bufferSize = (int)readMap.GetSize();
+                int bufferSize = (int)targetMap.GetSize();
                 DoubleDataValue[] buffer = new DoubleDataValue[bufferSize];
                 Memory<DoubleDataValue> bufferMemory = new(buffer);
 
                 using FileStream stream = new(blobFile.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
-                await CreateReaderAndReadFromStreamAsync(blobFile.CodecType, stream, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                BinaryDataReader reader = BinaryDataReader.Create(blobFile.CodecType, _windowSizeBytes, _mergeCapBytes);
+                await reader.ReadFromStreamAsync(stream, readMap, blobMap, targetMap, bufferMemory, CancellationToken.None);
             }));
         }
 
@@ -283,7 +283,7 @@ namespace Px.Utils.TestingApp.Commands
         {
             await Task.WhenAll(_blobFiles.Select(async blobFile =>
             {
-                await ReadBlobWithCodecAsync(blobFile, GenerateReadAllMap, async (readMap, blobMap, bufferMap, bufferMemory) =>
+                await ReadBlobWithCodecAsync(blobFile, _metadata!, GenerateReadAllMap, async (readMap, blobMap, bufferMap, bufferMemory) =>
                 {
                     await ReadNonSeekableAsync(blobFile.FullPath, blobFile.CodecType, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
                 });
@@ -293,7 +293,6 @@ namespace Px.Utils.TestingApp.Commands
         private async Task RunNonSeekableStreamReadLastBenchmarksAsync()
         {
             IMatrixMap? targetMap = DataReadBenchmark.GenerateBenchmarkTargetMap(_metadata!, _numberOfCells);
-            Console.WriteLine($"Global target map generated: {targetMap.GetSize()} cells to read across all blobs.");
 
             await Task.WhenAll(_blobFiles.Select(async blobFile =>
             {
@@ -306,12 +305,11 @@ namespace Px.Utils.TestingApp.Commands
                     return;
                 }
                 
-                IMatrixMap bufferMap = readMap;
-                int bufferSize = (int)readMap.GetSize();
+                int bufferSize = (int)targetMap.GetSize();
                 DoubleDataValue[] buffer = new DoubleDataValue[bufferSize];
                 Memory<DoubleDataValue> bufferMemory = new(buffer);
 
-                await ReadNonSeekableAsync(blobFile.FullPath, blobFile.CodecType, readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None);
+                await ReadNonSeekableAsync(blobFile.FullPath, blobFile.CodecType, readMap, blobMap, targetMap, bufferMemory, CancellationToken.None);
             }));
         }
 
@@ -325,6 +323,7 @@ namespace Px.Utils.TestingApp.Commands
 
         private static async Task ReadBlobWithCodecAsync(
             BinaryWriteBenchmark.BlobGenerationInfo blobFile,
+            IMatrixMap bufferMap,
             Func<BinaryWriteBenchmark.BlobGenerationInfo, IMatrixMap> mapGenerator,
             Func<IMatrixMap, IMatrixMap, IMatrixMap, Memory<DoubleDataValue>, Task> benchmarkAction)
         {
@@ -337,8 +336,7 @@ namespace Px.Utils.TestingApp.Commands
                 return;
             }
             
-            IMatrixMap bufferMap = readMap;
-            int bufferSize = (int)readMap.GetSize();
+            int bufferSize = (int)bufferMap.GetSize();
             DoubleDataValue[] buffer = new DoubleDataValue[bufferSize];
             Memory<DoubleDataValue> bufferMemory = new(buffer);
             await benchmarkAction(readMap, blobMap, bufferMap, bufferMemory);
@@ -353,69 +351,20 @@ namespace Px.Utils.TestingApp.Commands
             Memory<DoubleDataValue> bufferMemory,
             CancellationToken ct)
         {
-            byte[] fileData = await File.ReadAllBytesAsync(blobPath, ct);
-
-            using NonSeekableReadOnlyStream stream = new(fileData);
-            await CreateReaderAndReadFromStreamAsync(codecType, stream, readMap, blobMap, bufferMap, bufferMemory, ct);
+            using FileStream fileStream = new(blobPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
+            await using NonSeekableReadOnlyStream stream = new(fileStream);
+            BinaryDataReader reader = BinaryDataReader.Create(codecType, _windowSizeBytes, _mergeCapBytes);
+            await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct);
         }
 
-        private Task CreateReaderAndReadByChunkAsync(
-            BinaryValueCodecType codecType,
-            Func<long, long, CancellationToken, Task<Stream>> provider,
-            IMatrixMap readMap,
-            IMatrixMap blobMap,
-            IMatrixMap bufferMap,
-            Memory<DoubleDataValue> bufferMemory)
+        private sealed class NonSeekableReadOnlyStream : Stream
         {
-            return codecType switch
+            private readonly Stream _inner;
+
+            internal NonSeekableReadOnlyStream(Stream inner)
             {
-                BinaryValueCodecType.UInt16Codec => new BinaryDataReader<UInt16Codec>(_windowSizeBytes, _mergeCapBytes)
-                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
-                BinaryValueCodecType.Int16Codec => new BinaryDataReader<Int16Codec>(_windowSizeBytes, _mergeCapBytes)
-                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
-                BinaryValueCodecType.UInt24Codec => new BinaryDataReader<UInt24Codec>(_windowSizeBytes, _mergeCapBytes)
-                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
-                BinaryValueCodecType.Int24Codec => new BinaryDataReader<Int24Codec>(_windowSizeBytes, _mergeCapBytes)
-                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
-                BinaryValueCodecType.UInt32Codec => new BinaryDataReader<UInt32Codec>(_windowSizeBytes, _mergeCapBytes)
-                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
-                BinaryValueCodecType.Int32Codec => new BinaryDataReader<Int32Codec>(_windowSizeBytes, _mergeCapBytes)
-                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
-                BinaryValueCodecType.FloatCodec => new BinaryDataReader<FloatCodec>(_windowSizeBytes, _mergeCapBytes)
-                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
-                BinaryValueCodecType.DoubleCodec => new BinaryDataReader<DoubleCodec>(_windowSizeBytes, _mergeCapBytes)
-                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None),
-                _ => new BinaryDataReader<DoubleCodec>(_windowSizeBytes, _mergeCapBytes)
-                    .ReadByChunkAsync((offset, length, ct) => provider(offset, length, ct), readMap, blobMap, bufferMap, bufferMemory, CancellationToken.None)
-            };
-        }
-
-        private Task CreateReaderAndReadFromStreamAsync(
-            BinaryValueCodecType codecType,
-            Stream stream,
-            IMatrixMap readMap,
-            IMatrixMap blobMap,
-            IMatrixMap bufferMap,
-            Memory<DoubleDataValue> bufferMemory,
-            CancellationToken ct)
-        {
-            return codecType switch
-            {
-                BinaryValueCodecType.UInt16Codec => new BinaryDataReader<UInt16Codec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
-                BinaryValueCodecType.Int16Codec => new BinaryDataReader<Int16Codec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
-                BinaryValueCodecType.UInt24Codec => new BinaryDataReader<UInt24Codec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
-                BinaryValueCodecType.Int24Codec => new BinaryDataReader<Int24Codec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
-                BinaryValueCodecType.UInt32Codec => new BinaryDataReader<UInt32Codec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
-                BinaryValueCodecType.Int32Codec => new BinaryDataReader<Int32Codec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
-                BinaryValueCodecType.FloatCodec => new BinaryDataReader<FloatCodec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
-                BinaryValueCodecType.DoubleCodec => new BinaryDataReader<DoubleCodec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct),
-                _ => new BinaryDataReader<DoubleCodec>(_windowSizeBytes, _mergeCapBytes).ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, bufferMemory, ct)
-            };
-        }
-
-        private sealed class NonSeekableReadOnlyStream(ReadOnlyMemory<byte> data) : Stream
-        {
-            private readonly Stream _inner = new MemoryStream(data.ToArray(), writable: false);
+                _inner = inner;
+            }
 
             public override bool CanRead => true;
 
@@ -448,6 +397,11 @@ namespace Px.Utils.TestingApp.Commands
             public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
             {
                 return _inner.ReadAsync(buffer, cancellationToken);
+            }
+
+            public override int Read(Span<byte> buffer)
+            {
+                return _inner.Read(buffer);
             }
 
             public override long Seek(long offset, SeekOrigin origin)
@@ -483,6 +437,11 @@ namespace Px.Utils.TestingApp.Commands
                 }
 
                 base.Dispose(disposing);
+            }
+
+            public override ValueTask DisposeAsync()
+            {
+                return _inner.DisposeAsync();
             }
         }
     }
