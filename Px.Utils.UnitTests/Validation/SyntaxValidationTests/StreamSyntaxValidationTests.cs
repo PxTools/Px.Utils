@@ -1,4 +1,4 @@
-﻿using Px.Utils.Validation.SyntaxValidation;
+using Px.Utils.Validation.SyntaxValidation;
 using Px.Utils.UnitTests.Validation.Fixtures;
 using System.Text;
 using System.Reflection;
@@ -419,6 +419,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
 
         [TestMethod]
         [DataRow("TLIST(A1),\"2000\",\"2001\",\"2003\"", Utils.Validation.ValueType.TimeValSeries)]
+        [DataRow("TLIST(A1),\"2000\"", Utils.Validation.ValueType.TimeValSeries)] // Only one value - not a list
         [DataRow("TLIST(H1),\"20001\", \"20002\", \"20011\", \"20012\"", Utils.Validation.ValueType.TimeValSeries)] // Has spaces between values
         [DataRow("TLIST(T1),\"20001\",\"20002\",\"20003\"", Utils.Validation.ValueType.TimeValSeries)]
         [DataRow("TLIST(Q1),\"20001\",\"20002\",\"20003\",\"20004\"", Utils.Validation.ValueType.TimeValSeries)]
