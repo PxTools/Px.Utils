@@ -1,4 +1,4 @@
-﻿using Px.Utils.Validation.SyntaxValidation;
+using Px.Utils.Validation.SyntaxValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,7 +106,10 @@ namespace Px.Utils.Validation.ContentValidation
 
             if (availableLanguageEntries.Length == 1)
             {
-                List<string> languages = availableLanguageEntries[0].Value.Split(validator.Conf.Symbols.Value.ListSeparator).ToList();
+                List<string> languages = SyntaxValidationUtilityMethods.GetListItemsFromString(
+                    availableLanguageEntries[0].Value, 
+                    validator.Conf.Symbols.Value.ListSeparator, 
+                    validator.Conf.Symbols.Value.StringDelimeter);
                 validator._availableLanguages = [.. languages.Select(lang => SyntaxValidationUtilityMethods.CleanString(lang, validator.Conf))];
                 return null;
             }
