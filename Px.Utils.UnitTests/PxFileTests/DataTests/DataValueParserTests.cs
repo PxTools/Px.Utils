@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models.Data;
+using Px.Utils.Models.Data;
 using Px.Utils.Models.Data.DataValue;
 using Px.Utils.PxFile.Data;
 
@@ -317,6 +317,19 @@ namespace PxFileTests.DataTests
             Assert.AreEqual(DataValueType.Empty, result.Type);
         }
 
+        [TestMethod]
+        public void FastParseDoubleDataValueDangerousExcessivelyLongNumberReturnsExistsValueTypeWithCorrectUnsafeValue()
+        {
+            // Arrange (1.91287503458359810)
+            char[] buffer = ['1', '.', '9', '1', '2', '8', '7', '5', '0', '3', '4', '5', '8', '3', '5', '9', '8', '1', '0']; // 19 characters
+            int len = buffer.Length;
+            // Act
+            DoubleDataValue result = DataValueParsers.FastParseDoubleDataValueDangerous(buffer, len);
+            // Assert
+            Assert.AreEqual(DataValueType.Exists, result.Type);
+            Assert.AreEqual(1.9128750345835981, result.UnsafeValue);
+        }
+
         #endregion
 
         #region FastParseDecimalDataValueDangerous
@@ -627,6 +640,19 @@ namespace PxFileTests.DataTests
 
             // Assert
             Assert.AreEqual(DataValueType.Empty, result.Type);
+        }
+
+        [TestMethod]
+        public void FastParseDecimalDataValueDangerousExcessivelyLongNumberReturnsExistsValueTypeWithCorrectUnsafeValue()
+        {
+            // Arrange (1.91287503458359810)
+            char[] buffer = ['1', '.', '9', '1', '2', '8', '7', '5', '0', '3', '4', '5', '8', '3', '5', '9', '8', '1', '0']; // 19 characters
+            int len = buffer.Length;
+            // Act
+            DecimalDataValue result = DataValueParsers.FastParseDecimalDataValueDangerous(buffer, len);
+            // Assert
+            Assert.AreEqual(DataValueType.Exists, result.Type);
+            Assert.AreEqual(1.91287503458359810m, result.UnsafeValue);
         }
 
         #endregion
