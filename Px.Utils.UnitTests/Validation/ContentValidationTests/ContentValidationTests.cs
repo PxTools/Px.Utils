@@ -1,4 +1,4 @@
-﻿using Px.Utils.UnitTests.Validation.Fixtures;
+using Px.Utils.UnitTests.Validation.Fixtures;
 using Px.Utils.Validation;
 using Px.Utils.Validation.ContentValidation;
 using Px.Utils.Validation.SyntaxValidation;
@@ -44,6 +44,21 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.AreEqual(0, feedback.FeedbackItems.Count);
+        }
+
+        [TestMethod]
+        public void ValidateCalledWithSharedDimensionNameAcrossLanguagesCalculatesRowCountsFromDefaultLanguage()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_SHARED_DIMENSION_NAMES_ACROSS_LANGUAGES;
+            ContentValidator validator = new(filename, encoding, entries);
+
+            // Act
+            ContentValidationResult feedback = validator.Validate();
+
+            // Assert
+            Assert.AreEqual(2, feedback.DataRowAmount);
+            Assert.AreEqual(3, feedback.DataRowLength);
         }
 
         [TestMethod]

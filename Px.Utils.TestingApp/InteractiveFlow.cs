@@ -1,4 +1,4 @@
-﻿using Px.Utils.TestingApp;
+using Px.Utils.TestingApp;
 using Px.Utils.TestingApp.Commands;
 
 namespace Px.Utils.TestingApp
@@ -21,7 +21,7 @@ namespace Px.Utils.TestingApp
         }
 
 #pragma warning disable S2190 // The Ask Questions breaks the loop if exit is entered
-        public void Start()
+        public async Task StartAsync()
         {
             while(true)
             {
@@ -32,7 +32,7 @@ namespace Px.Utils.TestingApp
                 {
                     inputs = TestAppConsole.AskQuestion(followUp, true);
                 }
-                _commands[inputs[0]].Run(false, inputs.Skip(1).ToList());
+                await _commands[inputs[0]].Run(false, inputs.Skip(1).ToList());
             }
         }
 #pragma warning restore S2190
@@ -49,12 +49,13 @@ namespace Px.Utils.TestingApp
                 _commands = commands;
             }
 
-            internal override void Run(bool batchMode, List<string>? inputs = null)
+            internal override Task Run(bool batchMode, List<string>? inputs = null)
             {
                 Console.Clear();
                 Console.WriteLine("Available commands:");
                 Console.WriteLine(string.Join(Environment.NewLine, _commands.Select(c => $"\t{c.Key}: {c.Value.Description}")));
                 Console.WriteLine();
+                return Task.CompletedTask;
             }
         }
     }

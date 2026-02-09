@@ -1,4 +1,4 @@
-﻿using Px.Utils.Exceptions;
+using Px.Utils.Exceptions;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -211,7 +211,7 @@ namespace Px.Utils.PxFile.Metadata
             long position = stream.Position;
 
             byte[] bom = new byte[3];
-            stream.Read(bom);
+            stream.ReadExactly(bom);
 
             stream.Position = position;
 
@@ -238,7 +238,7 @@ namespace Px.Utils.PxFile.Metadata
             long position = stream.Position;
 
             byte[] bom = new byte[bomLength];
-            await stream.ReadAsync(bom.AsMemory(0, bomLength), cancellationToken);
+            await stream.ReadExactlyAsync(bom.AsMemory(0, bomLength), cancellationToken);
 
             stream.Position = position;
 

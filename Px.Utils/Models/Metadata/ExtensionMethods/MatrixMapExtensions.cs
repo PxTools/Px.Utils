@@ -1,4 +1,6 @@
-﻿namespace Px.Utils.Models.Metadata.ExtensionMethods
+using System.Linq;
+
+namespace Px.Utils.Models.Metadata.ExtensionMethods
 {
     public static class MatrixMapExtensions
     {
@@ -7,9 +9,9 @@
         /// </summary>
         /// <param name="matrixMap">The matrix map.</param>
         /// <returns>Total number of cells in the matrix described by the matrix map.</returns>
-        public static int GetSize(this IMatrixMap matrixMap)
+        public static long GetSize(this IMatrixMap matrixMap)
         {
-            int numberOfCells = 1;
+            long numberOfCells = 1;
             foreach (IDimensionMap dimensionMap in matrixMap.DimensionMaps)
             {
                 numberOfCells *= dimensionMap.ValueCodes.Count;
@@ -84,6 +86,124 @@
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Returns a union <see cref="IMatrixMap"/> of this map and other map that contains all values of each of them
+        /// </summary>
+        /// <remarks>Intended use of this extension method assumes that both maps are of the same base group.</remarks>
+        /// <exception cref="InvalidOperationException">Thrown if either map contains dimensions not included in the other map.</exception>
+        /// <returns>Combined union map with all values from both maps.</returns>
+        public static IMatrixMap UnionMap(this IMatrixMap thisMap, IMatrixMap other)
+        {
+            if (thisMap.DimensionMaps.Count != other.DimensionMaps.Count)
+            {
+                throw new InvalidOperationException("Maps must have the same number of dimensions.");
+            }
+
+            List<IDimensionMap> unionDimensions = [];
+
+            for (int i = 0; i < thisMap.DimensionMaps.Count; i++)
+            {
+                IDimensionMap thisDim = thisMap.DimensionMaps[i];
+                IDimensionMap otherDim = other.DimensionMaps[i];
+
+                if (thisDim.Code != otherDim.Code)
+                {
+                    throw new InvalidOperationException($"Dimension codes at position {i} do not match: '{thisDim.Code}' vs '{otherDim.Code}'.");
+                }
+
+                // Combine all values preserving order: first from thisMap, then new ones from other
+                List<string> allValues = [.. thisDim.ValueCodes];
+                allValues.AddRange(otherDim.ValueCodes.Where(valueCode => !allValues.Contains(valueCode)));
+                unionDimensions.Add(new DimensionMap(thisDim.Code, allValues));
+            }
+
+            return new MatrixMap(unionDimensions);
+        }
+
+        ///<summary>
+        /// Returns an intersection <see cref="IMatrixMap"/> of this map and other map that contains only the common values of each of them
+        /// </summary>
+        /// <remarks>Intended use of this extension method assumes that both maps are of the same base group.</remarks>
+        /// <exception cref="InvalidOperationException">Thrown if either map contains dimensions not included in the other map.</exception>
+        /// <returns>Combined intersection map with only the common values from both maps.</returns>
+        public static IMatrixMap IntersectionMap(this IMatrixMap thisMap, IMatrixMap other)
+        {
+            if (thisMap.DimensionMaps.Count != other.DimensionMaps.Count)
+            {
+                throw new InvalidOperationException("Maps must have the same number of dimensions.");
+            }
+
+            List<IDimensionMap> intersectedDimensions = [];
+
+            for (int i = 0; i < thisMap.DimensionMaps.Count; i++)
+            {
+                IDimensionMap thisDim = thisMap.DimensionMaps[i];
+                IDimensionMap otherDim = other.DimensionMaps[i];
+
+                if (thisDim.Code != otherDim.Code)
+                {
+                    throw new InvalidOperationException($"Dimension codes at position {i} do not match: '{thisDim.Code}' vs '{otherDim.Code}'.");
+                }
+
+                // Find common values preserving order from thisMap
+                List<string> commonValues = [];
+                commonValues.AddRange(thisDim.ValueCodes.Where(valueCode => otherDim.ValueCodes.Contains(valueCode)));
+                intersectedDimensions.Add(new DimensionMap(thisDim.Code, commonValues));
+            }
+
+            return new MatrixMap(intersectedDimensions);
+        }
+
+        /// <summary>
+        /// Computes index mappings from the <paramref name="subMap"/> to the current (super) map for each dimension.
+        /// </summary>
+        /// <param name="thisMap">The super map that contains all dimensions and values.</param>
+        /// <param name="subMap">The sub map whose value codes exist in the same order within the super map.</param>
+        /// <returns>
+        /// A jagged array where each element corresponds to a dimension; for each dimension it contains an array of
+        /// indices mapping the position of each value in <paramref name="subMap"/> to its index in the corresponding
+        /// dimension of <paramref name="thisMap"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the number of dimensions differs between <paramref name="subMap"/> and <paramref name="thisMap"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method assumes that <paramref name="subMap"/> is a valid submap of <paramref name="thisMap"/>,
+        /// meaning that for every dimension, the sequence of value codes in <paramref name="subMap"/> appears in the
+        /// same order within the corresponding dimension of <paramref name="thisMap"/>. If a value from
+        /// <paramref name="subMap"/> does not exist in <paramref name="thisMap"/>, the behavior is undefined.
+        /// Consider validating with <see cref="IsSubmapOf(IMatrixMap, IMatrixMap)"/> before calling.
+        /// </remarks>
+        public static int[][] GetIndicesOfSubmap(this IMatrixMap thisMap, IMatrixMap subMap)
+        {
+            if (subMap.DimensionMaps.Count != thisMap.DimensionMaps.Count)
+            {
+                throw new ArgumentException("Number of dimensions differ between source and target maps, index mapping can not be computed.");
+            }
+
+            int[][] result = new int[subMap.DimensionMaps.Count][];
+
+            for (int dimIndx = 0; dimIndx < subMap.DimensionMaps.Count; dimIndx++)
+            {
+                IReadOnlyList<string> subDimCodes = subMap.DimensionMaps[dimIndx].ValueCodes;
+                IReadOnlyList<string> superDimCodes = thisMap.DimensionMaps[dimIndx].ValueCodes;
+
+                int subValIndex = 0;
+                int[] valIndices = new int[subDimCodes.Count];
+                for (int superValIndex = 0; superValIndex < superDimCodes.Count; superValIndex++)
+                {
+                    if (subDimCodes[subValIndex] == superDimCodes[superValIndex])
+                    {
+                        valIndices[subValIndex] = superValIndex;
+                        subValIndex++;
+                        if (subValIndex >= subDimCodes.Count) break;
+                    }
+                }
+                result[dimIndx] = valIndices;
+            }
+            return result;
         }
     }
 }

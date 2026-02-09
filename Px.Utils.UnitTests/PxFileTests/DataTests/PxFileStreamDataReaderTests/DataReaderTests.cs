@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models.Metadata;
+using Px.Utils.Models.Metadata;
 using Px.Utils.PxFile.Data;
 using Px.Utils.UnitTests;
 using PxFileTests.Fixtures;
@@ -319,7 +319,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19
             ];
 
-            CollectionAssert.AreEqual( expexted, targetBuffer.Select(v => v.UnsafeValue).ToArray());
+            CollectionAssert.AreEqual(expexted, targetBuffer.Select(v => v.UnsafeValue).ToArray());
         }
 
         [TestMethod]
@@ -481,5 +481,59 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
             // Assert
             Assert.ThrowsException<ArgumentException>(() => reader.ReadDoubleDataValues(targetBuffer, 0, testMeta, matrixMap));
         }
-    }
+
+        [TestMethod]
+        public void ReadDoubleDataValuesWithExcessivePrecisionReturnsCorrectDoubleDataValues()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8__EXCESSIVELYLONGDATAVALUES);
+            using Stream stream = new MemoryStream(data);
+            using PxFileStreamDataReader reader = new(stream);
+            DoubleDataValue[] targetBuffer = new DoubleDataValue[20];
+
+            // Act
+            MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
+            MatrixMap matrixMap = new(
+            [
+                new DimensionMap("var0", ["var0_val0", "var0_val1"]),
+                new DimensionMap("var1", ["var1_val0", "var1_val1"]),
+                new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
+            ]);
+            reader.ReadDoubleDataValues(targetBuffer, 0, testMeta, matrixMap);
+
+            // Assert
+            double[] expexted =
+            [
+                0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
+                1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9128750345835981
+            ];
+            CollectionAssert.AreEqual(expexted, targetBuffer.Select(v => v.UnsafeValue).ToArray());
+        }
+
+        [TestMethod]
+        public void ReadDecimalDataValuesWithExcessivePrecisionReturnsCorrectDecimalDataValues()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes(DataReaderFixtures.MINIMAL_UTF8__EXCESSIVELYLONGDATAVALUES);
+            using Stream stream = new MemoryStream(data);
+            using PxFileStreamDataReader reader = new(stream);
+            DecimalDataValue[] targetBuffer = new DecimalDataValue[20];
+            // Act
+            MatrixMetadata testMeta = TestModelBuilder.BuildTestMetadata([2, 2, 5]);
+            MatrixMap matrixMap = new(
+            [
+                new DimensionMap("var0", ["var0_val0", "var0_val1"]),
+                new DimensionMap("var1", ["var1_val0", "var1_val1"]),
+                new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
+            ]);
+            reader.ReadDecimalDataValues(targetBuffer, 0, testMeta, matrixMap);
+            // Assert
+            decimal[] expexted =
+            [
+                0.0m, 0.1m, 0.2m, 0.3m, 0.4m, 0.5m, 0.6m, 0.7m, 0.8m, 0.9m,
+                1.0m, 1.1m, 1.2m, 1.3m, 1.4m, 1.5m, 1.6m, 1.7m, 1.8m, 1.9128750345835981m
+            ];
+            CollectionAssert.AreEqual(expexted, targetBuffer.Select(v => v.UnsafeValue).ToArray());
+        }
+	}
 }

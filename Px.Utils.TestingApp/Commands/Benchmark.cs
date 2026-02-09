@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Px.Utils.TestingApp.Commands
@@ -114,7 +114,7 @@ namespace Px.Utils.TestingApp.Commands
             }
         }
 
-        internal override void Run(bool batchMode, List<string>? inputs = null)
+        internal override async Task Run(bool batchMode, List<string>? inputs = null)
         {
             if (inputs?.Count == 1 && inputs[0] == "help")
             {
@@ -124,15 +124,15 @@ namespace Px.Utils.TestingApp.Commands
                 inputs = [];
             }
 
-            Parameters = GroupParameters(inputs ?? [], ParameterFlags.SelectMany(x => x).ToList());
+            Parameters = GroupParameters(inputs ?? [], [.. ParameterFlags.SelectMany(x => x)]);
             SetRunParameters();
-            OneTimeBenchmarkSetup();
+            await OneTimeBenchmarkSetupAsync();
 
             // synchronous validation
             RunBenchmarks(BenchmarkFunctions);
 
             // async validation
-            RunBenchmarksAsync(BenchmarkFunctionsAsync).Wait();
+            await RunBenchmarksAsync(BenchmarkFunctionsAsync);
         }
 
         protected virtual void SetRunParameters()
@@ -179,10 +179,11 @@ namespace Px.Utils.TestingApp.Commands
         /// <summary>
         /// Setup method for the benchmark. Called before running the benchmarks. Marked as virtual to allow for custom setup in derived classes.
         /// </summary>
-        protected virtual void OneTimeBenchmarkSetup()
+        protected virtual Task OneTimeBenchmarkSetupAsync()
         {
             Results.Clear();
             processesCompleted = 0;
+            return Task.CompletedTask;
         }
 
         protected void RunBenchmarks(Action[] functions)
