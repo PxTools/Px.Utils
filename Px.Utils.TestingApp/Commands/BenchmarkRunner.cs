@@ -1,4 +1,4 @@
-﻿namespace Px.Utils.TestingApp.Commands
+namespace Px.Utils.TestingApp.Commands
 {
     internal sealed class BenchmarkRunner : Command
     {
@@ -15,6 +15,8 @@
             _benchmarks.Add("file-validation", new PxFileValidationBenchmark());
             _benchmarks.Add("computation", new ComputationBenchmark());
             _benchmarks.Add("database-validation", new DatabaseValidationBenchmark());
+            _benchmarks.Add("binary-read", new BinaryReadBenchmark());
+            _benchmarks.Add("binary-write", new BinaryWriteBenchmark());
         }
 
         internal override string Help
@@ -29,7 +31,7 @@
 
         internal override string Description => "Run a set of benchmarks.";
 
-        internal override void Run(bool batchMode, List<string>? inputs = null)
+        internal override async Task Run(bool batchMode, List<string>? inputs = null)
         {
             const string q = "Enter the benchmark name and optional parameters:";
             const string followUp = "Valid benchmark name is required, please input the benchmark name:";
@@ -41,14 +43,14 @@
 
             if (_benchmarks.TryGetValue(inputs[0], out Benchmark? benchmark))
             {
-                benchmark.Run(batchMode, inputs.Skip(1).ToList());
+                await benchmark.Run(batchMode, inputs.Skip(1).ToList());
                 benchmark.PrintResults();
             }
             else if (inputs.Count == 1 && inputs[0] == "help")
             {
                 Console.WriteLine(Help);
                 inputs = TestAppConsole.AskQuestion(q, true, followUp);
-                Run(batchMode, inputs);
+                await Run(batchMode, inputs);
             }
             else
             {

@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models.Metadata;
+using Px.Utils.Models.Metadata;
 using Px.Utils.PxFile;
 using System.Text;
 
@@ -126,9 +126,7 @@ namespace Px.Utils.ModelBuilders
                 remaining[0] == _spesifierParamStart &&
                 remaining[^1] == _spesifierParamEnd)
             {
-                return SplitSpecifierParts(remaining[1..^1], _listSeparator)
-                    .Select(ValidateAndTrimSpecifierValue)
-                    .ToList();
+                return [.. SplitSpecifierParts(remaining[1..^1], _listSeparator).Select(ValidateAndTrimSpecifierValue)];
             }
             else
             {

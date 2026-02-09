@@ -1,4 +1,4 @@
-﻿using Px.Utils.Serializers.Json;
+using Px.Utils.Serializers.Json;
 using System.Collections;
 using System.Text.Json.Serialization;
 
@@ -43,8 +43,8 @@ namespace Px.Utils.Models.Metadata.Dimensions
         /// <param name="dimensions">The collection of dimension values in order.</param>
         public ValueList(IEnumerable<DimensionValue> dimensions)
         {
-            Values = dimensions.ToList();
-            Codes = Values.Select(d => d.Code).ToList();
+            Values = [.. dimensions];
+            Codes = [.. Values.Select(d => d.Code)];
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
         public void Add(DimensionValue value)
         {
             Values.Add(value);
-            Codes = Values.Select(d => d.Code).ToList();
+            Codes = [.. Values.Select(d => d.Code)];
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
         public void Insert(int index, DimensionValue value)
         {
             Values.Insert(index, value);
-            Codes = Values.Select(d => d.Code).ToList();
+            Codes = [.. Values.Select(d => d.Code)];
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace Px.Utils.Models.Metadata.Dimensions
             if (Find(code) is DimensionValue value)
             {
                 Values.Remove(value);
-                Codes = Values.Select(d => d.Code).ToList();
+                Codes = [.. Values.Select(d => d.Code)];
             }
             else
             {

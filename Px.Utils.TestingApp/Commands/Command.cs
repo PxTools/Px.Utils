@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Px.Utils.TestingApp.Commands
 {
@@ -8,7 +8,7 @@ namespace Px.Utils.TestingApp.Commands
 
         internal abstract string Description { get; }
 
-        internal abstract void Run(bool batchMode, List<string>? inputs = null);
+        internal abstract Task Run(bool batchMode, List<string>? inputs = null);
 
         protected static Dictionary<string, List<string>> GroupParameters(List<string> inputs, List<string> flags)
         {

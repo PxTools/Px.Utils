@@ -1,4 +1,4 @@
-﻿using Px.Utils.Language;
+using Px.Utils.Language;
 using Px.Utils.Models.Metadata.Enums;
 using Px.Utils.Models.Metadata.MetaProperties;
 using System.Text.Json;
@@ -252,7 +252,7 @@ namespace Px.Utils.UnitTests.SerializerTests
         {
             // Arrange
             string value = "Hello, World!";
-            StringProperty property = new StringProperty(value);
+            StringProperty property = new(value);
 
             // Act
             string json = JsonSerializer.Serialize(property);
@@ -281,7 +281,7 @@ namespace Px.Utils.UnitTests.SerializerTests
         {
             // Arrange
             string value = "Hello, World!";
-            StringProperty property = new StringProperty(value);
+            StringProperty property = new(value);
             JsonSerializerOptions jsonSerializerOptions = new()
             {
                 WriteIndented = true,

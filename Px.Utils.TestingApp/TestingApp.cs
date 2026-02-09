@@ -1,4 +1,4 @@
-﻿using Px.Utils.TestingApp.Commands;
+using Px.Utils.TestingApp.Commands;
 using Px.Utils.TestingApp;
 
 namespace Px.Utils.TestingApp
@@ -8,9 +8,9 @@ namespace Px.Utils.TestingApp
     /// </summary>
     internal static class TestingApp
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            if (args.Length == 0) new InteractiveFlow().Start();
+            if (args.Length == 0) await new InteractiveFlow().StartAsync();
             else StartBatchMode();
         }
 

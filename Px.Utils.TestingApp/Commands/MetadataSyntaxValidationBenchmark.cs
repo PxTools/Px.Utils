@@ -1,4 +1,4 @@
-﻿using Px.Utils.PxFile.Metadata;
+using Px.Utils.PxFile.Metadata;
 using Px.Utils.Validation.SyntaxValidation;
 using System.Text;
 
@@ -21,9 +21,9 @@ namespace Px.Utils.TestingApp.Commands
             BenchmarkFunctionsAsync = [SyntaxValidationBenchmarkAsync];
         }
 
-        protected override void OneTimeBenchmarkSetup()
+        protected override async Task OneTimeBenchmarkSetupAsync()
         {
-            base.OneTimeBenchmarkSetup();
+            await base.OneTimeBenchmarkSetupAsync();
 
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileMetadataReader reader = new();
