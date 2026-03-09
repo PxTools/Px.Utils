@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models.Metadata;
+using Px.Utils.Models.Metadata;
 using Px.Utils.Models.Metadata.Dimensions;
 using Px.Utils.Models.Metadata.ExtensionMethods;
 
@@ -18,7 +18,6 @@ namespace Px.Utils.UnitTests.ModelTests
             ContentDimension contentDimension = metadata.GetContentDimension();
 
             // Assert
-            Assert.IsNotNull(contentDimension);
             Assert.AreEqual(4, contentDimension.Values.Count);
         }
 
@@ -31,7 +30,7 @@ namespace Px.Utils.UnitTests.ModelTests
             metadata.Dimensions.RemoveAt(0);
 
             // Assert
-            Assert.ThrowsException<InvalidOperationException>(metadata.GetContentDimension);
+            Assert.ThrowsExactly<InvalidOperationException>(() => metadata.GetContentDimension());
         }
 
         [TestMethod]
@@ -77,7 +76,6 @@ namespace Px.Utils.UnitTests.ModelTests
             TimeDimension timeDimension = metadata.GetTimeDimension();
 
             // Assert
-            Assert.IsNotNull(timeDimension);
             Assert.AreEqual(3, timeDimension.Values.Count);
         }
 
@@ -90,7 +88,7 @@ namespace Px.Utils.UnitTests.ModelTests
             metadata.Dimensions.RemoveAll(dimension => dimension.Type == Models.Metadata.Enums.DimensionType.Time);
 
             // Assert
-            Assert.ThrowsException<InvalidOperationException>(metadata.GetTimeDimension);
+            Assert.ThrowsExactly<InvalidOperationException>(() => metadata.GetTimeDimension());
         }
 
         [TestMethod]
@@ -123,6 +121,130 @@ namespace Px.Utils.UnitTests.ModelTests
             // Assert
             Assert.IsFalse(found);
             Assert.IsNull(dim);
+        }
+
+        [TestMethod]
+        public void MatrixMetadataExtensionsGetLastUpdatedReturnsLatestLastUpdatedTimeStamp()
+        {
+            // Arrange
+            int[] dimensionSizes = [2, 1, 1, 1];
+            MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata(dimensionSizes);
+            ContentDimension contDim = metadata.GetContentDimension();
+            ContentDimensionValue value0 = new(
+                contDim.Values[0],
+                contDim.Values[0].Unit,
+                new(2020, 3, 9, 13, 0, 0, DateTimeKind.Unspecified),
+                contDim.Values[0].Precision
+            );
+            ContentDimensionValue value1 = new(
+                contDim.Values[1],
+                contDim.Values[1].Unit,
+                new(2026, 3, 9, 13, 0, 0, DateTimeKind.Unspecified),
+                contDim.Values[1].Precision
+            );
+            ContentDimension newContDim = new(
+                contDim.Code,
+                contDim.Name,
+                contDim.AdditionalProperties,
+                new ContentValueList([value0, value1])
+            );
+            metadata.Dimensions[0] = newContDim;
+
+            // Act
+            DateTime lastUpdated = metadata.GetLastUpdated();
+
+            // Assert
+            Assert.AreEqual(lastUpdated, value1.LastUpdated);
+        }
+
+        [TestMethod]
+        public void MatrixMetadataExtensionsGetLastUpdatedTimestampReturnsLatestDefaultFormat()
+        {
+            // Arrange
+            int[] dimensionSizes = [2, 1, 1, 1];
+            MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata(dimensionSizes);
+            ContentDimension contDim = metadata.GetContentDimension();
+            DateTime older = new(2020, 3, 9, 13, 0, 0, DateTimeKind.Unspecified);
+            DateTime newer = new (2026, 3, 9, 13, 0, 0, DateTimeKind.Unspecified);
+            ContentDimensionValue value0 = new(
+                contDim.Values[0],
+                contDim.Values[0].Unit,
+                older,
+                contDim.Values[0].Precision
+            );
+            ContentDimensionValue value1 = new(
+                contDim.Values[1],
+                contDim.Values[1].Unit,
+                newer,
+                contDim.Values[1].Precision
+            );
+            ContentDimension newContDim = new(
+                contDim.Code,
+                contDim.Name,
+                contDim.AdditionalProperties,
+                new ContentValueList([value0, value1])
+            );
+            metadata.Dimensions[0] = newContDim;
+            string expected = "202603091300";
+
+            // Act
+            string timestamp = metadata.GetLastUpdatedTimestamp();
+
+            // Assert
+            Assert.AreEqual(expected, timestamp);
+        }
+
+        [TestMethod]
+        public void MatrixMetadataExtensionsGetLastUpdatedTimestampReturnsLatestWithCustomFormat()
+        {
+            // Arrange
+            int[] dimensionSizes = [2, 1, 1, 1];
+            MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata(dimensionSizes);
+            ContentDimension contDim = metadata.GetContentDimension();
+            DateTime older = new(2020, 3, 9, 13, 0, 0, DateTimeKind.Unspecified);
+            DateTime newer = new(2026, 3, 9, 13, 0, 0, DateTimeKind.Unspecified);
+            ContentDimensionValue value0 = new(
+                contDim.Values[0],
+                contDim.Values[0].Unit,
+                older,
+                contDim.Values[0].Precision
+            );
+            ContentDimensionValue value1 = new(
+                contDim.Values[1],
+                contDim.Values[1].Unit,
+                newer,
+                contDim.Values[1].Precision
+            );
+            ContentDimension newContDim = new(
+                contDim.Code,
+                contDim.Name,
+                contDim.AdditionalProperties,
+                new ContentValueList([value0, value1])
+            );
+            metadata.Dimensions[0] = newContDim;
+            const string format = "yyyy-MM-dd";
+            string expected = "2026-03-09";
+
+            // Act
+            string timestamp = metadata.GetLastUpdatedTimestamp(format);
+
+            // Assert
+            Assert.AreEqual(expected, timestamp);
+        }
+
+        [TestMethod]
+        public void MatrixMetadataExtensionsGetContentDimensionValueCodesReturnsCodes()
+        {
+            // Arrange
+            int[] dimensionSizes = [3, 1, 1, 1];
+            MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata(dimensionSizes);
+            string[] expected = ["var0_val0", "var0_val1", "var0_val2"];
+
+            // Act
+            string[] result = metadata.GetContentDimensionValueCodes();
+
+            // Assert
+            CollectionAssert.AreEqual(expected, result);
         }
     }
 }

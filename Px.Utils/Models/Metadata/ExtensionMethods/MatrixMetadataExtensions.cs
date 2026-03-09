@@ -1,5 +1,6 @@
-﻿using Px.Utils.Models.Metadata.Dimensions;
+using Px.Utils.Models.Metadata.Dimensions;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace Px.Utils.Models.Metadata.ExtensionMethods
 {
@@ -50,6 +51,37 @@ namespace Px.Utils.Models.Metadata.ExtensionMethods
         {
             timeDimension = metadata.Dimensions.FirstOrDefault(dimension => dimension.Type == Enums.DimensionType.Time) as TimeDimension;
             return timeDimension is not null;
+        }
+
+        /// <summary>
+        /// Gets and returns the latest last updated date time from the content dimension values.
+        /// </summary>
+        /// <returns>DateTime representation of the latest last updated value from the metadata content dimension values.</returns>
+        public static DateTime GetLastUpdated(this IReadOnlyMatrixMetadata metadata)
+        {
+            return metadata.GetContentDimension().Values
+                .Map(value => value.LastUpdated).Max();
+        }
+
+        /// <summary>
+        /// Gets the latest last updated timestamp from the content dimension values in the metadata and formats it as a string using the optional specified format.
+        /// </summary>
+        /// <param name="format">Optional format string for the date and time. Default is "yyyyMMddHHmm".</param>
+        /// <returns>String representation of the latest last updated timestamp from the content dimension values, formatted according to the specified format.</returns>
+        public static string GetLastUpdatedTimestamp(this IReadOnlyMatrixMetadata metadata, string format = "yyyyMMddHHmm")
+        {
+            return metadata.GetContentDimension().Values
+                .Map(value => value.LastUpdated).Max()
+                .ToString(format, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>  
+        /// Gets the codes of the content dimension values from the metadata.
+        /// </summary>
+        /// <returns>Array of strings representing the codes of the content dimension values.</returns>
+        public static string[] GetContentDimensionValueCodes(this IReadOnlyMatrixMetadata metadata)
+        {
+            return [.. metadata.GetContentDimension().Values.Map(value => value.Code)];
         }
     }
 }
