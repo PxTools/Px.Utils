@@ -1,16 +1,17 @@
-﻿using Px.Utils.Models.Metadata;
+using Px.Utils.Models.Metadata;
 using Px.Utils.PxFile.Data;
-using Px.Utils.UnitTests;
 using PxFileTests.Fixtures;
 using Px.Utils.Models.Data;
 using Px.Utils.Models.Data.DataValue;
 using System.Text;
 
-namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
+namespace Px.Utils.UnitTests.PxFileTests.DataTests.PxFileStreamDataReaderTests
 {
     [TestClass]
     public class AsyncDataReaderTests
     {
+        public TestContext TestContext { get; set; }
+
         private readonly double[] missingMarkers = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6];
 
         [TestMethod]
@@ -32,7 +33,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta, TestContext.CancellationToken);
 
             double[] expexted =
             [
@@ -64,7 +65,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta, TestContext.CancellationToken);
 
             double[] expexted =
             [
@@ -96,7 +97,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta, TestContext.CancellationToken);
 
             // Assert
             DoubleDataValue[] expexted =
@@ -164,7 +165,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
             CancellationToken cToken = cts.Token;
 
             async Task call() => await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta, cToken);
-            await Assert.ThrowsExceptionAsync<TaskCanceledException>(call);
+            await Assert.ThrowsExactlyAsync<TaskCanceledException>(call);
         }
 
         [TestMethod]
@@ -221,7 +222,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
             CancellationToken cToken = cts.Token;
 
             async Task call() => await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, targetMap, testMeta, cToken);
-            await Assert.ThrowsExceptionAsync<TaskCanceledException>(call);
+            await Assert.ThrowsExactlyAsync<TaskCanceledException>(call);
         }
 
         [TestMethod]
@@ -279,7 +280,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
 
             // Act and Assert
             async Task call() => await reader.ReadUnsafeDoublesAsync(targetBuffer, 0, targetMap, testMeta, missingMarkers, cToken);
-            await Assert.ThrowsExceptionAsync<TaskCanceledException>(call);
+            await Assert.ThrowsExactlyAsync<TaskCanceledException>(call);
         }
 
         [TestMethod]
@@ -301,7 +302,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1", "var1_val2", "var1_val3", "var1_val4"]),
                 new DimensionMap("var2", ["var2_val0"])
             ]);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta, TestContext.CancellationToken);
 
 
             double[] expexted = [0.00, 2.00, 4.00, 6.00, 8.00, canary];
@@ -328,7 +329,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1", "var1_val2", "var1_val3", "var1_val4"]),
                 new DimensionMap("var2", ["var2_val0"])
             ]);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta, TestContext.CancellationToken);
 
             // Assert
             double[] expexted = [10.00, 12.00, 14.00, 16.00, 18.00];
@@ -352,7 +353,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta, TestContext.CancellationToken);
 
             // Assert
             double[] expexted =
@@ -381,7 +382,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1", "var1_val2", "var1_val3", "var1_val4"]),
                 new DimensionMap("var2", ["var2_val0"])
             ]);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta, TestContext.CancellationToken);
 
             // Assert
             double[] expexted = [0.00, 0.02, 0.04, 0.06, 0.08];
@@ -405,7 +406,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1", "var1_val2", "var1_val3", "var1_val4"]),
                 new DimensionMap("var2", ["var2_val0"])
             ]);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta, TestContext.CancellationToken);
 
             // Assert
             double[] expexted = [0.10, 0.12, 0.14, 0.16, 0.18];
@@ -429,7 +430,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
+            await reader.ReadDoubleDataValuesAsync(targetBuffer, 0, targetMap, testMeta, TestContext.CancellationToken);
 
             // Assert
             double[] expexted =
@@ -458,7 +459,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
+            await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, targetMap, testMeta, TestContext.CancellationToken);
 
             // Assert
             decimal[] expexted =
@@ -487,7 +488,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, targetMap, testMeta);
+            await reader.ReadDecimalDataValuesAsync(targetBuffer, 0, targetMap, testMeta, TestContext.CancellationToken);
 
             // Assert
             decimal[] expexted =
@@ -516,7 +517,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            await reader.ReadUnsafeDoublesAsync(targetBuffer, 0, targetMap, testMeta, missingMarkers);
+            await reader.ReadUnsafeDoublesAsync(targetBuffer, 0, targetMap, testMeta, missingMarkers, TestContext.CancellationToken);
 
             // Assert
             double[] expexted =
@@ -545,7 +546,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1"]),
                 new DimensionMap("var2", ["var2_val0", "var2_val1", "var2_val2", "var2_val3", "var2_val4"])
             ]);
-            await reader.ReadUnsafeDoublesAsync(targetBuffer, 0, targetMap, testMeta, missingMarkers);
+            await reader.ReadUnsafeDoublesAsync(targetBuffer, 0, targetMap, testMeta, missingMarkers, TestContext.CancellationToken);
 
             // Assert
             double[] expexted =

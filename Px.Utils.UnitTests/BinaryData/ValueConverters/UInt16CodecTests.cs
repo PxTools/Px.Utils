@@ -21,7 +21,7 @@ namespace Px.Utils.UnitTests.BinaryData.ValueConverters
             ReadOnlySpan<byte> bytes = ms.ToArray();
             DoubleDataValue[] output = new DoubleDataValue[input.Length];
             codec.Read(bytes, output);
-            Assert.AreEqual(input.Length, output.Length);
+            Assert.HasCount(input.Length, output);
             for (int i = 0; i < input.Length; i++)
             {
                 Assert.AreEqual(DataValueType.Exists, output[i].Type);
@@ -72,7 +72,7 @@ namespace Px.Utils.UnitTests.BinaryData.ValueConverters
             codec.Write(input, ms);
             ReadOnlySpan<byte> bytes = ms.ToArray();
             codec.Read(bytes, output);
-            Assert.AreEqual(3, output.Length);
+            Assert.HasCount(3, output);
             Assert.AreEqual(DataValueType.Exists, output[0].Type);
             Assert.AreEqual(0m, output[0].UnsafeValue);
             Assert.AreEqual(DataValueType.Exists, output[1].Type);

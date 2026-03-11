@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models.Metadata.ExtensionMethods;
+using Px.Utils.Models.Metadata.ExtensionMethods;
 
 namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
 {
@@ -160,7 +160,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
             Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -176,7 +176,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
             Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -192,7 +192,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
             Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -208,7 +208,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
             Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
 
@@ -225,7 +225,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
             Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -241,7 +241,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
             Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -257,7 +257,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
             Action func = new(() => input.SplitToListOfStrings(listSeparator, stringDelimeter));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         #endregion

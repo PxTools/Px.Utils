@@ -1,4 +1,4 @@
-﻿using Px.Utils.Validation.SyntaxValidation;
+using Px.Utils.Validation.SyntaxValidation;
 using Px.Utils.UnitTests.Validation.Fixtures;
 using System.Text;
 using System.Reflection;
@@ -49,8 +49,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidationResult result = validator.Validate(stream, "foo", encoding);
             stream.Close();
-            Assert.AreEqual(8, result.Result.Count);
-            Assert.AreEqual(0, feedback.Count);
+            Assert.HasCount(8, result.Result);
+            Assert.HasCount(0, feedback);
         }
 
         [TestMethod]
@@ -63,8 +63,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = entryValidationMethod?.Invoke(null, [entries, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
-            Assert.AreEqual(2, feedback.First().Value.Count);
+            Assert.HasCount(1, feedback);
+            Assert.HasCount(2, feedback.First().Value);
             Assert.AreEqual(ValidationFeedbackRule.MultipleEntriesOnOneLine, feedback.First().Key.Rule);
         }
 
@@ -85,7 +85,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidationResult result = validator.Validate(stream, "foo", encoding);
             stream.Close();
-            Assert.AreEqual(10, result.Result.Count);
+            Assert.HasCount(10, result.Result);
             Assert.AreEqual("YES", result.Result[8].Value);
             Assert.AreEqual("NO", result.Result[9].Value);
             Assert.AreEqual("fi", result.Result[8].Key.Language);
@@ -116,7 +116,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidationResult result = validator.Validate(stream, "foo", encoding);
             stream.Close();
-            Assert.AreEqual(4, result.FeedbackItems.Count);
+            Assert.HasCount(4, result.FeedbackItems);
             Assert.AreEqual(9, result.FeedbackItems[keyWhiteSpaceFeedbackKey][0].Line);
             Assert.AreEqual(12, result.FeedbackItems[valueWhiteSpaceFeedbackKey][0].Line);
             Assert.AreEqual(14, result.FeedbackItems[entryWithoutValueFeedbackKey][0].Line);
@@ -133,7 +133,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
+            Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.MoreThanOneLanguageParameterSection, feedback.First().Key.Rule);
         }
 
@@ -148,7 +148,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
+            Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.MoreThanOneSpecifierParameterSection, feedback.First().Key.Rule);
         }
 
@@ -162,10 +162,10 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(2, feedback.Count);
+            Assert.HasCount(2, feedback);
             Assert.IsTrue(feedback.ContainsKey(new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.KeyHasWrongOrder)));
             Assert.IsTrue(feedback.ContainsKey(new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingKeyword)));
-            Assert.AreEqual(2, feedback[new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.KeyHasWrongOrder)].Count);
+            Assert.HasCount(2, feedback[new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.KeyHasWrongOrder)]);
         }
 
         [TestMethod]
@@ -184,11 +184,11 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(3, feedback.Count);
+            Assert.HasCount(3, feedback);
             Assert.IsTrue(feedback.ContainsKey(missingDelimeterFeedbackKey));
             Assert.IsTrue(feedback.ContainsKey(tooManySpecifiersFeedbackKey));
             Assert.IsTrue(feedback.ContainsKey(notEnclosedFeedbackKey));
-            Assert.AreEqual(2, feedback[notEnclosedFeedbackKey].Count);
+            Assert.HasCount(2, feedback[notEnclosedFeedbackKey]);
         }
 
         [TestMethod]
@@ -201,8 +201,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
-            Assert.AreEqual(3, feedback.First().Value.Count);
+            Assert.HasCount(1, feedback);
+            Assert.HasCount(3, feedback.First().Value);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageSection, feedback.First().Key.Rule);
         }
 
@@ -216,8 +216,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
-            Assert.AreEqual(3, feedback.First().Value.Count);
+            Assert.HasCount(1, feedback);
+            Assert.HasCount(3, feedback.First().Value);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierSection, feedback.First().Key.Rule);
         }
 
@@ -231,8 +231,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
-            Assert.AreEqual(4, feedback.First().Value.Count);
+            Assert.HasCount(1, feedback);
+            Assert.HasCount(4, feedback.First().Value);
             Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, feedback.First().Key.Rule);
         }
 
@@ -246,7 +246,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
+            Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.ExcessWhitespaceInValue, feedback.First().Key.Rule);
         }
 
@@ -260,7 +260,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
+            Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.KeyContainsExcessWhiteSpace, feedback.First().Key.Rule);
         }
 
@@ -274,8 +274,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
-            Assert.AreEqual(2, feedback.First().Value.Count);
+            Assert.HasCount(1, feedback);
+            Assert.HasCount(2, feedback.First().Value);
             Assert.AreEqual(ValidationFeedbackRule.ExcessNewLinesInValue, feedback.First().Key.Rule);
         }
 
@@ -291,10 +291,10 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(2, feedback.Count);
+            Assert.HasCount(2, feedback);
             Assert.IsTrue(feedback.ContainsKey(startWithletterFeedbackKey));
             Assert.IsTrue(feedback.ContainsKey(illegalCharactersFeedbackKey));
-            Assert.AreEqual(2, feedback[illegalCharactersFeedbackKey].Count);
+            Assert.HasCount(2, feedback[illegalCharactersFeedbackKey]);
         }
 
         [TestMethod]
@@ -307,7 +307,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(0, feedback.Count);
+            Assert.HasCount(0, feedback);
         }
 
         [TestMethod]
@@ -320,7 +320,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
+            Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageSection, feedback.First().Key.Rule);
         }
 
@@ -334,7 +334,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
+            Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierPart, feedback.First().Key.Rule);
         }
 
@@ -348,7 +348,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = entryValidationMethod?.Invoke(null, [entries, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
+            Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.EntryWithoutValue, feedback.First().Key.Rule);
         }
 
@@ -362,8 +362,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf] ) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
-            Assert.AreEqual(2, feedback.First().Value.Count);
+            Assert.HasCount(1, feedback);
+            Assert.HasCount(2, feedback.First().Value);
             Assert.AreEqual(ValidationFeedbackRule.IncompliantLanguage, feedback.First().Key.Rule);
         }
 
@@ -377,7 +377,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf] ) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(2, feedback.Count);
+            Assert.HasCount(2, feedback);
             Assert.IsTrue(feedback.ContainsKey(new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.KeywordIsNotInUpperCase)));
             Assert.IsTrue(feedback.ContainsKey(new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.KeywordContainsUnderscore)));
         }
@@ -392,7 +392,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf]) as ValidationFeedback ?? [];
 
-            Assert.AreEqual(1, feedback.Count);
+            Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.KeywordExcessivelyLong, feedback.First().Key.Rule);
         }
 
@@ -414,7 +414,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
 
             // Assert
             Assert.AreEqual(Utils.Validation.ValueType.ListOfStrings, valueType);
-            Assert.AreEqual(0, feedback.Count);
+            Assert.HasCount(0, feedback);
         }
 
         [TestMethod]
@@ -443,7 +443,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             Utils.Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, [keyValuePairs[0].KeyValuePair.Value, PxFileConfiguration.Default]) as Utils.Validation.ValueType?;
 
             // Assert
-            Assert.AreEqual(0, feedback.Count);
+            Assert.HasCount(0, feedback);
             Assert.AreEqual(type, valueType);
         }
 
@@ -475,7 +475,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Assert
             if (type is null)
             {
-                Assert.AreEqual(1, feedback.Count);
+                Assert.HasCount(1, feedback);
                 Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, feedback.First().Key.Rule);
             }
             Assert.AreEqual(type, valueType);
@@ -498,7 +498,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidationResult result = validator.Validate(stream, "foo", encoding);
             stream.Close();
-            Assert.AreEqual(0, result.FeedbackItems.Count);
+            Assert.HasCount(0, result.FeedbackItems);
         }
 
         [TestMethod]
@@ -518,7 +518,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidationResult result = validator.Validate(stream, "foo", encoding);
             stream.Close();
-            Assert.AreEqual(1, result.FeedbackItems.Count);
+            Assert.HasCount(1, result.FeedbackItems);
             Assert.AreEqual(9, result.FeedbackItems.First().Value[0].Line);
             Assert.AreEqual(16, result.FeedbackItems.First().Value[0].Character);
             Assert.AreEqual(ValidationFeedbackRule.InvalidValueFormat, result.FeedbackItems.First().Key.Rule);
@@ -543,7 +543,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             stream.Close();
 
             // Assert
-            Assert.AreEqual(0, result.FeedbackItems.Count);
+            Assert.HasCount(0, result.FeedbackItems);
         }
 
         [TestMethod]
@@ -562,7 +562,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             stream.Close();
 
             // Assert
-            Assert.AreEqual(0, result.FeedbackItems.Count);
+            Assert.HasCount(0, result.FeedbackItems);
         }
     }
 }

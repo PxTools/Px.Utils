@@ -43,7 +43,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             ContentValidationResult feedback = validator.Validate();
 
             // Assert
-            Assert.AreEqual(0, feedback.FeedbackItems.Count);
+            Assert.HasCount(0, feedback.FeedbackItems);
         }
 
         [TestMethod]
@@ -76,7 +76,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
                 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.MissingDefaultLanguage, result.First().Key.Rule);
         }
 
@@ -95,7 +95,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result.First().Key.Rule);
         }
 
@@ -116,7 +116,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.UndefinedLanguageFound, result.First().Key.Rule);
         }
 
@@ -137,7 +137,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result.First().Key.Rule);
         }
 
@@ -156,8 +156,8 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(3, result.First().Value.Count);   
+            Assert.HasCount(1, result);
+            Assert.HasCount(3, result.First().Value);   
             Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result.First().Key.Rule);
         }
 
@@ -178,7 +178,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(0, result.Count);
+            Assert.HasCount(0, result);
         }
 
         [TestMethod]
@@ -198,7 +198,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.MissingStubAndHeading, result.First().Key.Rule);
         }
 
@@ -219,7 +219,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.DuplicateDimension, result.First().Key.Rule);
         }
 
@@ -241,8 +241,8 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(2, result.First().Value.Count);
+            Assert.HasCount(1, result);
+            Assert.HasCount(2, result.First().Value);
             Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result.First().Key.Rule);
         }
 
@@ -268,8 +268,8 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(3, result.First().Value.Count);
+            Assert.HasCount(1, result);
+            Assert.HasCount(3, result.First().Value);
             Assert.AreEqual(ValidationFeedbackRule.VariableValuesMissing, result.First().Key.Rule);
         }
 
@@ -299,7 +299,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.DuplicateEntry, result.First().Key.Rule);
         }
 
@@ -326,8 +326,8 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(2, result.First().Value.Count);
+            Assert.HasCount(1, result);
+            Assert.HasCount(2, result.First().Value);
             Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result.First().Key.Rule);
         }
 
@@ -357,10 +357,10 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(2, result.Count);
+            Assert.HasCount(2, result);
             Assert.IsTrue(result.ContainsKey(recommendedKeyFeedbackKey));
             Assert.IsTrue(result.ContainsKey(recommendedSpecifierFeedbackKey));
-            Assert.AreEqual(2, result[recommendedSpecifierFeedbackKey].Count);
+            Assert.HasCount(2, result[recommendedSpecifierFeedbackKey]);
         }
 
         [TestMethod]
@@ -382,8 +382,8 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(4, result.First().Value.Count);
+            Assert.HasCount(1, result);
+            Assert.HasCount(4, result.First().Value);
             Assert.AreEqual(ValidationFeedbackRule.RecommendedKeyMissing, result.First().Key.Rule);
         }
 
@@ -402,7 +402,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.IllegalSpecifierDefinitionFound, result.First().Key.Rule);
         }
 
@@ -421,7 +421,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.IllegalLanguageDefinitionFound, result.First().Key.Rule);
         }
 
@@ -442,7 +442,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.UndefinedLanguageFound, result.First().Key.Rule);
         }
 
@@ -465,7 +465,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.IllegalSpecifierDefinitionFound, result.First().Key.Rule);
         }
 
@@ -488,7 +488,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.IllegalSpecifierDefinitionFound, result.First().Key.Rule);
         }
 
@@ -509,7 +509,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
                 // Assert
                 Assert.IsNotNull(result);
-                Assert.AreEqual(1, result.Count);
+                Assert.HasCount(1, result);
                 Assert.AreEqual(ValidationFeedbackRule.UnmatchingValueType, result.First().Key.Rule);
             }
         }
@@ -531,7 +531,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
                 // Assert
                 Assert.IsNotNull(result);
-                Assert.AreEqual(1, result.Count);
+                Assert.HasCount(1, result);
                 Assert.AreEqual(ValidationFeedbackRule.InvalidValueFound, result.First().Key.Rule);
             }
         }
@@ -555,7 +555,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.UnmatchingValueAmount, result.First().Key.Rule);
         }
 
@@ -574,7 +574,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.ValueIsNotInUpperCase, result.First().Key.Rule);
         }
 
@@ -589,7 +589,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             ValidationFeedback feedback = validator.Validate().FeedbackItems;
 
             // Assert
-            Assert.AreEqual(0, feedback.Count);
+            Assert.HasCount(0, feedback);
         }
 
         [TestMethod]
@@ -607,7 +607,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.MultipleInstancesOfUniqueKey, result.First().Key.Rule);
         }
 
@@ -626,7 +626,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.MultipleInstancesOfUniqueKey, result.First().Key.Rule);
         }
 
@@ -645,7 +645,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.MissingStubAndHeading, result.First().Key.Rule);
         }
 
