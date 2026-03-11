@@ -169,8 +169,8 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             CollectionAssert.AreEqual(expectedCodes, Actual_3Lang.Dimensions.Select(d => d.Code).ToList());
 
             List<MultilanguageString> expectedNames = [
-                new([new("fi", "Vuosi"), new("sv", "≈r"), new("en", "Year")]),
-                new([new("fi", "Alue"), new("sv", "OmrÂde"), new("en", "Region")]),
+                new([new("fi", "Vuosi"), new("sv", "√Ör"), new("en", "Year")]),
+                new([new("fi", "Alue"), new("sv", "Omr√•de"), new("en", "Region")]),
                 new([new("fi", "Talotyyppi"), new("sv", "Hustyp"), new("en", "Building type")]),
                 new([new("fi", "Tiedot"), new("sv", "Uppgifter"), new("en", "Information")])
                 ];
@@ -186,8 +186,8 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             CollectionAssert.AreEqual(expectedCodes, Actual_Recommended_3Lang.Dimensions.Select(d => d.Code).ToList());
 
             List<MultilanguageString> expectedNames = [
-                new([new("fi", "Vuosi"), new("sv", "≈r"), new("en", "Year")]),
-                new([new("fi", "Alue"), new("sv", "OmrÂde"), new("en", "Region")]),
+                new([new("fi", "Vuosi"), new("sv", "√Ör"), new("en", "Year")]),
+                new([new("fi", "Alue"), new("sv", "Omr√•de"), new("en", "Region")]),
                 new([new("fi", "Talotyyppi"), new("sv", "Hustyp"), new("en", "Building type")]),
                 new([new("fi", "Tiedot"), new("sv", "Uppgifter"), new("en", "Information")])
                 ];
@@ -219,7 +219,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             MultilanguageString[] expectedUnits = [
                 new("fi", "indeksipisteluku"),
                 new("fi", "%"),
-                new("fi", "lukum‰‰r‰")
+                new("fi", "lukum√§√§r√§")
             ];
             for (int i = 0; i < contentDimension.Values.Count; i++)
             {
@@ -261,7 +261,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         [TestMethod]
         [DataRow(0, "indeksipisteluku", "indextal", "index point")]
         [DataRow(1, "%", "%", "%")]
-        [DataRow(2, "lukum‰‰r‰", "antal", "number")]
+        [DataRow(2, "lukum√§√§r√§", "antal", "number")]
         public void MultiLangUnitsTest(int index, string fi, string sv, string en)
         {
             ContentDimension? contentDimension = (ContentDimension?)Actual_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
@@ -273,7 +273,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         [TestMethod]
         [DataRow(0, "indeksipisteluku")]
         [DataRow(1, "%")]
-        [DataRow(2, "lukum‰‰r‰")]
+        [DataRow(2, "lukum√§√§r√§")]
         public void SingleLangUnitsTest(int index, string fi)
         {
             ContentDimension? contentDimension = (ContentDimension?)Actual_1Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
@@ -342,7 +342,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         [TestMethod]
         [DataRow(0, "indeksipisteluku", "indextal", "index point")]
         [DataRow(1, "%", "%", "%")]
-        [DataRow(2, "lukum‰‰r‰", "antal", "number")]
+        [DataRow(2, "lukum√§√§r√§", "antal", "number")]
         public void MultiLangUnitsTestFromRecommendedFixture(int index, string fi, string sv, string en)
         {
             ContentDimension? contentDimension = (ContentDimension?)Actual_Recommended_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
@@ -437,7 +437,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Assert.IsNotNull(building_type_dim);
             if (building_type_dim.AdditionalProperties["ELIMINATION"] is MultilanguageStringProperty msp)
             {
-                MultilanguageString expected = new([new("fi", "Talotyypit yhteens‰"), new("sv", "Hustyp totalt"), new("en", "Building types total")]);
+                MultilanguageString expected = new([new("fi", "Talotyypit yhteens√§"), new("sv", "Hustyp totalt"), new("en", "Building types total")]);
                 Assert.AreEqual(expected, msp.Value);
             }
             else
@@ -453,7 +453,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Assert.IsNotNull(building_type_dim);
             if (building_type_dim.AdditionalProperties["ELIMINATION"] is StringProperty msp)
             {
-                Assert.AreEqual("Talotyypit yhteens‰", msp.Value);
+                Assert.AreEqual("Talotyypit yhteens√§", msp.Value);
             }
             else
             {
