@@ -1,4 +1,4 @@
-﻿using Px.Utils.UnitTests.Validation.ContentValidationTests;
+using Px.Utils.UnitTests.Validation.ContentValidationTests;
 using Px.Utils.UnitTests.Validation.Fixtures;
 using Px.Utils.UnitTests.Validation.SyntaxValidationTests;
 using Px.Utils.Validation;
@@ -21,7 +21,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Count);
+            Assert.HasCount(0, result.FeedbackItems);
         }
 
         [TestMethod]
@@ -36,7 +36,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Count);
+            Assert.HasCount(0, result.FeedbackItems);
         }
 
         [TestMethod]
@@ -51,8 +51,8 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(9, result.FeedbackItems.Count); // Unique feedbacks
-            Assert.AreEqual(11, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
+            Assert.HasCount(9, result.FeedbackItems); // Unique feedbacks
+            Assert.HasCount(11, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
         }
 
         [TestMethod]
@@ -68,7 +68,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Count);
+            Assert.HasCount(0, result.FeedbackItems);
         }
 
         [TestMethod]
@@ -83,7 +83,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(1, result.FeedbackItems.Count);
+            Assert.HasCount(1, result.FeedbackItems);
         }
 
         [TestMethod]
@@ -98,7 +98,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(1, result.FeedbackItems.Count);
+            Assert.HasCount(1, result.FeedbackItems);
         }
 
         [TestMethod]
@@ -114,7 +114,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Count);
+            Assert.HasCount(0, result.FeedbackItems);
         }
 
         [TestMethod]
@@ -130,7 +130,7 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Count);
+            Assert.HasCount(0, result.FeedbackItems);
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Px.Utils.UnitTests.SerializerTests
             // Assert
             Assert.IsNotNull(property);
             Assert.AreEqual(MetaPropertyType.MultilanguageTextArray, property.Type);
-            Assert.AreEqual(2, property.Value.Count);
+            Assert.HasCount(2, property.Value);
             Assert.AreEqual("Hello", property.Value[0]["en"]);
             Assert.AreEqual("Bonjour", property.Value[0]["fr"]);
             Assert.AreEqual("Hola", property.Value[0]["es"]);
@@ -84,7 +84,7 @@ namespace Px.Utils.UnitTests.SerializerTests
             // Assert
             Assert.IsNotNull(deserializedProperty);
             Assert.AreEqual(MetaPropertyType.MultilanguageTextArray, deserializedProperty.Type);
-            Assert.AreEqual(2, deserializedProperty.Value.Count);
+            Assert.HasCount(2, deserializedProperty.Value);
             Assert.AreEqual("Hello", deserializedProperty.Value[0]["en"]);
             Assert.AreEqual("Bonjour", deserializedProperty.Value[0]["fr"]);
             Assert.AreEqual("Hola", deserializedProperty.Value[0]["es"]);
@@ -211,7 +211,7 @@ namespace Px.Utils.UnitTests.SerializerTests
             // Assert
             Assert.IsNotNull(property);
             Assert.AreEqual(MetaPropertyType.TextArray, property.Type);
-            Assert.AreEqual(3, property.Value.Count);
+            Assert.HasCount(3, property.Value);
             Assert.AreEqual("Hello", property.Value[0]);
             Assert.AreEqual("World", property.Value[1]);
             Assert.AreEqual("!", property.Value[2]);
@@ -237,7 +237,7 @@ namespace Px.Utils.UnitTests.SerializerTests
             // Assert
             Assert.IsNotNull(deserializedProperty);
             Assert.AreEqual(MetaPropertyType.TextArray, deserializedProperty.Type);
-            Assert.AreEqual(3, deserializedProperty.Value.Count);
+            Assert.HasCount(3, deserializedProperty.Value);
             Assert.AreEqual("Hello", deserializedProperty.Value[0]);
             Assert.AreEqual("World", deserializedProperty.Value[1]);
             Assert.AreEqual("!", deserializedProperty.Value[2]);

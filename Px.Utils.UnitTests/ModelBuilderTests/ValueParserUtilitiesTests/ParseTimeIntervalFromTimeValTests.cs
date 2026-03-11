@@ -1,7 +1,7 @@
-﻿using Px.Utils.ModelBuilders;
+using Px.Utils.ModelBuilders;
 using Px.Utils.Models.Metadata.Enums;
 
-namespace ModelBuilderTests.ValueParserUtilitiesTests
+namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
 {
     [TestClass]
     public class ParseTimeIntervalFromTimeValTests
@@ -83,7 +83,7 @@ namespace ModelBuilderTests.ValueParserUtilitiesTests
             string input = "FOO";
             void act() => ValueParserUtilities.ParseTimeIntervalFromTimeVal(input);
 
-            Assert.ThrowsException<ArgumentException>(act);
+            Assert.ThrowsExactly<ArgumentException>(act);
         }
     }
 }

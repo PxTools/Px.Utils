@@ -1,4 +1,4 @@
-﻿using Px.Utils.Language;
+using Px.Utils.Language;
 using Px.Utils.Models.Metadata.ExtensionMethods;
 
 namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
@@ -76,7 +76,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
             MultilanguageString mls = new([new("a", a_list_string), new("b", b_list_string)]);
 
             // Act and assert
-            Assert.ThrowsException<ArgumentException>(() => mls.ValueAsListOfMultilanguageStrings(',', '"'));
+            Assert.ThrowsExactly<ArgumentException>(() => mls.ValueAsListOfMultilanguageStrings(',', '"'));
         }
 
         [TestMethod]
@@ -88,7 +88,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests.PropertyExtensionTests
             MultilanguageString mls = new([new("a", a_list_string), new("b", b_list_string)]);
 
             // Act and assert
-            Assert.ThrowsException<ArgumentException>(() => mls.ValueAsListOfMultilanguageStrings(',', '"'));
+            Assert.ThrowsExactly<ArgumentException>(() => mls.ValueAsListOfMultilanguageStrings(',', '"'));
         }
     }
 }

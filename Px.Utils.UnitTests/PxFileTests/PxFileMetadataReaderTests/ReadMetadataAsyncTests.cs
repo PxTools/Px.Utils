@@ -8,6 +8,8 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
     [TestClass]
     public class ReadMetadataAsyncTests
     {
+        public TestContext TestContext { get; set; }
+
         [TestMethod]
         public async Task ReadMetadataAsyncCalledWithMinimalUTF8NReturnsMetadata()
         {
@@ -17,13 +19,13 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await reader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream, TestContext.CancellationToken);
             stream.Seek(0, SeekOrigin.Begin);
-            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding);
-            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
+            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding, cancellationToken: TestContext.CancellationToken);
+            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync(TestContext.CancellationToken);
 
             // Assert
-            Assert.AreEqual(8, metadataList.Count);
+            Assert.HasCount(8, metadataList);
 
             Assert.AreEqual("CHARSET", metadataList[0].Key);
             Assert.AreEqual("\"ANSI\"", metadataList[0].Value);
@@ -59,13 +61,13 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await reader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream, TestContext.CancellationToken);
             stream.Seek(0, SeekOrigin.Begin);
-            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding);
-            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
+            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding, cancellationToken: TestContext.CancellationToken);
+            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync(TestContext.CancellationToken);
 
             // Assert
-            Assert.AreEqual(8, metadataList.Count);
+            Assert.HasCount(8, metadataList);
 
             Assert.AreEqual("CHARSET", metadataList[0].Key);
             Assert.AreEqual("\"ANSI\"", metadataList[0].Value);
@@ -102,13 +104,13 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await reader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream, TestContext.CancellationToken);
             stream.Seek(0, SeekOrigin.Begin);
-            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding);
-            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
+            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding, cancellationToken: TestContext.CancellationToken);
+            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync(TestContext.CancellationToken);
 
             // Assert
-            Assert.AreEqual(8, metadataList.Count);
+            Assert.HasCount(8, metadataList);
 
             Assert.AreEqual("CHARSET", metadataList[0].Key);
             Assert.AreEqual("\"ANSI\"", metadataList[0].Value);
@@ -144,13 +146,13 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await reader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream, TestContext.CancellationToken);
             stream.Seek(0, SeekOrigin.Begin);
-            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding, 28);
-            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
+            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding, 28, cancellationToken: TestContext.CancellationToken);
+            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync(TestContext.CancellationToken);
 
             // Assert
-            Assert.AreEqual(8, metadataList.Count);
+            Assert.HasCount(8, metadataList);
 
             Assert.AreEqual("CHARSET", metadataList[0].Key);
             Assert.AreEqual("\"ANSI\"", metadataList[0].Value);
@@ -187,10 +189,12 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
 
             // Act + Assert
             stream.Seek(0, SeekOrigin.Begin);
-            await Assert.ThrowsExceptionAsync<InvalidPxFileMetadataException>(async () =>
+            await Assert.ThrowsExactlyAsync<InvalidPxFileMetadataException>(async () =>
             {
-                IAsyncEnumerable<KeyValuePair<string, string>> iterator = reader.ReadMetadataAsync(stream, Encoding.UTF8);
-                await iterator.ForEachAsync(_ => { });
+                await foreach (KeyValuePair<string, string> _ in reader.ReadMetadataAsync(stream, Encoding.UTF8, cancellationToken: TestContext.CancellationToken))
+                {
+                    // Iterate through to trigger exception
+                }
             });
         }
 
@@ -203,13 +207,13 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await reader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream, TestContext.CancellationToken);
             stream.Seek(0, SeekOrigin.Begin);
-            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding);
-            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync();
+            IAsyncEnumerable<KeyValuePair<string, string>> metadata = reader.ReadMetadataAsync(stream, encoding, cancellationToken: TestContext.CancellationToken);
+            List<KeyValuePair<string, string>> metadataList = await metadata.ToListAsync(TestContext.CancellationToken);
 
             // Assert
-            Assert.AreEqual(8, metadataList.Count);
+            Assert.HasCount(8, metadataList);
 
             Assert.AreEqual("CHARSET", metadataList[0].Key);
             Assert.AreEqual("\"ANSI\"", metadataList[0].Value);

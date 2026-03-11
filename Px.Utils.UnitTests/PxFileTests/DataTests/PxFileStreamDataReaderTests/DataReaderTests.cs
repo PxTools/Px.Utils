@@ -1,12 +1,11 @@
 using Px.Utils.Models.Metadata;
 using Px.Utils.PxFile.Data;
-using Px.Utils.UnitTests;
 using PxFileTests.Fixtures;
 using Px.Utils.Models.Data;
 using Px.Utils.Models.Data.DataValue;
 using System.Text;
 
-namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
+namespace Px.Utils.UnitTests.PxFileTests.DataTests.PxFileStreamDataReaderTests
 {
     [TestClass]
     public class DataReaderTests
@@ -457,7 +456,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
             ]);
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(() => reader.ReadDoubleDataValues(targetBuffer, 0, testMeta, matrixMap));
+            Assert.ThrowsExactly<ArgumentException>(() => reader.ReadDoubleDataValues(targetBuffer, 0, testMeta, matrixMap));
         }
 
         [TestMethod]
@@ -479,7 +478,7 @@ namespace PxFileTests.DataTests.PxFileStreamDataReaderTests
             ]);
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(() => reader.ReadDoubleDataValues(targetBuffer, 0, testMeta, matrixMap));
+            Assert.ThrowsExactly<ArgumentException>(() => reader.ReadDoubleDataValues(targetBuffer, 0, testMeta, matrixMap));
         }
 
         [TestMethod]
