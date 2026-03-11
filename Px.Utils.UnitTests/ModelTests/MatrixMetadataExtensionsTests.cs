@@ -18,6 +18,7 @@ namespace Px.Utils.UnitTests.ModelTests
             ContentDimension contentDimension = metadata.GetContentDimension();
 
             // Assert
+            Assert.IsNotNull(contentDimension);
             Assert.HasCount(4, contentDimension.Values);
         }
 
@@ -76,6 +77,7 @@ namespace Px.Utils.UnitTests.ModelTests
             TimeDimension timeDimension = metadata.GetTimeDimension();
 
             // Assert
+            Assert.IsNotNull(timeDimension);
             Assert.HasCount(3, timeDimension.Values);
         }
 
