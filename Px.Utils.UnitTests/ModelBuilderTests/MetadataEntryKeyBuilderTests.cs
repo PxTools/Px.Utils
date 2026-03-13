@@ -332,7 +332,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            try { func(); Assert.Fail("Expected ArgumentException was not thrown."); } catch (ArgumentException) { }
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -348,7 +348,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            try { func(); Assert.Fail("Expected ArgumentException was not thrown."); } catch (ArgumentException) { }
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
