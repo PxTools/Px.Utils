@@ -1,8 +1,7 @@
 ﻿using Px.Utils.Models.Metadata;
 using Px.Utils.PxFile.Data;
-using Px.Utils.UnitTests;
 
-namespace PxFileTests.DataTests
+namespace Px.Utils.UnitTests.PxFileTests.DataTests
 {
     [TestClass]
     public class DataIndexerTests
@@ -186,7 +185,7 @@ namespace PxFileTests.DataTests
                 new DimensionMap("var2", ["var2_val4", "var2_val3"])
             ]);
 
-            Assert.ThrowsException<ArgumentException>(() => new DataIndexer(testMeta, matrixMap));
+            Assert.ThrowsExactly<ArgumentException>(() => new DataIndexer(testMeta, matrixMap));
         }
 
         [TestMethod]
@@ -199,7 +198,7 @@ namespace PxFileTests.DataTests
                 new DimensionMap("var1", ["var1_val0", "var1_val1"])
             ]);
 
-            Assert.ThrowsException<ArgumentException>(() => new DataIndexer(testMeta, matrixMap));
+            Assert.ThrowsExactly<ArgumentException>(() => new DataIndexer(testMeta, matrixMap));
         }
     }
 }

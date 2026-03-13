@@ -75,7 +75,7 @@ namespace Px.Utils.UnitTests.BinaryData
 
             await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.AreEqual(16, calls.Count);
+            Assert.HasCount(16, calls);
             for (int i = 0; i < calls.Count; i++)
             {
                 Assert.AreEqual(i * 16, calls[i].offset);
@@ -107,7 +107,7 @@ namespace Px.Utils.UnitTests.BinaryData
 
             await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.IsTrue(calls.Count >= 1);
+            Assert.IsGreaterThanOrEqualTo(1, calls.Count);
             Assert.AreEqual(256, calls[0].offset);
             for (int k = 0; k < 32; k += 3)
             {
@@ -142,7 +142,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new(4096, 1024 * 1024);
             await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.AreEqual(1, calls.Count);
+            Assert.HasCount(1, calls);
             Assert.AreEqual(0, calls[0].offset);
             for (int i = 0; i < total; i += 4)
             {
@@ -177,7 +177,7 @@ namespace Px.Utils.UnitTests.BinaryData
             await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             int expectedCalls = 64 / 4;
-            Assert.AreEqual(expectedCalls, calls.Count);
+            Assert.HasCount(expectedCalls, calls);
             for (int i = 0; i < calls.Count; i++)
             {
                 Assert.AreEqual(i * 16, calls[i].offset);
@@ -208,7 +208,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new();
             await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.AreEqual(1, calls.Count);
+            Assert.HasCount(1, calls);
             Assert.AreEqual(0, calls[0].offset);
             for (int i = 0; i < total; i++)
             {
@@ -237,7 +237,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new();
             await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.AreEqual(1, calls.Count);
+            Assert.HasCount(1, calls);
             Assert.AreEqual(44, calls[0].offset);
             int[] expectedPositions = [11, 13, 16, 18];
             double[] expectedValues = [11, 13, 16, 18];
@@ -270,7 +270,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new();
             await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.AreEqual(1, calls.Count);
+            Assert.HasCount(1, calls);
             Assert.AreEqual(0, calls[0].offset);
             for (int i = 0; i < total; i += 2)
             {
@@ -299,7 +299,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new();
             await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.AreEqual(1, calls.Count);
+            Assert.HasCount(1, calls);
             Assert.AreEqual(24, calls[0].offset);
             int[] expectedBufferPositions = [6, 8, 11, 13];
             double[] expectedValues = [6, 8, 11, 13];
@@ -330,7 +330,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt16Codec> reader = new();
             await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.AreEqual(1, calls.Count);
+            Assert.HasCount(1, calls);
             Assert.AreEqual(0, calls[0].offset);
             for (int i = 0; i < 6; i++)
             {
@@ -369,7 +369,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new();
             await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.AreEqual(1, calls.Count);
+            Assert.HasCount(1, calls);
             Assert.AreEqual(0, calls[0].offset);
             Assert.AreEqual(DataValueType.Missing, dst[0].Type);
             Assert.AreEqual(DataValueType.CanNotRepresent, dst[1].Type);
@@ -398,7 +398,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new();
             await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.AreEqual(1, calls.Count);
+            Assert.HasCount(1, calls);
             Assert.AreEqual(8, calls[0].offset);
             int[] positions = [2, 3, 4, 12, 13, 14];
             for (int i = 0; i < positions.Length; i++)
@@ -485,7 +485,7 @@ namespace Px.Utils.UnitTests.BinaryData
             await reader.ReadByChunkAsync(provider, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             int expectedWindows = total / UInt32Codec.ByteCount; // 16 values * 4 bytes/value => 64 bytes total; 16-byte windows => 4 windows
-            Assert.AreEqual(expectedWindows, calls.Count);
+            Assert.HasCount(expectedWindows, calls);
             for (int i = 0; i < calls.Count; i++)
             {
                 Assert.AreEqual(headerLength + (i * 16), calls[i].offset);

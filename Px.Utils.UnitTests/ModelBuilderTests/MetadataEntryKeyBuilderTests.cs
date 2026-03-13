@@ -1,6 +1,7 @@
-﻿using Px.Utils.ModelBuilders;
+using Px.Utils.ModelBuilders;
+using Px.Utils.Models.Metadata;
 
-namespace ModelBuilderTests
+namespace Px.Utils.UnitTests.ModelBuilderTests
 {
     [TestClass]
     public class MetadataEntryKeyBuilderTests
@@ -20,7 +21,7 @@ namespace ModelBuilderTests
             string input = $"{key}[{lang}](\"{firstIdentifier}\",\"{secondIdentifier}\")";
 
             // Act
-            var result = builder.Parse(input);
+            MetadataEntryKey result = builder.Parse(input);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -40,7 +41,7 @@ namespace ModelBuilderTests
             string input = $"{key}[{lang}](\"{firstIdentifier}\", \"{secondIdentifier}\")";
 
             // Act
-            var result = builder.Parse(input);
+            MetadataEntryKey result = builder.Parse(input);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -58,7 +59,7 @@ namespace ModelBuilderTests
             string input = $"{key}[{lang}]";
 
             // Act
-            var result = builder.Parse(input);
+            MetadataEntryKey result = builder.Parse(input);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -77,7 +78,7 @@ namespace ModelBuilderTests
             string input = $"{key}(\"{firstIdentifier}\",\"{secondIdentifier}\")";
 
             // Act
-            var result = builder.Parse(input);
+            MetadataEntryKey result = builder.Parse(input);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -95,7 +96,7 @@ namespace ModelBuilderTests
             string input = $"{key}(\"{firstIdentifier}\")";
 
             // Act
-            var result = builder.Parse(input);
+            MetadataEntryKey result = builder.Parse(input);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -111,7 +112,7 @@ namespace ModelBuilderTests
             string key = "FOOBAR";
 
             // Act
-            var result = builder.Parse(key);
+            MetadataEntryKey result = builder.Parse(key);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -127,7 +128,7 @@ namespace ModelBuilderTests
             string key = "FOO-BAR";
 
             // Act
-            var result = builder.Parse(key);
+            MetadataEntryKey result = builder.Parse(key);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -145,7 +146,7 @@ namespace ModelBuilderTests
             string input = $"{key}(\"{firstIdentifier}\")";
 
             // Act
-            var result = builder.Parse(input);
+            MetadataEntryKey result = builder.Parse(input);
 
             // Assert
             Assert.AreEqual(key, result.KeyWord);
@@ -171,7 +172,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -187,7 +188,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -203,7 +204,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -219,7 +220,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -235,7 +236,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -251,7 +252,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -268,7 +269,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -285,7 +286,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -301,7 +302,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -317,7 +318,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -331,7 +332,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -347,7 +348,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -364,7 +365,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         [TestMethod]
@@ -381,7 +382,7 @@ namespace ModelBuilderTests
             Action func = new(() => builder.Parse(input));
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(func);
+            Assert.ThrowsExactly<ArgumentException>(func);
         }
 
         #endregion

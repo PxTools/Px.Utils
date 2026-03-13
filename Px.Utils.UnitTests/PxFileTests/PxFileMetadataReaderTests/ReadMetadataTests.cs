@@ -23,7 +23,7 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             List<KeyValuePair<string, string>> metadata = [.. reader.ReadMetadata(stream, encoding)];
 
             // Assert
-            Assert.AreEqual(8, metadata.Count);
+            Assert.HasCount(8, metadata);
 
             Assert.AreEqual("CHARSET", metadata[0].Key);
             Assert.AreEqual("\"ANSI\"", metadata[0].Value);
@@ -64,7 +64,7 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             List<KeyValuePair<string, string>> metadata = [.. reader.ReadMetadata(stream, encoding)];
 
             // Assert
-            Assert.AreEqual(8, metadata.Count);
+            Assert.HasCount(8, metadata);
 
             Assert.AreEqual("CHARSET", metadata[0].Key);
             Assert.AreEqual("\"ANSI\"", metadata[0].Value);
@@ -106,7 +106,7 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             List<KeyValuePair<string, string>> metadata = [.. reader.ReadMetadata(stream, encoding)];
 
             // Assert
-            Assert.AreEqual(8, metadata.Count);
+            Assert.HasCount(8, metadata);
 
             Assert.AreEqual("CHARSET", metadata[0].Key);
             Assert.AreEqual("\"ANSI\"", metadata[0].Value);
@@ -147,7 +147,7 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             List<KeyValuePair<string, string>> metadata = [.. reader.ReadMetadata(stream, encoding, 28)];
 
             // Assert
-            Assert.AreEqual(8, metadata.Count);
+            Assert.HasCount(8, metadata);
 
             Assert.AreEqual("CHARSET", metadata[0].Key);
             Assert.AreEqual("\"ANSI\"", metadata[0].Value);
@@ -202,7 +202,7 @@ namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
             List<KeyValuePair<string, string>> metadata = [.. reader.ReadMetadata(stream, encoding)];
 
             // Assert
-            Assert.AreEqual(8, metadata.Count);
+            Assert.HasCount(8, metadata);
 
             Assert.AreEqual("CHARSET", metadata[0].Key);
             Assert.AreEqual("\"ANSI\"", metadata[0].Value);

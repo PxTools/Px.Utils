@@ -1,5 +1,6 @@
-﻿using Px.Utils.Models.Metadata.Dimensions;
+using Px.Utils.Models.Metadata.Dimensions;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace Px.Utils.Models.Metadata.ExtensionMethods
 {
@@ -50,6 +51,16 @@ namespace Px.Utils.Models.Metadata.ExtensionMethods
         {
             timeDimension = metadata.Dimensions.FirstOrDefault(dimension => dimension.Type == Enums.DimensionType.Time) as TimeDimension;
             return timeDimension is not null;
+        }
+
+        /// <summary>
+        /// Gets and returns the latest last updated date time from the content dimension values.
+        /// </summary>
+        /// <returns>DateTime representation of the latest last updated value from the metadata content dimension values.</returns>
+        public static DateTime GetLastUpdated(this IReadOnlyMatrixMetadata metadata)
+        {
+            return metadata.GetContentDimension().Values
+                .Map(value => value.LastUpdated).Max();
         }
     }
 }
