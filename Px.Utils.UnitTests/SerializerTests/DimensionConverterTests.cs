@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models.Metadata.Dimensions;
+using Px.Utils.Models.Metadata.Dimensions;
 using Px.Utils.Models.Metadata.Enums;
 using Px.Utils.Models.Metadata.MetaProperties;
 using Px.Utils.UnitTests.SerializerTests.Fixtures.Json;
@@ -53,9 +53,9 @@ namespace Px.Utils.UnitTests.SerializerTests
             Assert.AreEqual("dimCode", nominalDim.Code);
             Assert.AreEqual("dimName", nominalDim.Name["lang"]);
             Assert.AreEqual(DimensionType.Nominal, nominalDim.Type);
-            Assert.AreEqual(1, nominalDim.AdditionalProperties.Count);
+            Assert.HasCount(1, nominalDim.AdditionalProperties);
             Assert.IsTrue(((BooleanProperty)nominalDim.AdditionalProperties["key1"]).Value);
-            Assert.AreEqual(2, nominalDim.Values.Count);
+            Assert.HasCount(2, nominalDim.Values);
             Assert.AreEqual("valueCode1", nominalDim.Values[0].Code);
             Assert.AreEqual("valueName1", nominalDim.Values[0].Name["lang"]);
             Assert.AreEqual("valueCode2", nominalDim.Values[1].Code);
@@ -85,7 +85,7 @@ namespace Px.Utils.UnitTests.SerializerTests
             Assert.AreEqual(nominalDim.Code, deserializedNominalDim.Code);
             Assert.AreEqual(nominalDim.Name["lang"], deserializedNominalDim.Name["lang"]);
             Assert.AreEqual(nominalDim.Type, deserializedNominalDim.Type);
-            Assert.AreEqual(nominalDim.AdditionalProperties.Count, deserializedNominalDim.AdditionalProperties.Count);
+            Assert.HasCount(nominalDim.AdditionalProperties.Count, deserializedNominalDim.AdditionalProperties);
             Assert.IsTrue(((BooleanProperty)deserializedNominalDim.AdditionalProperties["key1"]).Value);
             Assert.AreEqual(nominalDim.Values.Count, deserializedNominalDim.Values.Count);
             Assert.AreEqual(nominalDim.Values[0].Code, deserializedNominalDim.Values[0].Code);
@@ -163,9 +163,9 @@ namespace Px.Utils.UnitTests.SerializerTests
             Assert.AreEqual("dimCode", contentDim.Code);
             Assert.AreEqual("dimName", contentDim.Name["lang"]);
             Assert.AreEqual(DimensionType.Content, contentDim.Type);
-            Assert.AreEqual(1, contentDim.AdditionalProperties.Count);
+            Assert.HasCount(1, contentDim.AdditionalProperties);
             Assert.IsTrue(((BooleanProperty)contentDim.AdditionalProperties["key1"]).Value);
-            Assert.AreEqual(2, contentDim.Values.Count);
+            Assert.HasCount(2, contentDim.Values);
             Assert.AreEqual("valueCode1", contentDim.Values[0].Code);
             Assert.AreEqual("valueName1", contentDim.Values[0].Name["lang"]);
             Assert.AreEqual("valueUnit1", contentDim.Values[0].Unit["lang"]);
@@ -201,7 +201,7 @@ namespace Px.Utils.UnitTests.SerializerTests
             Assert.AreEqual(contentDim.Code, deserializedContentDim.Code);
             Assert.AreEqual(contentDim.Name["lang"], deserializedContentDim.Name["lang"]);
             Assert.AreEqual(contentDim.Type, deserializedContentDim.Type);
-            Assert.AreEqual(contentDim.AdditionalProperties.Count, deserializedContentDim.AdditionalProperties.Count);
+            Assert.HasCount(contentDim.AdditionalProperties.Count, deserializedContentDim.AdditionalProperties);
             Assert.IsTrue(((BooleanProperty)deserializedContentDim.AdditionalProperties["key1"]).Value);
             Assert.AreEqual(contentDim.Values.Count, deserializedContentDim.Values.Count);
             Assert.AreEqual(contentDim.Values[0].Code, deserializedContentDim.Values[0].Code);
@@ -287,9 +287,9 @@ namespace Px.Utils.UnitTests.SerializerTests
             Assert.AreEqual("dimCode", timeDim.Code);
             Assert.AreEqual("dimName", timeDim.Name["lang"]);
             Assert.AreEqual(DimensionType.Time, timeDim.Type);
-            Assert.AreEqual(1, timeDim.AdditionalProperties.Count);
+            Assert.HasCount(1, timeDim.AdditionalProperties);
             Assert.IsTrue(((BooleanProperty)timeDim.AdditionalProperties["key1"]).Value);
-            Assert.AreEqual(2, timeDim.Values.Count);
+            Assert.HasCount(2, timeDim.Values);
             Assert.AreEqual("valueCode1", timeDim.Values[0].Code);
             Assert.AreEqual("valueName1", timeDim.Values[0].Name["lang"]);
             Assert.AreEqual("valueCode2", timeDim.Values[1].Code);
@@ -322,7 +322,7 @@ namespace Px.Utils.UnitTests.SerializerTests
             Assert.AreEqual(timeDim.Code, deserializedTimeDim.Code);
             Assert.AreEqual(timeDim.Name["lang"], deserializedTimeDim.Name["lang"]);
             Assert.AreEqual(timeDim.Type, deserializedTimeDim.Type);
-            Assert.AreEqual(timeDim.AdditionalProperties.Count, deserializedTimeDim.AdditionalProperties.Count);
+            Assert.HasCount(timeDim.AdditionalProperties.Count, deserializedTimeDim.AdditionalProperties);
             Assert.IsTrue(((BooleanProperty)deserializedTimeDim.AdditionalProperties["key1"]).Value);
             Assert.AreEqual(timeDim.Values.Count, deserializedTimeDim.Values.Count);
             Assert.AreEqual(timeDim.Values[0].Code, deserializedTimeDim.Values[0].Code);

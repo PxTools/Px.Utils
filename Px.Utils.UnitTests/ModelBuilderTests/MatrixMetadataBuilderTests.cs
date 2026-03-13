@@ -1,4 +1,4 @@
-﻿using ModelBuilderTests.Fixtures;
+using ModelBuilderTests.Fixtures;
 using Px.Utils.Language;
 using Px.Utils.ModelBuilders;
 using Px.Utils.Models.Metadata;
@@ -63,7 +63,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             CollectionAssert.AreEqual(new List<string> { "fi" }, Actual_1Lang.AvailableLanguages.ToList());
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ANSI", "CHARSET")]
         [DataRow("2013", "AXIS-VERSION")]
         [DataRow("iso-8859-15", "CODEPAGE")]
@@ -81,7 +81,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             }
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(true, "OFFICIAL-STATISTICS")]
         public void MultiLangTableLevelAdditionalBoolParametersTest(bool expected, string keyWord)
         {
@@ -95,7 +95,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             }
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ANSI", "CHARSET")]
         [DataRow("2013", "AXIS-VERSION")]
         [DataRow("iso-8859-15", "CODEPAGE")]
@@ -113,7 +113,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             }
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(true, "OFFICIAL-STATISTICS")]
         public void SingleLangTableLevelAdditionalNotTranslatedParametersTest(bool expected, string keyWord)
         {
@@ -127,7 +127,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             }
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("abcd", "abcd", "abcd", "SUBJECT-AREA")]
         [DataRow("test_description_fi", "test_description_sv", "test_description_en", "DESCRIPTION")]
         [DataRow("test_note_fi", "test_note_sv", "test_note_en", "NOTE")]
@@ -144,7 +144,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             }
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("abcd", "SUBJECT-AREA")]
         [DataRow("test_description_fi", "DESCRIPTION")]
         [DataRow("test_note_fi", "NOTE")]
@@ -163,7 +163,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         [TestMethod]
         public void MultiLangVariableBuildTest()
         {
-            Assert.AreEqual(4, Actual_3Lang.Dimensions.Count);
+            Assert.HasCount(4, Actual_3Lang.Dimensions);
 
             List<string> expectedCodes = ["Vuosi", "Alue", "Talotyyppi", "Tiedot"];
             CollectionAssert.AreEqual(expectedCodes, Actual_3Lang.Dimensions.Select(d => d.Code).ToList());
@@ -180,7 +180,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         [TestMethod]
         public void MultiLangVariableBuildTestFromRecommendedFixture()
         {
-            Assert.AreEqual(4, Actual_Recommended_3Lang.Dimensions.Count);
+            Assert.HasCount(4, Actual_Recommended_3Lang.Dimensions);
 
             List<string> expectedCodes = ["year", "area", "type", "info"];
             CollectionAssert.AreEqual(expectedCodes, Actual_Recommended_3Lang.Dimensions.Select(d => d.Code).ToList());
@@ -197,7 +197,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         [TestMethod]
         public void SingleLangVariableBuildTest()
         {
-            Assert.AreEqual(4, Actual_1Lang.Dimensions.Count);
+            Assert.HasCount(4, Actual_1Lang.Dimensions);
 
             List<string> expectedCodes = ["Vuosi", "Alue", "Talotyyppi", "Tiedot"];
             CollectionAssert.AreEqual(expectedCodes, Actual_1Lang.Dimensions.Select(d => d.Code).ToList());
@@ -242,7 +242,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Dimension? contentDimension = Actual_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
             Assert.IsInstanceOfType<ContentDimension>(contentDimension);
             Assert.IsNotNull(contentDimension);
-            Assert.AreEqual(3, contentDimension.Values.Count);
+            Assert.HasCount(3, contentDimension.Values);
             Assert.AreEqual("Tiedot", contentDimension.Code);
             Assert.IsFalse(Actual_3Lang.AdditionalProperties.ContainsKey("CONTVARIABLE"));
         }
@@ -253,12 +253,12 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Dimension? contentDimension = (ContentDimension?)Actual_1Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
             Assert.IsInstanceOfType<ContentDimension>(contentDimension);
             Assert.IsNotNull(contentDimension);
-            Assert.AreEqual(3, contentDimension.Values.Count);
+            Assert.HasCount(3, contentDimension.Values);
             Assert.AreEqual("Tiedot", contentDimension.Code);
             Assert.IsFalse(Actual_1Lang.AdditionalProperties.ContainsKey("CONTVARIABLE"));
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(0, "indeksipisteluku", "indextal", "index point")]
         [DataRow(1, "%", "%", "%")]
         [DataRow(2, "lukumäärä", "antal", "number")]
@@ -270,7 +270,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("UNIT"));
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(0, "indeksipisteluku")]
         [DataRow(1, "%")]
         [DataRow(2, "lukumäärä")]
@@ -282,7 +282,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("UNIT"));
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(0, "20230131 08:00")]
         [DataRow(1, "20230131 09:00")]
         [DataRow(2, "20230131 10:00")]
@@ -294,7 +294,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("LAST-UPDATED"));
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(0, "20230131 08:00")]
         [DataRow(1, "20230131 09:00")]
         [DataRow(2, "20230131 10:00")]
@@ -306,7 +306,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("LAST-UPDATED"));
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(0, 1)]
         [DataRow(1, 1)]
         [DataRow(2, 0)]
@@ -317,7 +317,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("PRECISION"));
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(0, 1)]
         [DataRow(1, 1)]
         [DataRow(2, 0)]
@@ -334,12 +334,12 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Dimension? contentDimension = Actual_Recommended_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
             Assert.IsInstanceOfType<ContentDimension>(contentDimension);
             Assert.IsNotNull(contentDimension);
-            Assert.AreEqual(3, contentDimension.Values.Count);
+            Assert.HasCount(3, contentDimension.Values);
             Assert.AreEqual("info", contentDimension.Code);
             Assert.IsFalse(Actual_3Lang.AdditionalProperties.ContainsKey("CONTVARIABLE"));
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(0, "indeksipisteluku", "indextal", "index point")]
         [DataRow(1, "%", "%", "%")]
         [DataRow(2, "lukumäärä", "antal", "number")]
@@ -351,7 +351,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("UNIT"));
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(0, "20230131 08:00")]
         [DataRow(1, "20230131 09:00")]
         [DataRow(2, "20230131 10:00")]
@@ -363,7 +363,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Assert.IsFalse(contentDimension?.Values[index].AdditionalProperties.ContainsKey("LAST-UPDATED"));
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(0, 1)]
         [DataRow(1, 1)]
         [DataRow(2, 0)]
@@ -379,7 +379,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         {
             ContentDimension? contentDimension = (ContentDimension?)Actual_3Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
             Assert.IsNotNull(contentDimension);
-            Assert.AreEqual(3, contentDimension.Values.Count);
+            Assert.HasCount(3, contentDimension.Values);
             foreach (ContentDimensionValue value in contentDimension.Values)
             {
                 Assert.IsTrue(value.AdditionalProperties.ContainsKey("VALUENOTE"));
@@ -392,7 +392,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         {
             ContentDimension? contentDimension = (ContentDimension?)Actual_1Lang.Dimensions.Find(d => d.Type == DimensionType.Content);
             Assert.IsNotNull(contentDimension);
-            Assert.AreEqual(3, contentDimension.Values.Count);
+            Assert.HasCount(3, contentDimension.Values);
             foreach (ContentDimensionValue value in contentDimension.Values)
             {
                 Assert.IsTrue(value.AdditionalProperties.ContainsKey("VALUENOTE"));
@@ -411,7 +411,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Assert.IsNotNull(timeDimension);
             Assert.AreEqual("Vuosi", timeDimension.Code);
             Assert.AreEqual(TimeDimensionInterval.Year, timeDimension.Interval);
-            Assert.AreEqual(8, timeDimension.Values.Count);
+            Assert.HasCount(8, timeDimension.Values);
             Assert.IsTrue(timeDimension.AdditionalProperties.ContainsKey("TIMEVAL"));
             Assert.IsFalse(Actual_3Lang.AdditionalProperties.ContainsKey("TIMEVAL"));
         }
@@ -423,7 +423,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
             Assert.IsNotNull(timeDimension);
             Assert.AreEqual("Vuosi", timeDimension.Code);
             Assert.AreEqual(TimeDimensionInterval.Year, timeDimension.Interval);
-            Assert.AreEqual(8, timeDimension.Values.Count);
+            Assert.HasCount(8, timeDimension.Values);
             Assert.IsTrue(timeDimension.AdditionalProperties.ContainsKey("TIMEVAL"));
             Assert.IsFalse(Actual_3Lang.AdditionalProperties.ContainsKey("TIMEVAL"));
         }
@@ -465,22 +465,22 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         public void MultiLangDimensionValuesTest()
         {
             Dimension dim0 = Actual_3Lang.Dimensions[0];
-            Assert.AreEqual(8, dim0.Values.Count);
+            Assert.HasCount(8, dim0.Values);
             List<string> expected0 = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"];
             CollectionAssert.AreEqual(expected0, dim0.Values.Codes.ToList());
 
             Dimension dim1 = Actual_3Lang.Dimensions[1];
-            Assert.AreEqual(7, dim1.Values.Count);
+            Assert.HasCount(7, dim1.Values);
             List<string> expected1 = ["ksu", "pks", "msu", "091", "049", "092", "853"];
             CollectionAssert.AreEqual(expected1, dim1.Values.Codes.ToList());
 
             Dimension dim2 = Actual_3Lang.Dimensions[2];
-            Assert.AreEqual(3, dim2.Values.Count);
+            Assert.HasCount(3, dim2.Values);
             List<string> expected2 = ["0", "1", "3"];
             CollectionAssert.AreEqual(expected2, dim2.Values.Codes.ToList());
 
             Dimension dim3 = Actual_3Lang.Dimensions[3];
-            Assert.AreEqual(3, dim3.Values.Count);
+            Assert.HasCount(3, dim3.Values);
             List<string> expected3 = ["ketjutettu_lv", "vmuutos_lv", "lkm_julk_uudet"];
             CollectionAssert.AreEqual(expected3, dim3.Values.Codes.ToList());
         }
@@ -489,22 +489,22 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
         public void SingleLangDimensionValuesTest()
         {
             Dimension dim0 = Actual_1Lang.Dimensions[0];
-            Assert.AreEqual(8, dim0.Values.Count);
+            Assert.HasCount(8, dim0.Values);
             List<string> expected0 = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"];
             CollectionAssert.AreEqual(expected0, dim0.Values.Codes.ToList());
 
             Dimension dim1 = Actual_1Lang.Dimensions[1];
-            Assert.AreEqual(7, dim1.Values.Count);
+            Assert.HasCount(7, dim1.Values);
             List<string> expected1 = ["ksu", "pks", "msu", "091", "049", "092", "853"];
             CollectionAssert.AreEqual(expected1, dim1.Values.Codes.ToList());
 
             Dimension dim2 = Actual_1Lang.Dimensions[2];
-            Assert.AreEqual(3, dim2.Values.Count);
+            Assert.HasCount(3, dim2.Values);
             List<string> expected2 = ["0", "1", "3"];
             CollectionAssert.AreEqual(expected2, dim2.Values.Codes.ToList());
 
             Dimension dim3 = Actual_1Lang.Dimensions[3];
-            Assert.AreEqual(3, dim3.Values.Count);
+            Assert.HasCount(3, dim3.Values);
             List<string> expected3 = ["ketjutettu_lv", "vmuutos_lv", "lkm_julk_uudet"];
             CollectionAssert.AreEqual(expected3, dim3.Values.Codes.ToList());
         }
@@ -568,7 +568,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests
                     Assert.IsTrue(dim.AdditionalProperties.TryGetValue(PxFileConfiguration.Default.Tokens.KeyWords.TimeVal, out MetaProperty? value));
                     Assert.AreEqual(MetaPropertyType.TextArray, value.Type);
                     StringListProperty property = (StringListProperty)value;
-                    Assert.AreEqual(8, property.Value.Count);
+                    Assert.HasCount(8, property.Value);
                 }
             }
         }

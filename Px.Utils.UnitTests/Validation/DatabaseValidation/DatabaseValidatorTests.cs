@@ -1,4 +1,4 @@
-﻿using Px.Utils.Validation.DatabaseValidation;
+using Px.Utils.Validation.DatabaseValidation;
 using Px.Utils.Validation;
 
 namespace Px.Utils.UnitTests.Validation.DatabaseValidation
@@ -18,7 +18,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Count);
+            Assert.HasCount(0, result.FeedbackItems);
         }
 
         [TestMethod]
@@ -33,7 +33,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Count);
+            Assert.HasCount(0, result.FeedbackItems);
         }
 
         [TestMethod]
@@ -57,11 +57,11 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(9, result.FeedbackItems.Count); // Unique feedbacks
-            Assert.AreEqual(11, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
+            Assert.HasCount(9, result.FeedbackItems); // Unique feedbacks
+            Assert.HasCount(11, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
             Assert.IsTrue(result.FeedbackItems.ContainsKey(invalidValueFormatKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(recommendedKeyMissingKey));
-            Assert.AreEqual(3, result.FeedbackItems[recommendedKeyMissingKey].Count); // 3 warnings
+            Assert.HasCount(3, result.FeedbackItems[recommendedKeyMissingKey]); // 3 warnings
             Assert.IsTrue(result.FeedbackItems.ContainsKey(entryWithMultipleValuesKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(dataValidationFeedbackInvalidStructureKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(dataValidationFeedbackInvalidRowCountKey));
@@ -92,11 +92,11 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(9, result.FeedbackItems.Count); // Unique feedbacks
-            Assert.AreEqual(11, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
+            Assert.HasCount(9, result.FeedbackItems); // Unique feedbacks
+            Assert.HasCount(11, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
             Assert.IsTrue(result.FeedbackItems.ContainsKey(invalidValueFormatKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(recommendedKeyMissingKey));
-            Assert.AreEqual(3, result.FeedbackItems[recommendedKeyMissingKey].Count); // 3 warnings
+            Assert.HasCount(3, result.FeedbackItems[recommendedKeyMissingKey]); // 3 warnings
             Assert.IsTrue(result.FeedbackItems.ContainsKey(entryWithMultipleValuesKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(dataValidationFeedbackInvalidStructureKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(dataValidationFeedbackInvalidRowCountKey));
@@ -137,13 +137,13 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(10, result.FeedbackItems.Count); // Unique feedbacks
-            Assert.AreEqual(26, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
+            Assert.HasCount(10, result.FeedbackItems); // Unique feedbacks
+            Assert.HasCount(26, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
             Assert.IsTrue(result.FeedbackItems.ContainsKey(invalidValueFormatKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(aliasFileMissingKey));
-            Assert.AreEqual(15, result.FeedbackItems[aliasFileMissingKey].Count); // 15 warnings
+            Assert.HasCount(15, result.FeedbackItems[aliasFileMissingKey]); // 15 warnings
             Assert.IsTrue(result.FeedbackItems.ContainsKey(recommendedKeyMissingKey));
-            Assert.AreEqual(3, result.FeedbackItems[recommendedKeyMissingKey].Count); // 3 warnings
+            Assert.HasCount(3, result.FeedbackItems[recommendedKeyMissingKey]); // 3 warnings
             Assert.IsTrue(result.FeedbackItems.ContainsKey(entryWithMultipleValuesKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(dataValidationFeedbackInvalidStructureKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(dataValidationFeedbackInvalidRowCountKey));
@@ -185,13 +185,13 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(10, result.FeedbackItems.Count); // Unique feedbacks
-            Assert.AreEqual(26, result.FeedbackItems.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
+            Assert.HasCount(10, result.FeedbackItems); // Unique feedbacks
+            Assert.HasCount(26, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
             Assert.IsTrue(result.FeedbackItems.ContainsKey(invalidValueFormatKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(aliasFileMissingKey));
-            Assert.AreEqual(15, result.FeedbackItems[aliasFileMissingKey].Count); // 15 warnings
+            Assert.HasCount(15, result.FeedbackItems[aliasFileMissingKey]); // 15 warnings
             Assert.IsTrue(result.FeedbackItems.ContainsKey(recommendedKeyMissingKey));
-            Assert.AreEqual(3, result.FeedbackItems[recommendedKeyMissingKey].Count); // 3 warnings
+            Assert.HasCount(3, result.FeedbackItems[recommendedKeyMissingKey]); // 3 warnings
             Assert.IsTrue(result.FeedbackItems.ContainsKey(entryWithMultipleValuesKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(dataValidationFeedbackInvalidStructureKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(dataValidationFeedbackInvalidRowCountKey));
@@ -213,7 +213,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Count);
+            Assert.HasCount(0, result.FeedbackItems);
         }
 
         [TestMethod]
@@ -228,7 +228,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.AreEqual(0, result.FeedbackItems.Count);
+            Assert.HasCount(0, result.FeedbackItems);
         }
     }
 }

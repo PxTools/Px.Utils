@@ -9,13 +9,9 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
     {
         [TestMethod]
         [DataRow([EntryType.DataItem])]
-
         [DataRow([EntryType.DataItem, EntryType.DataItemSeparator])]
-        [DataRow([EntryType.DataItem, EntryType.DataItemSeparator])]
-
         [DataRow([EntryType.DataItem, EntryType.DataItemSeparator, EntryType.DataItem])]
         [DataRow([EntryType.DataItem, EntryType.DataItemSeparator, EntryType.LineSeparator])]
-
         [DataRow([EntryType.DataItem, EntryType.DataItemSeparator, EntryType.LineSeparator, EntryType.DataItem])]
         [DataRow([EntryType.DataItem, EntryType.EndOfData])]
 
@@ -32,7 +28,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                 }
             }
         
-            Assert.IsTrue(feedbacks.Count == 0);
+            Assert.IsEmpty(feedbacks);
         }
     
     
@@ -55,7 +51,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                 }
             }
 
-            Assert.AreEqual(1, feedbacks.Count);
+            Assert.HasCount(1, feedbacks);
             Assert.AreEqual(ValidationFeedbackRule.DataValidationFeedbackInvalidStructure, feedbacks.First().Key.Rule);
             Assert.AreEqual(ValidationFeedbackLevel.Error, feedbacks.First().Key.Level);
             List<EntryType> expectedTokens = [ tokenSequence.Length > 1 ? tokenSequence[^2] : EntryType.Unknown, tokenSequence[^1] ];

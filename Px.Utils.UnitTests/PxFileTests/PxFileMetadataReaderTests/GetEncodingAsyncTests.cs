@@ -1,12 +1,14 @@
-﻿using PxFileTests.Fixtures;
+using PxFileTests.Fixtures;
 using Px.Utils.PxFile.Metadata;
 using System.Text;
 
-namespace PxFileTests.PxFileMetadataReaderTests
+namespace Px.Utils.UnitTests.PxFileTests.PxFileMetadataReaderTests
 {
     [TestClass]
     public class GetEncodingAsyncTests
     {
+        public TestContext TestContext { get; set; }
+
         [TestMethod]
         public async Task GetEncodingAsyncCalledForMinimalUTF8NReturnsUtf8()
         {
@@ -16,7 +18,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
             PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await reader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream, TestContext.CancellationToken);
 
             // Assert
             Assert.AreEqual(Encoding.UTF8, encoding);
@@ -33,7 +35,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
             PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await reader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream, TestContext.CancellationToken);
 
             // Assert
             Assert.AreEqual(Encoding.UTF8, encoding);
@@ -50,7 +52,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
             PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await reader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream, TestContext.CancellationToken);
 
             // Assert
             Assert.AreEqual(Encoding.Unicode, encoding);
@@ -65,7 +67,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
             PxFileMetadataReader reader = new();
 
             // Act
-            Encoding encoding = await reader.GetEncodingAsync(stream);
+            Encoding encoding = await reader.GetEncodingAsync(stream, TestContext.CancellationToken);
 
             // Assert
             Assert.AreEqual(Encoding.UTF8, encoding);
@@ -82,7 +84,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
             PxFileMetadataReader reader = new();
 
             // Act
-            Encoding resutEncoding = await reader.GetEncodingAsync(stream);
+            Encoding resutEncoding = await reader.GetEncodingAsync(stream, TestContext.CancellationToken);
 
             // Assert
             Assert.AreEqual(encoding, resutEncoding);
@@ -99,7 +101,7 @@ namespace PxFileTests.PxFileMetadataReaderTests
             PxFileMetadataReader reader = new();
 
             // Act
-            Encoding resutEncoding = await reader.GetEncodingAsync(stream);
+            Encoding resutEncoding = await reader.GetEncodingAsync(stream, TestContext.CancellationToken);
 
             // Assert
             Assert.AreEqual(encoding, resutEncoding);

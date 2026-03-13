@@ -1,4 +1,4 @@
-﻿using Px.Utils.Validation.SyntaxValidation;
+using Px.Utils.Validation.SyntaxValidation;
 using Px.Utils.UnitTests.Validation.Fixtures;
 using System.Text;
 using Px.Utils.Validation;
@@ -29,8 +29,8 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidationResult result = await validator.ValidateAsync(stream, filename, encoding);
             stream.Close();
-            Assert.AreEqual(8, result.Result.Count);
-            Assert.AreEqual(0, feedback.Count);
+            Assert.HasCount(8, result.Result);
+            Assert.HasCount(0, feedback);
         }
 
         [TestMethod]
@@ -50,7 +50,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             // Act
             SyntaxValidationResult result = await validator.ValidateAsync(stream, filename, encoding);
             stream.Close();
-            Assert.AreEqual(10, result.Result.Count);
+            Assert.HasCount(10, result.Result);
             Assert.AreEqual("YES", result.Result[8].Value);
             Assert.AreEqual("NO", result.Result[9].Value);
             Assert.AreEqual("fi", result.Result[8].Key.Language);

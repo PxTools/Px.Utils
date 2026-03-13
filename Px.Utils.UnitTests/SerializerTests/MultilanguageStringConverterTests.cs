@@ -1,4 +1,4 @@
-﻿using Px.Utils.Language;
+using Px.Utils.Language;
 using System.Text.Json;
 
 namespace Px.Utils.UnitTests.SerializerTests
@@ -85,7 +85,7 @@ namespace Px.Utils.UnitTests.SerializerTests
 
             // Assert
             Assert.IsNotNull(deserialized);
-            Assert.AreEqual(3, deserialized.Languages.Count());
+            Assert.HasCount(3, deserialized.Languages);
             Assert.IsTrue(deserialized.Languages.Contains("lang1"));
             Assert.AreEqual("text1", deserialized["lang1"]);
             Assert.IsTrue(deserialized.Languages.Contains("lang2"));
@@ -105,7 +105,7 @@ namespace Px.Utils.UnitTests.SerializerTests
 
             // Assert
             Assert.IsNotNull(deserialized);
-            Assert.AreEqual(0, deserialized.Languages.Count());
+            Assert.HasCount(0, deserialized.Languages);
         }
 
         [TestMethod]

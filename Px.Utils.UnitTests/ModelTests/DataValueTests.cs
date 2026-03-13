@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models.Data;
+using Px.Utils.Models.Data;
 using Px.Utils.Models.Data.DataValue;
 
 namespace Px.Utils.UnitTests.ModelTests
@@ -274,7 +274,7 @@ namespace Px.Utils.UnitTests.ModelTests
             DecimalDataValue a = new(1, DataValueType.Exists);
             DecimalDataValue b = new(0, DataValueType.Exists);
 
-            Assert.ThrowsException<DivideByZeroException>(() => a / b);
+            Assert.ThrowsExactly<DivideByZeroException>(() => a / b);
         }
 
         [TestMethod]
@@ -321,7 +321,7 @@ namespace Px.Utils.UnitTests.ModelTests
             DoubleDataValue a = new(1, DataValueType.Exists);
             DoubleDataValue b = new(0, DataValueType.Exists);
 
-            Assert.ThrowsException<DivideByZeroException>(() => a / b);
+            Assert.ThrowsExactly<DivideByZeroException>(() => a / b);
         }
 
         [TestMethod]

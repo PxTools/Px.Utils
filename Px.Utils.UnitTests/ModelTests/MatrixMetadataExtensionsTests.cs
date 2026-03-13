@@ -18,7 +18,8 @@ namespace Px.Utils.UnitTests.ModelTests
             ContentDimension contentDimension = metadata.GetContentDimension();
 
             // Assert
-            Assert.AreEqual(4, contentDimension.Values.Count);
+            Assert.IsNotNull(contentDimension);
+            Assert.HasCount(4, contentDimension.Values);
         }
 
         [TestMethod]
@@ -30,7 +31,7 @@ namespace Px.Utils.UnitTests.ModelTests
             metadata.Dimensions.RemoveAt(0);
 
             // Assert
-            Assert.ThrowsExactly<InvalidOperationException>(() => metadata.GetContentDimension());
+            Assert.ThrowsExactly<InvalidOperationException>(metadata.GetContentDimension);
         }
 
         [TestMethod]
@@ -46,7 +47,7 @@ namespace Px.Utils.UnitTests.ModelTests
             // Assert
             Assert.IsTrue(found);
             Assert.IsNotNull(dim);
-            Assert.AreEqual(4, dim.Values.Count);
+            Assert.HasCount(4, dim.Values);
         }
 
         [TestMethod]
@@ -76,7 +77,8 @@ namespace Px.Utils.UnitTests.ModelTests
             TimeDimension timeDimension = metadata.GetTimeDimension();
 
             // Assert
-            Assert.AreEqual(3, timeDimension.Values.Count);
+            Assert.IsNotNull(timeDimension);
+            Assert.HasCount(3, timeDimension.Values);
         }
 
         [TestMethod]
@@ -88,7 +90,7 @@ namespace Px.Utils.UnitTests.ModelTests
             metadata.Dimensions.RemoveAll(dimension => dimension.Type == Models.Metadata.Enums.DimensionType.Time);
 
             // Assert
-            Assert.ThrowsExactly<InvalidOperationException>(() => metadata.GetTimeDimension());
+            Assert.ThrowsExactly<InvalidOperationException>(metadata.GetTimeDimension);
         }
 
         [TestMethod]
@@ -104,7 +106,7 @@ namespace Px.Utils.UnitTests.ModelTests
             // Assert
             Assert.IsTrue(found);
             Assert.IsNotNull(dim);
-            Assert.AreEqual(3, dim.Values.Count);
+            Assert.HasCount(3, dim.Values);
         }
 
         [TestMethod]
@@ -158,3 +160,4 @@ namespace Px.Utils.UnitTests.ModelTests
         }
     }
 }
+

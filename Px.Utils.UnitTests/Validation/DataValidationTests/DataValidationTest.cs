@@ -1,7 +1,6 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
 using Px.Utils.UnitTests.Validation.Fixtures;
-using Px.Utils.PxFile;
 using Px.Utils.Validation;
 using Px.Utils.Validation.DataValidation;
 
@@ -10,6 +9,8 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
     [TestClass]
     public class DataValidationTest
     {
+        public TestContext TestContext { get; set; }
+
         [TestMethod]
         public void TestValidateWithoutErrors()
         {
@@ -27,7 +28,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                         + $"{validationFeedback.Key.Rule} {instance.AdditionalInfo}");
                 }
             }
-            Assert.AreEqual(0, validationFeedbacks.Count);
+            Assert.HasCount(0, validationFeedbacks);
         }
 
         [TestMethod]
@@ -47,7 +48,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                         + $"{validationFeedback.Key.Rule} {instance.AdditionalInfo}");
                 }
             }
-            Assert.AreEqual(0, validationFeedbacks.Count);
+            Assert.HasCount(0, validationFeedbacks);
         }
 
         [TestMethod]
@@ -57,7 +58,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             stream.Seek(6, 0);
             DataValidator validator = new(5, 4, 1);
 
-            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8);
+            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8, cancellationToken: TestContext.CancellationToken);
             ValidationFeedback validationFeedbacks = result.FeedbackItems;
 
             foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
@@ -68,7 +69,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                         + $"{validationFeedback.Key.Rule} {instance.AdditionalInfo}");
                 }
             }
-            Assert.AreEqual(0, validationFeedbacks.Count);
+            Assert.HasCount(0, validationFeedbacks);
         }
 
         [TestMethod]
@@ -78,7 +79,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             stream.Seek(6, 0);
             DataValidator validator = new(5, 4, 1);
 
-            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8);
+            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8, cancellationToken: TestContext.CancellationToken);
             ValidationFeedback validationFeedbacks = result.FeedbackItems;
 
             foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
@@ -89,7 +90,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                         + $"{validationFeedback.Key.Rule} {instance.AdditionalInfo}");
                 }
             }
-            Assert.AreEqual(0, validationFeedbacks.Count);
+            Assert.HasCount(0, validationFeedbacks);
         }
 
         [TestMethod]
@@ -110,8 +111,8 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                 }
             }
 
-            Assert.AreEqual(7, validationFeedbacks.Count); // Unique feedbacks
-            Assert.AreEqual(13, validationFeedbacks.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
+            Assert.HasCount(7, validationFeedbacks); // Unique feedbacks
+            Assert.HasCount(13, validationFeedbacks.Values.SelectMany(f => f)); // Total feedbacks including duplicates
         }
 
         [TestMethod]
@@ -121,7 +122,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             stream.Seek(6, 0);
             DataValidator validator = new(5, 4, 1);
 
-            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8);
+            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8, cancellationToken: TestContext.CancellationToken);
             ValidationFeedback validationFeedbacks = result.FeedbackItems;
 
             foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
@@ -133,8 +134,8 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                 }
             }
 
-            Assert.AreEqual(7, validationFeedbacks.Count); // Unique feedbacks
-            Assert.AreEqual(13, validationFeedbacks.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
+            Assert.HasCount(7, validationFeedbacks); // Unique feedbacks
+            Assert.HasCount(13, validationFeedbacks.Values.SelectMany(f => f)); // Total feedbacks including duplicates
         }
 
         [TestMethod]
@@ -154,7 +155,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                 }
             }
 
-            Assert.AreEqual(2, validationFeedbacks.Count);
+            Assert.HasCount(2, validationFeedbacks);
         }
 
         [TestMethod]
@@ -163,7 +164,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.NO_DATA));
             DataValidator validator = new(5, 4, 1);
 
-            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8);
+            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8, cancellationToken: TestContext.CancellationToken);
             ValidationFeedback validationFeedbacks = result.FeedbackItems;
 
             foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
@@ -175,7 +176,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                 }
             }
 
-            Assert.AreEqual(2, validationFeedbacks.Count);
+            Assert.HasCount(2, validationFeedbacks);
         }
 
         [TestMethod]
@@ -195,8 +196,8 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                 }
             }
 
-            Assert.AreEqual(2, validationFeedbacks.Count); // Unique feedbacks
-            Assert.AreEqual(6, validationFeedbacks.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
+            Assert.HasCount(2, validationFeedbacks); // Unique feedbacks
+            Assert.HasCount(6, validationFeedbacks.Values.SelectMany(f => f)); // Total feedbacks including duplicates
         }
 
         [TestMethod]
@@ -205,7 +206,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.DATA_ON_SINGLE_ROW));
             DataValidator validator = new(5, 4, 1);
 
-            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8);
+            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8, cancellationToken: TestContext.CancellationToken);
             ValidationFeedback validationFeedbacks = result.FeedbackItems;
 
             foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> validationFeedback in validationFeedbacks)
@@ -217,8 +218,8 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
                 }
             }
 
-            Assert.AreEqual(2, validationFeedbacks.Count);// Unique feedbacks
-            Assert.AreEqual(6, validationFeedbacks.Values.SelectMany(f => f).Count()); // Total feedbacks including duplicates
+            Assert.HasCount(2, validationFeedbacks);// Unique feedbacks
+            Assert.HasCount(6, validationFeedbacks.Values.SelectMany(f => f)); // Total feedbacks including duplicates
         }
     }
 }
