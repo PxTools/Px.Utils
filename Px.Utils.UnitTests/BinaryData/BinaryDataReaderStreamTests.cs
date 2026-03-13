@@ -64,7 +64,7 @@ namespace Px.Utils.UnitTests.BinaryData
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             // With a window size of 16 bytes and each UInt32 value being 4 bytes, we expect 4 values per window.
-            Assert.AreEqual(0, stream.SeekOffsets.Count, "No seek calls expected. Data is fully sequential.");
+            Assert.HasCount(0, stream.SeekOffsets, "No seek calls expected. Data is fully sequential.");
             for (int i = 0; i < stream.SeekOffsets.Count; i++)
             {
                 Assert.AreEqual(i * 16, stream.SeekOffsets[i], "Seek offset mismatch at index " + i);
@@ -94,7 +94,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new(32);
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.IsTrue(stream.SeekOffsets.Count >= 1);
+            Assert.IsGreaterThanOrEqualTo(1, stream.SeekOffsets.Count);
             Assert.AreEqual(256, stream.SeekOffsets[0]);
 
             for (int k = 0; k < 32; k += 3)
@@ -123,7 +123,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new(4096, 1024 * 1024);
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.AreEqual(0, stream.SeekOffsets.Count, "No seek calls expected.");
+            Assert.HasCount(0, stream.SeekOffsets, "No seek calls expected.");
             for (int i = 0; i < total; i += 4)
             {
                 Assert.AreEqual(DataValueType.Exists, dst[i].Type);
@@ -150,7 +150,7 @@ namespace Px.Utils.UnitTests.BinaryData
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
             int expectedCalls = (64 / 4) - 1; // With relative seek, first window requires no seek; subsequent windows require relative gap seeks
-            Assert.AreEqual(expectedCalls, stream.SeekOffsets.Count, "Expected number of seek calls mismatch.");
+            Assert.HasCount(expectedCalls, stream.SeekOffsets, "Expected number of seek calls mismatch.");
 
             // Each selected target is 4 values apart (16 bytes). Each window reads 1 value (4 bytes) due to low merge cap.
             // Therefore the relative seek to the next window is 16 - 4 = 12 bytes for each transition.
@@ -183,7 +183,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt16Codec> reader = new();
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.AreEqual(0, stream.SeekOffsets.Count, "No seek calls expected.");
+            Assert.HasCount(0, stream.SeekOffsets, "No seek calls expected.");
             for (int i = 0; i < 6; i++)
             {
                 Assert.AreEqual(DataValueType.Exists, dst[i].Type, "Data value type mismatch at index " + i);
@@ -214,7 +214,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new();
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.IsTrue(stream.SeekOffsets.Count >= 1);
+            Assert.IsGreaterThanOrEqualTo(1, stream.SeekOffsets.Count);
             Assert.AreEqual(24, stream.SeekOffsets[0]);
             int[] expectedBufferPositions = [6, 8, 11, 13];
             double[] expectedValues = [6, 8, 11, 13];
@@ -399,7 +399,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new(64, null, headerLength);
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, CancellationToken.None);
 
-            Assert.AreEqual(1, stream.SeekOffsets.Count);
+            Assert.HasCount(1, stream.SeekOffsets);
             Assert.AreEqual(headerLength, stream.SeekOffsets[0]);
             for (int i = 0; i < total; i++)
             {
@@ -467,7 +467,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new(64, null, headerLength);
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex: null, CancellationToken.None);
 
-            Assert.AreEqual(1, stream.SeekOffsets.Count);
+            Assert.HasCount(1, stream.SeekOffsets);
             Assert.AreEqual(headerLength, stream.SeekOffsets[0]);
             for (int i = 0; i < total; i++)
             {
@@ -503,7 +503,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new(64, null, headerLength);
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex: 0, CancellationToken.None);
 
-            Assert.AreEqual(0, stream.SeekOffsets.Count, "Expected no seeks when stream is already at data start index 0.");
+            Assert.HasCount(0, stream.SeekOffsets, "Expected no seeks when stream is already at data start index 0.");
             for (int i = 0; i < total; i++)
             {
                 Assert.AreEqual(DataValueType.Exists, dst[i].Type);
@@ -574,7 +574,7 @@ namespace Px.Utils.UnitTests.BinaryData
             BinaryDataReader<UInt32Codec> reader = new(128, null, headerLength);
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex: dataIndex, CancellationToken.None);
 
-            Assert.AreEqual(0, stream.SeekOffsets.Count, "Expected no seeks when the stream is already positioned at the first requested item.");
+            Assert.HasCount(0, stream.SeekOffsets, "Expected no seeks when the stream is already positioned at the first requested item.");
 
             for (int i = 8; i <= 10; i++)
             {
@@ -668,7 +668,7 @@ namespace Px.Utils.UnitTests.BinaryData
             await reader.ReadFromStreamAsync(stream, readMap, blobMap, bufferMap, buffer, streamDataPositionIndex: streamAtDataIndex, CancellationToken.None);
 
             // First requested index is 12, so we must seek forward 4 values = 16 bytes.
-            Assert.AreEqual(1, stream.SeekOffsets.Count);
+            Assert.HasCount(1, stream.SeekOffsets);
             Assert.AreEqual(4 * UInt32Codec.ByteCount, stream.SeekOffsets[0]);
 
             for (int i = 12; i <= 13; i++)

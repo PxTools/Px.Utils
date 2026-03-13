@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models.Metadata;
+using Px.Utils.Models.Metadata;
 
 namespace Px.Utils.UnitTests.ModelTests
 {
@@ -18,7 +18,7 @@ namespace Px.Utils.UnitTests.ModelTests
                 ]);
             MatrixMetadata newMeta = metadata.GetTransform(matrixMap);
 
-            Assert.AreEqual(3, newMeta.Dimensions.Count);
+            Assert.HasCount(3, newMeta.Dimensions);
 
             List<string> var0ExpectedVars = ["var0_val1", "var0_val2"];
             List<string> var1ExpectedVars = ["var1_val0", "var1_val1"];
@@ -42,7 +42,7 @@ namespace Px.Utils.UnitTests.ModelTests
                 ]);
             MatrixMetadata newMeta = metadata.GetTransform(matrixMap);
 
-            Assert.AreEqual(3, newMeta.Dimensions.Count);
+            Assert.HasCount(3, newMeta.Dimensions);
 
             List<string> var0ExpectedVars = ["var1_val0", "var1_val1"];
             List<string> var1ExpectedVars = ["var0_val0", "var0_val1"];

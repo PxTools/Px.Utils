@@ -1,4 +1,4 @@
-﻿using Px.Utils.Language;
+using Px.Utils.Language;
 using Px.Utils.Models.Metadata.Dimensions;
 
 namespace Px.Utils.UnitTests.ModelTests
@@ -23,15 +23,15 @@ namespace Px.Utils.UnitTests.ModelTests
             bool[] isVirtual = valueList.Map(v => v.IsVirtual).ToArray();
 
             // Assert
-            Assert.AreEqual(2, codes.Length);
+            Assert.HasCount(2, codes);
             Assert.AreEqual("1", codes[0]);
             Assert.AreEqual("2", codes[1]);
 
-            Assert.AreEqual(2, names.Length);
+            Assert.HasCount(2, names);
             Assert.AreEqual("foo", names[0]);
             Assert.AreEqual("bar", names[1]);
 
-            Assert.AreEqual(2, isVirtual.Length);
+            Assert.HasCount(2, isVirtual);
             Assert.IsTrue(isVirtual[0]);
             Assert.IsFalse(isVirtual[1]);
         }
@@ -55,23 +55,23 @@ namespace Px.Utils.UnitTests.ModelTests
             int[] precisions = valueList.Map(v => v.Precision).ToArray();
 
             // Assert
-            Assert.AreEqual(2, codes.Length);
+            Assert.HasCount(2, codes);
             Assert.AreEqual("1", codes[0]);
             Assert.AreEqual("2", codes[1]);
 
-            Assert.AreEqual(2, names.Length);
+            Assert.HasCount(2, names);
             Assert.AreEqual("foo", names[0]);
             Assert.AreEqual("bar", names[1]);
 
-            Assert.AreEqual(2, units.Length);
+            Assert.HasCount(2, units);
             Assert.AreEqual("kg", units[0]);
             Assert.AreEqual("m", units[1]);
 
-            Assert.AreEqual(2, lastUpdated.Length);
+            Assert.HasCount(2, lastUpdated);
             Assert.AreEqual(DateTime.MinValue, lastUpdated[0]);
             Assert.AreEqual(DateTime.MaxValue, lastUpdated[1]);
 
-            Assert.AreEqual(2, precisions.Length);
+            Assert.HasCount(2, precisions);
             Assert.AreEqual(0, precisions[0]);
             Assert.AreEqual(1, precisions[1]);
         }

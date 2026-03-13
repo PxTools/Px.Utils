@@ -2,7 +2,7 @@ using Px.Utils.Models.Data;
 using Px.Utils.Models.Data.DataValue;
 using Px.Utils.PxFile.Data;
 
-namespace PxFileTests.DataTests
+namespace Px.Utils.UnitTests.PxFileTests.DataTests
 {
     [TestClass]
     public class DataValueParserTests
@@ -1274,7 +1274,7 @@ namespace PxFileTests.DataTests
             int len = 4;
 
             // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseDoubleDataValue(buffer, len));
+            Assert.ThrowsExactly<ArgumentException>(() => DataValueParsers.ParseDoubleDataValue(buffer, len));
         }
 
         [TestMethod]
@@ -1285,7 +1285,7 @@ namespace PxFileTests.DataTests
             int len = 4;
 
             // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseDoubleDataValue(buffer, len));
+            Assert.ThrowsExactly<ArgumentException>(() => DataValueParsers.ParseDoubleDataValue(buffer, len));
         }
 
         [TestMethod]
@@ -1296,7 +1296,7 @@ namespace PxFileTests.DataTests
             int len = 4;
 
             // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseDoubleDataValue(buffer, len));
+            Assert.ThrowsExactly<ArgumentException>(() => DataValueParsers.ParseDoubleDataValue(buffer, len));
         }
 
         [TestMethod]
@@ -1307,7 +1307,7 @@ namespace PxFileTests.DataTests
             int len = 4;
 
             // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseDoubleDataValue(buffer, len));
+            Assert.ThrowsExactly<ArgumentException>(() => DataValueParsers.ParseDoubleDataValue(buffer, len));
         }
 
         #endregion
@@ -1526,7 +1526,7 @@ namespace PxFileTests.DataTests
             int len = 4;
 
             // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseDecimalDataValue(buffer, len));
+            Assert.ThrowsExactly<ArgumentException>(() => DataValueParsers.ParseDecimalDataValue(buffer, len));
         }
 
         [TestMethod]
@@ -1537,7 +1537,7 @@ namespace PxFileTests.DataTests
             int len = 4;
 
             // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseDecimalDataValue(buffer, len));
+            Assert.ThrowsExactly<ArgumentException>(() => DataValueParsers.ParseDecimalDataValue(buffer, len));
         }
 
         [TestMethod]
@@ -1548,7 +1548,7 @@ namespace PxFileTests.DataTests
             int len = 4;
 
             // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseDecimalDataValue(buffer, len));
+            Assert.ThrowsExactly<ArgumentException>(() => DataValueParsers.ParseDecimalDataValue(buffer, len));
         }
 
         [TestMethod]
@@ -1559,7 +1559,7 @@ namespace PxFileTests.DataTests
             int len = 4;
 
             // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseDecimalDataValue(buffer, len));
+            Assert.ThrowsExactly<ArgumentException>(() => DataValueParsers.ParseDecimalDataValue(buffer, len));
         }
 
         #endregion
@@ -1770,7 +1770,7 @@ namespace PxFileTests.DataTests
             int len = 4;
 
             // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings));
+            Assert.ThrowsExactly<ArgumentException>(() => DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings));
         }
 
         [TestMethod]
@@ -1781,7 +1781,7 @@ namespace PxFileTests.DataTests
             int len = 4;
 
             // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings));
+            Assert.ThrowsExactly<ArgumentException>(() => DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings));
         }
 
         [TestMethod]
@@ -1792,7 +1792,7 @@ namespace PxFileTests.DataTests
             int len = 4;
 
             // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings));
+            Assert.ThrowsExactly<ArgumentException>(() => DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings));
         }
 
         [TestMethod]
@@ -1803,7 +1803,7 @@ namespace PxFileTests.DataTests
             int len = 4;
 
             // Act
-            Assert.ThrowsException<ArgumentException>(() => DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings));
+            Assert.ThrowsExactly<ArgumentException>(() => DataValueParsers.ParseUnsafeDouble(buffer, len, missingValueEncodings));
         }
 
         [TestMethod]

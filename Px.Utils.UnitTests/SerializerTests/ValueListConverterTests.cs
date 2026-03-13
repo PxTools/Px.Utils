@@ -1,4 +1,4 @@
-﻿using Px.Utils.Language;
+using Px.Utils.Language;
 using Px.Utils.Models.Metadata.Dimensions;
 using Px.Utils.Models.Metadata.MetaProperties;
 using System.Text.Json;
@@ -69,7 +69,7 @@ namespace Px.Utils.UnitTests.SerializerTests
 
             // Assert
             Assert.IsNotNull(actual);
-            Assert.AreEqual(0, actual.Count);
+            Assert.HasCount(0, actual);
         }
 
         [TestMethod]
@@ -86,7 +86,7 @@ namespace Px.Utils.UnitTests.SerializerTests
             Assert.AreEqual("code", actual[0].Code);
             Assert.AreEqual("name", actual[0].Name["lang"]);
             Assert.IsFalse(actual[0].IsVirtual);
-            Assert.AreEqual(0, actual[0].AdditionalProperties.Count);
+            Assert.HasCount(0, actual[0].AdditionalProperties);
         }
 
         [TestMethod]
@@ -103,12 +103,12 @@ namespace Px.Utils.UnitTests.SerializerTests
             Assert.AreEqual("code1", actual[0].Code);
             Assert.AreEqual("name1", actual[0].Name["lang"]);
             Assert.IsFalse(actual[0].IsVirtual);
-            Assert.AreEqual(0, actual[0].AdditionalProperties.Count);
+            Assert.HasCount(0, actual[0].AdditionalProperties);
 
             Assert.AreEqual("code2", actual[1].Code);
             Assert.AreEqual("name2", actual[1].Name["lang"]);
             Assert.IsFalse(actual[1].IsVirtual);
-            Assert.AreEqual(0, actual[1].AdditionalProperties.Count);
+            Assert.HasCount(0, actual[1].AdditionalProperties);
         }
 
         [TestMethod]

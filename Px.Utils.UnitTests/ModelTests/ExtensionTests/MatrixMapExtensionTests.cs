@@ -652,9 +652,9 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
         {
             // Arrange - Create dimensions that would result in a large number
             List<IDimensionMap> dimensions = [
-                new DimensionMap("dim1", Enumerable.Range(0, 100).Select(i => $"val{i}").ToList()),
-                new DimensionMap("dim2", Enumerable.Range(0, 50).Select(i => $"val{i}").ToList()),
-                new DimensionMap("dim3", Enumerable.Range(0, 10).Select(i => $"val{i}").ToList())
+                new DimensionMap("dim1", [.. Enumerable.Range(0, 100).Select(i => $"val{i}")]),
+                new DimensionMap("dim2", [.. Enumerable.Range(0, 50).Select(i => $"val{i}")]),
+                new DimensionMap("dim3", [.. Enumerable.Range(0, 10).Select(i => $"val{i}")])
             ];
 
             MatrixMap map = new(dimensions);
@@ -669,9 +669,9 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
             // Arrange - Create dimensions that would overflow int but fit in long
             // This simulates a case where GetSize() would fail but GetSizeLong() should work
             List<IDimensionMap> dimensions = [
-                new DimensionMap("dim1", Enumerable.Range(0, 1000).Select(i => $"val{i}").ToList()),
-                new DimensionMap("dim2", Enumerable.Range(0, 1000).Select(i => $"val{i}").ToList()),
-                new DimensionMap("dim3", Enumerable.Range(0, 5).Select(i => $"val{i}").ToList())
+                new DimensionMap("dim1", [.. Enumerable.Range(0, 1000).Select(i => $"val{i}")]),
+                new DimensionMap("dim2", [.. Enumerable.Range(0, 1000).Select(i => $"val{i}")]),
+                new DimensionMap("dim3", [.. Enumerable.Range(0, 5).Select(i => $"val{i}")])
             ];
 
             MatrixMap map = new(dimensions);
@@ -777,10 +777,10 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
             IMatrixMap result = map1.IntersectionMap(map2);
 
             // Assert
-            Assert.AreEqual(3, result.DimensionMaps.Count);
-            Assert.AreEqual(2, result.DimensionMaps[0].ValueCodes.Count); // bb11, cc11
-            Assert.AreEqual(2, result.DimensionMaps[1].ValueCodes.Count); // aa22, cc22
-            Assert.AreEqual(2, result.DimensionMaps[2].ValueCodes.Count); // aa33, bb33
+            Assert.HasCount(3, result.DimensionMaps);
+            Assert.HasCount(2, result.DimensionMaps[0].ValueCodes); // bb11, cc11
+            Assert.HasCount(2, result.DimensionMaps[1].ValueCodes); // aa22, cc22
+            Assert.HasCount(2, result.DimensionMaps[2].ValueCodes); // aa33, bb33
             CollectionAssert.AreEqual(new List<string> { "bb11", "cc11" }, result.DimensionMaps[0].ValueCodes.ToList());
         }
 
@@ -805,9 +805,9 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
             IMatrixMap result = map1.IntersectionMap(map2);
 
             // Assert
-            Assert.AreEqual(2, result.DimensionMaps.Count);
-            Assert.AreEqual(0, result.DimensionMaps[0].ValueCodes.Count);
-            Assert.AreEqual(0, result.DimensionMaps[1].ValueCodes.Count);
+            Assert.HasCount(2, result.DimensionMaps);
+            Assert.HasCount(0, result.DimensionMaps[0].ValueCodes);
+            Assert.HasCount(0, result.DimensionMaps[1].ValueCodes);
         }
 
         [TestMethod]
@@ -918,9 +918,9 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
             IMatrixMap result = map1.UnionMap(map2);
 
             // Assert
-            Assert.AreEqual(2, result.DimensionMaps.Count);
-            Assert.AreEqual(3, result.DimensionMaps[0].ValueCodes.Count); // aa11, bb11, cc11
-            Assert.AreEqual(4, result.DimensionMaps[1].ValueCodes.Count); // aa22, bb22, cc22, dd22
+            Assert.HasCount(2, result.DimensionMaps);
+            Assert.HasCount(3, result.DimensionMaps[0].ValueCodes); // aa11, bb11, cc11
+            Assert.HasCount(4, result.DimensionMaps[1].ValueCodes); // aa22, bb22, cc22, dd22
             CollectionAssert.AreEqual(new List<string> { "aa11", "bb11", "cc11" }, result.DimensionMaps[0].ValueCodes.ToList());
             CollectionAssert.AreEqual(new List<string> { "aa22", "bb22", "cc22", "dd22" }, result.DimensionMaps[1].ValueCodes.ToList());
         }
@@ -946,9 +946,9 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
             IMatrixMap result = map1.UnionMap(map2);
 
             // Assert
-            Assert.AreEqual(2, result.DimensionMaps.Count);
-            Assert.AreEqual(4, result.DimensionMaps[0].ValueCodes.Count); // aa11, bb11, cc11, dd11
-            Assert.AreEqual(3, result.DimensionMaps[1].ValueCodes.Count); // aa22, bb22, cc22
+            Assert.HasCount(2, result.DimensionMaps);
+            Assert.HasCount(4, result.DimensionMaps[0].ValueCodes); // aa11, bb11, cc11, dd11
+            Assert.HasCount(3, result.DimensionMaps[1].ValueCodes); // aa22, bb22, cc22
         }
 
         [TestMethod]
@@ -974,7 +974,6 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void UnionMapWithDifferentDimensionCountThrows()
         {
             // Arrange
@@ -991,7 +990,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
             MatrixMap map2 = new(dimensions2);
 
             // Act
-            _ = map1.UnionMap(map2);
+            Assert.ThrowsExactly<InvalidOperationException>(() => _ = map1.UnionMap(map2));
         }
 
         [TestMethod]
@@ -1036,7 +1035,7 @@ namespace Px.Utils.UnitTests.ModelTests.ExtensionTests
 
             // Assert
             Assert.AreEqual(9L, collapsedMap.GetSize()); // 3 * 1 * 3 = 9
-            Assert.AreEqual(1, collapsedMap.DimensionMaps[1].ValueCodes.Count);
+            Assert.HasCount(1, collapsedMap.DimensionMaps[1].ValueCodes);
             Assert.AreEqual("foo", collapsedMap.DimensionMaps[1].ValueCodes[0]);
         }
 

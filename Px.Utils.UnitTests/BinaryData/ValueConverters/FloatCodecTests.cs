@@ -1,7 +1,6 @@
 using Px.Utils.BinaryData.ValueConverters;
 using Px.Utils.Models.Data.DataValue;
 using Px.Utils.Models.Data;
-using System;
 
 namespace Px.Utils.UnitTests.BinaryData.ValueConverters
 {
@@ -23,7 +22,7 @@ namespace Px.Utils.UnitTests.BinaryData.ValueConverters
             ReadOnlySpan<byte> bytes = ms.ToArray();
             DoubleDataValue[] output = new DoubleDataValue[input.Length];
             codec.Read(bytes, output);
-            Assert.AreEqual(input.Length, output.Length);
+            Assert.HasCount(input.Length, output);
             for (int i = 0; i < input.Length; i++)
             {
                 Assert.AreEqual(DataValueType.Exists, output[i].Type);
@@ -74,13 +73,13 @@ namespace Px.Utils.UnitTests.BinaryData.ValueConverters
             codec.Write(input, ms);
             ReadOnlySpan<byte> bytes = ms.ToArray();
             codec.Read(bytes, output);
-            Assert.AreEqual(3, output.Length);
+            Assert.HasCount(3, output);
             Assert.AreEqual(DataValueType.Exists, output[0].Type);
-            Assert.IsTrue(Math.Abs(output[0].UnsafeValue - 0.0m) <= 0.0001m);
+            Assert.IsLessThanOrEqualTo(0.0001m, Math.Abs(output[0].UnsafeValue - 0.0m));
             Assert.AreEqual(DataValueType.Exists, output[1].Type);
-            Assert.IsTrue(Math.Abs(output[1].UnsafeValue - 1.5m) <= 0.0001m);
+            Assert.IsLessThanOrEqualTo(0.0001m, Math.Abs(output[1].UnsafeValue - 1.5m));
             Assert.AreEqual(DataValueType.Exists, output[2].Type);
-            Assert.IsTrue(Math.Abs(output[2].UnsafeValue - (-2.25m)) <= 0.0001m);
+            Assert.IsLessThanOrEqualTo(0.0001m, Math.Abs(output[2].UnsafeValue - (-2.25m)));
         }
 
         [TestMethod]
