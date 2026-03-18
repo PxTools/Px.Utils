@@ -560,6 +560,27 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
+        public void ValidateValueAmountsCalledWithMatchingAmountOfElementsWithListDelimetersReturnsNoError()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = [ContentValidationFixtures.StructuredEntryWithMatchingAmountOfElementsWithListDelimeters];
+            ContentValidator validator = new(filename, encoding, entries);
+            SetValidatorField(validator, "_defaultLanguage", defaultLanguage);
+            SetValidatorField(validator, "_availableLanguages", availableLanguages);
+            SetValidatorField(validator, "_stubDimensionNames", stubDimensionNames);
+            SetValidatorField(validator, "_dimensionValueNames", dimensionValueNames);
+
+            // Act
+            ValidationFeedback? result = ContentValidator.ValidateValueAmounts(
+                entries[0],
+                validator
+                );
+
+            // Assert
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
         public void ValidateValueUppercaseRecommendationsCalledWithLowerCaseEntryReturnsWithWarning()
         {
             // Arrange

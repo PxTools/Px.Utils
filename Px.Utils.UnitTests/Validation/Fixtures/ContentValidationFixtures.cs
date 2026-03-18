@@ -761,6 +761,15 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
                 codesBarEntry.ValueStartIndex,
                 Utils.Validation.ValueType.ListOfStrings);
 
+        internal static ValidationStructuredEntry StructuredEntryWithMatchingAmountOfElementsWithListDelimeters =>
+            new(filename,
+                codesBarEntry.Key,
+                "\"foo,bar\"", // foo,bar should be treated as one element due to the quotes
+                codesBarEntry.ValueStartIndex,
+                codesBarEntry.LineChangeIndexes,
+                codesBarEntry.ValueStartIndex,
+                Utils.Validation.ValueType.ListOfStrings);
+
         internal static ValidationStructuredEntry StructuredEntryWithLowerCaseValue =>
             new(filename,
             codepageEntry.Key,

@@ -1,4 +1,4 @@
-﻿using Px.Utils.Validation.SyntaxValidation;
+using Px.Utils.Validation.SyntaxValidation;
 using System.Globalization;
 
 namespace Px.Utils.Validation.ContentValidation
@@ -399,7 +399,7 @@ namespace Px.Utils.Validation.ContentValidation
                 return null;
             }
 
-            string[] codes = entry.Value.Split(validator.Conf.Symbols.Value.ListSeparator);
+            string[] codes = [.. SyntaxValidationUtilityMethods.GetListItemsFromString(entry.Value, validator.Conf.Symbols.Value.ListSeparator, validator.Conf.Symbols.Value.StringDelimeter)];
             string defaultLanguage = validator._defaultLanguage ?? string.Empty;
             string lang = entry.Key.Language ?? defaultLanguage;
             if (codes.Length != validator._dimensionValueNames[new(lang, entry.Key.FirstSpecifier)].Length)
