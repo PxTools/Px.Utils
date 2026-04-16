@@ -112,7 +112,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             }
 
             Assert.HasCount(7, validationFeedbacks); // Unique feedbacks
-            Assert.HasCount(13, validationFeedbacks.Values.SelectMany(f => f)); // Total feedbacks including duplicates
+            Assert.HasCount(12, validationFeedbacks.Values.SelectMany(f => f)); // Total feedbacks including duplicates
         }
 
         [TestMethod]
@@ -135,7 +135,7 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
             }
 
             Assert.HasCount(7, validationFeedbacks); // Unique feedbacks
-            Assert.HasCount(13, validationFeedbacks.Values.SelectMany(f => f)); // Total feedbacks including duplicates
+            Assert.HasCount(12, validationFeedbacks.Values.SelectMany(f => f)); // Total feedbacks including duplicates
         }
 
         [TestMethod]
@@ -220,6 +220,78 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
 
             Assert.HasCount(2, validationFeedbacks);// Unique feedbacks
             Assert.HasCount(6, validationFeedbacks.Values.SelectMany(f => f)); // Total feedbacks including duplicates
+        }
+
+        [TestMethod]
+        public void ValidateDataStartingWithEnclosedMissingValueReturnsWithoutErrors()
+        {
+            using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.DATA_STARTING_WITH_ENCLOSED_MISSING_VALUE));
+            stream.Seek(6, 0);
+            DataValidator validator = new(5, 4, 1);
+
+            ValidationFeedback validationFeedbacks = validator.Validate(stream, "foo", Encoding.UTF8).FeedbackItems;
+
+            Assert.HasCount(0, validationFeedbacks);
+        }
+
+        [TestMethod]
+        public void ValidateDataStartingWithUnenclosedMissingValueReturnsWithoutErrors()
+        {
+            using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.DATA_STARTING_WITH_UNENCLOSED_MISSING_VALUE));
+            stream.Seek(6, 0);
+            DataValidator validator = new(5, 4, 1);
+
+            ValidationFeedback validationFeedbacks = validator.Validate(stream, "foo", Encoding.UTF8).FeedbackItems;
+
+            Assert.HasCount(0, validationFeedbacks);
+        }
+
+        [TestMethod]
+        public void ValidateDataStartingWithNilValueReturnsWithoutErrors()
+        {
+            using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.DATA_STARTING_WITH_NIL_VALUE));
+            stream.Seek(6, 0);
+            DataValidator validator = new(5, 4, 1);
+
+            ValidationFeedback validationFeedbacks = validator.Validate(stream, "foo", Encoding.UTF8).FeedbackItems;
+
+            Assert.HasCount(0, validationFeedbacks);
+        }
+
+        [TestMethod]
+        public void ValidateDataStartingWithUnenclosedNilValueReturnsWithoutErrors()
+        {
+            using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.DATA_STARTING_WITH_UNENCLOSED_NIL_VALUE));
+            stream.Seek(6, 0);
+            DataValidator validator = new(5, 4, 1);
+
+            ValidationFeedback validationFeedbacks = validator.Validate(stream, "foo", Encoding.UTF8).FeedbackItems;
+
+            Assert.HasCount(0, validationFeedbacks);
+        }
+
+        [TestMethod]
+        public async Task ValidateAsyncDataStartingWithEnclosedMissingValueReturnsWithoutErrors()
+        {
+            using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.DATA_STARTING_WITH_ENCLOSED_MISSING_VALUE));
+            stream.Seek(6, 0);
+            DataValidator validator = new(5, 4, 1);
+
+            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8, cancellationToken: TestContext.CancellationToken);
+
+            Assert.HasCount(0, result.FeedbackItems);
+        }
+
+        [TestMethod]
+        public async Task ValidateAsyncDataStartingWithUnenclosedMissingValueReturnsWithoutErrors()
+        {
+            using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(DataStreamContents.DATA_STARTING_WITH_UNENCLOSED_MISSING_VALUE));
+            stream.Seek(6, 0);
+            DataValidator validator = new(5, 4, 1);
+
+            ValidationResult result = await validator.ValidateAsync(stream, "foo", Encoding.UTF8, cancellationToken: TestContext.CancellationToken);
+
+            Assert.HasCount(0, result.FeedbackItems);
         }
     }
 }
