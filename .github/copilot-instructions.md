@@ -24,5 +24,15 @@ Unit testing:
 - Use Moq for mocking dependencies in unit tests.
 - Use PascalCase for naming test methods, following the pattern: MethodNameStateUnderTestExpectedBehavior.
 
+Architecture:
+- See `docs/architecture.md` for the architecture index. It links to focused sub-files — read only the one relevant to your task:
+  - `docs/architecture.overview.md` — solution structure, config, patterns, file map
+  - `docs/architecture.validation.md` — validation pipeline, interfaces, extensibility
+  - `docs/architecture.models.md` — models, metadata, dimensions, builders
+  - `docs/architecture.readers.md` — metadata/data readers, binary codecs
+  - `docs/architecture.operations.md` — matrix operations
+  - `docs/architecture.serializers.md` — JSON converters
+  - `docs/architecture.testing.md` — unit tests, mocks, benchmarks
+
 Other:
 - When refactoring code, update the documentation comments to reflect the changes made.
