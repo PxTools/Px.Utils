@@ -323,7 +323,7 @@ namespace Px.Utils.Validation.ContentValidation
             string[] allowedCharsets = ["ANSI", "Unicode"];
 
             string[] dimensionTypes = [
-                    validator.Conf.Tokens.VariableTypes.Content,
+                validator.Conf.Tokens.VariableTypes.Content,
                 validator.Conf.Tokens.VariableTypes.Time,
                 validator.Conf.Tokens.VariableTypes.Geographical,
                 validator.Conf.Tokens.VariableTypes.Ordinal,
@@ -331,20 +331,30 @@ namespace Px.Utils.Validation.ContentValidation
                 validator.Conf.Tokens.VariableTypes.Other,
                 validator.Conf.Tokens.VariableTypes.Unknown,
                 validator.Conf.Tokens.VariableTypes.Classificatory
-                    ];
+            ];
+
+            string[] knownDimensionTypeAliases = [
+                validator.Conf.Tokens.VariableTypes.Contents,
+                validator.Conf.Tokens.VariableTypes.Region,
+            ];
 
             string value = SyntaxValidationUtilityMethods.CleanString(entry.Value, validator.Conf);
             if ((entry.Key.Keyword == validator.Conf.Tokens.KeyWords.Charset && !allowedCharsets.Contains(value)) ||
                 (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.CodePage && !value.Equals(validator._encoding.BodyName, StringComparison.OrdinalIgnoreCase)) ||
                 (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.DimensionType && !dimensionTypes.Contains(value)))
             {
+                // If the value is included in known aliases, set level to warning instead of error
+                ValidationFeedbackLevel level = entry.Key.Keyword == validator.Conf.Tokens.KeyWords.DimensionType && knownDimensionTypeAliases.Contains(value) ?
+                        ValidationFeedbackLevel.Warning : 
+                        ValidationFeedbackLevel.Error;
+
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
                     entry.ValueStartIndex,
                     entry.LineChangeIndexes);
 
                 KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
-                    new(ValidationFeedbackLevel.Error,
+                    new(level,
                         ValidationFeedbackRule.InvalidValueFound),
                     new(validator._filename,
                         feedbackIndexes.Key,

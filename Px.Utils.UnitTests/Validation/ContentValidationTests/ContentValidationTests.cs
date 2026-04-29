@@ -537,6 +537,27 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
+        public void ValidateValueTypesCalledWithStructuredEntryArrayWithKnownDimensionTypeAliasesReturnsWithWarnings()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_KNOWN_DIMENSIONTYPE_ALIASES;
+            ContentValidator validator = new(filename, encoding, entries);
+            // Act
+            foreach (ValidationStructuredEntry entry in entries)
+            {
+                ValidationFeedback? result = ContentValidator.ValidateValueContents(
+                    entry,
+                    validator
+                    );
+                // Assert
+                Assert.IsNotNull(result);
+                Assert.HasCount(1, result);
+                Assert.AreEqual(ValidationFeedbackRule.InvalidValueFound, result.First().Key.Rule);
+                Assert.AreEqual(ValidationFeedbackLevel.Warning, result.First().Key.Level);
+            }
+        }
+
+        [TestMethod]
         public void ValidateValueAmountsCalledWithUnmatchingAmountOfElementsReturnsWithError()
         {
             // Arrange

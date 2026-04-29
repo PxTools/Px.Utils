@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models.Metadata.Enums;
+using Px.Utils.Models.Metadata.Enums;
 
 namespace Px.Utils.PxFile
 {
@@ -110,19 +110,23 @@ namespace Px.Utils.PxFile
             public class VariableTypeTokens
             {
                 private const string CONTENT = "Content";
+                private const string CONTENTS = "Contents";
                 private const string TIME = "Time";
                 private const string ORDINAL = "Ordinal";
                 private const string NOMINAL = "Nominal";
                 private const string GEOGRAPHICAL = "Geographical";
+                private const string REGION = "Region";
                 private const string OTHER = "Other";
                 private const string UNKNOWN = "Unknown";
                 private const string CLASSIFICATORY = "Classificatory";
 
                 public string Content { get; set; } = CONTENT;
+                public string Contents { get; set; } = CONTENTS;
                 public string Time { get; set; } = TIME;
                 public string Ordinal { get; set; } = ORDINAL;
                 public string Nominal { get; set; } = NOMINAL;
                 public string Geographical { get; set; } = GEOGRAPHICAL;
+                public string Region { get; set; } = REGION;
                 public string Other { get; set; } = OTHER;
                 public string Unknown { get; set; } = UNKNOWN;
                 public string Classificatory { get; set; } = CLASSIFICATORY;

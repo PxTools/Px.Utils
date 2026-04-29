@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models.Metadata.Enums;
+using Px.Utils.Models.Metadata.Enums;
 using Px.Utils.Models.Metadata.ExtensionMethods;
 using Px.Utils.PxFile;
 
@@ -113,10 +113,12 @@ namespace Px.Utils.ModelBuilders
             Dictionary<string, DimensionType> map = new()
             {
                 {conf.Tokens.VariableTypes.Content, DimensionType.Content},
+                {conf.Tokens.VariableTypes.Contents, DimensionType.Content}, // Known alias for content dimension type
                 {conf.Tokens.VariableTypes.Time, DimensionType.Time},
                 {conf.Tokens.VariableTypes.Ordinal, DimensionType.Ordinal},
                 {conf.Tokens.VariableTypes.Nominal, DimensionType.Nominal},
                 {conf.Tokens.VariableTypes.Geographical, DimensionType.Geographical},
+                {conf.Tokens.VariableTypes.Region, DimensionType.Geographical}, // Known alias for geographical dimension type
                 {conf.Tokens.VariableTypes.Other, DimensionType.Other},
                 {conf.Tokens.VariableTypes.Unknown, DimensionType.Unknown}
             };
