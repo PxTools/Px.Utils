@@ -2,6 +2,7 @@ using Px.Utils.UnitTests.Validation.Fixtures;
 using Px.Utils.Validation;
 using Px.Utils.Validation.ContentValidation;
 using Px.Utils.Validation.SyntaxValidation;
+using Px.Utils.PxFile;
 using System.Text;
 using System.Reflection;
 
@@ -555,6 +556,34 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
                 Assert.AreEqual(ValidationFeedbackRule.InvalidValueFound, result.First().Key.Rule);
                 Assert.AreEqual(ValidationFeedbackLevel.Warning, result.First().Key.Level);
             }
+        }
+
+        [TestMethod]
+        public void ValidateValueContentsCalledWithConfiguredDimensionTypeAliasReturnsWithWarning()
+        {
+            // Arrange
+            PxFileConfiguration conf = PxFileConfiguration.Default;
+            conf.Tokens.VariableTypes.Ordinal = ["Ordinal", "Ranking"];
+
+            ValidationStructuredEntry entry = new(
+                filename,
+                new ValidationStructuredEntryKey("VARIABLE-TYPE", "fi", "foo"),
+                "Ranking",
+                0,
+                [],
+                0,
+                Px.Utils.Validation.ValueType.StringValue);
+
+            ContentValidator validator = new(filename, encoding, [entry], conf: conf);
+
+            // Act
+            ValidationFeedback? result = ContentValidator.ValidateValueContents(entry, validator);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.HasCount(1, result);
+            Assert.AreEqual(ValidationFeedbackRule.InvalidValueFound, result.First().Key.Rule);
+            Assert.AreEqual(ValidationFeedbackLevel.Warning, result.First().Key.Level);
         }
 
         [TestMethod]

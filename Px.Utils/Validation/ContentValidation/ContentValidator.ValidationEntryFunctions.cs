@@ -1,3 +1,4 @@
+using Px.Utils.PxFile;
 using Px.Utils.Validation.SyntaxValidation;
 using System.Globalization;
 
@@ -322,31 +323,19 @@ namespace Px.Utils.Validation.ContentValidation
         {
             string[] allowedCharsets = ["ANSI", "Unicode"];
 
-            string[] dimensionTypes = [
-                validator.Conf.Tokens.VariableTypes.Content,
-                validator.Conf.Tokens.VariableTypes.Time,
-                validator.Conf.Tokens.VariableTypes.Geographical,
-                validator.Conf.Tokens.VariableTypes.Ordinal,
-                validator.Conf.Tokens.VariableTypes.Nominal,
-                validator.Conf.Tokens.VariableTypes.Other,
-                validator.Conf.Tokens.VariableTypes.Unknown,
-                validator.Conf.Tokens.VariableTypes.Classificatory
-            ];
-
-            string[] knownDimensionTypeAliases = [
-                validator.Conf.Tokens.VariableTypes.Contents,
-                validator.Conf.Tokens.VariableTypes.Region,
-            ];
+            HashSet<string> primaryDimensionTypes = GetPrimaryDimensionTypeTokens(validator.Conf);
+            HashSet<string> aliasDimensionTypes = GetAliasDimensionTypeTokens(validator.Conf);
 
             string value = SyntaxValidationUtilityMethods.CleanString(entry.Value, validator.Conf);
             if ((entry.Key.Keyword == validator.Conf.Tokens.KeyWords.Charset && !allowedCharsets.Contains(value)) ||
                 (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.CodePage && !value.Equals(validator._encoding.BodyName, StringComparison.OrdinalIgnoreCase)) ||
-                (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.DimensionType && !dimensionTypes.Contains(value)))
+                (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.DimensionType && !primaryDimensionTypes.Contains(value) && !aliasDimensionTypes.Contains(value)) ||
+                (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.DimensionType && aliasDimensionTypes.Contains(value)))
             {
-                // If the value is included in known aliases, set level to warning instead of error
-                ValidationFeedbackLevel level = entry.Key.Keyword == validator.Conf.Tokens.KeyWords.DimensionType && knownDimensionTypeAliases.Contains(value) ?
-                        ValidationFeedbackLevel.Warning : 
-                        ValidationFeedbackLevel.Error;
+                // Using a known alias dimension type as a value for DimensionType is not invalid but is not recommended, so it is reported as a warning instead of an error
+                ValidationFeedbackLevel level = entry.Key.Keyword == validator.Conf.Tokens.KeyWords.DimensionType && aliasDimensionTypes.Contains(value)
+                    ? ValidationFeedbackLevel.Warning
+                    : ValidationFeedbackLevel.Error;
 
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
@@ -472,6 +461,41 @@ namespace Px.Utils.Validation.ContentValidation
                 return new(feedback);
             }
             return null;
+        }
+
+        private static HashSet<string> GetPrimaryDimensionTypeTokens(PxFileConfiguration conf)
+        {
+            IEnumerable<string> primaryTokens = GetDimensionTypeTokenSets(conf)
+                .Select(tokens => tokens.FirstOrDefault())
+                .Where(token => !string.IsNullOrWhiteSpace(token))
+                .Cast<string>();
+
+            return [.. primaryTokens];
+        }
+
+        private static HashSet<string> GetAliasDimensionTypeTokens(PxFileConfiguration conf)
+        {
+            IEnumerable<string> aliasTokens = GetDimensionTypeTokenSets(conf)
+                .Where(tokens => tokens.Length > 1)
+                .SelectMany(tokens => tokens.Skip(1))
+                .Where(token => !string.IsNullOrWhiteSpace(token));
+
+            return [.. aliasTokens];
+        }
+
+        private static IEnumerable<string[]> GetDimensionTypeTokenSets(PxFileConfiguration conf)
+        {
+            return
+            [
+                conf.Tokens.VariableTypes.Content,
+                conf.Tokens.VariableTypes.Time,
+                conf.Tokens.VariableTypes.Ordinal,
+                conf.Tokens.VariableTypes.Nominal,
+                conf.Tokens.VariableTypes.Geographical,
+                conf.Tokens.VariableTypes.Other,
+                conf.Tokens.VariableTypes.Unknown,
+                conf.Tokens.VariableTypes.Classificatory
+            ];
         }
     }
 }

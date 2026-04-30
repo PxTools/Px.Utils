@@ -62,6 +62,8 @@ Task<MatrixMetadata> BuildAsync(IAsyncEnumerable<KeyValuePair<string, string>> m
 
 Helpers: `MetadataEntryKeyBuilder`, `ValueParserUtilities`, `MetadataEntryKey`.
 
+`PxFileConfiguration.TokenDefinitions.VariableTypeTokens` exposes configurable string arrays for each dimension type. The first value is the primary token used by builders, and any additional values are treated as aliases during parsing.
+
 ## Extension Methods
 
 | File | Purpose |
