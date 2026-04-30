@@ -1,5 +1,6 @@
 using Px.Utils.PxFile;
 using Px.Utils.Validation.SyntaxValidation;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 
 namespace Px.Utils.Validation.ContentValidation
@@ -318,69 +319,79 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns>Key value pair containing information about the rule violation is returned if an unexpected value is detected</returns>
+        /// <returns>Key value pair containing information about the rule violation is returned if an unexpected or unrecommended value is detected from the entry</returns>
         public static ValidationFeedback? ValidateValueContents(ValidationStructuredEntry entry, ContentValidator validator)
         {
-            string[] allowedCharsets = ["ANSI", "Unicode"];
-
-            HashSet<string> primaryDimensionTypes = GetPrimaryDimensionTypeTokens(validator.Conf);
-            HashSet<string> aliasDimensionTypes = GetAliasDimensionTypeTokens(validator.Conf);
-
+            string[] recommendedValueContents = [];
+            string[] knownAliases = [];
+            StringComparer comparer = StringComparer.Ordinal;
+            string keyword = entry.Key.Keyword;
             string value = SyntaxValidationUtilityMethods.CleanString(entry.Value, validator.Conf);
-            if ((entry.Key.Keyword == validator.Conf.Tokens.KeyWords.Charset && !allowedCharsets.Contains(value)) ||
-                (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.CodePage && !value.Equals(validator._encoding.BodyName, StringComparison.OrdinalIgnoreCase)) ||
-                (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.DimensionType && !primaryDimensionTypes.Contains(value) && !aliasDimensionTypes.Contains(value)) ||
-                (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.DimensionType && aliasDimensionTypes.Contains(value)))
+
+            if (keyword == validator.Conf.Tokens.KeyWords.Charset)
             {
-                // Using a known alias dimension type as a value for DimensionType is not invalid but is not recommended, so it is reported as a warning instead of an error
-                ValidationFeedbackLevel level = entry.Key.Keyword == validator.Conf.Tokens.KeyWords.DimensionType && aliasDimensionTypes.Contains(value)
-                    ? ValidationFeedbackLevel.Warning
-                    : ValidationFeedbackLevel.Error;
-
-                KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    entry.KeyStartLineIndex,
-                    entry.ValueStartIndex,
-                    entry.LineChangeIndexes);
-
-                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
-                    new(level,
-                        ValidationFeedbackRule.InvalidValueFound),
-                    new(validator._filename,
-                        feedbackIndexes.Key,
-                        feedbackIndexes.Value,
-                        $"{entry.Key.Keyword}: {entry.Value}")
-                );
-
-                return new(feedback);
+                recommendedValueContents = ["ANSI", "Unicode"];
             }
-            else if (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.ContentVariableIdentifier)
+            else if (keyword == validator.Conf.Tokens.KeyWords.CodePage)
+            {
+                recommendedValueContents = [validator._encoding.BodyName];
+                comparer = StringComparer.OrdinalIgnoreCase;
+            }
+            else if (keyword == validator.Conf.Tokens.KeyWords.DimensionType)
+            {
+                (recommendedValueContents, knownAliases) = BuildAllowedDimensionTypes(validator.Conf);
+            }
+            else if (keyword == validator.Conf.Tokens.KeyWords.ContentVariableIdentifier)
             {
                 string defaultLanguage = validator._defaultLanguage ?? string.Empty;
                 string lang = entry.Key.Language ?? defaultLanguage;
-                if (validator._stubDimensionNames is not null && validator._stubDimensionNames.TryGetValue(lang, out string[]? stubValues) && 
-                    !Array.Exists(stubValues, d => d == value) &&
-                (validator._headingDimensionNames is not null && validator._headingDimensionNames.TryGetValue(lang, out string[]? headingValues) && 
-                    !Array.Exists(headingValues, d => d == value)))
+                List<string> dimensionNames = [];
+
+                if (validator._stubDimensionNames is not null && validator._stubDimensionNames.TryGetValue(lang, out string[]? stubValues))
                 {
-                    KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                        entry.KeyStartLineIndex,
-                        entry.ValueStartIndex,
-                        entry.LineChangeIndexes);
-
-                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
-                        new(ValidationFeedbackLevel.Error,
-                                ValidationFeedbackRule.InvalidValueFound),
-                        new(validator._filename,
-                            feedbackIndexes.Key,
-                            feedbackIndexes.Value,
-                            $"{entry.Key.Keyword}: {entry.Value}")
-                    );
-
-                    return new(feedback);
+                    dimensionNames.AddRange(stubValues);
                 }
+
+                if (validator._headingDimensionNames is not null && validator._headingDimensionNames.TryGetValue(lang, out string[]? headingValues))
+                {
+                    dimensionNames.AddRange(headingValues);
+                }
+
+                recommendedValueContents = [.. dimensionNames];
+            }
+
+            if (recommendedValueContents.Length > 0 && !recommendedValueContents.Contains(value, comparer))
+            {
+                ValidationFeedbackLevel level = knownAliases.Contains(value, comparer)
+                    ? ValidationFeedbackLevel.Warning
+                    : ValidationFeedbackLevel.Error;
+
+                return CreateInvalidValueFeedback(entry, validator, level);
             }
 
             return null;
+        }
+
+        private static ValidationFeedback CreateInvalidValueFeedback(
+            ValidationStructuredEntry entry,
+            ContentValidator validator,
+            ValidationFeedbackLevel level)
+        {
+            KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
+                entry.KeyStartLineIndex,
+                entry.ValueStartIndex,
+                entry.LineChangeIndexes);
+
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                new(level,
+                    ValidationFeedbackRule.InvalidValueFound),
+                new(validator._filename,
+                    feedbackIndexes.Key,
+                    feedbackIndexes.Value,
+                    $"{entry.Key.Keyword}: {entry.Value}")
+            );
+
+            return new(feedback);
         }
 
         /// <summary>
@@ -463,29 +474,11 @@ namespace Px.Utils.Validation.ContentValidation
             return null;
         }
 
-        private static HashSet<string> GetPrimaryDimensionTypeTokens(PxFileConfiguration conf)
+        private static (string[] RecommendedValueContents, string[] KnownAliases) BuildAllowedDimensionTypes(PxFileConfiguration conf)
         {
-            IEnumerable<string> primaryTokens = GetDimensionTypeTokenSets(conf)
-                .Select(tokens => tokens.FirstOrDefault())
-                .Where(token => !string.IsNullOrWhiteSpace(token))
-                .Cast<string>();
-
-            return [.. primaryTokens];
-        }
-
-        private static HashSet<string> GetAliasDimensionTypeTokens(PxFileConfiguration conf)
-        {
-            IEnumerable<string> aliasTokens = GetDimensionTypeTokenSets(conf)
-                .Where(tokens => tokens.Length > 1)
-                .SelectMany(tokens => tokens.Skip(1))
-                .Where(token => !string.IsNullOrWhiteSpace(token));
-
-            return [.. aliasTokens];
-        }
-
-        private static IEnumerable<string[]> GetDimensionTypeTokenSets(PxFileConfiguration conf)
-        {
-            return
+            List<string> primaryDimensionTypes = [];
+            List<string> aliasDimensionTypes = [];
+            string[][] dimensionTypeTokenSets =
             [
                 conf.Tokens.VariableTypes.Content,
                 conf.Tokens.VariableTypes.Time,
@@ -496,6 +489,26 @@ namespace Px.Utils.Validation.ContentValidation
                 conf.Tokens.VariableTypes.Unknown,
                 conf.Tokens.VariableTypes.Classificatory
             ];
+
+            foreach (string[] tokenSet in dimensionTypeTokenSets)
+            {
+                if (tokenSet.Length == 0 || string.IsNullOrWhiteSpace(tokenSet[0]))
+                {
+                    continue;
+                }
+
+                primaryDimensionTypes.Add(tokenSet[0]);
+
+                for (int i = 1; i < tokenSet.Length; i++)
+                {
+                    if (!string.IsNullOrWhiteSpace(tokenSet[i]))
+                    {
+                        aliasDimensionTypes.Add(tokenSet[i]);
+                    }
+                }
+            }
+
+            return ([.. primaryDimensionTypes], [.. aliasDimensionTypes]);
         }
     }
 }
