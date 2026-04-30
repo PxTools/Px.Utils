@@ -1,6 +1,5 @@
 using Px.Utils.PxFile;
 using Px.Utils.Validation.SyntaxValidation;
-using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 
 namespace Px.Utils.Validation.ContentValidation
