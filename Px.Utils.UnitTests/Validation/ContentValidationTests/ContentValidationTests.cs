@@ -537,7 +537,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateValueTypesCalledWithStructuredEntryArrayWithKnownDimensionTypeAliasesReturnsWithWarnings()
+        public void ValidateValueContentsCalledWithStructuredEntryArrayWithKnownDimensionTypeAliasesReturnsWithWarnings()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_KNOWN_DIMENSIONTYPE_ALIASES;
