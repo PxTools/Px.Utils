@@ -102,7 +102,7 @@ namespace Px.Utils.ModelBuilders
         /// <summary>
         /// Parses a string into a <see cref="DimensionType"/> enumeration value.
         /// This method maps the input string to a <see cref="DimensionType"/> enumeration value based on the provided or default PxFileConfiguration configuration.
-        /// The first configured token for a dimension type is treated as the primary value and any additional configured tokens are treated as aliases.
+        /// Mapping is done using the configured variable type mappings.
         /// If the input string does not map to a known <see cref="DimensionType"/>, the method returns <see cref="DimensionType.Unknown"/>.
         /// </summary>
         /// <param name="input">The string to parse into a <see cref="DimensionType"/> enumeration value.</param>
@@ -111,40 +111,14 @@ namespace Px.Utils.ModelBuilders
         public static DimensionType StringToDimensionType(string input, PxFileConfiguration? conf = null)
         {
             conf ??= PxFileConfiguration.Default;
-            Dictionary<string, DimensionType> map = GetDimensionTypeTokenMap(conf);
 
             string cleanString = input.CleanStringDelimeters(conf.Symbols.Value.StringDelimeter);
-            if (map.TryGetValue(cleanString, out DimensionType value))
+            if (conf.Tokens.VariableTypes.Mappings.TryGetValue(cleanString, out DimensionType value))
             {
                 return value;
             }
 
             return DimensionType.Unknown;
-        }
-
-        private static Dictionary<string, DimensionType> GetDimensionTypeTokenMap(PxFileConfiguration conf)
-        {
-            Dictionary<string, DimensionType> map = [];
-            Dictionary<DimensionType, string[]> tokensByType = new()
-            {
-                { DimensionType.Content, conf.Tokens.VariableTypes.Content },
-                { DimensionType.Time, conf.Tokens.VariableTypes.Time },
-                { DimensionType.Ordinal, conf.Tokens.VariableTypes.Ordinal },
-                { DimensionType.Nominal, conf.Tokens.VariableTypes.Nominal },
-                { DimensionType.Geographical, conf.Tokens.VariableTypes.Geographical },
-                { DimensionType.Other, conf.Tokens.VariableTypes.Other },
-                { DimensionType.Unknown, conf.Tokens.VariableTypes.Unknown }
-            };
-
-            foreach (KeyValuePair<DimensionType, string[]> tokenSet in tokensByType)
-            {
-                foreach (string token in tokenSet.Value)
-                {
-                    map[token] = tokenSet.Key;
-                }
-            }
-
-            return map;
         }
     }
 }

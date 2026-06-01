@@ -755,12 +755,6 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
                     Utils.Validation.ValueType.StringValue),
             ];
 
-        internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_KNOWN_DIMENSIONTYPE_ALIASES =>
-            [
-                new ValidationStructuredEntry(filename, dimensionTypeEntryKey, "Contents", 0, [], 0, Utils.Validation.ValueType.StringValue),
-                new ValidationStructuredEntry(filename, dimensionTypeEntryKey, "Region", 1, [], 0, Utils.Validation.ValueType.StringValue),
-            ];
-
         internal static ValidationStructuredEntry StructuredEntryWithUnmatchingAmountOfElements =>
             new(filename,
                 codesBarEntry.Key,

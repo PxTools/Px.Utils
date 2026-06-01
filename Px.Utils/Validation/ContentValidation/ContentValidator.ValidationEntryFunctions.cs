@@ -1,5 +1,5 @@
-using Px.Utils.PxFile;
 using Px.Utils.Validation.SyntaxValidation;
+using Px.Utils.Models.Metadata.Enums;
 using System.Globalization;
 
 namespace Px.Utils.Validation.ContentValidation
@@ -338,7 +338,17 @@ namespace Px.Utils.Validation.ContentValidation
             }
             else if (keyword == validator.Conf.Tokens.KeyWords.DimensionType)
             {
-                (recommendedValueContents, knownAliases) = BuildAllowedDimensionTypes(validator.Conf);
+                if (Enum.TryParse<DimensionType>(value, out DimensionType enumType) && value == enumType.ToString())
+                {
+                    return null;
+                }
+
+                if (validator.Conf.Tokens.VariableTypes.Mappings.TryGetValue(value, out DimensionType mappedType))
+                {
+                    return null;
+                }
+
+                return CreateInvalidValueFeedback(entry, validator, ValidationFeedbackLevel.Error);
             }
             else if (keyword == validator.Conf.Tokens.KeyWords.ContentVariableIdentifier)
             {
@@ -471,43 +481,6 @@ namespace Px.Utils.Validation.ContentValidation
                 return new(feedback);
             }
             return null;
-        }
-
-        private static (string[] RecommendedValueContents, string[] KnownAliases) BuildAllowedDimensionTypes(PxFileConfiguration conf)
-        {
-            List<string> primaryDimensionTypes = [];
-            List<string> aliasDimensionTypes = [];
-            string[][] dimensionTypeTokenSets =
-            [
-                conf.Tokens.VariableTypes.Content,
-                conf.Tokens.VariableTypes.Time,
-                conf.Tokens.VariableTypes.Ordinal,
-                conf.Tokens.VariableTypes.Nominal,
-                conf.Tokens.VariableTypes.Geographical,
-                conf.Tokens.VariableTypes.Other,
-                conf.Tokens.VariableTypes.Unknown,
-                conf.Tokens.VariableTypes.Classificatory
-            ];
-
-            foreach (string[] tokenSet in dimensionTypeTokenSets)
-            {
-                if (tokenSet.Length == 0 || string.IsNullOrWhiteSpace(tokenSet[0]))
-                {
-                    continue;
-                }
-
-                primaryDimensionTypes.Add(tokenSet[0]);
-
-                for (int i = 1; i < tokenSet.Length; i++)
-                {
-                    if (!string.IsNullOrWhiteSpace(tokenSet[i]))
-                    {
-                        aliasDimensionTypes.Add(tokenSet[i]);
-                    }
-                }
-            }
-
-            return ([.. primaryDimensionTypes], [.. aliasDimensionTypes]);
         }
     }
 }

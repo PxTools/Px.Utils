@@ -39,7 +39,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
         {
             string input = "Ranking";
             PxFileConfiguration conf = PxFileConfiguration.Default;
-            conf.Tokens.VariableTypes.Ordinal = ["Ordinal", "Ranking"];
+            conf.Tokens.VariableTypes.Mappings["Ranking"] = DimensionType.Ordinal;
 
             DimensionType expected = DimensionType.Ordinal;
             DimensionType actual = ValueParserUtilities.StringToDimensionType(input, conf);
