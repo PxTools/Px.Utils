@@ -539,30 +539,6 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateValueContentsCalledWithDimensionTypeEnumValueReturnsWithoutFeedback()
-        {
-            // Arrange
-            PxFileConfiguration conf = PxFileConfiguration.Default;
-
-            ValidationStructuredEntry entry = new(
-                filename,
-                new ValidationStructuredEntryKey("VARIABLE-TYPE", "fi", "foo"),
-                "Content",
-                0,
-                [],
-                0,
-                Utils.Validation.ValueType.StringValue);
-
-            ContentValidator validator = new(filename, encoding, [entry], conf: conf);
-
-            // Act
-            ValidationFeedback? result = ContentValidator.ValidateValueContents(entry, validator);
-
-            // Assert
-            Assert.IsNull(result);
-        }
-
-        [TestMethod]
         public void ValidateValueContentsCalledWithCustomDimensionTypeValueReturnsWithoutFeedback()
         {
             // Arrange

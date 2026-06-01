@@ -306,7 +306,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         private static readonly ValidationStructuredEntry variableTypeBarEntry =
             new(filename,
                 new ValidationStructuredEntryKey("VARIABLE-TYPE", null, "bar"),
-                "Content",
+                "Contents",
                 23,
                 [],
                 13,
@@ -428,9 +428,6 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
                 [],
                 17,
                 Utils.Validation.ValueType.StringValue);
-
-        private static readonly ValidationStructuredEntryKey dimensionTypeEntryKey =
-                new ("VARIABLE-TYPE", "fi", "foo");
 
         internal static ValidationStructuredEntry[] MINIMAL_STRUCTURED_ENTRY_ARRAY =>
         [

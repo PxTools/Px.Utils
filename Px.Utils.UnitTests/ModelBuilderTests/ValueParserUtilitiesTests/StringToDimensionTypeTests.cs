@@ -17,16 +17,7 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
         }
 
         [TestMethod]
-        public void ContentTest()
-        {
-            string input = "Content";
-            DimensionType expected = DimensionType.Content;
-            DimensionType actual = ValueParserUtilities.StringToDimensionType(input);
-            Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
-        public void ContentAliasTest()
+        public void ContentsTest()
         {
             string input = "Contents";
             DimensionType expected = DimensionType.Content;

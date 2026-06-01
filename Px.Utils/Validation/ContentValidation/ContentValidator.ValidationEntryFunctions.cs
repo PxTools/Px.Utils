@@ -338,11 +338,6 @@ namespace Px.Utils.Validation.ContentValidation
             }
             else if (keyword == validator.Conf.Tokens.KeyWords.DimensionType)
             {
-                if (Enum.TryParse<DimensionType>(value, out DimensionType enumType) && value == enumType.ToString())
-                {
-                    return null;
-                }
-
                 if (validator.Conf.Tokens.VariableTypes.Mappings.TryGetValue(value, out DimensionType mappedType))
                 {
                     return null;
