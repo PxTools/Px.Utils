@@ -568,7 +568,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateValueContentsCalledWithUnknownDimensionTypeValueReturnsWithoutFeedback()
+        public void ValidateValueContentsCalledWithUnknownDimensionTypeValueReturnsWithError()
         {
             // Arrange
             PxFileConfiguration conf = PxFileConfiguration.Default;
@@ -591,6 +591,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             Assert.IsNotNull(result);
             Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.InvalidValueFound, result.First().Key.Rule);
+            Assert.AreEqual(ValidationFeedbackLevel.Error, result.First().Key.Level);
         }
 
         [TestMethod]
