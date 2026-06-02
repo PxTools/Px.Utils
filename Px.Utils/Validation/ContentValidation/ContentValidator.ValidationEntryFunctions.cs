@@ -318,32 +318,31 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns>Key value pair containing information about the rule violation is returned if an unexpected or unrecommended value is detected from the entry</returns>
+        /// <returns>Key value pair containing information about the rule violation is returned if an unexpected value is detected from the entry</returns>
         public static ValidationFeedback? ValidateValueContents(ValidationStructuredEntry entry, ContentValidator validator)
         {
-            string[] recommendedValueContents = [];
-            string[] knownAliases = [];
+            string[] allowedValueContents = [];
             StringComparer comparer = StringComparer.Ordinal;
             string keyword = entry.Key.Keyword;
             string value = SyntaxValidationUtilityMethods.CleanString(entry.Value, validator.Conf);
 
             if (keyword == validator.Conf.Tokens.KeyWords.Charset)
             {
-                recommendedValueContents = ["ANSI", "Unicode"];
+                allowedValueContents = ["ANSI", "Unicode"];
             }
             else if (keyword == validator.Conf.Tokens.KeyWords.CodePage)
             {
-                recommendedValueContents = [validator._encoding.BodyName];
+                allowedValueContents = [validator._encoding.BodyName];
                 comparer = StringComparer.OrdinalIgnoreCase;
             }
             else if (keyword == validator.Conf.Tokens.KeyWords.DimensionType)
             {
-                if (validator.Conf.Tokens.VariableTypes.Mappings.TryGetValue(value, out DimensionType mappedType))
+                if (validator.Conf.Tokens.VariableTypes.Mappings.TryGetValue(value, out DimensionType _))
                 {
                     return null;
                 }
 
-                return CreateInvalidValueFeedback(entry, validator, ValidationFeedbackLevel.Error);
+                return CreateInvalidValueFeedback(entry, validator);
             }
             else if (keyword == validator.Conf.Tokens.KeyWords.ContentVariableIdentifier)
             {
@@ -361,25 +360,20 @@ namespace Px.Utils.Validation.ContentValidation
                     dimensionNames.AddRange(headingValues);
                 }
 
-                recommendedValueContents = [.. dimensionNames];
+                allowedValueContents = [.. dimensionNames];
             }
 
-            if (recommendedValueContents.Length > 0 && !recommendedValueContents.Contains(value, comparer))
+            if (allowedValueContents.Length == 0 || allowedValueContents.Contains(value, comparer))
             {
-                ValidationFeedbackLevel level = knownAliases.Contains(value, comparer)
-                    ? ValidationFeedbackLevel.Warning
-                    : ValidationFeedbackLevel.Error;
-
-                return CreateInvalidValueFeedback(entry, validator, level);
+                return null;
             }
 
-            return null;
+            return CreateInvalidValueFeedback(entry, validator);
         }
 
         private static ValidationFeedback CreateInvalidValueFeedback(
             ValidationStructuredEntry entry,
-            ContentValidator validator,
-            ValidationFeedbackLevel level)
+            ContentValidator validator)
         {
             KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                 entry.KeyStartLineIndex,
@@ -387,7 +381,7 @@ namespace Px.Utils.Validation.ContentValidation
                 entry.LineChangeIndexes);
 
             KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
-                new(level,
+                new(ValidationFeedbackLevel.Error,
                     ValidationFeedbackRule.InvalidValueFound),
                 new(validator._filename,
                     feedbackIndexes.Key,
