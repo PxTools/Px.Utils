@@ -6,6 +6,7 @@ using Px.Utils.PxFile;
 using Px.Utils.Models.Metadata.Enums;
 using System.Text;
 using System.Reflection;
+using System.Globalization;
 
 namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 {
@@ -539,20 +540,23 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateValueContentsCalledWithCustomDimensionTypeValueReturnsWithoutFeedback()
+        [DataRow("ranking", DimensionType.Ordinal)]
+        [DataRow("REGION", DimensionType.Geographical)]
+        public void ValidateValueContentsCalledWithCustomDimensionTypesValueReturnsWithoutFeedback(string alias, DimensionType dimensionType)
         {
             // Arrange
             PxFileConfiguration conf = PxFileConfiguration.Default;
-            conf.Tokens.VariableTypes.Mappings["Ranking"] = DimensionType.Ordinal;
+            conf.Tokens.VariableTypes.Mappings[alias] = dimensionType;
 
             ValidationStructuredEntry entry = new(
                 filename,
                 new ValidationStructuredEntryKey("VARIABLE-TYPE", "fi", "foo"),
-                "Ranking",
+                alias.ToUpper(CultureInfo.InvariantCulture), // The value is converted to upper case to verify case insensitivity of the dimension type matching
                 0,
                 [],
                 0,
                 Utils.Validation.ValueType.StringValue);
+
 
             ContentValidator validator = new(filename, encoding, [entry], conf: conf);
 

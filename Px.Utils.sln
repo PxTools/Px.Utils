@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.8.34408.163
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11709.299 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Px.Utils", "Px.Utils\Px.Utils.csproj", "{D94934AF-6B41-4C66-818A-C4C33230E9DD}"
 EndProject
@@ -36,6 +36,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Px.Utils.TestingApp", "Px.U
 		{D94934AF-6B41-4C66-818A-C4C33230E9DD} = {D94934AF-6B41-4C66-818A-C4C33230E9DD}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture", "architecture", "{BFA8E05B-EBD8-4085-B765-EAED69DD0874}"
+	ProjectSection(SolutionItems) = preProject
+		docs\architecture.md = docs\architecture.md
+		docs\architecture.models.md = docs\architecture.models.md
+		docs\architecture.operations.md = docs\architecture.operations.md
+		docs\architecture.overview.md = docs\architecture.overview.md
+		docs\architecture.readers.md = docs\architecture.readers.md
+		docs\architecture.serializers.md = docs\architecture.serializers.md
+		docs\architecture.testing.md = docs\architecture.testing.md
+		docs\architecture.validation.md = docs\architecture.validation.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +72,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{EB4119B8-8292-418A-9CD3-2905DA67B889} = {BC1C9772-9B8F-49A7-A8F3-09E3A94789ED}
+		{BFA8E05B-EBD8-4085-B765-EAED69DD0874} = {42DFE3AF-7507-415A-806B-99B74519BF97}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1F81A3B-9FF5-4557-8A5A-A9519C42C2B2}

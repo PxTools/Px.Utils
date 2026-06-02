@@ -1,6 +1,7 @@
 using Px.Utils.ModelBuilders;
 using Px.Utils.Models.Metadata.Enums;
 using Px.Utils.PxFile;
+using System.Globalization;
 
 namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
 {
@@ -26,13 +27,14 @@ namespace Px.Utils.UnitTests.ModelBuilderTests.ValueParserUtilitiesTests
         }
 
         [TestMethod]
-        public void CustomAliasTest()
+        [DataRow("RANKING", DimensionType.Ordinal)]
+        [DataRow("region", DimensionType.Geographical)]
+        public void CustomAliasTest(string alias, DimensionType expected)
         {
-            string input = "Ranking";
+            string input = alias.ToUpper(CultureInfo.InvariantCulture); // Testing case-insensitivity
             PxFileConfiguration conf = PxFileConfiguration.Default;
-            conf.Tokens.VariableTypes.Mappings["Ranking"] = DimensionType.Ordinal;
+            conf.Tokens.VariableTypes.Mappings[alias] = expected; 
 
-            DimensionType expected = DimensionType.Ordinal;
             DimensionType actual = ValueParserUtilities.StringToDimensionType(input, conf);
             Assert.AreEqual(expected, actual);
         }

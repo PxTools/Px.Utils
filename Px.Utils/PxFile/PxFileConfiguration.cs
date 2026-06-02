@@ -115,7 +115,7 @@ namespace Px.Utils.PxFile
                 /// <summary>
                 /// Gets or sets the expandable dictionary mapping string tokens to dimension types.
                 /// </summary>
-                public Dictionary<string, DimensionType> Mappings { get; set; } = new(StringComparer.Ordinal)
+                public Dictionary<string, DimensionType> Mappings { get; set; } = new(StringComparer.OrdinalIgnoreCase)
                 {
                     { "Time", DimensionType.Time },
                     { "Contents", DimensionType.Content },
