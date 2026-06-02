@@ -557,7 +557,6 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
                 0,
                 Utils.Validation.ValueType.StringValue);
 
-
             ContentValidator validator = new(filename, encoding, [entry], conf: conf);
 
             // Act
