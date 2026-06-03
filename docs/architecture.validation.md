@@ -34,6 +34,8 @@ Validates metadata content (required keys, language definitions, dimension consi
 File: `Validation/ContentValidation/ContentValidator.cs`  
 Partial files: `ValidationEntryFunctions.cs`, `ValidationFindKeywordFunctions.cs`, `UtilityMethods.cs`
 
+Dimension type validation uses `PxFileConfiguration.TokenDefinitions.VariableTypeTokens`. The first configured token for each dimension type is treated as the recommended primary value, while additional configured tokens are accepted as aliases and reported as warnings.
+
 ### DataValidator
 
 Validates data section (row counts, row lengths, value types, separators).  

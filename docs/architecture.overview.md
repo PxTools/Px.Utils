@@ -27,6 +27,7 @@ No DI container — all types instantiated directly via constructors. Configurat
 | `Symbols.KeywordSeparator` | Keyword = value separator | `=` |
 | `Symbols.EntrySeparator` | Entry separator | `;` |
 | `Tokens.KeyWords.Data` | Data section keyword | `DATA` |
+| `Tokens.VariableTypes.Mappings` | `VARIABLE-TYPE` token to `DimensionType` mapping | Case-insensitive dictionary (`StringComparer.OrdinalIgnoreCase`) |
 
 ## Key Patterns
 

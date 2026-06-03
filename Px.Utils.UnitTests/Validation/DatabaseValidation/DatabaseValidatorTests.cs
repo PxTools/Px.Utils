@@ -161,7 +161,7 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             IDatabaseValidator[] customValidators =
                 [
                     new MockCustomDatabaseValidator()
-                    ];
+                ];
             DatabaseValidator validator = new(
                 "database_invalid", 
                 customPxFileValidators: customValidators,

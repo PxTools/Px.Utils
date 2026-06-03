@@ -62,6 +62,8 @@ Task<MatrixMetadata> BuildAsync(IAsyncEnumerable<KeyValuePair<string, string>> m
 
 Helpers: `MetadataEntryKeyBuilder`, `ValueParserUtilities`, `MetadataEntryKey`.
 
+`PxFileConfiguration.TokenDefinitions.VariableTypeTokens` exposes a configurable `Dictionary<string, DimensionType>` (`Mappings`) used by both parsing and validation for `VARIABLE-TYPE` values. The dictionary uses `StringComparer.OrdinalIgnoreCase`, so lookups are case-insensitive by default. Custom aliases can be added by inserting additional keys into `Mappings`.
+
 ## Extension Methods
 
 | File | Purpose |

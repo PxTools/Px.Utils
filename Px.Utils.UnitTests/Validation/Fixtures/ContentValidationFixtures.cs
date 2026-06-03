@@ -306,7 +306,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         private static readonly ValidationStructuredEntry variableTypeBarEntry =
             new(filename,
                 new ValidationStructuredEntryKey("VARIABLE-TYPE", null, "bar"),
-                "Content",
+                "Contents",
                 23,
                 [],
                 13,

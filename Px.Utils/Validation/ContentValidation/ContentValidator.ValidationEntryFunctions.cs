@@ -1,4 +1,5 @@
 using Px.Utils.Validation.SyntaxValidation;
+using Px.Utils.Models.Metadata.Enums;
 using System.Globalization;
 
 namespace Px.Utils.Validation.ContentValidation
@@ -317,71 +318,78 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="entry">Entry in the Px file metadata. Represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns>Key value pair containing information about the rule violation is returned if an unexpected value is detected</returns>
+        /// <returns>Key value pair containing information about the rule violation is returned if an unexpected value is detected from the entry</returns>
         public static ValidationFeedback? ValidateValueContents(ValidationStructuredEntry entry, ContentValidator validator)
         {
-            string[] allowedCharsets = ["ANSI", "Unicode"];
-
-            string[] dimensionTypes = [
-                    validator.Conf.Tokens.VariableTypes.Content,
-                validator.Conf.Tokens.VariableTypes.Time,
-                validator.Conf.Tokens.VariableTypes.Geographical,
-                validator.Conf.Tokens.VariableTypes.Ordinal,
-                validator.Conf.Tokens.VariableTypes.Nominal,
-                validator.Conf.Tokens.VariableTypes.Other,
-                validator.Conf.Tokens.VariableTypes.Unknown,
-                validator.Conf.Tokens.VariableTypes.Classificatory
-                    ];
-
+            string[] allowedValueContents = [];
+            StringComparer comparer = StringComparer.Ordinal;
+            string keyword = entry.Key.Keyword;
             string value = SyntaxValidationUtilityMethods.CleanString(entry.Value, validator.Conf);
-            if ((entry.Key.Keyword == validator.Conf.Tokens.KeyWords.Charset && !allowedCharsets.Contains(value)) ||
-                (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.CodePage && !value.Equals(validator._encoding.BodyName, StringComparison.OrdinalIgnoreCase)) ||
-                (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.DimensionType && !dimensionTypes.Contains(value)))
+
+            if (keyword == validator.Conf.Tokens.KeyWords.Charset)
             {
-                KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                    entry.KeyStartLineIndex,
-                    entry.ValueStartIndex,
-                    entry.LineChangeIndexes);
-
-                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
-                    new(ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.InvalidValueFound),
-                    new(validator._filename,
-                        feedbackIndexes.Key,
-                        feedbackIndexes.Value,
-                        $"{entry.Key.Keyword}: {entry.Value}")
-                );
-
-                return new(feedback);
+                allowedValueContents = ["ANSI", "Unicode"];
             }
-            else if (entry.Key.Keyword == validator.Conf.Tokens.KeyWords.ContentVariableIdentifier)
+            else if (keyword == validator.Conf.Tokens.KeyWords.CodePage)
+            {
+                allowedValueContents = [validator._encoding.BodyName];
+                comparer = StringComparer.OrdinalIgnoreCase;
+            }
+            else if (keyword == validator.Conf.Tokens.KeyWords.DimensionType)
+            {
+                if (validator.Conf.Tokens.VariableTypes.Mappings.TryGetValue(value, out DimensionType _))
+                {
+                    return null;
+                }
+
+                return CreateInvalidValueFeedback(entry, validator);
+            }
+            else if (keyword == validator.Conf.Tokens.KeyWords.ContentVariableIdentifier)
             {
                 string defaultLanguage = validator._defaultLanguage ?? string.Empty;
                 string lang = entry.Key.Language ?? defaultLanguage;
-                if (validator._stubDimensionNames is not null && validator._stubDimensionNames.TryGetValue(lang, out string[]? stubValues) && 
-                    !Array.Exists(stubValues, d => d == value) &&
-                (validator._headingDimensionNames is not null && validator._headingDimensionNames.TryGetValue(lang, out string[]? headingValues) && 
-                    !Array.Exists(headingValues, d => d == value)))
+                List<string> dimensionNames = [];
+
+                if (validator._stubDimensionNames is not null && validator._stubDimensionNames.TryGetValue(lang, out string[]? stubValues))
                 {
-                    KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
-                        entry.KeyStartLineIndex,
-                        entry.ValueStartIndex,
-                        entry.LineChangeIndexes);
-
-                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
-                        new(ValidationFeedbackLevel.Error,
-                                ValidationFeedbackRule.InvalidValueFound),
-                        new(validator._filename,
-                            feedbackIndexes.Key,
-                            feedbackIndexes.Value,
-                            $"{entry.Key.Keyword}: {entry.Value}")
-                    );
-
-                    return new(feedback);
+                    dimensionNames.AddRange(stubValues);
                 }
+
+                if (validator._headingDimensionNames is not null && validator._headingDimensionNames.TryGetValue(lang, out string[]? headingValues))
+                {
+                    dimensionNames.AddRange(headingValues);
+                }
+
+                allowedValueContents = [.. dimensionNames];
             }
 
-            return null;
+            if (allowedValueContents.Length == 0 || allowedValueContents.Contains(value, comparer))
+            {
+                return null;
+            }
+
+            return CreateInvalidValueFeedback(entry, validator);
+        }
+
+        private static ValidationFeedback CreateInvalidValueFeedback(
+            ValidationStructuredEntry entry,
+            ContentValidator validator)
+        {
+            KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
+                entry.KeyStartLineIndex,
+                entry.ValueStartIndex,
+                entry.LineChangeIndexes);
+
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                new(ValidationFeedbackLevel.Error,
+                    ValidationFeedbackRule.InvalidValueFound),
+                new(validator._filename,
+                    feedbackIndexes.Key,
+                    feedbackIndexes.Value,
+                    $"{entry.Key.Keyword}: {entry.Value}")
+            );
+
+            return new(feedback);
         }
 
         /// <summary>
