@@ -96,7 +96,7 @@ Whitespace characters are not significant in the value outside of ```"``` separa
 - Decimal separator is period ```.```.
 - Thousands separator is not allowed.
 - Whitespace characters are not allowed between the characters of the number.
-- Number must be in range of ±7.9228 x 10^28.
+- Number must be in range of Â±7.9228 x 10^28.
 
 #### List of strings
 - List items are separated by a comma ```,```.
@@ -281,6 +281,7 @@ More spesific encoding information. The value must be a string that matches the 
 - Recommended that the variable type is defined for each variable defined by the STUB or HEADING.
 - Has a set of allowed values: ```Content```, ```Time```, ```Geographical```, ```Ordinal```, ```Nominal```, ```Other```, ```Classificatory```., ```Unknown```.
 - Can be defined for each language, but this is not recommended.
+- Value is not case sensitive, but uppercase characters are recommended.
 
 #### TIMEVAL
 - See the TIMEVAL entry for the syntax and content requirements.

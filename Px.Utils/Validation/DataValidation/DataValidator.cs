@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Px.Utils.PxFile;
 using Px.Utils.Validation.DatabaseValidation;
@@ -15,6 +15,7 @@ namespace Px.Utils.Validation.DataValidation
     public class DataValidator(int rowLen, int numOfRows, int startRow, PxFileConfiguration? conf = null) : IPxFileStreamValidator, IPxFileStreamValidatorAsync
     {
         private const int _streamBufferSize = 4096;
+        private static ReadOnlySpan<byte> MissingValueStartBytes => [CharacterConstants.QUOTATIONMARK, (byte)'-', (byte)'.'];
 
         private readonly PxFileConfiguration _conf = conf ?? PxFileConfiguration.Default;
 
@@ -267,11 +268,13 @@ namespace Px.Utils.Validation.DataValidation
                 bytesRead = stream.Read(buffer, 0, buffer.Length);
                 for (int i = 0; i < bytesRead; i++)
                 {
-                    if (buffer[i] >= CharacterConstants.Zero && buffer[i] <= CharacterConstants.Nine)
+                    byte currentByte = buffer[i];
+                    char currentChar = (char)currentByte;
+                    if (IsDataValueStartByte(currentByte))
                     {
                         return (int)stream.Position - bytesRead + i;
                     }
-                    else if (!CharacterConstants.WhitespaceCharacters.Contains((char)buffer[i]))
+                    else if (!CharacterConstants.WhitespaceCharacters.Contains(currentChar))
                     {
                         feedbacks.Add(new(
                             new(ValidationFeedbackLevel.Error,
@@ -283,6 +286,12 @@ namespace Px.Utils.Validation.DataValidation
             } while (bytesRead > 0);
 
             return -1;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool IsDataValueStartByte(byte currentByte)
+        {
+            return currentByte >= CharacterConstants.Zero && currentByte <= CharacterConstants.Nine || MissingValueStartBytes.Contains(currentByte);
         }
     }
 

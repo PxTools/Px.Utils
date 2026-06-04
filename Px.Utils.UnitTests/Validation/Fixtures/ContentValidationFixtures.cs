@@ -306,7 +306,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         private static readonly ValidationStructuredEntry variableTypeBarEntry =
             new(filename,
                 new ValidationStructuredEntryKey("VARIABLE-TYPE", null, "bar"),
-                "Content",
+                "Contents",
                 23,
                 [],
                 13,
@@ -756,6 +756,15 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
             new(filename,
                 codesBarEntry.Key,
                 "foo,bar,baz",
+                codesBarEntry.ValueStartIndex,
+                codesBarEntry.LineChangeIndexes,
+                codesBarEntry.ValueStartIndex,
+                Utils.Validation.ValueType.ListOfStrings);
+
+        internal static ValidationStructuredEntry StructuredEntryWithMatchingAmountOfElementsWithListDelimeters =>
+            new(filename,
+                codesBarEntry.Key,
+                "\"foo,bar\"", // foo,bar should be treated as one element due to the quotes
                 codesBarEntry.ValueStartIndex,
                 codesBarEntry.LineChangeIndexes,
                 codesBarEntry.ValueStartIndex,

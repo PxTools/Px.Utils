@@ -1,22 +1,29 @@
-﻿namespace Px.Utils.UnitTests.Validation.Fixtures
+namespace Px.Utils.UnitTests.Validation.Fixtures
 {
     internal static class DataStreamContents
     {
-        internal static string  SIMPLE_VALID_DATA =>
+        internal const string  SIMPLE_VALID_DATA =
             "DATA=\n"+
             "1 2 3 4 5 \r\n" +
             "6 7 8 9 10 \n\r" +
             "\".\" \"..\" \"...\" \"....\" \".....\" \r"+
             "\"......\" \"-\" -1 1.2 -1.3; \r\n";
 
-        internal static string SIMPLE_VALID_DATA_WITHOUT_MISISNG_CODE_DELIMETERS =>
+        internal const string SIMPLE_VALID_DATA_WITH_INCONSISTENT_LINEBREAKS =
+            "DATA=\r\n" +
+            "1 2 3 4 5 \n" +
+            "6 7 8 9 10 \r\n" +
+            "\".\" \"..\" \"...\" \"....\" \".....\" \n" +
+            "\"......\" \"-\" -1 1.2 -1.3; \r\n";
+
+        internal const string SIMPLE_VALID_DATA_WITHOUT_MISISNG_CODE_DELIMETERS =
             "DATA=\n" +
             "1 2 3 4 5 \r\n" +
             "6 7 8 9 10 \n\r" +
             ". .. ... .... ..... \r" +
             "...... - -1 1.2 -1.3; \r\n";
 
-        internal static string SIMPLE_INVALID_DATA =>
+        internal const string SIMPLE_INVALID_DATA =
             "DATA=a\n" +
             "\"b\" 1 2. 3 4 5 \r\n" +
             "6 7 +8\t9 10 \n\r" +
@@ -24,10 +31,38 @@
             "\"dots\" \"-\" \"..123\" -1 1.2 -1.3 \r\n" +
             "1 2 \0 4 5 \r\n;";
 
-        internal static string NO_DATA =>
+        internal const string NO_DATA =
             "DATA=\n";
 
-        internal static string DATA_ON_SINGLE_ROW =>
+        internal const string DATA_ON_SINGLE_ROW =
             "DATA=1 2 3 4 5 6 7 8 9 10;";
+
+        internal const string DATA_STARTING_WITH_ENCLOSED_MISSING_VALUE =
+            "DATA=\n" +
+            "\".\" 2 3 4 5 \r\n" +
+            "6 7 8 9 10 \n\r" +
+            "\".\" \"..\" \"...\" \"....\" \".....\" \r" +
+            "\"......\" \"-\" -1 1.2 -1.3; \r\n";
+
+        internal const string DATA_STARTING_WITH_UNENCLOSED_MISSING_VALUE =
+            "DATA=\n" +
+            ". 2 3 4 5 \r\n" +
+            "6 7 8 9 10 \n\r" +
+            ". .. ... .... ..... \r" +
+            "...... - -1 1.2 -1.3; \r\n";
+
+        internal const string DATA_STARTING_WITH_NIL_VALUE =
+            "DATA=\n" +
+            "\"-\" 2 3 4 5 \r\n" +
+            "6 7 8 9 10 \n\r" +
+            "\".\" \"..\" \"...\" \"....\" \".....\" \r" +
+            "\"......\" \"-\" -1 1.2 -1.3; \r\n";
+
+        internal const string DATA_STARTING_WITH_UNENCLOSED_NIL_VALUE =
+            "DATA=\n" +
+            "- 2 3 4 5 \r\n" +
+            "6 7 8 9 10 \n\r" +
+            ". .. ... .... ..... \r" +
+            "...... - -1 1.2 -1.3; \r\n";
     }
 }

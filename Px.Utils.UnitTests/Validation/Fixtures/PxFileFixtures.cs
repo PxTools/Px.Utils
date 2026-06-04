@@ -1,4 +1,4 @@
-﻿namespace Px.Utils.UnitTests.Validation.Fixtures
+namespace Px.Utils.UnitTests.Validation.Fixtures
 {
     internal static class PxFileFixtures
     {
@@ -22,7 +22,7 @@
             "\r\nCODES(\"Vuosi\")=\"2015\",\"2016\",\"2017\",\"2018\",\"2019\",\"2020\",\"2021\",\"2022\",\"2023\",\"2024\";" +
             "\r\nCODES(\"Tiedot\")=\"code-foo-val-a\",\"code-foo-val-b\";" +
             "\r\nVARIABLE-TYPE(\"Vuosi\")=\"Time\";" +
-            "\r\nVARIABLE-TYPE(\"Tiedot\")=\"Content\";" +
+            "\r\nVARIABLE-TYPE(\"Tiedot\")=\"Contents\";" +
             "\r\nPRECISION(\"Tiedot\",\"foo-val-a\")=1;" +
             "\r\nPRECISION(\"Tiedot\",\"foo-val-b\")=1;" +
             "\r\nLAST-UPDATED(\"Tiedot\",\"foo-val-a\")=\"20231101 08:00\";" +
@@ -64,7 +64,7 @@
             "\r\nCODES(\"Vuosi\")=\"2015\",\"2016\",\"2017\",\"2018\",\"2019\",\"2020\",\"2021\",\"2022\",\"2023\",\"2024\";" +
             "\r\nCODES(\"Tiedot\")=\"code-foo-val-a\",\"code-foo-val-b\";" +
             "\r\nVARIABLE-TYPE(\"Vuosi\")=\"Time\";" +
-            "\r\nVARIABLE-TYPE(\"Tiedot\")=\"Content\";" +
+            "\r\nVARIABLE-TYPE(\"Tiedot\")=\"Contents\";" +
             "\r\nPRECISION(\"Tiedot\",\"foo-val-a\")=1;" +
             "\r\nPRECISION(\"Tiedot\",\"foo-val-b\")=1;" +
             "\r\nLAST-UPDATED(\"Tiedot\",\"foo-val-a\")=\"20231101 08:00\";" +
@@ -94,7 +94,7 @@
             "\r\nCODES(\"Vuosi\")=\"2015\",\"2016\",\"2017\",\"2018\",\"2019\",\"2020\",\"2021\",\"2022\",\"2023\",\"2024\";" +
             "\r\nCODES(\"Tiedot\")=\"code-foo-val-a\",\"code-foo-val-b\";" +
             "\r\nVARIABLE-TYPE(\"Vuosi\")=\"Time\";" +
-            "\r\nVARIABLE-TYPE(\"Tiedot\")=\"Content\";" +
+            "\r\nVARIABLE-TYPE(\"Tiedot\")=\"Contents\";" +
             "\r\nPRECISION(\"Tiedot\",\"foo-val-a\")=1;" +
             "\r\nPRECISION(\"Tiedot\",\"foo-val-b\")=1;" +
             "\r\nLAST-UPDATED(\"Tiedot\",\"foo-val-a\")=\"20231101 08:00\";" +
@@ -135,7 +135,7 @@
             "\r\nCODES(\"Vuosi\")=\"2015\",\"2016\",\"2017\",\"2018\",\"2019\",\"2020\",\"2021\",\"2022\",\"2023\",\"2024\";" +
             "\r\nCODES(\"Tiedot\")=\"code-foo-val-a\",\"code-foo-val-b\";" +
             "\r\nVARIABLE-TYPE(\"Vuosi\")=\"Time\";" +
-            "\r\nVARIABLE-TYPE(\"Tiedot\")=\"Content\";" +
+            "\r\nVARIABLE-TYPE(\"Tiedot\")=\"Contents\";" +
             "\r\nPRECISION(\"Tiedot\",\"foo-val-a\")=1;" +
             "\r\nLAST-UPDATED(\"Tiedot\",\"foo-val-a\")=\"20231101 08:00\";" +
             "\r\nUNITS(\"Tiedot\",\"foo-val-a\")=\"kpl\";" +

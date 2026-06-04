@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models.Metadata.Enums;
+using Px.Utils.Models.Metadata.Enums;
 
 namespace Px.Utils.PxFile
 {
@@ -107,28 +107,29 @@ namespace Px.Utils.PxFile
                 public static TimeValue DefaultTimeValue => new();
             }
 
+            /// <summary>
+            /// Defines accepted tokens for parsing and validating dimension types using an expandable dictionary string to <see cref="DimensionType"/>.
+            /// </summary>
             public class VariableTypeTokens
             {
-                private const string CONTENT = "Content";
-                private const string TIME = "Time";
-                private const string ORDINAL = "Ordinal";
-                private const string NOMINAL = "Nominal";
-                private const string GEOGRAPHICAL = "Geographical";
-                private const string OTHER = "Other";
-                private const string UNKNOWN = "Unknown";
-                private const string CLASSIFICATORY = "Classificatory";
-
-                public string Content { get; set; } = CONTENT;
-                public string Time { get; set; } = TIME;
-                public string Ordinal { get; set; } = ORDINAL;
-                public string Nominal { get; set; } = NOMINAL;
-                public string Geographical { get; set; } = GEOGRAPHICAL;
-                public string Other { get; set; } = OTHER;
-                public string Unknown { get; set; } = UNKNOWN;
-                public string Classificatory { get; set; } = CLASSIFICATORY;
+                /// <summary>
+                /// Gets or sets the expandable dictionary mapping string tokens to dimension types.
+                /// </summary>
+                public Dictionary<string, DimensionType> Mappings { get; set; } = new(StringComparer.OrdinalIgnoreCase)
+                {
+                    { "Time", DimensionType.Time },
+                    { "Contents", DimensionType.Content },
+                    { "Geographical", DimensionType.Geographical },
+                    { "Ordinal", DimensionType.Ordinal },
+                    { "Nominal", DimensionType.Nominal },
+                    { "Other", DimensionType.Other },
+                };
 
                 private VariableTypeTokens() { }
 
+                /// <summary>
+                /// Gets the default variable type tokens configuration.
+                /// </summary>
                 public static VariableTypeTokens DefaultVariableTypeTokens => new();
             }
 

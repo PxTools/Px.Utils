@@ -1,4 +1,4 @@
-﻿using Px.Utils.Exceptions;
+using Px.Utils.Exceptions;
 using Px.Utils.PxFile;
 using Px.Utils.PxFile.Metadata;
 using Px.Utils.Validation.SyntaxValidation;
@@ -373,7 +373,10 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
             else if (splitEntry[0] == _conf.Tokens.KeyWords.AvailableLanguages)
             {
-                languages = splitEntry[1].Split(_conf.Symbols.Value.ListSeparator);
+                languages = [.. SyntaxValidationUtilityMethods.GetListItemsFromString(
+                    splitEntry[1], 
+                    _conf.Symbols.Value.ListSeparator, 
+                    _conf.Symbols.Value.StringDelimeter)];
                 for (int j = 0; j < languages.Length; j++)
                 {
                     languages[j] = languages[j].Trim(_conf.Symbols.Key.StringDelimeter);

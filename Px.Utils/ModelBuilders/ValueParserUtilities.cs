@@ -1,6 +1,7 @@
-﻿using Px.Utils.Models.Metadata.Enums;
+using Px.Utils.Models.Metadata.Enums;
 using Px.Utils.Models.Metadata.ExtensionMethods;
 using Px.Utils.PxFile;
+using System.Globalization;
 
 namespace Px.Utils.ModelBuilders
 {
@@ -102,6 +103,7 @@ namespace Px.Utils.ModelBuilders
         /// <summary>
         /// Parses a string into a <see cref="DimensionType"/> enumeration value.
         /// This method maps the input string to a <see cref="DimensionType"/> enumeration value based on the provided or default PxFileConfiguration configuration.
+        /// Mapping is done using the configured variable type mappings.
         /// If the input string does not map to a known <see cref="DimensionType"/>, the method returns <see cref="DimensionType.Unknown"/>.
         /// </summary>
         /// <param name="input">The string to parse into a <see cref="DimensionType"/> enumeration value.</param>
@@ -110,20 +112,14 @@ namespace Px.Utils.ModelBuilders
         public static DimensionType StringToDimensionType(string input, PxFileConfiguration? conf = null)
         {
             conf ??= PxFileConfiguration.Default;
-            Dictionary<string, DimensionType> map = new()
-            {
-                {conf.Tokens.VariableTypes.Content, DimensionType.Content},
-                {conf.Tokens.VariableTypes.Time, DimensionType.Time},
-                {conf.Tokens.VariableTypes.Ordinal, DimensionType.Ordinal},
-                {conf.Tokens.VariableTypes.Nominal, DimensionType.Nominal},
-                {conf.Tokens.VariableTypes.Geographical, DimensionType.Geographical},
-                {conf.Tokens.VariableTypes.Other, DimensionType.Other},
-                {conf.Tokens.VariableTypes.Unknown, DimensionType.Unknown}
-            };
 
             string cleanString = input.CleanStringDelimeters(conf.Symbols.Value.StringDelimeter);
-            if (map.TryGetValue(cleanString, out DimensionType value)) return value;
-            else return DimensionType.Unknown;
+            if (conf.Tokens.VariableTypes.Mappings.TryGetValue(cleanString, out DimensionType value))
+            {
+                return value;
+            }
+
+            return DimensionType.Unknown;
         }
     }
 }

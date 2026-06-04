@@ -2,8 +2,11 @@ using Px.Utils.UnitTests.Validation.Fixtures;
 using Px.Utils.Validation;
 using Px.Utils.Validation.ContentValidation;
 using Px.Utils.Validation.SyntaxValidation;
+using Px.Utils.PxFile;
+using Px.Utils.Models.Metadata.Enums;
 using System.Text;
 using System.Reflection;
+using System.Globalization;
 
 namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 {
@@ -537,6 +540,60 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
+        [DataRow("ranking", DimensionType.Ordinal)]
+        [DataRow("REGION", DimensionType.Geographical)]
+        public void ValidateValueContentsCalledWithCustomDimensionTypesValueReturnsWithoutFeedback(string alias, DimensionType dimensionType)
+        {
+            // Arrange
+            PxFileConfiguration conf = PxFileConfiguration.Default;
+            conf.Tokens.VariableTypes.Mappings[alias] = dimensionType;
+
+            ValidationStructuredEntry entry = new(
+                filename,
+                new ValidationStructuredEntryKey("VARIABLE-TYPE", "fi", "foo"),
+                alias.ToUpper(CultureInfo.InvariantCulture), // The value is converted to upper case to verify case insensitivity of the dimension type matching
+                0,
+                [],
+                0,
+                Utils.Validation.ValueType.StringValue);
+
+            ContentValidator validator = new(filename, encoding, [entry], conf: conf);
+
+            // Act
+            ValidationFeedback? result = ContentValidator.ValidateValueContents(entry, validator);
+
+            // Assert
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public void ValidateValueContentsCalledWithUnknownDimensionTypeValueReturnsWithError()
+        {
+            // Arrange
+            PxFileConfiguration conf = PxFileConfiguration.Default;
+
+            ValidationStructuredEntry entry = new(
+                filename,
+                new ValidationStructuredEntryKey("VARIABLE-TYPE", "fi", "foo"),
+                "Ranking",
+                0,
+                [],
+                0,
+                Utils.Validation.ValueType.StringValue);
+
+            ContentValidator validator = new(filename, encoding, [entry], conf: conf);
+
+            // Act
+            ValidationFeedback? result = ContentValidator.ValidateValueContents(entry, validator);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.HasCount(1, result);
+            Assert.AreEqual(ValidationFeedbackRule.InvalidValueFound, result.First().Key.Rule);
+            Assert.AreEqual(ValidationFeedbackLevel.Error, result.First().Key.Level);
+        }
+
+        [TestMethod]
         public void ValidateValueAmountsCalledWithUnmatchingAmountOfElementsReturnsWithError()
         {
             // Arrange
@@ -557,6 +614,27 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             Assert.IsNotNull(result);
             Assert.HasCount(1, result);
             Assert.AreEqual(ValidationFeedbackRule.UnmatchingValueAmount, result.First().Key.Rule);
+        }
+
+        [TestMethod]
+        public void ValidateValueAmountsCalledWithMatchingAmountOfElementsWithListDelimetersReturnsNoError()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = [ContentValidationFixtures.StructuredEntryWithMatchingAmountOfElementsWithListDelimeters];
+            ContentValidator validator = new(filename, encoding, entries);
+            SetValidatorField(validator, "_defaultLanguage", defaultLanguage);
+            SetValidatorField(validator, "_availableLanguages", availableLanguages);
+            SetValidatorField(validator, "_stubDimensionNames", stubDimensionNames);
+            SetValidatorField(validator, "_dimensionValueNames", dimensionValueNames);
+
+            // Act
+            ValidationFeedback? result = ContentValidator.ValidateValueAmounts(
+                entries[0],
+                validator
+                );
+
+            // Assert
+            Assert.IsNull(result);
         }
 
         [TestMethod]

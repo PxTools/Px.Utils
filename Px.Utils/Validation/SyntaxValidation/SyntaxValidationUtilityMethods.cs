@@ -458,8 +458,8 @@ namespace Px.Utils.Validation.SyntaxValidation
             }
 
             // Remove preceding list separator from input
-            input = input.Remove(0, 1);
-            if (!IsStringListFormat(input, listSeparator, conf.Symbols.Value.StringDelimeter))
+            input = input[1..];
+            if (!IsStringListFormat(input, listSeparator, conf.Symbols.Value.StringDelimeter) && !IsStringFormat(input, conf.Symbols.Value.StringDelimeter))
             {
                 return null;
             }
