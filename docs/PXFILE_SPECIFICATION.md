@@ -279,7 +279,7 @@ More spesific encoding information. The value must be a string that matches the 
 #### VARIABLE-TYPE
 - The value must be a string.
 - Recommended that the variable type is defined for each variable defined by the STUB or HEADING.
-- Has a set of allowed values: ```Content```, ```Time```, ```Geographical```, ```Ordinal```, ```Nominal```, ```Other```, ```Classificatory```., ```Unknown```.
+- Has a set of allowed values: ```Contents```, ```Time```, ```Geographical```, ```Ordinal```, ```Nominal```, ```Other```
 - Can be defined for each language, but this is not recommended.
 - Value is not case sensitive, but uppercase characters are recommended.
 
