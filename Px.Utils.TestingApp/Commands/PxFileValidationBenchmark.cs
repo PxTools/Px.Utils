@@ -8,7 +8,8 @@ namespace Px.Utils.TestingApp.Commands
     internal sealed class PxFileValidationBenchmark : FileBenchmark
     {
         internal override string Help =>
-        "Runs through the whole px file validation process (metadata syntax- and contents-, data-) for the given file.";
+        "Runs through the whole px file validation process (metadata syntax- and contents-, data-) for the given file." + Environment.NewLine +
+        "\t-l, -limit: Feedback items retained per file, level, and rule; use a positive number. Defaults to 100.";
 
         internal override string Description => "Benchmarks the px file validation capabilities of the PxFileValidator.";
 
@@ -42,14 +43,14 @@ namespace Px.Utils.TestingApp.Commands
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileValidator validator = new();
-            validator.Validate(stream, TestFilePath, encoding);
+            var result = validator.Validate(stream, TestFilePath, encoding, null, ValidationOptions);
         }
 
         private async Task ValidatePxFileBenchmarksAsync()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileValidator validator = new();
-            await validator.ValidateAsync(stream, TestFilePath, encoding);
+            await validator.ValidateAsync(stream, TestFilePath, encoding, null, ValidationOptions);
         }
     }
 }

@@ -68,6 +68,32 @@ namespace Px.Utils.Validation.SyntaxValidation
         }
 
         /// <summary>
+        /// Validates the syntax of a PX file's metadata using the specified feedback retention options.
+        /// </summary>
+        public SyntaxValidationResult Validate(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            ValidationOptions options)
+        {
+            ValidationFeedbackSink sink = new(options);
+            return Validate(stream, filename, encoding, fileSystem, sink);
+        }
+
+        internal SyntaxValidationResult Validate(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            ValidationFeedbackSink sink)
+        {
+            SyntaxValidationResult result = Validate(stream, filename, encoding, fileSystem);
+            sink.ReportRange(result.FeedbackItems);
+            return new SyntaxValidationResult(sink.ToFeedback(), [.. result.Result], result.DataStartRow, result.DataStartStreamPosition);
+        }
+
+        /// <summary>
         /// Asynchronously validates the syntax of a PX file's metadata.
         /// </summary>
         /// <param name="stream">Stream of the PX file to be validated</param>
@@ -111,6 +137,34 @@ namespace Px.Utils.Validation.SyntaxValidation
             validationFeedbacks.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, conf));
 
             return new SyntaxValidationResult(validationFeedbacks, structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
+        }
+
+        /// <summary>
+        /// Asynchronously validates the syntax of a PX file's metadata using the specified feedback retention options.
+        /// </summary>
+        public async Task<SyntaxValidationResult> ValidateAsync(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            ValidationOptions options,
+            CancellationToken cancellationToken = default)
+        {
+            ValidationFeedbackSink sink = new(options);
+            return await ValidateAsync(stream, filename, encoding, fileSystem, sink, cancellationToken);
+        }
+
+        internal async Task<SyntaxValidationResult> ValidateAsync(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            ValidationFeedbackSink sink,
+            CancellationToken cancellationToken = default)
+        {
+            SyntaxValidationResult result = await ValidateAsync(stream, filename, encoding, fileSystem, cancellationToken);
+            sink.ReportRange(result.FeedbackItems);
+            return new SyntaxValidationResult(sink.ToFeedback(), [.. result.Result], result.DataStartRow, result.DataStartStreamPosition);
         }
 
         #region Interface implementation

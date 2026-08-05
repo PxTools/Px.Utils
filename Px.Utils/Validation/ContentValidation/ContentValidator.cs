@@ -93,6 +93,22 @@ namespace Px.Utils.Validation.ContentValidation
             return new ContentValidationResult(feedbackItems, lengthOfDataRows, amountOfDataRows);
         }
 
+        /// <summary>
+        /// Validates contents of PX file metadata using the specified feedback retention options.
+        /// </summary>
+        public ContentValidationResult Validate(ValidationOptions options)
+        {
+            ValidationFeedbackSink sink = new(options);
+            return Validate(sink);
+        }
+
+        internal ContentValidationResult Validate(ValidationFeedbackSink sink)
+        {
+            ContentValidationResult result = Validate();
+            sink.ReportRange(result.FeedbackItems);
+            return new ContentValidationResult(sink.ToFeedback(), result.DataRowLength, result.DataRowAmount);
+        }
+
         #region Interface implementation
 
         ValidationResult IValidator.Validate()

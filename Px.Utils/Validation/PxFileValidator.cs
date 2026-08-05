@@ -1,4 +1,4 @@
-﻿using Px.Utils.PxFile;
+using Px.Utils.PxFile;
 using Px.Utils.Validation.ContentValidation;
 using Px.Utils.Validation.DatabaseValidation;
 using Px.Utils.Validation.DataValidation;
@@ -66,28 +66,44 @@ namespace Px.Utils.Validation
             string filename,
             Encoding? encoding = null,
             IFileSystem? fileSystem = null)
+            => Validate(stream, filename, encoding, fileSystem, new ValidationFeedbackSink());
+
+        /// <summary>
+        /// Validates the PX file using the specified feedback retention options.
+        /// </summary>
+        public ValidationResult Validate(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            ValidationOptions options)
+            => Validate(stream, filename, encoding, fileSystem, new ValidationFeedbackSink(options));
+
+        internal ValidationResult Validate(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            ValidationFeedbackSink sink)
         {
             encoding ??= new LocalFileSystem().GetEncoding(stream);
             conf ??= PxFileConfiguration.Default;
 
-            ValidationFeedback feedbacks = [];
             SyntaxValidator syntaxValidator = new(conf, _customSyntaxValidationFunctions);
-            SyntaxValidationResult syntaxValidationResult = syntaxValidator.Validate(stream, filename, encoding, fileSystem);
-            feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
+            SyntaxValidationResult syntaxValidationResult = syntaxValidator.Validate(stream, filename, encoding, fileSystem, sink);
 
             ContentValidator contentValidator = new(filename, encoding, [.. syntaxValidationResult.Result], _customContentValidationFunctions, conf);
-            ContentValidationResult contentValidationResult = contentValidator.Validate();
-            feedbacks.AddRange(contentValidationResult.FeedbackItems);
+            ContentValidationResult contentValidationResult = contentValidator.Validate(sink);
 
             if (syntaxValidationResult.DataStartStreamPosition == -1)
             {
-                feedbacks.Add(new(
+                sink.Report(new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
                     new(ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.StartOfDataSectionNotFound),
                     new(filename, 0, 0)
                     ));
 
-                return new (feedbacks);
+                return new(sink.ToFeedback());
             }
 
             stream.Position = syntaxValidationResult.DataStartStreamPosition;
@@ -96,15 +112,14 @@ namespace Px.Utils.Validation
                 contentValidationResult.DataRowAmount,
                 syntaxValidationResult.DataStartRow, 
                 conf);
-            ValidationResult dataValidationResult = dataValidator.Validate(stream, filename, encoding, fileSystem);
-            feedbacks.AddRange(dataValidationResult.FeedbackItems);
+            dataValidator.Validate(stream, filename, encoding, fileSystem, sink);
 
             if (_customStreamValidators is not null)
             {
                 foreach (IPxFileStreamValidator customValidator in _customStreamValidators)
                 {
                     ValidationResult customValidationResult = customValidator.Validate(stream, filename, encoding, fileSystem);
-                    feedbacks.AddRange(customValidationResult.FeedbackItems);
+                    sink.ReportRange(customValidationResult.FeedbackItems);
                 }
             }
             if (_customValidators is not null)
@@ -112,11 +127,11 @@ namespace Px.Utils.Validation
                 foreach (IValidator customValidator in _customValidators)
                 {
                     ValidationResult customValidationResult = customValidator.Validate();
-                    feedbacks.AddRange(customValidationResult.FeedbackItems);
+                    sink.ReportRange(customValidationResult.FeedbackItems);
                 }
             }
             stream.Close();
-            return new ValidationResult(feedbacks);
+            return new ValidationResult(sink.ToFeedback());
         }
 
         /// <summary>
@@ -135,28 +150,46 @@ namespace Px.Utils.Validation
             Encoding? encoding = null,
             IFileSystem? fileSystem = null,
             CancellationToken cancellationToken = default)
+            => await ValidateAsync(stream, filename, encoding, fileSystem, new ValidationFeedbackSink(), cancellationToken);
+
+        /// <summary>
+        /// Asynchronously validates the PX file using the specified feedback retention options.
+        /// </summary>
+        public async Task<ValidationResult> ValidateAsync(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            ValidationOptions options,
+            CancellationToken cancellationToken = default)
+            => await ValidateAsync(stream, filename, encoding, fileSystem, new ValidationFeedbackSink(options), cancellationToken);
+
+        internal async Task<ValidationResult> ValidateAsync(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            ValidationFeedbackSink sink,
+            CancellationToken cancellationToken = default)
         {
             encoding ??= await new LocalFileSystem().GetEncodingAsync(stream, cancellationToken);
             conf ??= PxFileConfiguration.Default;
 
-            ValidationFeedback feedbacks = [];
             SyntaxValidator syntaxValidator = new(conf, _customSyntaxValidationFunctions);
-            SyntaxValidationResult syntaxValidationResult = await syntaxValidator.ValidateAsync(stream, filename, encoding, fileSystem, cancellationToken);
-            feedbacks.AddRange(syntaxValidationResult.FeedbackItems);
+            SyntaxValidationResult syntaxValidationResult = await syntaxValidator.ValidateAsync(stream, filename, encoding, fileSystem, sink, cancellationToken);
 
             ContentValidator contentValidator = new(filename, encoding, [..syntaxValidationResult.Result], _customContentValidationFunctions, conf);
-            ContentValidationResult contentValidationResult = contentValidator.Validate();
-            feedbacks.AddRange(contentValidationResult.FeedbackItems);
+            ContentValidationResult contentValidationResult = contentValidator.Validate(sink);
 
             if (syntaxValidationResult.DataStartStreamPosition == -1)
             {
-                feedbacks.Add(new(
+                sink.Report(new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
                     new(ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.StartOfDataSectionNotFound),
                     new(filename, 0, 0)
                 ));
 
-                return new (feedbacks);
+                return new(sink.ToFeedback());
             }
 
             stream.Position = syntaxValidationResult.DataStartStreamPosition;
@@ -166,15 +199,14 @@ namespace Px.Utils.Validation
                 syntaxValidationResult.DataStartRow, 
                 conf);
 
-            ValidationResult dataValidationResult = await dataValidator.ValidateAsync(stream, filename, encoding, fileSystem, cancellationToken);
-            feedbacks.AddRange(dataValidationResult.FeedbackItems);
+            await dataValidator.ValidateAsync(stream, filename, encoding, fileSystem, sink, cancellationToken);
 
             if (_customStreamAsyncValidators is not null)
             {
                 foreach (IPxFileStreamValidatorAsync customValidator in _customStreamAsyncValidators)
                 {
                     ValidationResult customValidationResult = await customValidator.ValidateAsync(stream, filename, encoding, fileSystem, cancellationToken);
-                    feedbacks.AddRange(customValidationResult.FeedbackItems);
+                    sink.ReportRange(customValidationResult.FeedbackItems);
                 }
             }
             if (_customAsyncValidators is not null)
@@ -182,11 +214,11 @@ namespace Px.Utils.Validation
                 foreach (IValidatorAsync customValidator in _customAsyncValidators)
                 {
                     ValidationResult customValidationResult = await customValidator.ValidateAsync(cancellationToken);
-                    feedbacks.AddRange(customValidationResult.FeedbackItems);
+                    sink.ReportRange(customValidationResult.FeedbackItems);
                 }
             }
             stream.Close();
-            return new ValidationResult(feedbacks);
+            return new ValidationResult(sink.ToFeedback());
         }
     }
 }
