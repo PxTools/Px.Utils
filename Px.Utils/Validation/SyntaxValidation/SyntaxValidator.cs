@@ -1,4 +1,5 @@
-﻿using Px.Utils.PxFile;
+using Px.Utils.PxFile;
+using Px.Utils.PxFile.Data;
 using Px.Utils.Validation.DatabaseValidation;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -19,7 +20,7 @@ namespace Px.Utils.Validation.SyntaxValidation
     {
         private const int _bufferSize = 4096;
         private int _dataSectionStartRow = -1;
-        private int _dataSectionStartStreamPosition = -1;
+        private long _dataSectionStartStreamPosition = -1;
 
         ///<summary>
         /// Validates the syntax of a PX file's metadata.
@@ -52,6 +53,8 @@ namespace Px.Utils.Validation.SyntaxValidation
             }
 
             conf ??= PxFileConfiguration.Default;
+            ResetDataSectionPosition();
+            _dataSectionStartStreamPosition = StreamUtilities.FindDataStartPosition(stream, conf, _bufferSize);
 
             ValidationFeedback validationFeedbacks = [];
             List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, conf, filename, _bufferSize);
@@ -97,6 +100,8 @@ namespace Px.Utils.Validation.SyntaxValidation
             }
 
             conf ??= PxFileConfiguration.Default;
+            ResetDataSectionPosition();
+            _dataSectionStartStreamPosition = await StreamUtilities.FindDataStartPositionAsync(stream, conf, _bufferSize, cancellationToken);
             ValidationFeedback validationFeedbacks = [];
             List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, conf, filename, _bufferSize, cancellationToken);
             validationFeedbacks.AddRange(ValidateEntries(entries, stringValidationFunctions, conf));
@@ -251,8 +256,6 @@ namespace Px.Utils.Validation.SyntaxValidation
                     if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
                     {
                         _dataSectionStartRow = lineChangeIndexes.Count;
-                        // This here should find the actual start of the data section, after line changes, spaces and whatnot.
-                        _dataSectionStartStreamPosition = characterIndex + 1;
                         return entries;
                     }
                     UpdateLineAndCharacter(buffer[i], syntaxConf, ref characterIndex, ref lineChangeIndexes, ref isProcessingString);
@@ -311,7 +314,6 @@ namespace Px.Utils.Validation.SyntaxValidation
                     if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
                     {
                         _dataSectionStartRow = lineChangeIndexes.Count;
-                        _dataSectionStartStreamPosition = characterIndex + 1;
                         return entries;
                     }
                     UpdateLineAndCharacter(buffer[i], syntaxConf, ref characterIndex, ref lineChangeIndexes, ref isProcessingString);
@@ -333,6 +335,12 @@ namespace Px.Utils.Validation.SyntaxValidation
             while (read > 0);
 
             return entries;
+        }
+
+        private void ResetDataSectionPosition()
+        {
+            _dataSectionStartRow = -1;
+            _dataSectionStartStreamPosition = -1;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

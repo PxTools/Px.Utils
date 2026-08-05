@@ -54,6 +54,32 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
+        public async Task ValidateAndValidateAsyncDataWithBomAndMultibyteMetadataReturnSameRawByteOffset()
+        {
+            // Arrange
+            string content = "TITLE=\"Ää Öö\";\r\nDATA=\r\n\t2635 2;";
+            byte[] bom = Encoding.UTF8.GetPreamble();
+            byte[] data = [.. bom, .. Encoding.UTF8.GetBytes(content)];
+            long expectedPosition = bom.Length + Encoding.UTF8.GetByteCount(content[..content.IndexOf("2635", StringComparison.Ordinal)]);
+            using Stream synchronousStream = new MemoryStream(data);
+            using Stream asynchronousStream = new MemoryStream(data);
+            SyntaxValidator synchronousValidator = new();
+            SyntaxValidator asynchronousValidator = new();
+
+            // Act
+            SyntaxValidationResult synchronousResult = synchronousValidator.Validate(synchronousStream, "foo", Encoding.UTF8);
+            SyntaxValidationResult asynchronousResult = await asynchronousValidator.ValidateAsync(asynchronousStream, "foo", Encoding.UTF8, cancellationToken: System.Threading.CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(expectedPosition, synchronousResult.DataStartStreamPosition);
+            Assert.AreEqual(synchronousResult.DataStartStreamPosition, asynchronousResult.DataStartStreamPosition);
+            Assert.AreEqual(1, synchronousResult.DataStartRow);
+            Assert.AreEqual(synchronousResult.DataStartRow, asynchronousResult.DataStartRow);
+            synchronousStream.Position = synchronousResult.DataStartStreamPosition;
+            Assert.AreEqual('2', (char)synchronousStream.ReadByte());
+        }
+
+        [TestMethod]
         public void ValidateObjectsCalledWithMultipleEntriesInSingleLineReturnsWithWarnings()
         {
             // Arrange

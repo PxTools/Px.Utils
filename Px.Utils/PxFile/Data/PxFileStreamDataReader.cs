@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models.Data.DataValue;
+using Px.Utils.Models.Data.DataValue;
 using Px.Utils.Models.Metadata;
 using Px.Utils.Models.Metadata.ExtensionMethods;
 
@@ -36,7 +36,7 @@ namespace Px.Utils.PxFile.Data
         /// Constructor that allows specifying the position of the data section in the file.
         /// </summary>
         /// <param name="stream">Px file stream</param>
-        /// <param name="dataStart">Position of the first data point in the file</param>
+        /// <param name="dataStart">Absolute raw byte offset of the first non-whitespace data value after DATA=.</param>
         /// <param name="conf">Px file syntax configuration</param>
         public PxFileStreamDataReader(Stream stream, long dataStart, PxFileConfiguration? conf = null, int readBufferSize = 4096)
         {
@@ -272,25 +272,23 @@ namespace Px.Utils.PxFile.Data
         private void SetReaderPositionIfZero()
         {
             if (_stream.Position != 0) return;
-            string dataKeyword = _conf.Tokens.KeyWords.Data;
-            long start = StreamUtilities.FindKeywordPosition(_stream, dataKeyword, _conf);
+            long start = StreamUtilities.FindDataStartPosition(_stream, _conf, _readBufferSize);
             if (start == -1)
             {
-                throw new ArgumentException($"Could not find data keyword '{dataKeyword}'");
+                throw new ArgumentException($"Could not find the first data value after '{_conf.Tokens.KeyWords.Data}='");
             }
-            _stream.Position = start + dataKeyword.Length + 1; // +1 to skip the '='
+            _stream.Position = start;
         }
 
         private async Task SetReaderPositionIfZeroAsync(CancellationToken? cancellationToken = null)
         {
             if (_stream.Position != 0) return;
-            string dataKeyword = _conf.Tokens.KeyWords.Data;
-            long start = await StreamUtilities.FindKeywordPositionAsync(_stream, dataKeyword, _conf, cancellationToken);
+            long start = await StreamUtilities.FindDataStartPositionAsync(_stream, _conf, _readBufferSize, cancellationToken ?? CancellationToken.None);
             if (start == -1)
             {
-                throw new ArgumentException($"Could not find data keyword '{dataKeyword}'");
+                throw new ArgumentException($"Could not find the first data value after '{_conf.Tokens.KeyWords.Data}='");
             }
-            _stream.Position = start + dataKeyword.Length + 1; // +1 to skip the '='
+            _stream.Position = start;
         }
 
         private void ReadItemsFromStreamByCoordinate<T>(T[] buffer, int offset, IMatrixMap target, IMatrixMap complete, Func<char[], int, T> readItem, CancellationToken? token = null)

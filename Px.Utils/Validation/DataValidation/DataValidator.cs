@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using Px.Utils.PxFile;
+using Px.Utils.PxFile.Data;
 using Px.Utils.Validation.DatabaseValidation;
 
 namespace Px.Utils.Validation.DataValidation
@@ -15,7 +16,6 @@ namespace Px.Utils.Validation.DataValidation
     public class DataValidator(int rowLen, int numOfRows, int startRow, PxFileConfiguration? conf = null) : IPxFileStreamValidator, IPxFileStreamValidatorAsync
     {
         private const int _streamBufferSize = 4096;
-        private static ReadOnlySpan<byte> MissingValueStartBytes => [CharacterConstants.QUOTATIONMARK, (byte)'-', (byte)'.'];
 
         private readonly PxFileConfiguration _conf = conf ?? PxFileConfiguration.Default;
 
@@ -26,6 +26,7 @@ namespace Px.Utils.Validation.DataValidation
 
         private EntryType _currentEntryType = EntryType.Unknown;
         private List<byte> _currentEntry = [];
+        private List<byte> _currentRow = [];
         private int _lineNumber = 1;
         private int _charPosition;
         private EntryType _currentCharacterType;
@@ -56,7 +57,7 @@ namespace Px.Utils.Validation.DataValidation
             SetValidationParameters(encoding, filename);
 
             ValidationFeedback validationFeedbacks = [];
-            int dataStartIndex = GetStreamIndexOfFirstDataValue(stream, ref validationFeedbacks);
+            long dataStartIndex = GetStreamIndexOfFirstDataValue(stream);
             if (dataStartIndex == -1)
             {
                 KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback =
@@ -65,7 +66,7 @@ namespace Px.Utils.Validation.DataValidation
                     new(filename, 0, 0));
                 validationFeedbacks.Add(feedback);
 
-                return new (validationFeedbacks);
+                return new(validationFeedbacks);
             }
             stream.Position = dataStartIndex;
             ValidationFeedback dataStreamFeedbacks = ValidateDataStream(stream);
@@ -73,7 +74,7 @@ namespace Px.Utils.Validation.DataValidation
 
             ResetValidator();
 
-            return new (validationFeedbacks);
+            return new(validationFeedbacks);
         }
 
         /// <summary>
@@ -100,7 +101,7 @@ namespace Px.Utils.Validation.DataValidation
             SetValidationParameters(encoding, filename);
 
             ValidationFeedback validationFeedbacks = [];
-            int dataStartIndex = GetStreamIndexOfFirstDataValue(stream, ref validationFeedbacks);
+            long dataStartIndex = GetStreamIndexOfFirstDataValue(stream);
             if (dataStartIndex == -1)
             {
                 KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback =
@@ -109,16 +110,16 @@ namespace Px.Utils.Validation.DataValidation
                     new(filename, 0, 0));
                 validationFeedbacks.Add(feedback);
 
-                return new (validationFeedbacks);
+                return new(validationFeedbacks);
             }
             stream.Position = dataStartIndex;
-            ValidationFeedback dataStreamFeedbacks =  await Task.Factory.StartNew(() => 
+            ValidationFeedback dataStreamFeedbacks = await Task.Factory.StartNew(() =>
                 ValidateDataStream(stream, cancellationToken), cancellationToken);
             validationFeedbacks.AddRange(dataStreamFeedbacks);
 
             ResetValidator();
 
-            return new (validationFeedbacks);
+            return new(validationFeedbacks);
         }
 
         private void SetValidationParameters(Encoding encoding, string filename)
@@ -139,6 +140,7 @@ namespace Px.Utils.Validation.DataValidation
             ValidationFeedback validationFeedbacks = [];
             byte endOfData = (byte)_conf.Symbols.EntrySeparator;
             _currentEntry = new(_streamBufferSize);
+            _currentRow = new(_streamBufferSize);
             byte[] buffer = new byte[_streamBufferSize];
             int bytesRead = 0;
 
@@ -164,10 +166,15 @@ namespace Px.Utils.Validation.DataValidation
                             HandleNonSeparatorType(ref validationFeedbacks);
                         }
                         _currentEntryType = _currentCharacterType;
+                        // Console.WriteLine($"entry: {_encoding.GetString(_currentEntry.ToArray())}");
                         _currentEntry.Clear();
                     }
 
                     _currentEntry.Add(currentByte);
+                    if (_currentCharacterType != EntryType.LineSeparator)
+                    {
+                        _currentRow.Add(currentByte);
+                    }
                     _charPosition++;
                 }
             }
@@ -210,7 +217,7 @@ namespace Px.Utils.Validation.DataValidation
                     KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(
                         _currentEntry,
                         _currentEntryType,
-                        _encoding, 
+                        _encoding,
                         _lineNumber + startRow,
                         _charPosition,
                         _filename);
@@ -231,10 +238,13 @@ namespace Px.Utils.Validation.DataValidation
             }
             else if (_currentCharacterType == EntryType.LineSeparator)
             {
+                Console.WriteLine($"row at {_lineNumber}: {_encoding.GetString(_currentRow.ToArray())}");
+                Console.WriteLine($"{_currentRowLength} vs {rowLen} items");
+                _currentRow.Clear();
                 if (_currentRowLength != rowLen)
                 {
                     validationFeedbacks.Add(new(
-                        new (ValidationFeedbackLevel.Error,
+                        new(ValidationFeedbackLevel.Error,
                         ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength),
                         new(_filename, _lineNumber + startRow, _charPosition,
                         $"Expected {rowLen}, got row length of {_currentRowLength}."))
@@ -254,44 +264,29 @@ namespace Px.Utils.Validation.DataValidation
             _dataSeparatorValidators.Clear();
             _currentEntryType = EntryType.Unknown;
             _currentEntry.Clear();
+            _currentRow.Clear();
             _lineNumber = 1;
             _charPosition = 0;
             _currentRowLength = 0;
         }
 
-        private int GetStreamIndexOfFirstDataValue(Stream stream, ref ValidationFeedback feedbacks)
+        private static long GetStreamIndexOfFirstDataValue(Stream stream)
         {
-            byte[] buffer = new byte[_streamBufferSize];
-            int bytesRead;
-            do
+            if (stream.Position == 0)
             {
-                bytesRead = stream.Read(buffer, 0, buffer.Length);
-                for (int i = 0; i < bytesRead; i++)
+                return StreamUtilities.FindDataStartPosition(stream, PxFileConfiguration.Default, _streamBufferSize);
+            }
+
+            int currentByte;
+            while ((currentByte = stream.ReadByte()) != -1)
+            {
+                if (currentByte is not CharacterConstants.SPACE and not CharacterConstants.HORIZONTALTAB and not CharacterConstants.CARRIAGERETURN and not CharacterConstants.LINEFEED)
                 {
-                    byte currentByte = buffer[i];
-                    char currentChar = (char)currentByte;
-                    if (IsDataValueStartByte(currentByte))
-                    {
-                        return (int)stream.Position - bytesRead + i;
-                    }
-                    else if (!CharacterConstants.WhitespaceCharacters.Contains(currentChar))
-                    {
-                        feedbacks.Add(new(
-                            new(ValidationFeedbackLevel.Error,
-                            ValidationFeedbackRule.DataValidationFeedbackInvalidChar),
-                            new(_filename, _lineNumber + startRow, _charPosition))
-                        );
-                    }
+                    return stream.Position - 1;
                 }
-            } while (bytesRead > 0);
+            }
 
             return -1;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsDataValueStartByte(byte currentByte)
-        {
-            return currentByte >= CharacterConstants.Zero && currentByte <= CharacterConstants.Nine || MissingValueStartBytes.Contains(currentByte);
         }
     }
 

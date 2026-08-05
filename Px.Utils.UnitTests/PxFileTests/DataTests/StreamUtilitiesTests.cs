@@ -1,4 +1,4 @@
-﻿using PxFileTests.Fixtures;
+using PxFileTests.Fixtures;
 using Px.Utils.PxFile;
 using Px.Utils.PxFile.Data;
 using System.Text;
@@ -13,141 +13,66 @@ namespace PxFileTests.DataTests
          */
 
         [TestMethod]
-        public void FindKeywordTestDataKeywordAtStartOfStreamReturnsZero()
+        [DataRow("1")]
+        [DataRow("-1")]
+        [DataRow(".5")]
+        [DataRow("0")]
+        [DataRow("0.0")]
+        [DataRow("0.5")]
+        [DataRow("123.456")]
+        [DataRow("\".\"")]
+        [DataRow("\"..\"")]
+        public void FindDataStartPositionDataWithBomMultibyteMetadataAndWhitespaceReturnsFirstValueOffset(string firstValue)
         {
             // Arrange
-            byte[] data = Encoding.UTF8.GetBytes("DATA=");
+            string content = "TITLE=\"DATA=79_20180101;\";\r\nVALUES=\"Ää, Öö\";\r\nDATA=\t \r\n" + firstValue + " 2;";
+            byte[] bom = Encoding.UTF8.GetPreamble();
+            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
+            byte[] data = [.. bom, .. contentBytes];
             using Stream stream = new MemoryStream(data);
+            long expectedPosition = bom.Length + Encoding.UTF8.GetByteCount(content[..(content.LastIndexOf("DATA=", StringComparison.Ordinal) + 5 + "\t \r\n".Length)]);
 
             // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, "DATA", PxFileConfiguration.Default);
+            long position = StreamUtilities.FindDataStartPosition(stream, PxFileConfiguration.Default, 3);
 
             // Assert
-            Assert.AreEqual(0, position);
+            Assert.AreEqual(expectedPosition, position);
+            Assert.AreEqual(0, stream.Position);
+            Assert.AreEqual(firstValue[0], (char)data[(int)position]);
         }
 
         [TestMethod]
-        public void FindKeywordTestTwoDataKeywordsReturnsNegative1()
+        public async Task FindDataStartPositionAsyncDataSplitAcrossBuffersReturnsSameOffset()
         {
             // Arrange
-            byte[] data = Encoding.UTF8.GetBytes("DATADATA=");
+            string content = "TITLE=\"Åland\";\nDATA=\r\n\t\".\" 2;";
+            byte[] bom = Encoding.UTF8.GetPreamble();
+            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
+            byte[] data = [.. bom, .. contentBytes];
             using Stream stream = new MemoryStream(data);
+            long expectedPosition = bom.Length + Encoding.UTF8.GetByteCount(content[..content.IndexOf('"', content.IndexOf("DATA=", StringComparison.Ordinal) + 5)]);
 
             // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, "DATA", PxFileConfiguration.Default);
+            long synchronousPosition = StreamUtilities.FindDataStartPosition(stream, PxFileConfiguration.Default, 2);
+            long asynchronousPosition = await StreamUtilities.FindDataStartPositionAsync(stream, PxFileConfiguration.Default, 2, System.Threading.CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(expectedPosition, synchronousPosition);
+            Assert.AreEqual(synchronousPosition, asynchronousPosition);
+            Assert.AreEqual(0, stream.Position);
+        }
+
+        [TestMethod]
+        public void FindDataStartPositionDataWithoutValueReturnsNegative1()
+        {
+            // Arrange
+            using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes("TITLE=\"foo\";\nDATA=\r\n\t "));
+
+            // Act
+            long position = StreamUtilities.FindDataStartPosition(stream, PxFileConfiguration.Default, 2);
 
             // Assert
             Assert.AreEqual(-1, position);
-        }
-
-        [TestMethod]
-        public void FindKeywordTestDataKeywordInTheMiddleOfStreamReturnsIndex()
-        {
-            // Arrange
-            byte[] data = Encoding.UTF8.GetBytes("KEYWORD=\"foo\";\nDATA=123 345");
-            using Stream stream = new MemoryStream(data);
-
-            // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, "DATA", PxFileConfiguration.Default);
-
-            // Assert
-            Assert.AreEqual(15, position);
-        }
-
-        [TestMethod]
-        public void FindKeywordTestDataKeywordAtTheEndOfStreamReturnsIndex()
-        {
-            // Arrange
-            byte[] data = Encoding.UTF8.GetBytes("DADADADATA=");
-            using Stream stream = new MemoryStream(data);
-
-            // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, "DATA", PxFileConfiguration.Default);
-
-            // Assert
-            Assert.AreEqual(-1, position);
-        }
-
-        [TestMethod]
-        public void FindKeywordTestDKeywordInTheMiddleOfStreamReturnsIndex()
-        {
-            // Arrange
-            byte[] data = Encoding.UTF8.GetBytes("FFFFFF;D=AAAA");
-            using Stream stream = new MemoryStream(data);
-
-            // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, "D", PxFileConfiguration.Default);
-
-            // Assert
-            Assert.AreEqual(7, position);
-        }
-
-        [TestMethod]
-        public void FindKeywordTestDATAKeywordInTheMiddleOfUtfFixtureStreamReturnsIndex()
-        {
-            string keyword = "DATA";
-
-            // Arrange
-            byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N);
-            using Stream stream = new MemoryStream(data);
-
-            // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, keyword, PxFileConfiguration.Default);
-            string result = Encoding.ASCII.GetString(data, (int)position, keyword.Length);
-
-            // Assert
-            Assert.AreEqual(keyword, result);
-        }
-
-        [TestMethod]
-        public void FindKeywordTestDATAKeywordInTheMiddleOfAsciiFixtureStreamReturnsIndex()
-        {
-            string keyword = "DATA";
-
-            // Arrange
-            byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_ISO_8859_15_N);
-            using Stream stream = new MemoryStream(data);
-
-            // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, keyword, PxFileConfiguration.Default);
-            string result = Encoding.ASCII.GetString(data, (int)position, keyword.Length);
-
-            // Assert
-            Assert.AreEqual(keyword, result);
-        }
-
-        [TestMethod]
-        public void FindKeywordTestDATAKeywordInTheMiddleOfAsciiFixtureStreamShortBufferSplitsKeywordReturnsIndex()
-        {
-            string keyword = "DATA";
-
-            // Arrange
-            byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_ISO_8859_15_N);
-            using Stream stream = new MemoryStream(data);
-
-            // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, keyword, PxFileConfiguration.Default, 3);
-            string result = Encoding.ASCII.GetString(data, (int)position, keyword.Length);
-
-            // Assert
-            Assert.AreEqual(keyword, result);
-        }
-
-        [TestMethod]
-        public void FindKeywordTestDATAKeywordInTheMiddleOfDataFinderFixtureStreamReturnsIndex()
-        {
-            string keyword = "DATA";
-
-            // Arrange
-            byte[] data = Encoding.UTF8.GetBytes(MinimalPx.MINIMAL_UTF8_N_FOR_DATA_FINDER);
-            using Stream stream = new MemoryStream(data);
-
-            // Act
-            long position = StreamUtilities.FindKeywordPosition(stream, keyword, PxFileConfiguration.Default);
-            string result = Encoding.ASCII.GetString(data, (int)position -1, keyword.Length+2);
-
-            // Assert
-            Assert.AreEqual('\n' + keyword + '=', result);
         }
     }
 }
