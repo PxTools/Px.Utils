@@ -57,6 +57,8 @@ The entries need to be in the same key-value format as the output of the ```PxFi
 
 **IMPORTANT!** The target map must have the same order as the complete file map. This is for performance reasons, we do not want to move back and forth in the file or generate a second indexer for placing the data in the buffer.
 
+When the reader is created at stream position `0`, it finds the first non-whitespace data value after the top-level `DATA=` entry automatically. This also works with a UTF-8 BOM and multibyte metadata. The overload that accepts `dataStart` expects the absolute raw byte offset of that first value; use `StreamUtilities.FindDataStartPosition()` or `FindDataStartPositionAsync()` to obtain the offset from a seekable stream. Both helpers restore the original stream position and return `-1` when no data value is found.
+
 ### Metadata example
 ```csharp
     // Read meta
@@ -225,6 +227,14 @@ Validator classes implement either ```IPxFileStreamValidator``` or ```IPxFileStr
 - encoding (Encoding, optional): Encoding of the px file. Default is Encoding.Default
 - fileSystem (IFileSystem, optional): Object that defines the file system used for the validation process. Default file called LocalFileSystem system is used if none provided.
 
+#### Feedback retention
+All concrete validators provide overloads that accept a `ValidationOptions` instance. By default, validation retains at most 100 feedback items for each filename, feedback level, and rule combination. When a limit is reached, the final retained item is annotated to indicate that additional matching feedback was detected but not logged. Set `MaxFeedbackItemsPerSignature` to a positive number to choose a limit, or use `ValidationOptions.Unlimited` to retain every item.
+
+```csharp
+ValidationOptions options = new() { MaxFeedbackItemsPerSignature = 500 };
+ValidationResult result = validator.Validate(fileStream, "path/to/file.px", Encoding.UTF8, null, options);
+```
+
 #### PxFileValidator : IPxFileStreamValidator, IPxFileStreamValidatorAsync
 ```PxFileValidator``` is a class that validates the whole px file including its data, metadata syntax and metadata contents. The class can be instantiated with the following parameters:
 - conf (PxFileConfiguration, optional): Object that contains px file configuration.
@@ -236,6 +246,7 @@ Once the PxFileValidator object is instantiated, either the Validate or Validate
 	PxFileValidator validator = new PxFileValidator();
 	ValidationResult result = validator.Validate(fileStream, "path/to/file.px", Encoding.UTF8);
 	ValidationResult asyncResult = await validator.ValidateAsync(fileStream, "path/to/file.px", Encoding.UTF8, cancellationToken: cancellationToken);
+    ValidationResult limitedResult = validator.Validate(fileStream, "path/to/file.px", Encoding.UTF8, null, new ValidationOptions { MaxFeedbackItemsPerSignature = 500 });
 ```
 
 #### SyntaxValidator : IPxFileStreamValidator, IPxFileStreamValidatorAsync
@@ -249,6 +260,7 @@ The class can be instantiated with the following parameters:
 	SyntaxValidator validator = new SyntaxValidator();
 	SyntaxValidationResult result = validator.Validate(fileStream, "path/to/file.px", Encoding.UTF8);
 	SyntaxValidationResult asyncResult = await validator.ValidateAsync(fileStream, "path/to/file.px", Encoding.UTF8, cancellationToken: cancellationToken);
+    SyntaxValidationResult limitedResult = validator.Validate(fileStream, "path/to/file.px", Encoding.UTF8, null, ValidationOptions.Unlimited);
 ```
 
 #### ContentValidator : IValidator
@@ -267,6 +279,7 @@ The class can be instantiated with the following parameters:
 	SyntaxValidationResult syntaxResult = syntaxValidator.Validate(fileStream, "path/to/file.px", encoding);
 	ContentValidator validator = new ContentValidator("path/to/file.px", encoding, syntaxResult.Result);
 	ValidationResult result = validator.Validate();
+    ValidationResult limitedResult = validator.Validate(new ValidationOptions { MaxFeedbackItemsPerSignature = 500 });
 ```
 
 #### DataValidator : IPxFileStreamValidator, IPxFileStreamValidatorAsync
@@ -286,6 +299,7 @@ The class can be instantiated with the following parameters:
 	ValidationResult contentResult = contentValidator.Validate();
 	DataValidator validator = new DataValidator(contentResult.DataRowLength, contentResult.DataRowAmount, syntaxResult.DataStartRow);
 	ValidationResult result = validator.Validate(fileStream, "path/to/file.px", encoding);
+    ValidationResult limitedResult = validator.Validate(fileStream, "path/to/file.px", encoding, null, new ValidationOptions { MaxFeedbackItemsPerSignature = 500 });
 ```
 
 #### DatabaseValidator : IValidator, IValidatorAsync
@@ -305,6 +319,7 @@ The database needs to contain alias files for each language used in the database
 	DatabaseValidator validator = new DatabaseValidator("path/to/database");
 	ValidationResult result = validator.Validate();
 	ValidationResult asyncResult = await validator.ValidateAsync(cancellationToken);
+    ValidationResult limitedResult = validator.Validate(new ValidationOptions { MaxFeedbackItemsPerSignature = 500 });
 ```
 
 ### Computing
