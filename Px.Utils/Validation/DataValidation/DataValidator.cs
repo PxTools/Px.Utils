@@ -52,7 +52,13 @@ namespace Px.Utils.Validation.DataValidation
             IFileSystem? fileSystem = null)
         {
             fileSystem ??= new LocalFileSystem();
-            encoding ??= fileSystem.GetEncoding(stream);
+            if (encoding is null)
+            {
+                long originalPosition = stream.Position;
+                encoding = fileSystem.GetEncoding(stream);
+                stream.Position = originalPosition;
+            }
+
             SetValidationParameters(encoding, filename);
 
             ValidationFeedback validationFeedbacks = [];
@@ -105,7 +111,12 @@ namespace Px.Utils.Validation.DataValidation
             ValidationFeedbackSink sink)
         {
             fileSystem ??= new LocalFileSystem();
-            encoding ??= fileSystem.GetEncoding(stream);
+            if (encoding is null)
+            {
+                long originalPosition = stream.Position;
+                encoding = fileSystem.GetEncoding(stream);
+                stream.Position = originalPosition;
+            }
             SetValidationParameters(encoding, filename);
 
             long dataStartIndex = GetStreamIndexOfFirstDataValue(stream);
@@ -156,9 +167,14 @@ namespace Px.Utils.Validation.DataValidation
             CancellationToken cancellationToken = default)
         {
             fileSystem ??= new LocalFileSystem();
-            encoding ??= await fileSystem.GetEncodingAsync(stream, cancellationToken);
+            if (encoding is null)
+            {
+                long originalPosition = stream.Position;
+                encoding = await fileSystem.GetEncodingAsync(stream, cancellationToken);
+                stream.Position = originalPosition;
+            }
             SetValidationParameters(encoding, filename);
-
+            
             long dataStartIndex = GetStreamIndexOfFirstDataValue(stream);
             if (dataStartIndex == -1)
             {
@@ -194,7 +210,12 @@ namespace Px.Utils.Validation.DataValidation
             CancellationToken cancellationToken = default)
         {
             fileSystem ??= new LocalFileSystem();
-            encoding ??= await fileSystem.GetEncodingAsync(stream, cancellationToken);
+            if (encoding is null)
+            {
+                long originalPosition = stream.Position;
+                encoding = await fileSystem.GetEncodingAsync(stream, cancellationToken);
+                stream.Position = originalPosition;
+            }
             SetValidationParameters(encoding, filename);
 
             ValidationFeedback validationFeedbacks = [];

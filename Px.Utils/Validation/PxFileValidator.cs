@@ -92,7 +92,13 @@ namespace Px.Utils.Validation
             IFileSystem? fileSystem,
             ValidationFeedbackSink sink)
         {
-            encoding ??= new LocalFileSystem().GetEncoding(stream);
+            if (encoding is null)
+            {
+                long originalPosition = stream.Position;
+                encoding = new LocalFileSystem().GetEncoding(stream);
+                stream.Position = originalPosition;
+            }
+
             conf ??= PxFileConfiguration.Default;
 
             SyntaxValidator syntaxValidator = new(conf, _customSyntaxValidationFunctions);
@@ -185,7 +191,13 @@ namespace Px.Utils.Validation
             ValidationFeedbackSink sink,
             CancellationToken cancellationToken = default)
         {
-            encoding ??= await new LocalFileSystem().GetEncodingAsync(stream, cancellationToken);
+            if (encoding is null)
+            {
+                long originalPosition = stream.Position;
+                encoding = await new LocalFileSystem().GetEncodingAsync(stream, cancellationToken);
+                stream.Position = originalPosition;
+            }
+
             conf ??= PxFileConfiguration.Default;
 
             SyntaxValidator syntaxValidator = new(conf, _customSyntaxValidationFunctions);

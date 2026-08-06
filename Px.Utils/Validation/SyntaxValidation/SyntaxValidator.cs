@@ -37,7 +37,12 @@ namespace Px.Utils.Validation.SyntaxValidation
             IFileSystem? fileSystem = null)
         {
             fileSystem ??= new LocalFileSystem();
-            encoding ??= fileSystem.GetEncoding(stream);
+            if (encoding is null)
+            {
+                long originalPosition = stream.Position;
+                encoding = fileSystem.GetEncoding(stream);
+                stream.Position = originalPosition;
+            }
 
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
@@ -94,7 +99,12 @@ namespace Px.Utils.Validation.SyntaxValidation
             ValidationFeedbackSink sink)
         {
             fileSystem ??= new LocalFileSystem();
-            encoding ??= fileSystem.GetEncoding(stream);
+            if (encoding is null)
+            {
+                long originalPosition = stream.Position;
+                encoding = fileSystem.GetEncoding(stream);
+                stream.Position = originalPosition;
+            }
 
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
@@ -140,7 +150,12 @@ namespace Px.Utils.Validation.SyntaxValidation
             CancellationToken cancellationToken = default)
         {
             fileSystem ??= new LocalFileSystem();
-            encoding ??= await fileSystem.GetEncodingAsync(stream, cancellationToken);
+            if (encoding is null)
+            {
+                long originalPosition = stream.Position;
+                encoding = await fileSystem.GetEncodingAsync(stream, cancellationToken);
+                stream.Position = originalPosition;
+            }
 
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
@@ -199,7 +214,12 @@ namespace Px.Utils.Validation.SyntaxValidation
             CancellationToken cancellationToken = default)
         {
             fileSystem ??= new LocalFileSystem();
-            encoding ??= await fileSystem.GetEncodingAsync(stream, cancellationToken);
+            if (encoding is null)
+            {
+                long originalPosition = stream.Position;
+                encoding = await fileSystem.GetEncodingAsync(stream, cancellationToken);
+                stream.Position = originalPosition;
+            }
 
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
