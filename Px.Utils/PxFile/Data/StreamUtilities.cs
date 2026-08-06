@@ -109,6 +109,7 @@ namespace Px.Utils.PxFile.Data
 
         private static long FindKeywordPositionImpl(Stream stream, string keyword, PxFileConfiguration conf, int bufferSize)
         {
+            SkipUtf8BomAtStreamOrigin(stream);
             byte[] keywordBytes = Encoding.ASCII.GetBytes(keyword + conf.Symbols.KeywordSeparator);
             byte[] buffer = new byte[bufferSize];
             TopLevelKeywordSearchState state = new(
@@ -170,6 +171,7 @@ namespace Px.Utils.PxFile.Data
 
         private static async Task<long> FindKeywordPositionImplAsync(Stream stream, string keyword, PxFileConfiguration conf, int bufferSize, CancellationToken cancellationToken)
         {
+            await SkipUtf8BomAtStreamOriginAsync(stream, cancellationToken);
             byte[] keywordBytes = Encoding.ASCII.GetBytes(keyword + conf.Symbols.KeywordSeparator);
             byte[] buffer = new byte[bufferSize];
             TopLevelKeywordSearchState state = new(
@@ -207,6 +209,7 @@ namespace Px.Utils.PxFile.Data
 
         private static long FindDataStartPositionImpl(Stream stream, PxFileConfiguration conf, int bufferSize)
         {
+            SkipUtf8BomAtStreamOrigin(stream);
             byte[] dataKeywordBytes = Encoding.ASCII.GetBytes(conf.Tokens.KeyWords.Data);
             byte[] buffer = new byte[bufferSize];
             DataStartSearchState state = new(
@@ -234,6 +237,7 @@ namespace Px.Utils.PxFile.Data
 
         private static async Task<long> FindDataStartPositionImplAsync(Stream stream, PxFileConfiguration conf, int bufferSize, CancellationToken cancellationToken)
         {
+            await SkipUtf8BomAtStreamOriginAsync(stream, cancellationToken);
             byte[] dataKeywordBytes = Encoding.ASCII.GetBytes(conf.Tokens.KeyWords.Data);
             byte[] buffer = new byte[bufferSize];
             DataStartSearchState state = new(
@@ -411,6 +415,36 @@ namespace Px.Utils.PxFile.Data
         private static bool IsWhitespace(byte value)
         {
             return value is CharacterConstants.SPACE or CharacterConstants.HORIZONTALTAB or CharacterConstants.CARRIAGERETURN or CharacterConstants.LINEFEED;
+        }
+
+        private static void SkipUtf8BomAtStreamOrigin(Stream stream)
+        {
+            if (!stream.CanSeek || stream.Position != 0 || stream.Length < Encoding.UTF8.Preamble.Length)
+            {
+                return;
+            }
+
+            Span<byte> prefix = stackalloc byte[Encoding.UTF8.Preamble.Length];
+            int bytesRead = stream.Read(prefix);
+            if (bytesRead != prefix.Length || !prefix.SequenceEqual(Encoding.UTF8.Preamble))
+            {
+                stream.Position = 0;
+            }
+        }
+
+        private static async Task SkipUtf8BomAtStreamOriginAsync(Stream stream, CancellationToken cancellationToken)
+        {
+            if (!stream.CanSeek || stream.Position != 0 || stream.Length < Encoding.UTF8.Preamble.Length)
+            {
+                return;
+            }
+
+            byte[] prefix = new byte[Encoding.UTF8.Preamble.Length];
+            int bytesRead = await stream.ReadAsync(prefix, cancellationToken);
+            if (bytesRead != prefix.Length || !prefix.AsSpan().SequenceEqual(Encoding.UTF8.Preamble))
+            {
+                stream.Position = 0;
+            }
         }
 
         private struct DataStartSearchState(byte[] dataKeywordBytes, byte entrySeparator, byte keywordSeparator, byte stringDelimiter)

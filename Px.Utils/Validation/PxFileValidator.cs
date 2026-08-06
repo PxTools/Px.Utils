@@ -92,10 +92,12 @@ namespace Px.Utils.Validation
             IFileSystem? fileSystem,
             ValidationFeedbackSink sink)
         {
+            fileSystem ??= new LocalFileSystem();
+
             if (encoding is null)
             {
                 long originalPosition = stream.Position;
-                encoding = new LocalFileSystem().GetEncoding(stream);
+                encoding = fileSystem.GetEncoding(stream);
                 stream.Position = originalPosition;
             }
 
@@ -191,10 +193,11 @@ namespace Px.Utils.Validation
             ValidationFeedbackSink sink,
             CancellationToken cancellationToken = default)
         {
+            fileSystem ??= new LocalFileSystem();
             if (encoding is null)
             {
                 long originalPosition = stream.Position;
-                encoding = await new LocalFileSystem().GetEncodingAsync(stream, cancellationToken);
+                encoding = await fileSystem.GetEncodingAsync(stream, cancellationToken);
                 stream.Position = originalPosition;
             }
 
@@ -214,6 +217,7 @@ namespace Px.Utils.Validation
                     new(filename, 0, 0)
                 ));
 
+                stream.Close();
                 return new(sink.ToFeedback());
             }
 

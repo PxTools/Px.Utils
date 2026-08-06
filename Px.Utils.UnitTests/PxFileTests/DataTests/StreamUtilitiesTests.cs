@@ -47,6 +47,61 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public void FindKeywordPositionAtStartOfMetadataReturnsFirstValueOffset()
+        {
+            // Arrange
+            string content = "METADATA=\"FOO\";\r\nDATA=1;";
+            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
+            byte[] data = contentBytes;
+            using Stream stream = new MemoryStream(data);
+            long expectedPosition = Encoding.UTF8.GetByteCount(content[..content.LastIndexOf("METADATA=", StringComparison.Ordinal)]);
+
+            // Act
+            long position = StreamUtilities.FindKeywordPosition(stream, "METADATA", PxFileConfiguration.Default, 2);
+
+            // Assert   
+            Assert.AreEqual(expectedPosition, position);
+        }
+
+        [TestMethod]
+        public async Task FindKeywordPositionAtStreamOriginWithBomReturnsRawKeywordOffset()
+        {
+            // Arrange
+            byte[] bom = Encoding.UTF8.GetPreamble();
+            byte[] data = [.. bom, .. Encoding.UTF8.GetBytes("DATA=1;")];
+            using Stream synchronousStream = new MemoryStream(data);
+            using Stream asynchronousStream = new MemoryStream(data);
+
+            // Act
+            long synchronousPosition = StreamUtilities.FindKeywordPosition(synchronousStream, "DATA", PxFileConfiguration.Default, 2);
+            long asynchronousPosition = await StreamUtilities.FindKeywordPositionAsync(asynchronousStream, "DATA", PxFileConfiguration.Default, TestContext.CancellationToken, 2);
+
+            // Assert
+            Assert.AreEqual(bom.Length, synchronousPosition);
+            Assert.AreEqual(synchronousPosition, asynchronousPosition);
+            Assert.IsGreaterThan(synchronousPosition, synchronousStream.Position);
+            Assert.IsGreaterThan(asynchronousPosition, asynchronousStream.Position);
+        }
+
+        [TestMethod]
+        public void FindKeywordPositionAtStartOfMetadataWithBomReturnsFirstValueOffset()
+        {
+            // Arrange
+            string content = "METADATA=\"FOO\";\r\nDATA=1;";
+            byte[] bom = Encoding.UTF8.GetPreamble();
+            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
+            byte[] data = [.. bom, .. contentBytes];
+            using Stream stream = new MemoryStream(data);
+            long expectedPosition = bom.Length + Encoding.UTF8.GetByteCount(content[..content.LastIndexOf("METADATA=", StringComparison.Ordinal)]);
+
+            // Act
+            long position = StreamUtilities.FindKeywordPosition(stream, "METADATA", PxFileConfiguration.Default, 2);
+
+            // Assert   
+            Assert.AreEqual(expectedPosition, position);
+        }
+
+        [TestMethod]
         [DataRow("1")]
         [DataRow("-1")]
         [DataRow(".5")]
@@ -97,6 +152,25 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public async Task FindDataStartPositionAtStreamOriginWithBomReturnsFirstValueOffset()
+        {
+            // Arrange
+            byte[] bom = Encoding.UTF8.GetPreamble();
+            byte[] data = [.. bom, .. Encoding.UTF8.GetBytes("DATA=\r\n\t1;")];
+            long expectedPosition = bom.Length + "DATA=\r\n\t".Length;
+            using Stream stream = new MemoryStream(data);
+
+            // Act
+            long synchronousPosition = StreamUtilities.FindDataStartPosition(stream, PxFileConfiguration.Default, 2);
+            long asynchronousPosition = await StreamUtilities.FindDataStartPositionAsync(stream, PxFileConfiguration.Default, 2, TestContext.CancellationToken);
+
+            // Assert
+            Assert.AreEqual(expectedPosition, synchronousPosition);
+            Assert.AreEqual(synchronousPosition, asynchronousPosition);
+            Assert.AreEqual(0, stream.Position);
+        }
+
+        [TestMethod]
         public async Task FindKeywordPositionQuotedKeywordWithBomAndMultibyteMetadataReturnsRawTopLevelOffset()
         {
             // Arrange
@@ -118,12 +192,15 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        public async Task FindDataStartPositionUncheckedQuotedKeywordAndWhitespaceReturnsOffsetAndAdvancesStream()
+        [DataRow(false)]
+        [DataRow(true)]
+        public async Task FindDataStartPositionUncheckedQuotedKeywordAndWhitespaceReturnsOffsetAndAdvancesStream(bool includesUtf8Bom)
         {
             // Arrange
             string content = "TITLE=\"DATA=not-an-entry\";\nVALUES=\"Ää\";\nDATA=\r\n\t1 2;";
-            byte[] data = [.. Encoding.UTF8.GetPreamble(), .. Encoding.UTF8.GetBytes(content)];
-            long expectedPosition = Encoding.UTF8.GetPreamble().Length + Encoding.UTF8.GetByteCount(content[..content.IndexOf('1')]);
+            byte[] bom = includesUtf8Bom ? Encoding.UTF8.GetPreamble() : [];
+            byte[] data = [.. bom, .. Encoding.UTF8.GetBytes(content)];
+            long expectedPosition = bom.Length + Encoding.UTF8.GetByteCount(content[..content.IndexOf('1')]);
             using Stream synchronousStream = new MemoryStream(data);
             using Stream asynchronousStream = new MemoryStream(data);
 
