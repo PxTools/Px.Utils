@@ -97,6 +97,65 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public async Task FindKeywordPositionQuotedKeywordWithBomAndMultibyteMetadataReturnsRawTopLevelOffset()
+        {
+            // Arrange
+            string content = "TITLE=\"DATA=not-an-entry\";\nVALUES=\"Ää\";\nDATA=1;";
+            byte[] data = [.. Encoding.UTF8.GetPreamble(), .. Encoding.UTF8.GetBytes(content)];
+            long expectedPosition = Encoding.UTF8.GetPreamble().Length + Encoding.UTF8.GetByteCount(content[..content.LastIndexOf("DATA=", StringComparison.Ordinal)]);
+            using Stream synchronousStream = new MemoryStream(data);
+            using Stream asynchronousStream = new MemoryStream(data);
+
+            // Act
+            long synchronousPosition = StreamUtilities.FindKeywordPosition(synchronousStream, "DATA", PxFileConfiguration.Default, 2);
+            long asynchronousPosition = await StreamUtilities.FindKeywordPositionAsync(asynchronousStream, "DATA", PxFileConfiguration.Default, CancellationToken.None, 2);
+
+            // Assert
+            Assert.AreEqual(expectedPosition, synchronousPosition);
+            Assert.AreEqual(synchronousPosition, asynchronousPosition);
+            Assert.IsGreaterThan(synchronousPosition, synchronousStream.Position);
+            Assert.IsGreaterThan(asynchronousPosition, asynchronousStream.Position);
+        }
+
+        [TestMethod]
+        public async Task FindDataStartPositionUncheckedQuotedKeywordAndWhitespaceReturnsOffsetAndAdvancesStream()
+        {
+            // Arrange
+            string content = "TITLE=\"DATA=not-an-entry\";\nVALUES=\"Ää\";\nDATA=\r\n\t1 2;";
+            byte[] data = [.. Encoding.UTF8.GetPreamble(), .. Encoding.UTF8.GetBytes(content)];
+            long expectedPosition = Encoding.UTF8.GetPreamble().Length + Encoding.UTF8.GetByteCount(content[..content.IndexOf('1')]);
+            using Stream synchronousStream = new MemoryStream(data);
+            using Stream asynchronousStream = new MemoryStream(data);
+
+            // Act
+            long synchronousPosition = StreamUtilities.FindDataStartPositionUnchecked(synchronousStream, PxFileConfiguration.Default, 2);
+            long asynchronousPosition = await StreamUtilities.FindDataStartPositionUncheckedAsync(asynchronousStream, PxFileConfiguration.Default, 2, TestContext.CancellationToken);
+
+            // Assert
+            Assert.AreEqual(expectedPosition, synchronousPosition);
+            Assert.AreEqual(synchronousPosition, asynchronousPosition);
+            Assert.IsGreaterThan(synchronousPosition, synchronousStream.Position);
+            Assert.IsGreaterThan(asynchronousPosition, asynchronousStream.Position);
+        }
+
+        [TestMethod]
+        public async Task FindDataStartPositionUncheckedMissingDataReturnsNegative1()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes("TITLE=\"value\";");
+            using Stream synchronousStream = new MemoryStream(data);
+            using Stream asynchronousStream = new MemoryStream(data);
+
+            // Act
+            long synchronousPosition = StreamUtilities.FindDataStartPositionUnchecked(synchronousStream, PxFileConfiguration.Default, 1);
+            long asynchronousPosition = await StreamUtilities.FindDataStartPositionUncheckedAsync(asynchronousStream, PxFileConfiguration.Default, 1, TestContext.CancellationToken);
+
+            // Assert
+            Assert.AreEqual(-1, synchronousPosition);
+            Assert.AreEqual(synchronousPosition, asynchronousPosition);
+        }
+
+        [TestMethod]
         public void FindDataStartPositionDataWithoutValueReturnsNegative1()
         {
             // Arrange
@@ -124,5 +183,7 @@ namespace PxFileTests.DataTests
             Assert.AreEqual(synchronousPosition, asynchronousPosition);
             Assert.AreEqual(0, stream.Position);
         }
+
+        public TestContext TestContext { get; set; }
     }
 }

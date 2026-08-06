@@ -275,7 +275,7 @@ namespace Px.Utils.PxFile.Data
         private void SetReaderPositionIfZero()
         {
             if (_stream.Position != 0) return;
-            long start = StreamUtilities.FindDataStartPosition(_stream, _conf, _readBufferSize);
+            long start = StreamUtilities.FindDataStartPositionUnchecked(_stream, _conf, _readBufferSize);
             if (start == -1)
             {
                 throw new ArgumentException($"Could not find the first data value after '{_conf.Tokens.KeyWords.Data}='");
@@ -286,7 +286,7 @@ namespace Px.Utils.PxFile.Data
         private async Task SetReaderPositionIfZeroAsync(CancellationToken? cancellationToken = null)
         {
             if (_stream.Position != 0) return;
-            long start = await StreamUtilities.FindDataStartPositionAsync(_stream, _conf, _readBufferSize, cancellationToken ?? CancellationToken.None);
+            long start = await StreamUtilities.FindDataStartPositionUncheckedAsync(_stream, _conf, _readBufferSize, cancellationToken ?? CancellationToken.None);
             if (start == -1)
             {
                 throw new ArgumentException($"Could not find the first data value after '{_conf.Tokens.KeyWords.Data}='");

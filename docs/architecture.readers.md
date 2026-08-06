@@ -32,7 +32,7 @@ void ReadDecimalDataValues(DecimalDataValue[] buffer, int offset, IMatrixMap tar
 Async variants available. Implements `IDisposable`.  
 Depends on: `PxFileConfiguration`.
 
-When constructed at stream position `0`, `PxFileStreamDataReader` locates the first non-whitespace value following the top-level `DATA=` entry before reading. The overload that accepts `dataStart` requires that value's absolute raw byte offset.
+When constructed at stream position `0`, `PxFileStreamDataReader` uses an internal trusted-input locator to find the first non-whitespace value following the top-level `DATA=` entry. This path retains quote-aware top-level matching but assumes that the PX syntax was validated before reading. The overload that accepts `dataStart` requires that value's absolute raw byte offset and avoids a metadata rescan; use a validated `SyntaxValidationResult.DataStartStreamPosition` when one is available.
 
 ### Helpers
 
@@ -40,7 +40,7 @@ When constructed at stream position `0`, `PxFileStreamDataReader` locates the fi
 |---|---|
 | `DataIndexer.cs` | Index mapping between source and target `IMatrixMap` |
 | `DataValueParsers.cs` | Parse raw data values from byte spans |
-| `StreamUtilities.cs` | `FindDataStartPosition` and async equivalent locate the first value after top-level `DATA=` as an absolute raw byte offset, preserving the original position of a seekable stream. `FindKeywordPosition` and async equivalent locate any top-level entry keyword from the current position and leave the stream advanced. |
+| `StreamUtilities.cs` | Public `FindDataStartPosition` and async equivalent are validation-aware: they search from origin, return the first value after top-level `DATA=` as an absolute raw byte offset, and restore the original position of a seekable stream. Internal `FindDataStartPositionUnchecked` equivalents are for validated reader input, search from the current position, and leave the stream advanced. `FindKeywordPosition` and async equivalent locate quote-aware top-level entry keywords from the current position and leave the stream advanced. |
 
 ## Binary Data
 
