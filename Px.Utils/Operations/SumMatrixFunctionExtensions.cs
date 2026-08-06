@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models;
+using Px.Utils.Models;
 using Px.Utils.Models.Metadata;
 using Px.Utils.Models.Metadata.Dimensions;
 using System.Numerics;
@@ -19,6 +19,7 @@ namespace Px.Utils.Operations
         /// <param name="input">The source matrix for the operation</param>
         /// <param name="newValue">This value will be added to the dimension defined by the <paramref name="sumMap"/></param>
         /// <param name="sumMap">Defines the <see cref="Dimension"/> relative to which the sums are calculated. 
+        /// <param name="insertIndex">The index at which to insert the new value. Defaults to -1, which appends the value to the end.</param> 
         /// Also defines which <see cref="DimensionValue"/>s are included in the sum.</param>
         /// <returns>A new <see cref="Matrix{TData}"/> object that contais the results of the additions.</returns>
         public static Matrix<TData> SumToNewValue<TData>(this Matrix<TData> input, DimensionValue newValue, IDimensionMap sumMap, int insertIndex = -1) 
@@ -35,7 +36,8 @@ namespace Px.Utils.Operations
         /// <see cref="IAdditionOperators{TSelf, TOther, TResult}"/> and <see cref="IAdditiveIdentity{TSelf, TResult}"/></typeparam>
         /// <param name="input">The source matrix for the operation</param>
         /// <param name="newValue">This value will be added to the dimension defined by the <paramref name="sumMap"/></param>
-        /// <param name="sumMap">Defines the <see cref="Dimension"/> relative to which the sums are calculated. 
+        /// <param name="sumMap">Defines the <see cref="Dimension"/> relative to which the sums are calculated.
+        /// <param name="insetIndex">The index at which to insert the new value. Defaults to -1, which appends the value to the end.</param>
         /// Also defines which <see cref="DimensionValue"/>s are included in the sum.</param>
         /// <returns>A new <see cref="Matrix{TData}"/> object that contais the results of the additions.</returns>
         public async static Task<Matrix<TData>> SumToNewValueAsync<TData>(this Matrix<TData> input, DimensionValue newValue, IDimensionMap sumMap, int insetIndex = -1)
@@ -52,6 +54,7 @@ namespace Px.Utils.Operations
         /// <param name="input">The source matrix for the operation</param>
         /// <param name="newValue">This value will be added to the dimension defined by the <paramref name="sumMap"/></param>
         /// <param name="sumMap">Defines the <see cref="Dimension"/> relative to which the sums are calculated. 
+        /// <param name="insetIndex">The index at which to insert the new value. Defaults to -1, which appends the value to the end.</param>
         /// Also defines which <see cref="DimensionValue"/>s are included in the sum.</param>
         /// <returns>A new <see cref="Matrix{TData}"/> object that contais the results of the additions.</returns>
         public async static Task<Matrix<TData>> SumToNewValueAsync<TData>(this Task<Matrix<TData>> input, DimensionValue newValue, IDimensionMap sumMap, int insetIndex = -1)

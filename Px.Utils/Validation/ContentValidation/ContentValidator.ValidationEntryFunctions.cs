@@ -25,7 +25,7 @@ namespace Px.Utils.Validation.ContentValidation
         /// <summary>
         /// Validates that given entry does not contain specifiers if it is not allowed to have them based on keyword.
         /// </summary>
-        /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
+        /// <param name="entry">Px file metadata entry represented by a <see cref="ValidationStructuredEntry"/> object</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
         /// <returns>Key value pair containing information about the rule violation is returned if an unexpected specifier is detected.</returns>
         public static ValidationFeedback? ValidateUnexpectedSpecifiers(ValidationStructuredEntry entry, ContentValidator validator)

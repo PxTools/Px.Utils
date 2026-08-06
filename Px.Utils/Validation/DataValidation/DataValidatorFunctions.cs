@@ -1,4 +1,4 @@
-﻿using Px.Utils.PxFile;
+using Px.Utils.PxFile;
 using System.Globalization;
 using System.Text;
 
@@ -32,6 +32,7 @@ namespace Px.Utils.Validation.DataValidation
         /// <param name="encoding">Encoding format of the Px file.</param>
         /// <param name="lineNumber">Line number for the validation item.</param>
         /// <param name="charPos">Represents the position relative to the line for the validation item.</param>
+        /// <param name="filename">The name of the file being validated.</param>
         /// <returns>Key value pair containing information about the rule violation if the entry is not a missing value string sequence, otherwise null.</returns>
         public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, string filename)
         {
@@ -63,6 +64,7 @@ namespace Px.Utils.Validation.DataValidation
         /// <param name="encoding">Encoding format of the Px file.</param>
         /// <param name="lineNumber">Line number for the validation item.</param>
         /// <param name="charPos">Represents the position relative to the line for the validation item.</param>
+        /// <param name="filename">The name of the file being validated.</param>
         /// <returns>Key value pair containing information about the rule violation if the entry is not a valid number, otherwise null.</returns>
         public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, string filename)
         {
@@ -145,6 +147,7 @@ namespace Px.Utils.Validation.DataValidation
         /// <param name="encoding">Encoding format of the Px file.</param>
         /// <param name="lineNumber">Line number for the validation item.</param>
         /// <param name="charPos">Represents the position relative to the line for the validation item.</param>
+        /// <param name="filename">The name of the file being validated.</param>
         /// <returns>Key value pair containing information about the rule violation if the entry is not a valid item separator, otherwise null.</returns>
         public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, string filename)
         {
@@ -188,7 +191,7 @@ namespace Px.Utils.Validation.DataValidation
         /// <param name="encoding">Encoding format of the Px file.</param>
         /// <param name="lineNumber">Line number for the validation item.</param>
         /// <param name="charPos">Represents the position relative to the line for the validation item.</param>
-        /// <param name="feedbacks">Reference to a list of feedback items to which any validation feedback is added to.</param>
+        /// <param name="filename">The name of the file being validated.</param>
         /// <returns>Key value pair containing information about the rule violation if the entry sequence is invalid. Otherwise null.</returns>
         public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(List<byte> entry, EntryType entryType, Encoding encoding, int lineNumber, int charPos, string filename)
         {

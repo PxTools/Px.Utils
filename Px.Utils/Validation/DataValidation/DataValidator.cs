@@ -179,6 +179,7 @@ namespace Px.Utils.Validation.DataValidation
         /// <summary>
         /// Validates the data in the specified stream asynchronously.
         /// Assumes that the stream is at the start of the data section (after 'DATA='-keyword) at the first data item.
+        /// </summary>
         /// <param name="stream">Px file stream to be validated</param>
         /// <param name="filename">Name of the file being validated. If not provided, validator tries to find the encoding.</param>
         /// <param name="encoding">Encoding of the stream.</param>

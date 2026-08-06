@@ -1,4 +1,4 @@
-﻿using Px.Utils.Models;
+using Px.Utils.Models;
 using Px.Utils.Models.Metadata;
 using Px.Utils.Models.Metadata.Dimensions;
 using System.Numerics;
@@ -19,6 +19,7 @@ namespace Px.Utils.Operations
         /// <param name="newValue">This value will be added to the dimension defined by the <paramref name="multiplicationMap"/></param>
         /// <param name="multiplicationMap">Defines the <see cref="Dimension"/> relative to which the products are calculated. 
         /// Also defines which <see cref="DimensionValue"/>s are included in the sum.</param>
+        /// <param name="insertIndex">The index at which to insert the new value. Defaults to -1, which appends the value to the end.</param> 
         /// <returns>A new <see cref="Matrix{TData}"/> object that contais the results of the operation.</returns>
         public static Matrix<TData> MultiplyToNewValue<TData>(this Matrix<TData> input, DimensionValue newValue, IDimensionMap multiplicationMap, int insertIndex = -1) 
             where TData : IMultiplyOperators<TData, TData, TData>, IMultiplicativeIdentity<TData, TData>
@@ -26,7 +27,7 @@ namespace Px.Utils.Operations
             return input.ApplyOverDimension(newValue, multiplicationMap, Multiply, TData.MultiplicativeIdentity, insertIndex);
         }
 
-        
+
         /// <summary>
         /// Asynchronously multiplies the values defined in the <paramref name="multiplicationMap"/> together and places the product in the new value which will be added to the dimension.
         /// </summary>
@@ -36,6 +37,7 @@ namespace Px.Utils.Operations
         /// <param name="newValue">This value will be added to the dimension defined by the <paramref name="multiplicationMap"/></param>
         /// <param name="multiplicationMap">Defines the <see cref="Dimension"/> relative to which the products are calculated. 
         /// Also defines which <see cref="DimensionValue"/>s are included in the sum.</param>
+        /// <param name="insertIndex">The index at which to insert the new value. Defaults to -1, which appends the value to the end.</param>
         /// <returns>A new <see cref="Matrix{TData}"/> object that contais the results of the operation.</returns>
         public async static Task<Matrix<TData>> MultiplyToNewValueAsync<TData>(this Matrix<TData> input, DimensionValue newValue, IDimensionMap multiplicationMap, int insertIndex = -1)
             where TData : IMultiplyOperators<TData, TData, TData>, IMultiplicativeIdentity<TData, TData>
@@ -51,6 +53,7 @@ namespace Px.Utils.Operations
         /// <param name="input">The source matrix for the operation</param>
         /// <param name="newValue">This value will be added to the dimension defined by the <paramref name="multiplicationMap"/></param>
         /// <param name="multiplicationMap">Defines the <see cref="Dimension"/> relative to which the products are calculated. 
+        /// <param name="insertIndex">The index at which to insert the new value. Defaults to -1, which appends the value to the end.</param> 
         /// Also defines which <see cref="DimensionValue"/>s are included in the sum.</param>
         /// <returns>A new <see cref="Matrix{TData}"/> object that contais the results of the operation.</returns>
         public async static Task<Matrix<TData>> MultiplyToNewValueAsync<TData>(this Task<Matrix<TData>> input, DimensionValue newValue, IDimensionMap multiplicationMap, int insertIndex = -1)

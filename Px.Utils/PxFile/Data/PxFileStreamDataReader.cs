@@ -25,6 +25,7 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         /// <param name="stream">Px file stream</param>
         /// <param name="conf">Px file syntax configuration</param>
+        /// <param name="readBufferSize">The size of the buffer used for reading from the stream.</param>
         public PxFileStreamDataReader(Stream stream, PxFileConfiguration? conf = null, int readBufferSize = 4096)
         {
             _stream = stream;
@@ -38,6 +39,7 @@ namespace Px.Utils.PxFile.Data
         /// <param name="stream">Px file stream</param>
         /// <param name="dataStart">Absolute raw byte offset of the first non-whitespace data value after DATA=.</param>
         /// <param name="conf">Px file syntax configuration</param>
+        /// <param name="readBufferSize">The size of the buffer used for reading from the stream.</param>
         public PxFileStreamDataReader(Stream stream, long dataStart, PxFileConfiguration? conf = null, int readBufferSize = 4096)
         {
             _stream = stream;
@@ -244,7 +246,8 @@ namespace Px.Utils.PxFile.Data
         /// </summary>
         /// <param name="buffer">The buffer to store the read values.</param>
         /// <param name="offset">The starting index in the buffer to begin storing the read values.</param>
-        /// <param name="indexer">Provides the indexes where the data will be read.</param>
+        /// <param name="target">Map defining the data to be read. Must be a submap of the <paramref name="complete"/> map.</param>
+        /// <param name="complete">Map defining the complete data set.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
         public async Task ReadDecimalDataValuesAsync(DecimalDataValue[] buffer, int offset, IMatrixMap target, IMatrixMap complete, CancellationToken cancellationToken)
         {

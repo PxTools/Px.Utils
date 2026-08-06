@@ -1,4 +1,4 @@
-﻿namespace Px.Utils.Validation.SyntaxValidation
+namespace Px.Utils.Validation.SyntaxValidation
 {
     /// <summary>
     /// Represents a key for a <see cref="ValidationStructuredEntry"/>. A key consists of a keyword and two optional language and specifier strings.
@@ -50,6 +50,7 @@
     /// <param name="keyStartLineIndex">Index of the line where the entry starts.</param>
     /// <param name="lineChangeIndexes">Character indexes of the line changes in the entry starting from the entry start.</param>
     /// <param name="valueStartIndex">Index of the first character of the value in the entry.</param>
+    /// <param name="valueType">Value type of the value part of the entry, if found.</param>
     public class ValidationStructuredEntry(
         string file,
         ValidationStructuredEntryKey key,

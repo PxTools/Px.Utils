@@ -44,6 +44,7 @@ namespace Px.Utils.Validation.SyntaxValidation
         /// </summary>
         /// <param name="input">The input string to extract from</param>
         /// <param name="startSymbol">Symbol that starts enclosement</param>
+        /// <param name="stringDelimeter">Symbol that encloses a string</param>
         /// <param name="endSymbol">Optional symbol that closes the enclosement. If none given, startSymbol is used for both starting and ending the enclosement</param>
         /// <return>Returns an <see cref="ExtractSectionResult"/> object that contains the extracted sections,
         /// the string that remains after the operation and starting indexes of extracted sections</return>

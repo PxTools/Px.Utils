@@ -9,10 +9,9 @@ namespace Px.Utils.Validation.SyntaxValidation
     /// <summary>
     /// Provides methods for validating the syntax of a PX file. Validation can be done using both synchronous and asynchronous methods.
     /// Additionally custom validation functions can be provided to be used during validation.
+    /// </summary>
     /// <param name="conf">Object that stores syntax specific symbols and tokens for the PX file</param>
     /// <param name="customValidationFunctions">Object that contains any optional additional validation functions</param>
-    /// his is required if multiple validations are executed for the same stream.</param>
-    /// </summary>
     public class SyntaxValidator(
             PxFileConfiguration? conf = null,
             CustomSyntaxValidationFunctions? customValidationFunctions = null) 
