@@ -57,7 +57,11 @@ namespace Px.Utils.PxFile.Data
         {
             byte[] dataKeywordBytes = Encoding.ASCII.GetBytes(conf.Tokens.KeyWords.Data);
             byte[] buffer = new byte[bufferSize];
-            DataStartSearchState state = new();
+            DataStartSearchState state = new(
+                dataKeywordBytes,
+                (byte)conf.Symbols.EntrySeparator,
+                (byte)conf.Symbols.KeywordSeparator,
+                (byte)conf.Symbols.Key.StringDelimeter);
 
             int bytesRead;
             while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
@@ -66,10 +70,6 @@ namespace Px.Utils.PxFile.Data
                 if (TryFindDataStartPosition(
                     buffer.AsSpan(0, bytesRead), 
                     bufferStart,
-                    dataKeywordBytes,
-                    (byte)conf.Symbols.EntrySeparator,
-                    (byte)conf.Symbols.KeywordSeparator, 
-                    (byte)conf.Symbols.Key.StringDelimeter, 
                     ref state, 
                     out long dataStartPosition))
                 {
@@ -84,7 +84,11 @@ namespace Px.Utils.PxFile.Data
         {
             byte[] dataKeywordBytes = Encoding.ASCII.GetBytes(conf.Tokens.KeyWords.Data);
             byte[] buffer = new byte[bufferSize];
-            DataStartSearchState state = new();
+            DataStartSearchState state = new(
+                dataKeywordBytes,
+                (byte)conf.Symbols.EntrySeparator,
+                (byte)conf.Symbols.KeywordSeparator,
+                (byte)conf.Symbols.Key.StringDelimeter);
 
             int bytesRead;
             while ((bytesRead = await stream.ReadAsync(buffer.AsMemory(), cancellationToken)) > 0)
@@ -93,10 +97,6 @@ namespace Px.Utils.PxFile.Data
                 if (TryFindDataStartPosition(
                     buffer.AsSpan(0, bytesRead), 
                     bufferStart, 
-                    dataKeywordBytes, 
-                    (byte)conf.Symbols.EntrySeparator, 
-                    (byte)conf.Symbols.KeywordSeparator, 
-                    (byte)conf.Symbols.Key.StringDelimeter,
                     ref state, 
                     out long dataStartPosition))
                 {
@@ -111,18 +111,19 @@ namespace Px.Utils.PxFile.Data
         private static bool TryFindDataStartPosition(
             ReadOnlySpan<byte> buffer, 
             long bufferStart, 
-            ReadOnlySpan<byte> dataKeywordBytes,
-            byte entrySeparator, 
-            byte keywordSeparator, 
-            byte stringDelimiter, 
             ref DataStartSearchState state, 
             out long dataStartPosition)
         {
             for (int i = 0; i < buffer.Length; i++)
             {
-                if (TryProcessDataStartByte(buffer[i], dataKeywordBytes, entrySeparator, keywordSeparator, stringDelimiter, ref state))
+                if (TryProcessDataStartByte(buffer[i], ref state))
                 {
                     dataStartPosition = bufferStart + i;
+                    return true;
+                }
+                if (state.IsDataEntryEmpty)
+                {
+                    dataStartPosition = -1;
                     return true;
                 }
             }
@@ -132,40 +133,39 @@ namespace Px.Utils.PxFile.Data
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool TryProcessDataStartByte(
-            byte currentByte, 
-            ReadOnlySpan<byte> dataKeywordBytes, 
-            byte entrySeparator, 
-            byte keywordSeparator, 
-            byte stringDelimiter, 
-            ref DataStartSearchState state)
+        private static bool TryProcessDataStartByte(byte currentByte, ref DataStartSearchState state)
         {
             if (state.IsAfterDataKeyword)
             {
+                if (currentByte == state.EntrySeparator)
+                {
+                    state.IsDataEntryEmpty = true;
+                    return false;
+                }
                 return !IsWhitespace(currentByte);
             }
             if (state.IsInString)
             {
-                state.IsInString = currentByte != stringDelimiter;
+                state.IsInString = currentByte != state.StringDelimiter;
                 return false;
             }
-            if (currentByte == stringDelimiter)
+            if (currentByte == state.StringDelimiter)
             {
                 state.IsInString = true;
                 return false;
             }
-            if (currentByte == entrySeparator)
+            if (currentByte == state.EntrySeparator)
             {
                 state.ResetEntry();
                 return false;
             }
             if (state.IsAtEntryStart && IsWhitespace(currentByte)) return false;
-            if (state.IsAtEntryStart && state.MatchedKeywordBytes < dataKeywordBytes.Length && currentByte == dataKeywordBytes[state.MatchedKeywordBytes])
+            if (state.IsAtEntryStart && state.MatchedKeywordBytes < state.DataKeywordBytes.Length && currentByte == state.DataKeywordBytes[state.MatchedKeywordBytes])
             {
                 state.MatchedKeywordBytes++;
                 return false;
             }
-            if (state.MatchedKeywordBytes == dataKeywordBytes.Length && currentByte == keywordSeparator)
+            if (state.MatchedKeywordBytes == state.DataKeywordBytes.Length && currentByte == state.KeywordSeparator)
             {
                 state.IsAfterDataKeyword = true;
                 return false;
@@ -182,17 +182,17 @@ namespace Px.Utils.PxFile.Data
             return value is CharacterConstants.SPACE or CharacterConstants.HORIZONTALTAB or CharacterConstants.CARRIAGERETURN or CharacterConstants.LINEFEED;
         }
 
-        private struct DataStartSearchState
+        private struct DataStartSearchState(byte[] dataKeywordBytes, byte entrySeparator, byte keywordSeparator, byte stringDelimiter)
         {
+            public readonly byte[] DataKeywordBytes = dataKeywordBytes;
+            public readonly byte EntrySeparator = entrySeparator;
+            public readonly byte KeywordSeparator = keywordSeparator;
+            public readonly byte StringDelimiter = stringDelimiter;
             public int MatchedKeywordBytes;
-            public bool IsAtEntryStart;
+            public bool IsAtEntryStart = true;
             public bool IsInString;
             public bool IsAfterDataKeyword;
-
-            public DataStartSearchState()
-            {
-                IsAtEntryStart = true;
-            }
+            public bool IsDataEntryEmpty;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void ResetEntry()

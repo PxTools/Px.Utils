@@ -43,6 +43,8 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// <summary>
         /// Runs database validation using the specified feedback retention options.
         /// </summary>
+        /// <param name="options">Feedback retention options. A positive limit applies per filename, level, and rule; <see langword="null"/> limit retains all feedback.</param>
+        /// <returns>The database validation result with retained feedback.</returns>
         public ValidationResult Validate(ValidationOptions options)
         {
             ValidationFeedbackSink sink = new(options);
@@ -87,6 +89,9 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// <summary>
         /// Runs database validation asynchronously using the specified feedback retention options.
         /// </summary>
+        /// <param name="options">Feedback retention options. A positive limit applies per filename, level, and rule; <see langword="null"/> limit retains all feedback.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that produces the database validation result with retained feedback.</returns>
         public async Task<ValidationResult> ValidateAsync(ValidationOptions options, CancellationToken cancellationToken = default)
         {
             ValidationFeedbackSink sink = new(options);
@@ -424,21 +429,55 @@ namespace Px.Utils.Validation.DatabaseValidation
         }
     }
 
+    /// <summary>
+    /// Represents a database validation item.
+    /// </summary>
+    /// <param name="path">The path of the database validation item.</param>
     public class DatabaseValidationItem(string path)
     {
+        /// <summary>
+        /// Gets the path of the file or directory.
+        /// </summary>
         public string Path { get; } = path;
     }
 
+    /// <summary>
+    /// Represents a px file or alias file within a px file database for validation purposes.
+    /// </summary>
+    /// <param name="name">Name of the file.</param>
+    /// <param name="location">Path of the file's directory.</param>
+    /// <param name="languages">Languages associated with the file.</param>
+    /// <param name="encoding">Encoding of the file.</param>
     public class DatabaseFileInfo(string name, string location, string[] languages, Encoding encoding) : DatabaseValidationItem(name)
     {
+        /// <summary>
+        /// Gets the name of the file.
+        /// </summary>
         public string Name { get; } = name;
+        /// <summary>
+        /// Gets the path of the file's directory.
+        /// </summary>
         public string Location { get; } = location;
+        /// <summary>
+        /// Gets the languages associated with the file.
+        /// </summary>
         public string[] Languages { get; } = languages;
+        /// <summary>
+        /// Gets the encoding of the file.
+        /// </summary>
         public Encoding Encoding { get; } = encoding;
     }
 
+    /// <summary>
+    /// Validator interface for validating a px file database including px files, alias files, and directory structures.
+    /// </summary>
     public interface IDatabaseValidator
     {
+        /// <summary>
+        /// Validates a given <see cref="DatabaseValidationItem"/> and returns a feedback entry if validation fails, or <see langword="null"/> if validation passes.
+        /// </summary>
+        /// <param name="item">The database validation item to validate.</param>
+        /// <returns>A key-value pair representing the validation feedback if validation fails, or <see langword="null"/> if validation passes.</returns>
         public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(DatabaseValidationItem item);
     }
 }

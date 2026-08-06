@@ -57,7 +57,7 @@ The entries need to be in the same key-value format as the output of the ```PxFi
 
 **IMPORTANT!** The target map must have the same order as the complete file map. This is for performance reasons, we do not want to move back and forth in the file or generate a second indexer for placing the data in the buffer.
 
-When the reader is created at stream position `0`, it finds the first non-whitespace data value after the top-level `DATA=` entry automatically. This also works with a UTF-8 BOM and multibyte metadata. The overload that accepts `dataStart` expects the absolute raw byte offset of that first value; use `StreamUtilities.FindDataStartPosition()` or `FindDataStartPositionAsync()` to obtain the offset from a seekable stream. Both helpers restore the original stream position and return `-1` when no data value is found.
+When the reader is created at stream position `0`, it finds the first non-whitespace data value after the top-level `DATA=` entry automatically. This also works with a UTF-8 BOM and multibyte metadata. The overload that accepts `dataStart` expects the absolute raw byte offset of that first value; use `StreamUtilities.FindDataStartPosition()` or `FindDataStartPositionAsync()` to obtain the offset from a seekable stream. Both helpers restore the original stream position and return `-1` when no data value is found, including an explicitly empty entry such as `DATA=;`.
 
 ### Metadata example
 ```csharp

@@ -43,7 +43,7 @@ namespace Px.Utils.TestingApp.Commands
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileValidator validator = new();
-            var result = validator.Validate(stream, TestFilePath, encoding, null, ValidationOptions);
+            validator.Validate(stream, TestFilePath, encoding, null, ValidationOptions);
         }
 
         private async Task ValidatePxFileBenchmarksAsync()

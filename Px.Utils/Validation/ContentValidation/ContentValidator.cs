@@ -96,6 +96,8 @@ namespace Px.Utils.Validation.ContentValidation
         /// <summary>
         /// Validates contents of PX file metadata using the specified feedback retention options.
         /// </summary>
+        /// <param name="options">Feedback retention options. A positive limit applies per filename, level, and rule; <see langword="null"/> limit retains all feedback.</param>
+        /// <returns>The content validation result with retained feedback and calculated data dimensions.</returns>
         public ContentValidationResult Validate(ValidationOptions options)
         {
             ValidationFeedbackSink sink = new(options);
@@ -104,9 +106,39 @@ namespace Px.Utils.Validation.ContentValidation
 
         internal ContentValidationResult Validate(ValidationFeedbackSink sink)
         {
-            ContentValidationResult result = Validate();
-            sink.ReportRange(result.FeedbackItems);
-            return new ContentValidationResult(sink.ToFeedback(), result.DataRowLength, result.DataRowAmount);
+            IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
+            IEnumerable<ContentValidationFindKeywordValidator> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
+
+            if (customContentValidationFunctions is not null)
+            {
+                contentValidationEntryFunctions = contentValidationEntryFunctions.Concat(customContentValidationFunctions.CustomContentValidationEntryFunctions);
+                contentValidationFindKeywordFunctions = contentValidationFindKeywordFunctions.Concat(customContentValidationFunctions.CustomContentValidationFindKeywordFunctions);
+            }
+
+            foreach (ContentValidationFindKeywordValidator findingFunction in contentValidationFindKeywordFunctions)
+            {
+                ValidationFeedback? feedback = findingFunction(entries, this);
+                if (feedback is not null)
+                {
+                    sink.ReportRange(feedback);
+                }
+            }
+            foreach (ContentValidationEntryValidator entryFunction in contentValidationEntryFunctions)
+            {
+                foreach (ValidationStructuredEntry entry in entries)
+                {
+                    ValidationFeedback? feedback = entryFunction(entry, this);
+                    if (feedback is not null)
+                    {
+                        sink.ReportRange(feedback);
+                    }
+                }
+            }
+            int lengthOfDataRows = _headingDimensionNames is not null ? GetProductOfDimensionValues(_headingDimensionNames) : 0;
+            int amountOfDataRows = _stubDimensionNames is not null ? GetProductOfDimensionValues(_stubDimensionNames) : 0;
+            ResetFields();
+
+            return new ContentValidationResult(sink.ToFeedback(), lengthOfDataRows, amountOfDataRows);
         }
 
         #region Interface implementation

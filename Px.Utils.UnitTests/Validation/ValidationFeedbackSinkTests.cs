@@ -19,9 +19,9 @@ namespace Px.Utils.UnitTests.Validation
             ValidationFeedback feedback = sink.ToFeedback();
             List<ValidationFeedbackValue> values = feedback[key];
 
-            Assert.AreEqual(2, values.Count);
-            StringAssert.Contains(values[1].AdditionalInfo, "Original information.");
-            StringAssert.Contains(values[1].AdditionalInfo, "Feedback limit of 2 instances");
+            Assert.HasCount(2, values);
+            Assert.Contains("Original information.", values[1].AdditionalInfo);
+            Assert.Contains("Feedback limit of 2 instances", values[1].AdditionalInfo);
         }
 
         [TestMethod]
@@ -30,11 +30,14 @@ namespace Px.Utils.UnitTests.Validation
             ValidationFeedbackSink sink = new(ValidationOptions.Unlimited);
             ValidationFeedbackKey key = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidChar);
 
-            sink.Report(key, new ValidationFeedbackValue("file.px", 1));
-            sink.Report(key, new ValidationFeedbackValue("file.px", 2));
-            sink.Report(key, new ValidationFeedbackValue("file.px", 3));
+            for (int line = 1; line <= 101; line++)
+            {
+                sink.Report(key, new ValidationFeedbackValue("file.px", line));
+            }
 
-            Assert.AreEqual(3, sink.ToFeedback()[key].Count);
+            List<ValidationFeedbackValue> values = sink.ToFeedback()[key];
+            Assert.HasCount(101, values);
+            Assert.DoesNotContain(value => value.AdditionalInfo?.Contains("Feedback limit", StringComparison.Ordinal) == true, values);
         }
 
         [TestMethod]
@@ -52,7 +55,7 @@ namespace Px.Utils.UnitTests.Validation
             ValidationFeedback feedback = sink.ToFeedback();
 
             Assert.AreEqual(2, feedback[errorKey].Select(value => value.Filename).Distinct(StringComparer.Ordinal).Count());
-            Assert.AreEqual(1, feedback[warningKey].Count);
+            Assert.HasCount(1, feedback[warningKey]);
         }
 
         [TestMethod]

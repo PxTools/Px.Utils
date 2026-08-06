@@ -3,6 +3,7 @@ using System.Text;
 using Px.Utils.UnitTests.Validation.Fixtures;
 using Px.Utils.Validation;
 using Px.Utils.Validation.DataValidation;
+using Px.Utils.PxFile;
 
 namespace Px.Utils.UnitTests.Validation.DataValidationTests
 {
@@ -43,6 +44,39 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
 
             Assert.HasCount(expectedUniqueErrorCount, validationFeedbacks);
             Assert.AreEqual(expectedTotalErrorCount, actualErrorCount);
+        }
+
+        [TestMethod]
+        public async Task ValidateAndValidateAsyncCustomDataKeywordAtStreamOriginFindDataSection()
+        {
+            PxFileConfiguration configuration = PxFileConfiguration.Default;
+            configuration.Tokens.KeyWords.Data = "VALUES";
+            byte[] data = Encoding.UTF8.GetBytes("TITLE=\"test\";VALUES=1;");
+            DataValidator validator = new(1, 0, 0, configuration);
+
+            using Stream synchronousStream = new MemoryStream(data);
+            using Stream asynchronousStream = new MemoryStream(data);
+            ValidationResult synchronousResult = validator.Validate(synchronousStream, "custom.px", Encoding.UTF8);
+            ValidationResult asynchronousResult = await validator.ValidateAsync(asynchronousStream, "custom.px", Encoding.UTF8, cancellationToken: TestContext.CancellationToken);
+
+            ValidationFeedbackKey key = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.StartOfDataSectionNotFound);
+            Assert.IsFalse(synchronousResult.FeedbackItems.ContainsKey(key));
+            Assert.IsFalse(asynchronousResult.FeedbackItems.ContainsKey(key));
+        }
+
+        [TestMethod]
+        public void ValidateWithLimitLargeInvalidDataRetainsOnlyConfiguredFeedbackCount()
+        {
+            const int limit = 3;
+            string invalidData = string.Concat(Enumerable.Repeat("! ", 200)) + ";";
+            using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes("DATA=" + invalidData));
+            DataValidator validator = new(0, 0, 0);
+
+            ValidationResult result = validator.Validate(stream, "invalid.px", Encoding.UTF8, null, new ValidationOptions { MaxFeedbackItemsPerSignature = limit });
+
+            ValidationFeedbackKey key = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidChar);
+            Assert.HasCount(limit, result.FeedbackItems[key]);
+            Assert.Contains("Feedback limit of 3 instances", result.FeedbackItems[key][^1].AdditionalInfo!);
         }
 
         [TestMethod]

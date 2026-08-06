@@ -74,5 +74,21 @@ namespace PxFileTests.DataTests
             // Assert
             Assert.AreEqual(-1, position);
         }
+
+        [TestMethod]
+        [DataRow("DATA=;")]
+        [DataRow("DATA= ;")]
+        [DataRow("DATA=\r\n\t;")]
+        public async Task FindDataStartPositionEmptyDataEntryReturnsNegative1(string content)
+        {
+            using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+
+            long synchronousPosition = StreamUtilities.FindDataStartPosition(stream, PxFileConfiguration.Default, 1);
+            long asynchronousPosition = await StreamUtilities.FindDataStartPositionAsync(stream, PxFileConfiguration.Default, 1);
+
+            Assert.AreEqual(-1, synchronousPosition);
+            Assert.AreEqual(synchronousPosition, asynchronousPosition);
+            Assert.AreEqual(0, stream.Position);
+        }
     }
 }

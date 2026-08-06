@@ -4,12 +4,15 @@ namespace Px.Utils.Validation
 {
     internal sealed class ValidationFeedbackSink
     {
+        private const int DEFAULT_MAX_FEEDBACK_ITEMS_PER_SIGNATURE = 100;
         private readonly ConcurrentDictionary<ValidationFeedbackSignature, FeedbackBucket> _buckets = new(ValidationFeedbackSignatureComparer.Instance);
         private readonly int? _maxFeedbackItemsPerSignature;
 
         public ValidationFeedbackSink(ValidationOptions? options = null)
         {
-            _maxFeedbackItemsPerSignature = options?.MaxFeedbackItemsPerSignature ?? 100;
+            _maxFeedbackItemsPerSignature = options is null
+                ? DEFAULT_MAX_FEEDBACK_ITEMS_PER_SIGNATURE
+                : options.MaxFeedbackItemsPerSignature;
             if (_maxFeedbackItemsPerSignature is <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(options), "The maximum number of feedback items per signature must be positive or unlimited.");
@@ -35,7 +38,8 @@ namespace Px.Utils.Validation
                 if (!bucket.IsTruncated)
                 {
                     ValidationFeedbackValue finalValue = bucket.Values[^1];
-                    string truncationNote = $"Feedback limit of {_maxFeedbackItemsPerSignature.Value} instances for this file, level, and rule was reached. Additional instances were detected but not logged.";
+                    string truncationNote = $"Feedback limit of {_maxFeedbackItemsPerSignature.Value} instances for this file, level, and rule was reached. " +
+                        $"Additional instances were detected but not logged.";
                     string additionalInfo = string.IsNullOrEmpty(finalValue.AdditionalInfo)
                         ? truncationNote
                         : $"{finalValue.AdditionalInfo}{Environment.NewLine}{truncationNote}";

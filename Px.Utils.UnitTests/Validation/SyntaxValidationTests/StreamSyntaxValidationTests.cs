@@ -80,6 +80,24 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
+        public void ValidateWithLimitRepeatedCustomSyntaxFeedbackRetainsOnlyConfiguredCount()
+        {
+            const int limit = 2;
+            List<EntryValidationFunction> entryFunctions = [static (entry, _) => new(
+                new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.MultipleEntriesOnOneLine),
+                new(entry.File, entry.KeyStartLineIndex))];
+            CustomSyntaxValidationFunctions functions = new(entryFunctions, [], []);
+            SyntaxValidator validator = new(customValidationFunctions: functions);
+            using Stream stream = new MemoryStream(Encoding.UTF8.GetBytes("A=1;B=2;C=3;D=4;DATA=1;"));
+
+            SyntaxValidationResult result = validator.Validate(stream, "syntax.px", Encoding.UTF8, null, new ValidationOptions { MaxFeedbackItemsPerSignature = limit });
+
+            ValidationFeedbackKey key = new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.MultipleEntriesOnOneLine);
+            Assert.HasCount(limit, result.FeedbackItems[key]);
+            Assert.Contains("Feedback limit of 2 instances", result.FeedbackItems[key][^1].AdditionalInfo);
+        }
+
+        [TestMethod]
         public void ValidateObjectsCalledWithMultipleEntriesInSingleLineReturnsWithWarnings()
         {
             // Arrange

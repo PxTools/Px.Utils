@@ -50,6 +50,27 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
+        public void ValidateWithLimitRepeatedCustomContentFeedbackRetainsOnlyConfiguredCount()
+        {
+            const int limit = 2;
+            ContentValidationEntryValidator entryValidator = static (entry, _) => new(new(
+                new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ValueIsNotInUpperCase),
+                new(entry.File, entry.KeyStartLineIndex)));
+            CustomContentValidationFunctions functions = new([], [entryValidator]);
+            ValidationStructuredEntry[] entries = [
+                new("content.px", new("ONE", null, null, null), "1", 1, [], 0, null),
+                new("content.px", new("TWO", null, null, null), "2", 2, [], 0, null),
+                new("content.px", new("THREE", null, null, null), "3", 3, [], 0, null)];
+            ContentValidator validator = new("content.px", Encoding.UTF8, entries, functions);
+
+            ContentValidationResult result = validator.Validate(new ValidationOptions { MaxFeedbackItemsPerSignature = limit });
+
+            ValidationFeedbackKey key = new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ValueIsNotInUpperCase);
+            Assert.HasCount(limit, result.FeedbackItems[key]);
+            Assert.Contains("Feedback limit of 2 instances", result.FeedbackItems[key][^1].AdditionalInfo!);
+        }
+
+        [TestMethod]
         public void ValidateCalledWithSharedDimensionNameAcrossLanguagesCalculatesRowCountsFromDefaultLanguage()
         {
             // Arrange

@@ -71,6 +71,12 @@ namespace Px.Utils.Validation
         /// <summary>
         /// Validates the PX file using the specified feedback retention options.
         /// </summary>
+        /// <param name="stream">The PX file stream to validate.</param>
+        /// <param name="filename">The name used in reported feedback.</param>
+        /// <param name="encoding">The PX file encoding, or <see langword="null"/> to detect it.</param>
+        /// <param name="fileSystem">The file system used for encoding detection, or <see langword="null"/> for the default.</param>
+        /// <param name="options">Feedback retention options. A positive limit applies per filename, level, and rule; <see langword="null"/> limit retains all feedback.</param>
+        /// <returns>The complete PX file validation result with retained feedback.</returns>
         public ValidationResult Validate(
             Stream stream,
             string filename,
@@ -155,6 +161,13 @@ namespace Px.Utils.Validation
         /// <summary>
         /// Asynchronously validates the PX file using the specified feedback retention options.
         /// </summary>
+        /// <param name="stream">The PX file stream to validate.</param>
+        /// <param name="filename">The name used in reported feedback.</param>
+        /// <param name="encoding">The PX file encoding, or <see langword="null"/> to detect it.</param>
+        /// <param name="fileSystem">The file system used for encoding detection, or <see langword="null"/> for the default.</param>
+        /// <param name="options">Feedback retention options. A positive limit applies per filename, level, and rule; <see langword="null"/> limit retains all feedback.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that produces the complete PX file validation result with retained feedback.</returns>
         public async Task<ValidationResult> ValidateAsync(
             Stream stream,
             string filename,
