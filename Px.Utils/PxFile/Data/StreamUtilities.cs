@@ -9,6 +9,33 @@ namespace Px.Utils.PxFile.Data
     public static class StreamUtilities
     {
         /// <summary>
+        /// Finds the absolute raw byte offset of the first occurrence of a keyword at the start of a top-level PX entry.
+        /// </summary>
+        /// <param name="stream">The PX file stream to search from its current position.</param>
+        /// <param name="keyword">The keyword to search for.</param>
+        /// <param name="conf">A configuration object that contains PX syntax symbols.</param>
+        /// <param name="bufferSize">The size of the buffer to use when reading from the stream. Defaults to 4096.</param>
+        /// <returns>The absolute raw byte offset of the keyword, or -1 when the keyword cannot be found.</returns>
+        public static long FindKeywordPosition(Stream stream, string keyword, PxFileConfiguration conf, int bufferSize = 4096)
+        {
+            return FindKeywordPositionImpl(stream, keyword, conf, bufferSize);
+        }
+
+        /// <summary>
+        /// Asynchronously finds the absolute raw byte offset of the first occurrence of a keyword at the start of a top-level PX entry.
+        /// </summary>
+        /// <param name="stream">The PX file stream to search from its current position.</param>
+        /// <param name="keyword">The keyword to search for.</param>
+        /// <param name="conf">A configuration object that contains PX syntax symbols.</param>
+        /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+        /// <param name="bufferSize">The size of the buffer to use when reading from the stream. Defaults to 4096.</param>
+        /// <returns>The absolute raw byte offset of the keyword, or -1 when the keyword cannot be found.</returns>
+        public static Task<long> FindKeywordPositionAsync(Stream stream, string keyword, PxFileConfiguration conf, CancellationToken? cancellationToken = null, int bufferSize = 4096)
+        {
+            return FindKeywordPositionImplAsync(stream, keyword, conf, bufferSize, cancellationToken ?? CancellationToken.None);
+        }
+
+        /// <summary>
         /// Finds the absolute raw byte offset of the first non-whitespace data value after a top-level DATA entry.
         /// The stream position is restored before this method returns. Returns -1 when the DATA entry or its first value cannot be found.
         /// </summary>
@@ -51,6 +78,60 @@ namespace Px.Utils.PxFile.Data
             {
                 stream.Position = originalPosition;
             }
+        }
+
+        private static long FindKeywordPositionImpl(Stream stream, string keyword, PxFileConfiguration conf, int bufferSize)
+        {
+            byte[] keywordBytes = Encoding.ASCII.GetBytes(keyword + conf.Symbols.KeywordSeparator);
+            byte[] buffer = new byte[bufferSize];
+            KeywordSearchState state = new(keywordBytes, (byte)conf.Symbols.EntrySeparator);
+
+            int bytesRead;
+            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                long bufferStart = stream.Position - bytesRead;
+                long keywordPosition = FindKeywordPosition(buffer.AsSpan(0, bytesRead), bufferStart, ref state);
+                if (keywordPosition >= 0)
+                {
+                    return keywordPosition;
+                }
+            }
+
+            return -1;
+        }
+
+        private static async Task<long> FindKeywordPositionImplAsync(Stream stream, string keyword, PxFileConfiguration conf, int bufferSize, CancellationToken cancellationToken)
+        {
+            byte[] keywordBytes = Encoding.ASCII.GetBytes(keyword + conf.Symbols.KeywordSeparator);
+            byte[] buffer = new byte[bufferSize];
+            KeywordSearchState state = new(keywordBytes, (byte)conf.Symbols.EntrySeparator);
+
+            int bytesRead;
+            while ((bytesRead = await stream.ReadAsync(buffer.AsMemory(), cancellationToken)) > 0)
+            {
+                long bufferStart = stream.Position - bytesRead;
+                long keywordPosition = FindKeywordPosition(buffer.AsSpan(0, bytesRead), bufferStart, ref state);
+                if (keywordPosition >= 0)
+                {
+                    return keywordPosition;
+                }
+            }
+
+            return -1;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static long FindKeywordPosition(ReadOnlySpan<byte> buffer, long bufferStart, ref KeywordSearchState state)
+        {
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                if (TryProcessKeywordByte(buffer[i], ref state))
+                {
+                    return bufferStart + i - state.KeywordBytes.Length + 1;
+                }
+            }
+
+            return -1;
         }
 
         private static long FindDataStartPositionImpl(Stream stream, PxFileConfiguration conf, int bufferSize)
@@ -156,19 +237,33 @@ namespace Px.Utils.PxFile.Data
             }
             if (currentByte == state.EntrySeparator)
             {
-                state.ResetEntry();
+                state.KeywordSearchState.Reset();
                 return false;
             }
-            if (state.IsAtEntryStart && IsWhitespace(currentByte)) return false;
-            if (state.IsAtEntryStart && state.MatchedKeywordBytes < state.DataKeywordBytes.Length && currentByte == state.DataKeywordBytes[state.MatchedKeywordBytes])
-            {
-                state.MatchedKeywordBytes++;
-                return false;
-            }
-            if (state.MatchedKeywordBytes == state.DataKeywordBytes.Length && currentByte == state.KeywordSeparator)
+            if (TryProcessKeywordByte(currentByte, ref state.KeywordSearchState))
             {
                 state.IsAfterDataKeyword = true;
+            }
+
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool TryProcessKeywordByte(byte currentByte, ref KeywordSearchState state)
+        {
+            if (currentByte == state.EntrySeparator)
+            {
+                state.Reset();
                 return false;
+            }
+            if (!state.IsAtEntryStart || IsWhitespace(currentByte))
+            {
+                return false;
+            }
+            if (state.MatchedKeywordBytes < state.KeywordBytes.Length && currentByte == state.KeywordBytes[state.MatchedKeywordBytes])
+            {
+                state.MatchedKeywordBytes++;
+                return state.MatchedKeywordBytes == state.KeywordBytes.Length;
             }
 
             state.IsAtEntryStart = false;
@@ -184,18 +279,23 @@ namespace Px.Utils.PxFile.Data
 
         private struct DataStartSearchState(byte[] dataKeywordBytes, byte entrySeparator, byte keywordSeparator, byte stringDelimiter)
         {
-            public readonly byte[] DataKeywordBytes = dataKeywordBytes;
             public readonly byte EntrySeparator = entrySeparator;
-            public readonly byte KeywordSeparator = keywordSeparator;
             public readonly byte StringDelimiter = stringDelimiter;
-            public int MatchedKeywordBytes;
-            public bool IsAtEntryStart = true;
+            public KeywordSearchState KeywordSearchState = new([.. dataKeywordBytes, keywordSeparator], entrySeparator);
             public bool IsInString;
             public bool IsAfterDataKeyword;
             public bool IsDataEntryEmpty;
+        }
+
+        private struct KeywordSearchState(byte[] keywordBytes, byte entrySeparator)
+        {
+            public readonly byte[] KeywordBytes = keywordBytes;
+            public readonly byte EntrySeparator = entrySeparator;
+            public int MatchedKeywordBytes;
+            public bool IsAtEntryStart = true;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void ResetEntry()
+            public void Reset()
             {
                 MatchedKeywordBytes = 0;
                 IsAtEntryStart = true;

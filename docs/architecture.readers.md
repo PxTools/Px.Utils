@@ -40,7 +40,7 @@ When constructed at stream position `0`, `PxFileStreamDataReader` locates the fi
 |---|---|
 | `DataIndexer.cs` | Index mapping between source and target `IMatrixMap` |
 | `DataValueParsers.cs` | Parse raw data values from byte spans |
-| `StreamUtilities.cs` | `FindDataStartPosition` and async equivalent locate the first value after top-level `DATA=` as an absolute raw byte offset, preserving the original position of a seekable stream |
+| `StreamUtilities.cs` | `FindDataStartPosition` and async equivalent locate the first value after top-level `DATA=` as an absolute raw byte offset, preserving the original position of a seekable stream. `FindKeywordPosition` and async equivalent locate any top-level entry keyword from the current position and leave the stream advanced. |
 
 ## Binary Data
 

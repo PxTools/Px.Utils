@@ -186,12 +186,12 @@ namespace Px.Utils.TestingApp.Commands
 
         private static ValidationOptions ParseValidationOptions(string value)
         {
-            if (int.TryParse(value, out int limit) && limit > 0)
+            if (!int.TryParse(value, out int limit) || limit <= 0)
             {
-                return new ValidationOptions { MaxFeedbackItemsPerSignature = limit };
+                throw new ArgumentOutOfRangeException(nameof(value), "Feedback limit must be a positive integer.");
             }
 
-            return ValidationOptions.Unlimited;
+            return new ValidationOptions { MaxFeedbackItemsPerSignature = limit };
         }
 
         /// <summary>

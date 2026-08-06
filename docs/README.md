@@ -59,6 +59,8 @@ The entries need to be in the same key-value format as the output of the ```PxFi
 
 When the reader is created at stream position `0`, it finds the first non-whitespace data value after the top-level `DATA=` entry automatically. This also works with a UTF-8 BOM and multibyte metadata. The overload that accepts `dataStart` expects the absolute raw byte offset of that first value; use `StreamUtilities.FindDataStartPosition()` or `FindDataStartPositionAsync()` to obtain the offset from a seekable stream. Both helpers restore the original stream position and return `-1` when no data value is found, including an explicitly empty entry such as `DATA=;`.
 
+`StreamUtilities.FindKeywordPosition()` and `FindKeywordPositionAsync()` locate a specified keyword at the start of a top-level PX entry and return that keyword's raw byte offset. Use `FindDataStartPosition` or `FindDataStartPositionAsync` when locating the first data value after `DATA=`. Unlike the DATA-specific helpers, the generic keyword methods search from the stream's current position and leave it advanced after reading.
+
 ### Metadata example
 ```csharp
     // Read meta

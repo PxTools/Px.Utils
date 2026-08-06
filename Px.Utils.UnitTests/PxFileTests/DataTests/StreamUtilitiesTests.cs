@@ -13,6 +13,40 @@ namespace PxFileTests.DataTests
          */
 
         [TestMethod]
+        public void FindKeywordPositionKeywordSplitAcrossBuffersReturnsKeywordOffset()
+        {
+            // Arrange
+            string content = "TITLE=\"DATA=79\";\r\n  VALUES=\"x\";\r\nDATA=1;";
+            byte[] data = Encoding.UTF8.GetBytes(content);
+            using Stream stream = new MemoryStream(data);
+            long expectedPosition = Encoding.UTF8.GetByteCount(content[..content.LastIndexOf("DATA=", StringComparison.Ordinal)]);
+
+            // Act
+            long position = StreamUtilities.FindKeywordPosition(stream, "DATA", PxFileConfiguration.Default, 3);
+
+            // Assert
+            Assert.AreEqual(expectedPosition, position);
+            Assert.IsTrue(stream.Position > position);
+        }
+
+        [TestMethod]
+        public async Task FindKeywordPositionAsyncKeywordSplitAcrossBuffersReturnsKeywordOffset()
+        {
+            // Arrange
+            string content = "TITLE=\"DATA=79\";\r\n  VALUES=\"x\";\r\nDATA=1;";
+            byte[] data = Encoding.UTF8.GetBytes(content);
+            using Stream stream = new MemoryStream(data);
+            long expectedPosition = Encoding.UTF8.GetByteCount(content[..content.LastIndexOf("DATA=", StringComparison.Ordinal)]);
+
+            // Act
+            long position = await StreamUtilities.FindKeywordPositionAsync(stream, "DATA", PxFileConfiguration.Default, CancellationToken.None, 3);
+
+            // Assert
+            Assert.AreEqual(expectedPosition, position);
+            Assert.IsTrue(stream.Position > position);
+        }
+
+        [TestMethod]
         [DataRow("1")]
         [DataRow("-1")]
         [DataRow(".5")]
