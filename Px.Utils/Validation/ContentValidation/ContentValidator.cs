@@ -101,10 +101,11 @@ namespace Px.Utils.Validation.ContentValidation
         public ContentValidationResult Validate(ValidationOptions options)
         {
             ValidationFeedbackSink sink = new(options);
-            return Validate(sink);
+            ContentValidationOutput output = ValidateIntoSink(sink);
+            return new ContentValidationResult(sink.ToFeedback(), output.DataRowLength, output.DataRowAmount);
         }
 
-        internal ContentValidationResult Validate(ValidationFeedbackSink sink)
+        internal ContentValidationOutput ValidateIntoSink(ValidationFeedbackSink sink)
         {
             IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
             IEnumerable<ContentValidationFindKeywordValidator> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
@@ -138,7 +139,7 @@ namespace Px.Utils.Validation.ContentValidation
             int amountOfDataRows = _stubDimensionNames is not null ? GetProductOfDimensionValues(_stubDimensionNames) : 0;
             ResetFields();
 
-            return new ContentValidationResult(sink.ToFeedback(), lengthOfDataRows, amountOfDataRows);
+            return new ContentValidationOutput(lengthOfDataRows, amountOfDataRows);
         }
 
         #region Interface implementation

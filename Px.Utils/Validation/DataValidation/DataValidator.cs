@@ -100,10 +100,11 @@ namespace Px.Utils.Validation.DataValidation
             ValidationOptions options)
         {
             ValidationFeedbackSink sink = new(options);
-            return Validate(stream, filename, encoding, fileSystem, sink);
+            ValidateIntoSink(stream, filename, encoding, fileSystem, sink);
+            return new ValidationResult(sink.ToFeedback());
         }
 
-        internal ValidationResult Validate(
+        internal void ValidateIntoSink(
             Stream stream,
             string filename,
             Encoding? encoding,
@@ -126,14 +127,12 @@ namespace Px.Utils.Validation.DataValidation
                     new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.StartOfDataSectionNotFound),
                     new(filename, 0, 0)));
                 ResetValidator();
-                return new ValidationResult(sink.ToFeedback());
+                return;
             }
 
             stream.Position = dataStartIndex;
             ValidateDataStream(stream, sink);
             ResetValidator();
-
-            return new ValidationResult(sink.ToFeedback());
         }
 
         /// <summary>
@@ -155,40 +154,7 @@ namespace Px.Utils.Validation.DataValidation
             CancellationToken cancellationToken = default)
         {
             ValidationFeedbackSink sink = new(options);
-            return await ValidateAsync(stream, filename, encoding, fileSystem, sink, cancellationToken);
-        }
-
-        internal async Task<ValidationResult> ValidateAsync(
-            Stream stream,
-            string filename,
-            Encoding? encoding,
-            IFileSystem? fileSystem,
-            ValidationFeedbackSink sink,
-            CancellationToken cancellationToken = default)
-        {
-            fileSystem ??= new LocalFileSystem();
-            if (encoding is null)
-            {
-                long originalPosition = stream.Position;
-                encoding = await fileSystem.GetEncodingAsync(stream, cancellationToken);
-                stream.Position = originalPosition;
-            }
-            SetValidationParameters(encoding, filename);
-            
-            long dataStartIndex = GetStreamIndexOfFirstDataValue(stream);
-            if (dataStartIndex == -1)
-            {
-                sink.Report(new(
-                    new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.StartOfDataSectionNotFound),
-                    new(filename, 0, 0)));
-                ResetValidator();
-                return new ValidationResult(sink.ToFeedback());
-            }
-
-            stream.Position = dataStartIndex;
-            await Task.Factory.StartNew(() => ValidateDataStream(stream, sink, cancellationToken), cancellationToken);
-            ResetValidator();
-
+            await ValidateIntoSinkAsync(stream, filename, encoding, fileSystem, sink, cancellationToken);
             return new ValidationResult(sink.ToFeedback());
         }
 
@@ -238,6 +204,38 @@ namespace Px.Utils.Validation.DataValidation
             ResetValidator();
 
             return new(validationFeedbacks);
+        }
+
+        internal async Task ValidateIntoSinkAsync(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            ValidationFeedbackSink sink,
+            CancellationToken cancellationToken = default)
+        {
+            fileSystem ??= new LocalFileSystem();
+            if (encoding is null)
+            {
+                long originalPosition = stream.Position;
+                encoding = await fileSystem.GetEncodingAsync(stream, cancellationToken);
+                stream.Position = originalPosition;
+            }
+            SetValidationParameters(encoding, filename);
+            
+            long dataStartIndex = GetStreamIndexOfFirstDataValue(stream);
+            if (dataStartIndex == -1)
+            {
+                sink.Report(new(
+                    new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.StartOfDataSectionNotFound),
+                    new(filename, 0, 0)));
+                ResetValidator();
+                return;
+            }
+
+            stream.Position = dataStartIndex;
+            await Task.Factory.StartNew(() => ValidateDataStream(stream, sink, cancellationToken), cancellationToken);
+            ResetValidator();
         }
 
         private void SetValidationParameters(Encoding encoding, string filename)

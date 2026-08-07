@@ -88,10 +88,11 @@ namespace Px.Utils.Validation.SyntaxValidation
             ValidationOptions options)
         {
             ValidationFeedbackSink sink = new(options);
-            return Validate(stream, filename, encoding, fileSystem, sink);
+            SyntaxValidationOutput output = ValidateIntoSink(stream, filename, encoding, fileSystem, sink);
+            return new SyntaxValidationResult(sink.ToFeedback(), output.StructuredEntries, output.DataStartRow, output.DataStartStreamPosition);
         }
 
-        internal SyntaxValidationResult Validate(
+        internal SyntaxValidationOutput ValidateIntoSink(
             Stream stream,
             string filename,
             Encoding? encoding,
@@ -129,7 +130,7 @@ namespace Px.Utils.Validation.SyntaxValidation
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, conf);
             ReportStructuredFeedback(structuredEntries, structuredValidationFunctions, conf, sink);
 
-            return new SyntaxValidationResult(sink.ToFeedback(), structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
+            return new SyntaxValidationOutput(structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
         }
 
         /// <summary>
@@ -202,10 +203,11 @@ namespace Px.Utils.Validation.SyntaxValidation
             CancellationToken cancellationToken = default)
         {
             ValidationFeedbackSink sink = new(options);
-            return await ValidateAsync(stream, filename, encoding, fileSystem, sink, cancellationToken);
+            SyntaxValidationOutput output = await ValidateIntoSinkAsync(stream, filename, encoding, fileSystem, sink, cancellationToken);
+            return new SyntaxValidationResult(sink.ToFeedback(), output.StructuredEntries, output.DataStartRow, output.DataStartStreamPosition);
         }
 
-        internal async Task<SyntaxValidationResult> ValidateAsync(
+        internal async Task<SyntaxValidationOutput> ValidateIntoSinkAsync(
             Stream stream,
             string filename,
             Encoding? encoding,
@@ -243,7 +245,7 @@ namespace Px.Utils.Validation.SyntaxValidation
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, conf);
             ReportStructuredFeedback(structuredEntries, structuredValidationFunctions, conf, sink);
 
-            return new SyntaxValidationResult(sink.ToFeedback(), structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
+            return new SyntaxValidationOutput(structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
         }
 
         #region Interface implementation
