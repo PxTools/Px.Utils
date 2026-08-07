@@ -41,6 +41,12 @@ The read pipeline consists of the following components: Reading the metadata, bu
 Each of these components can be used separately and replaced with custom implementations.
 Especially if the contents of your px-files do not follow the standard px-file format, you might need to implement your own metadata builder.
 
+### Supported text encodings
+
+Px.Utils supports ASCII-compatible single-byte encodings, including ANSI code pages specified through `CODEPAGE`, and UTF-8. UTF-8 files may be provided with or without a BOM. UTF-8 metadata may contain multibyte characters.
+
+UTF-16 and UTF-32, in either byte order and with or without a BOM, are not supported for full PX file reading or validation.
+
 #### PxFileMetadataReader : IPxFileMetadataReader
 ```ReadMetadata(Stream stream, Encoding encoding)``` reads the metadata entries from the provided stream as a IEnumerable of ```KeyValuePair<string, string>``` representing the keys and values of the entries.
 **This method does not perform any validation on the metadata entries.**

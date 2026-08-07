@@ -2,6 +2,12 @@
 
 Purpose of this document is to describe the syntax and content requirements for the pxfiles supported by this library. These requirements do not necessarily apply to other implementations of the pxfile format.
 
+## Supported text encodings
+
+Supported PX file encodings are ASCII-compatible single-byte encodings, including ANSI code pages declared through `CODEPAGE`, and UTF-8. UTF-8 files may include a BOM or omit it, and metadata strings may contain multibyte UTF-8 characters.
+
+UTF-16 and UTF-32 are not supported, regardless of byte order or BOM presence.
+
 ## Syntax
 
 ### Entries
