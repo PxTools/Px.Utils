@@ -36,39 +36,9 @@ namespace Px.Utils.Validation.SyntaxValidation
             Encoding? encoding = null,
             IFileSystem? fileSystem = null)
         {
-            fileSystem ??= new LocalFileSystem();
-            if (encoding is null)
-            {
-                long originalPosition = stream.Position;
-                encoding = fileSystem.GetEncoding(stream);
-                stream.Position = originalPosition;
-            }
-
-            SyntaxValidationFunctions validationFunctions = new();
-            IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
-            IEnumerable<KeyValuePairValidationFunction> keyValueValidationFunctions = validationFunctions.DefaultKeyValueValidationFunctions;
-            IEnumerable<StructuredValidationFunction> structuredValidationFunctions = validationFunctions.DefaultStructuredValidationFunctions;
-
-            if (customValidationFunctions is not null)
-            {
-                stringValidationFunctions = stringValidationFunctions.Concat(customValidationFunctions.CustomStringValidationFunctions);
-                keyValueValidationFunctions = keyValueValidationFunctions.Concat(customValidationFunctions.CustomKeyValueValidationFunctions);
-                structuredValidationFunctions = structuredValidationFunctions.Concat(customValidationFunctions.CustomStructuredValidationFunctions);
-            }
-
-            conf ??= PxFileConfiguration.Default;
-            ResetDataSectionPosition();
-            _dataSectionStartStreamPosition = StreamUtilities.FindDataStartPosition(stream, conf, _bufferSize);
-
-            ValidationFeedback validationFeedbacks = [];
-            List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, conf, filename, _bufferSize);
-            validationFeedbacks.AddRange(ValidateEntries(stringEntries, stringValidationFunctions, conf));
-            List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(stringEntries, conf);
-            validationFeedbacks.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, conf));
-            List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, conf);
-            validationFeedbacks.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, conf));
-
-            return new SyntaxValidationResult(validationFeedbacks, structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
+            ValidationFeedbackSink sink = new();
+            SyntaxValidationOutput output = ValidateIntoSink(stream, filename, encoding, fileSystem, sink);
+            return new SyntaxValidationResult(sink.ToFeedback(), output.StructuredEntries, output.DataStartRow, output.DataStartStreamPosition);
         }
 
         /// <summary>
@@ -150,38 +120,9 @@ namespace Px.Utils.Validation.SyntaxValidation
             IFileSystem? fileSystem = null,
             CancellationToken cancellationToken = default)
         {
-            fileSystem ??= new LocalFileSystem();
-            if (encoding is null)
-            {
-                long originalPosition = stream.Position;
-                encoding = await fileSystem.GetEncodingAsync(stream, cancellationToken);
-                stream.Position = originalPosition;
-            }
-
-            SyntaxValidationFunctions validationFunctions = new();
-            IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
-            IEnumerable<KeyValuePairValidationFunction> keyValueValidationFunctions = validationFunctions.DefaultKeyValueValidationFunctions;
-            IEnumerable<StructuredValidationFunction> structuredValidationFunctions = validationFunctions.DefaultStructuredValidationFunctions;
-
-            if (customValidationFunctions is not null)
-            {
-                stringValidationFunctions = stringValidationFunctions.Concat(customValidationFunctions.CustomStringValidationFunctions);
-                keyValueValidationFunctions = keyValueValidationFunctions.Concat(customValidationFunctions.CustomKeyValueValidationFunctions);
-                structuredValidationFunctions = structuredValidationFunctions.Concat(customValidationFunctions.CustomStructuredValidationFunctions);
-            }
-
-            conf ??= PxFileConfiguration.Default;
-            ResetDataSectionPosition();
-            _dataSectionStartStreamPosition = await StreamUtilities.FindDataStartPositionAsync(stream, conf, _bufferSize, cancellationToken);
-            ValidationFeedback validationFeedbacks = [];
-            List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, conf, filename, _bufferSize, cancellationToken);
-            validationFeedbacks.AddRange(ValidateEntries(entries, stringValidationFunctions, conf));
-            List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, conf);
-            validationFeedbacks.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, conf));
-            List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, conf);
-            validationFeedbacks.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, conf));
-
-            return new SyntaxValidationResult(validationFeedbacks, structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
+            ValidationFeedbackSink sink = new();
+            SyntaxValidationOutput output = await ValidateIntoSinkAsync(stream, filename, encoding, fileSystem, sink, cancellationToken);
+            return new SyntaxValidationResult(sink.ToFeedback(), output.StructuredEntries, output.DataStartRow, output.DataStartStreamPosition);
         }
 
         /// <summary>
@@ -283,23 +224,6 @@ namespace Px.Utils.Validation.SyntaxValidation
             return false;
         }
 
-        private static ValidationFeedback ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunction> validationFunctions, PxFileConfiguration syntaxConf)
-        {
-            ValidationFeedback validationFeedback = [];
-            foreach (ValidationEntry entry in entries)
-            {
-                foreach (EntryValidationFunction function in validationFunctions)
-                {
-                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = function(entry, syntaxConf);
-                    if (feedback is not null)
-                    {
-                        validationFeedback.Add((KeyValuePair <ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
-                    }
-                }
-            }
-            return validationFeedback;
-        }
-
         private static void ReportEntryFeedback(
             IEnumerable<ValidationEntry> entries,
             IEnumerable<EntryValidationFunction> validationFunctions,
@@ -319,26 +243,6 @@ namespace Px.Utils.Validation.SyntaxValidation
             }
         }
 
-        private static ValidationFeedback ValidateKeyValuePairs(
-            IEnumerable<ValidationKeyValuePair> kvpObjects,
-            IEnumerable<KeyValuePairValidationFunction> validationFunctions,
-            PxFileConfiguration syntaxConf)
-        {
-            ValidationFeedback validationFeedback = [];
-            foreach (ValidationKeyValuePair kvpObject in kvpObjects)
-            {
-                foreach (KeyValuePairValidationFunction function in validationFunctions)
-                {
-                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = function(kvpObject, syntaxConf);
-                    if (feedback is not null)
-                    {
-                        validationFeedback.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
-                    }
-                }
-            }
-            return validationFeedback;
-        }
-
         private static void ReportKeyValuePairFeedback(
             IEnumerable<ValidationKeyValuePair> kvpObjects,
             IEnumerable<KeyValuePairValidationFunction> validationFunctions,
@@ -356,26 +260,6 @@ namespace Px.Utils.Validation.SyntaxValidation
                     }
                 }
             }
-        }
-
-        private static ValidationFeedback ValidateStructs(
-            IEnumerable<ValidationStructuredEntry> structuredEntries, 
-            IEnumerable<StructuredValidationFunction> validationFunctions,
-            PxFileConfiguration syntaxConf)
-        {
-            ValidationFeedback validationFeedback = [];
-            foreach (ValidationStructuredEntry structuredEntry in structuredEntries)
-            {
-                foreach (StructuredValidationFunction function in validationFunctions)
-                {
-                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = function(structuredEntry, syntaxConf);
-                    if (feedback is not null)
-                    {
-                        validationFeedback.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
-                    }
-                }
-            }
-            return validationFeedback;
         }
 
         private static void ReportStructuredFeedback(

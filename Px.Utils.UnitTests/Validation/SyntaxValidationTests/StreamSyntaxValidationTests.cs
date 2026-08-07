@@ -23,13 +23,52 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
         public void Initialize()
         {
             entryValidationMethod = typeof(SyntaxValidator)
-                .GetMethod("ValidateEntries", BindingFlags.NonPublic | BindingFlags.Static);
+                .GetMethod("ReportEntryFeedback", BindingFlags.NonPublic | BindingFlags.Static);
             kvpValidationMethod = typeof(SyntaxValidator)
-                .GetMethod("ValidateKeyValuePairs", BindingFlags.NonPublic | BindingFlags.Static);
+                .GetMethod("ReportKeyValuePairFeedback", BindingFlags.NonPublic | BindingFlags.Static);
             structuredValidationMethod = typeof(SyntaxValidator)
-                .GetMethod("ValidateStructs", BindingFlags.NonPublic | BindingFlags.Static);
+                .GetMethod("ReportStructuredFeedback", BindingFlags.NonPublic | BindingFlags.Static);
             getValueTypeFromStringMethod = typeof(SyntaxValidationUtilityMethods)
                 .GetMethod("GetValueTypeFromString", BindingFlags.NonPublic | BindingFlags.Static);
+        }
+
+        private ValidationFeedback ReportEntryFeedback(
+            IEnumerable<ValidationEntry> entries,
+            IEnumerable<EntryValidationFunction> functions)
+        {
+            object sink = CreateFeedbackSink();
+            entryValidationMethod!.Invoke(null, [entries, functions, conf, sink]);
+            return GetFeedback(sink);
+        }
+
+        private ValidationFeedback ReportKeyValuePairFeedback(
+            IEnumerable<ValidationKeyValuePair> keyValuePairs,
+            IEnumerable<KeyValuePairValidationFunction> functions)
+        {
+            object sink = CreateFeedbackSink();
+            kvpValidationMethod!.Invoke(null, [keyValuePairs, functions, conf, sink]);
+            return GetFeedback(sink);
+        }
+
+        private ValidationFeedback ReportStructuredFeedback(
+            IEnumerable<ValidationStructuredEntry> structuredEntries,
+            IEnumerable<StructuredValidationFunction> functions)
+        {
+            object sink = CreateFeedbackSink();
+            structuredValidationMethod!.Invoke(null, [structuredEntries, functions, conf, sink]);
+            return GetFeedback(sink);
+        }
+
+        private static object CreateFeedbackSink()
+        {
+            Type sinkType = typeof(SyntaxValidator).Assembly.GetType("Px.Utils.Validation.ValidationFeedbackSink")!;
+            return Activator.CreateInstance(sinkType, [null])!;
+        }
+
+        private static ValidationFeedback GetFeedback(object sink)
+        {
+            MethodInfo toFeedbackMethod = sink.GetType().GetMethod("ToFeedback")!;
+            return (ValidationFeedback)toFeedbackMethod.Invoke(sink, null)!;
         }
 
         [TestMethod]
@@ -98,6 +137,29 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
         }
 
         [TestMethod]
+        public async Task ValidateDefaultOverloadsRepeatedCustomSyntaxFeedbackRetainDefaultFeedbackCount()
+        {
+            List<EntryValidationFunction> entryFunctions = [static (entry, _) => new(
+                new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.MultipleEntriesOnOneLine),
+                new(entry.File, entry.KeyStartLineIndex))];
+            CustomSyntaxValidationFunctions functions = new(entryFunctions, [], []);
+            byte[] data = Encoding.UTF8.GetBytes(string.Concat(Enumerable.Range(1, 101).Select(index => $"A{index}=1;")) + "DATA=1;");
+            using Stream synchronousStream = new MemoryStream(data);
+            using Stream asynchronousStream = new MemoryStream(data);
+            SyntaxValidator synchronousValidator = new(customValidationFunctions: functions);
+            SyntaxValidator asynchronousValidator = new(customValidationFunctions: functions);
+
+            SyntaxValidationResult synchronousResult = synchronousValidator.Validate(synchronousStream, "syntax.px", Encoding.UTF8);
+            SyntaxValidationResult asynchronousResult = await asynchronousValidator.ValidateAsync(asynchronousStream, "syntax.px", Encoding.UTF8);
+
+            ValidationFeedbackKey key = new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.MultipleEntriesOnOneLine);
+            Assert.HasCount(100, synchronousResult.FeedbackItems[key]);
+            Assert.Contains("Feedback limit of 100 instances", synchronousResult.FeedbackItems[key][^1].AdditionalInfo!);
+            Assert.HasCount(100, asynchronousResult.FeedbackItems[key]);
+            Assert.Contains("Feedback limit of 100 instances", asynchronousResult.FeedbackItems[key][^1].AdditionalInfo!);
+        }
+
+        [TestMethod]
         public void ValidateObjectsCalledWithMultipleEntriesInSingleLineReturnsWithWarnings()
         {
             // Arrange
@@ -105,7 +167,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<EntryValidationFunction> functions = [SyntaxValidationFunctions.MultipleEntriesOnLine];
 
             // Act
-            feedback = entryValidationMethod?.Invoke(null, [entries, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportEntryFeedback(entries, functions);
 
             Assert.HasCount(1, feedback);
             Assert.HasCount(2, feedback.First().Value);
@@ -175,7 +237,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.MoreThanOneLanguageParameter];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportKeyValuePairFeedback(keyValuePairs, functions);
 
             Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.MoreThanOneLanguageParameterSection, feedback.First().Key.Rule);
@@ -190,7 +252,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.MoreThanOneSpecifierParameter];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportKeyValuePairFeedback(keyValuePairs, functions);
 
             Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.MoreThanOneSpecifierParameterSection, feedback.First().Key.Rule);
@@ -204,7 +266,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.WrongKeyOrderOrMissingKeyword];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportKeyValuePairFeedback(keyValuePairs, functions);
 
             Assert.HasCount(2, feedback);
             Assert.IsTrue(feedback.ContainsKey(new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.KeyHasWrongOrder)));
@@ -226,7 +288,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             ValidationFeedbackKey notEnclosedFeedbackKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.SpecifierPartNotEnclosed);
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportKeyValuePairFeedback(keyValuePairs, functions);
 
             Assert.HasCount(3, feedback);
             Assert.IsTrue(feedback.ContainsKey(missingDelimeterFeedbackKey));
@@ -243,7 +305,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.IllegalSymbolsInLanguageParamSection];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportKeyValuePairFeedback(keyValuePairs, functions);
 
             Assert.HasCount(1, feedback);
             Assert.HasCount(3, feedback.First().Value);
@@ -258,7 +320,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.IllegalCharactersInSpecifierSection];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportKeyValuePairFeedback(keyValuePairs, functions);
 
             Assert.HasCount(1, feedback);
             Assert.HasCount(3, feedback.First().Value);
@@ -273,7 +335,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.InvalidValueFormat];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportKeyValuePairFeedback(keyValuePairs, functions);
 
             Assert.HasCount(1, feedback);
             Assert.HasCount(4, feedback.First().Value);
@@ -288,7 +350,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.ExcessWhitespaceInValue];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportKeyValuePairFeedback(keyValuePairs, functions);
 
             Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.ExcessWhitespaceInValue, feedback.First().Key.Rule);
@@ -302,7 +364,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.KeyContainsExcessWhiteSpace];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportKeyValuePairFeedback(keyValuePairs, functions);
 
             Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.KeyContainsExcessWhiteSpace, feedback.First().Key.Rule);
@@ -316,7 +378,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.ExcessNewLinesInValue];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportKeyValuePairFeedback(keyValuePairs, functions);
 
             Assert.HasCount(1, feedback);
             Assert.HasCount(2, feedback.First().Value);
@@ -333,7 +395,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             ValidationFeedbackKey illegalCharactersFeedbackKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.IllegalCharactersInKeyword);
 
             // Act
-            feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportStructuredFeedback(structuredEntries, functions);
 
             Assert.HasCount(2, feedback);
             Assert.IsTrue(feedback.ContainsKey(startWithletterFeedbackKey));
@@ -349,7 +411,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<StructuredValidationFunction> functions = [SyntaxValidationFunctions.IllegalCharactersInLanguageParameter];
 
             // Act
-            feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportStructuredFeedback(structuredEntries, functions);
 
             Assert.HasCount(0, feedback);
         }
@@ -362,7 +424,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<StructuredValidationFunction> functions = [SyntaxValidationFunctions.IllegalCharactersInLanguageParameter];
 
             // Act
-            feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportStructuredFeedback(structuredEntries, functions);
 
             Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInLanguageSection, feedback.First().Key.Rule);
@@ -376,7 +438,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<StructuredValidationFunction> functions = [SyntaxValidationFunctions.IllegalCharactersInSpecifierParts];
 
             // Act
-            feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportStructuredFeedback(structuredEntries, functions);
 
             Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.IllegalCharactersInSpecifierPart, feedback.First().Key.Rule);
@@ -390,7 +452,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<EntryValidationFunction> functions = [SyntaxValidationFunctions.EntryWithoutValue];
 
             // Act
-            feedback = entryValidationMethod?.Invoke(null, [entries, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportEntryFeedback(entries, functions);
 
             Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.EntryWithoutValue, feedback.First().Key.Rule);
@@ -404,7 +466,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<StructuredValidationFunction> functions = [SyntaxValidationFunctions.IncompliantLanguage];
 
             // Act
-            feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf] ) as ValidationFeedback ?? [];
+            feedback = ReportStructuredFeedback(structuredEntries, functions);
 
             Assert.HasCount(1, feedback);
             Assert.HasCount(2, feedback.First().Value);
@@ -419,7 +481,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<StructuredValidationFunction> functions = [SyntaxValidationFunctions.KeywordContainsUnderscore, SyntaxValidationFunctions.KeywordIsNotInUpperCase];
 
             // Act
-            feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf] ) as ValidationFeedback ?? [];
+            feedback = ReportStructuredFeedback(structuredEntries, functions);
 
             Assert.HasCount(2, feedback);
             Assert.IsTrue(feedback.ContainsKey(new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.KeywordIsNotInUpperCase)));
@@ -434,7 +496,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<StructuredValidationFunction> functions = [SyntaxValidationFunctions.KeywordIsExcessivelyLong];
 
             // Act
-            feedback = structuredValidationMethod?.Invoke(null, [structuredEntries, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportStructuredFeedback(structuredEntries, functions);
 
             Assert.HasCount(1, feedback);
             Assert.AreEqual(ValidationFeedbackRule.KeywordExcessivelyLong, feedback.First().Key.Rule);
@@ -453,7 +515,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.InvalidValueFormat];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportKeyValuePairFeedback(keyValuePairs, functions);
             Utils.Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, [keyValuePairs[0].KeyValuePair.Value, PxFileConfiguration.Default]) as Utils.Validation.ValueType?;
 
             // Assert
@@ -484,7 +546,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.InvalidValueFormat];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportKeyValuePairFeedback(keyValuePairs, functions);
             Utils.Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, [keyValuePairs[0].KeyValuePair.Value, PxFileConfiguration.Default]) as Utils.Validation.ValueType?;
 
             // Assert
@@ -514,7 +576,7 @@ namespace Px.Utils.UnitTests.SyntaxValidationTests
             List<KeyValuePairValidationFunction> functions = [SyntaxValidationFunctions.InvalidValueFormat];
 
             // Act
-            feedback = kvpValidationMethod?.Invoke(null, [keyValuePairs, functions, conf]) as ValidationFeedback ?? [];
+            feedback = ReportKeyValuePairFeedback(keyValuePairs, functions);
             Utils.Validation.ValueType? valueType = getValueTypeFromStringMethod?.Invoke(null, [keyValuePairs.First().KeyValuePair.Value, PxFileConfiguration.Default]) as Utils.Validation.ValueType?;
 
             // Assert

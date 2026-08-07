@@ -80,6 +80,26 @@ namespace Px.Utils.UnitTests.Validation.DataValidationTests
         }
 
         [TestMethod]
+        public async Task ValidateDefaultOverloadsLargeInvalidDataRetainDefaultFeedbackCount()
+        {
+            string invalidData = string.Concat(Enumerable.Repeat("! ", 200)) + ";";
+            byte[] data = Encoding.UTF8.GetBytes("DATA=" + invalidData);
+            using Stream synchronousStream = new MemoryStream(data);
+            using Stream asynchronousStream = new MemoryStream(data);
+            DataValidator synchronousValidator = new(0, 0, 0);
+            DataValidator asynchronousValidator = new(0, 0, 0);
+
+            ValidationResult synchronousResult = synchronousValidator.Validate(synchronousStream, "invalid.px", Encoding.UTF8);
+            ValidationResult asynchronousResult = await asynchronousValidator.ValidateAsync(asynchronousStream, "invalid.px", Encoding.UTF8, cancellationToken: TestContext.CancellationToken);
+
+            ValidationFeedbackKey key = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidChar);
+            Assert.HasCount(100, synchronousResult.FeedbackItems[key]);
+            Assert.Contains("Feedback limit of 100 instances", synchronousResult.FeedbackItems[key][^1].AdditionalInfo!);
+            Assert.HasCount(100, asynchronousResult.FeedbackItems[key]);
+            Assert.Contains("Feedback limit of 100 instances", asynchronousResult.FeedbackItems[key][^1].AdditionalInfo!);
+        }
+
+        [TestMethod]
         [DataRow(DataStreamContents.SIMPLE_VALID_DATA, 0, 0)]
         [DataRow(DataStreamContents.SIMPLE_VALID_DATA_WITH_INCONSISTENT_LINEBREAKS, 0, 0)]
         [DataRow(DataStreamContents.SIMPLE_VALID_DATA_WITHOUT_MISISNG_CODE_DELIMETERS, 0, 0)]

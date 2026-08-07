@@ -56,41 +56,9 @@ namespace Px.Utils.Validation.ContentValidation
         /// <returns><see cref="ContentValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
         public ContentValidationResult Validate()
         {
-            IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
-            IEnumerable<ContentValidationFindKeywordValidator> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
-
-            if (customContentValidationFunctions is not null)
-            {
-                contentValidationEntryFunctions = contentValidationEntryFunctions.Concat(customContentValidationFunctions.CustomContentValidationEntryFunctions);
-                contentValidationFindKeywordFunctions = contentValidationFindKeywordFunctions.Concat(customContentValidationFunctions.CustomContentValidationFindKeywordFunctions);
-            }
-
-            ValidationFeedback feedbackItems = [];
-
-            foreach (ContentValidationFindKeywordValidator findingFunction in contentValidationFindKeywordFunctions)
-            {
-                ValidationFeedback? feedback = findingFunction(entries, this);
-                if (feedback is not null)
-                {
-                    feedbackItems.AddRange(feedback);
-                }
-            }
-            foreach (ContentValidationEntryValidator entryFunction in contentValidationEntryFunctions)
-            {
-                foreach (ValidationStructuredEntry entry in entries)
-                {
-                    ValidationFeedback? feedback = entryFunction(entry, this);
-                    if (feedback is not null)
-                    {
-                        feedbackItems.AddRange(feedback);
-                    }
-                }
-            }
-            int lengthOfDataRows = _headingDimensionNames is not null ? GetProductOfDimensionValues(_headingDimensionNames) : 0;
-            int amountOfDataRows = _stubDimensionNames is not null ? GetProductOfDimensionValues(_stubDimensionNames) : 0;
-            ResetFields();
-
-            return new ContentValidationResult(feedbackItems, lengthOfDataRows, amountOfDataRows);
+            ValidationFeedbackSink sink = new();
+            ContentValidationOutput output = ValidateIntoSink(sink);
+            return new ContentValidationResult(sink.ToFeedback(), output.DataRowLength, output.DataRowAmount);
         }
 
         /// <summary>
