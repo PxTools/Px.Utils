@@ -1,0 +1,137 @@
+CHARSET="ANSI";
+AXIS-VERSION="2013";
+CODEPAGE="iso-8859-15";
+LANGUAGE="fi";
+LANGUAGES="fi","sv","en";
+CREATION-DATE="20230324 09:00";
+NEXT-UPDATE="20280324 08:00";
+TABLEID="statfin_cvts_pxt_13vr";
+SYNONYMS="koulutus, aikuiskoulutus";
+DECIMALS=1;
+SHOWDECIMALS=1;
+MATRIX="196_13vr_2020";
+SUBJECT-CODE="CVTS";
+SUBJECT-AREA="cvts";
+SUBJECT-AREA[sv]="cvts";
+SUBJECT-AREA[en]="cvts";
+COPYRIGHT=YES;
+DESCRIPTION="13vr -- Rajoitukset tai esteet henkilöstön osaamisen kehittämiselle yrityksissä, %, 2010-2020";
+DESCRIPTION[sv]="13vr -- Begränsningar eller hinder för utvecklingen av personalens kompetens i företagen, %, 2010-2020";
+DESCRIPTION[en]="13vr -- Restrictions or obstacles to personnel competence development in enterprises, %, 2010-2020";
+TITLE="CVTS, yritysten henkilöstökoulutus muuttujina Vuosi, Koulutuksen esteet, Tarkasteltavat yritykset ja Tiedot";
+TITLE[sv]="CVTS, företagens personalutbildning efter År, daega, korga och Uppgifter";
+TITLE[en]="CVTS, continuing vocational training by Year, agae, ksada and Information";
+CONTENTS="CVTS, yritysten henkilöstökoulutus";
+CONTENTS[sv]="CVTS, företagens personalutbildning";
+CONTENTS[en]="CVTS, continuing vocational training";
+UNITS="Prosentti";
+UNITS[sv]="Procent";
+UNITS[en]="Per cent";
+STUB="Vuosi","Koulutuksen esteet";
+STUB[sv]="År","daega";
+STUB[en]="Year","agae";
+HEADING="Tarkasteltavat yritykset","Tiedot";
+HEADING[sv]="korga","Uppgifter";
+HEADING[en]="ksada","Information";
+CONTVARIABLE="Tiedot";
+CONTVARIABLE[sv]="Uppgifter";
+CONTVARIABLE[en]="Information";
+VALUES("Vuosi")="2010","2015","2020";
+VALUES[sv]("År")="2010","2015","2020";
+VALUES[en]("Year")="2010","2015","2020";
+VALUES("Koulutuksen esteet")=
+"Henkilöstön olemassa oleva osaaminen ja pätevyys vastasivat yrityksen nykyisiä tarpeita",
+"Yrityksen ensisijaisena strategiana oli rekrytoida henkilöitä, joilla on jo tarvittava osaaminen ja pätevyys",
+"Vaikeudet arvioida yrityksen henkilöstökoulutuksen tarpeita",
+"Sopivan tarjonnan puute koulutusmarkkinoilla","Henkilöstökoulutuksen korkeat kustannukset",
+"Ammatillinen peruskoulutus oli tärkeämmällä sijalla kuin henkilöstökoulutus",
+"Merkittävä panostus henkilöstökoulutukseen edellisinä vuosina",
+"Henkilöstön työkiireet ja ajan puute","Jotkin muut kuin edellä mainitut syyt";
+VALUES[sv]("daega")="a1","c1","e1","g1","i1","k1","m1","o1","q1";
+VALUES[en]("agae")="b1","d1","f1","h1","j1","l1","n1","p1","y1";
+VALUES("Tarkasteltavat yritykset")="Kaikki yritykset",
+"Yritykset, jotka järjestivät kurssikoulutusta",
+"Yritykset, jotka järjestivät sisäistä kurssikoulutusta",
+"Yritykset, jotka järjestivät ulkoista kurssikoulutusta",
+"Yritykset, jotka järjestivät muuta kuin kurssikoulutusta",
+"Yritykset, jotka eivät järjestäneet koulutusta";
+VALUES[sv]("korga")="Totalt","cc","ee","gg","ii","kk";
+VALUES[en]("ksada")="Total","dd","ff","hh","jj","ll";
+VALUES("Tiedot")="Osuus tarkasteltavista yrityksistä, %";
+VALUES[sv]("Uppgifter")="Andel av de företag som granskas, %";
+VALUES[en]("Information")="Share of enterprises examined, %";
+TIMEVAL("Vuosi")=TLIST(A1),"2010","2011","2012";
+TIMEVAL[sv]("År")=TLIST(A1),"2010","2011","2012";
+TIMEVAL[en]("Year")=TLIST(A1),"2010","2011","2012";
+CODES("Vuosi")="2010","2015","2020";
+CODES[sv]("År")="2010","2015","2020";
+CODES[en]("Year")="2010","2015","2020";
+CODES("Koulutuksen esteet")="esta","estb","estc","estd","este","estf","estg","esth","esti";
+CODES[sv]("daega")="esta","estb","estc","estd","este","estf","estg","esth","esti";
+CODES[en]("agae")="esta","estb","estc","estd","este","estf","estg","esth","esti";
+CODES("Tarkasteltavat yritykset")="SSS","1","2","3","4","6";
+CODES[sv]("korga")="SSS","1","2","3","4","6";
+CODES[en]("ksada")="SSS","1","2","3","4","6";
+CODES("Tiedot")="osuuse";
+CODES[sv]("Uppgifter")="osuuse";
+CODES[en]("Information")="osuuse";
+VARIABLE-TYPE("Vuosi")="Time";
+VARIABLE-TYPE[sv]("År")="Time";
+VARIABLE-TYPE[en]("Year")="Time";
+ELIMINATION("Tarkasteltavat yritykset")="Kaikki yritykset";
+ELIMINATION[sv]("korga")="Totalt";
+ELIMINATION[en]("ksada")="Total";
+LAST-UPDATED("Osuus tarkasteltavista yrityksistä, %")="20230324 08:00";
+LAST-UPDATED[sv]("Andel av de företag som granskas, %")="20230324 08:00";
+LAST-UPDATED[en]("Share of enterprises examined, %")="20230324 08:00";
+UNITS("Osuus tarkasteltavista yrityksistä, %")="Prosentti";
+UNITS[sv]("Andel av de företag som granskas, %")="Procent";
+UNITS[en]("Share of enterprises examined, %")="Per cent";
+CONTACT("Osuus tarkasteltavista yrityksistä, %")="<A HREF='https://stat.fi/tilasto/cvts' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Andel av de företag som granskas, %")="<A HREF='https://stat.fi/sv/statistik/cvts' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Share of enterprises examined, %")="<A HREF='https://stat.fi/en/statistics/cvts' TARGET=_blank>Statistics' homepage</A>";
+SOURCE="Tilastokeskus, CVTS, yritysten henkilöstökoulutus";
+SOURCE[sv]="Statistikcentralen, CVTS, företagens personalutbildning";
+SOURCE[en]="Statistics Finland, CVTS, continuing vocational training";
+META-ID("Vuosi")="SCALE-TYPE=None";
+META-ID[sv]("År")="SCALE-TYPE=None";
+META-ID[en]("Year")="SCALE-TYPE=None";
+META-ID("Koulutuksen esteet")="SCALE-TYPE=nominal";
+META-ID[sv]("daega")="SCALE-TYPE=nominal";
+META-ID[en]("agae")="SCALE-TYPE=nominal";
+META-ID("Tarkasteltavat yritykset")="SCALE-TYPE=nominal";
+META-ID[sv]("korga")="SCALE-TYPE=nominal";
+META-ID[en]("ksada")="SCALE-TYPE=nominal";
+OFFICIAL-STATISTICS=YES;
+NOTE="<A HREF='https://stat.fi/tilasto/dokumentaatio/cvts' TARGET=_blank>Tilaston dokumentaatio</A>";
+NOTE[sv]="<A HREF='https://stat.fi/sv/statistik/dokumentation/cvts' TARGET=_blank>Dokumentation för statistiken</A>";
+NOTE[en]="<A HREF='https://stat.fi/en/statistics/documentation/cvts' TARGET=_blank>Documentation of statistics</A>";
+MADE-WITH="PxPro";
+DATA=
+41.5 32.6 24.3 31.8 32.8 72.1 
+36.5 31 25.9 30.9 32.2 54.4 
+19 20 20.9 20.1 20.4 15.8 
+19.2 19.1 20.9 19.1 20.2 18 
+37.4 38.6 37.8 38.5 39.5 31.6 
+21.3 18 15.4 17.6 18.1 33.8 
+6.6 6.8 7.9 6.8 7.4 5.9 
+56 58.6 59.6 58.9 59.3 42.3 
+12.6 13.4 14 13 13.7 9.2 
+47 40 34.2 39.8 40.6 81.9 
+36.9 32.9 31.3 32.6 33.8 52.8 
+17.8 18.4 19.8 18.2 19.2 15 
+19 18.8 17.7 18.4 19.8 18.7 
+40.6 40.6 41.6 40.7 42.3 39.9 
+20.7 17.8 15.1 18 17.8 34.2 
+9.1 9.4 10 9.3 9.6 6.7 
+58.5 60.4 63.3 60.3 62 48.2 
+13.4 12.8 13.6 12.8 14.1 15.5 
+18.3 8.7 4.9 8.5 9.5 38.9 
+36.1 28 24.2 28.3 29.5 51.2 
+11 10.6 12 9.9 12.2 9 
+17.8 16.8 15.8 16.1 17.5 19.9 
+20 18.9 17.7 18.9 20.3 19.4 
+3.5 2.4 2.1 2.4 2.9 5.3 
+3.8 2.6 2.4 2.8 3 6.5 
+50.6 53.9 54 54 55.9 40 
+26.2 30.6 33.4 29.7 31.3 16.2; 

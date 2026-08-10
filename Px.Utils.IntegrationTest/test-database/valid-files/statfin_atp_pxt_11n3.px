@@ -1,0 +1,122 @@
+CHARSET="ANSI";
+AXIS-VERSION="2013";
+CODEPAGE="iso-8859-15";
+LANGUAGE="fi";
+LANGUAGES="fi","sv","en";
+CREATION-DATE="20190219 09:00";
+NEXT-UPDATE="20250220 08:00";
+TABLEID="statfin_atp_pxt_11n3";
+DECIMALS=0;
+SHOWDECIMALS=0;
+MATRIX="001_11n3_2023";
+SUBJECT-CODE="ATP";
+SUBJECT-AREA="atp";
+SUBJECT-AREA[sv]="atp";
+SUBJECT-AREA[en]="atp";
+COPYRIGHT=YES;
+DESCRIPTION="11n3 -- Avoimet työpaikat, vuositietoja, 2013-2023";
+DESCRIPTION[sv]="11n3 -- Lediga arbetsplatser, årsuppgifter, 2013-2023";
+DESCRIPTION[en]="11n3 -- Job vacancies by year, 2013-2023";
+TITLE="Avoimet työpaikat muuttujina Tiedot ja Vuosi";
+TITLE[sv]="Lediga arbetsplatser efter Uppgifter och År";
+TITLE[en]="Job vacancies by Information and Year";
+CONTENTS="Avoimet työpaikat";
+CONTENTS[sv]="Lediga arbetsplatser";
+CONTENTS[en]="Job vacancies";
+UNITS="Lukumäärä";
+UNITS[sv]="Antal";
+UNITS[en]="Number";
+STUB="Tiedot";
+STUB[sv]="Uppgifter";
+STUB[en]="Information";
+HEADING="Vuosi";
+HEADING[sv]="År";
+HEADING[en]="Year";
+CONTVARIABLE="Tiedot";
+CONTVARIABLE[sv]="Uppgifter";
+CONTVARIABLE[en]="Information";
+VALUES("Tiedot")="Avoimet työpaikat","Avoimet työpaikat, joilla ei ole hoitajaa",
+"Osa-aikaiset avoimet työpaikat","Määräaikaiset avoimet työpaikat",
+"Vaikeasti täytettävät avoimet työpaikat";
+VALUES[sv]("Uppgifter")="Lediga arbetsplatser","Obesatta lediga arbetsplatser",
+"Lediga arbetsplatser på deltid","Lediga arbetsplatser på viss tid",
+"Svårbesatta lediga arbetsplatser";
+VALUES[en]("Information")="Job vacancies","Unoccupied job vacancies","Part-time vacancies",
+"Fixed term vacancies","Hard-to-fill vacancies";
+VALUES("Vuosi")="2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+VALUES[sv]("År")="2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+VALUES[en]("Year")="2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+TIMEVAL("Vuosi")=TLIST(A1),"2013","2014","2015","2016","2017","2018","2019","2020","2021","2022",
+"2023";
+TIMEVAL[sv]("År")=TLIST(A1),"2013","2014","2015","2016","2017","2018","2019","2020","2021","2022",
+"2023";
+TIMEVAL[en]("Year")=TLIST(A1),"2013","2014","2015","2016","2017","2018","2019","2020","2021","2022",
+"2023";
+CODES("Tiedot")="atp_lkm","atp_eihoit","atp_osa","atp_maar","atp_vaik";
+CODES[sv]("Uppgifter")="atp_lkm","atp_eihoit","atp_osa","atp_maar","atp_vaik";
+CODES[en]("Information")="atp_lkm","atp_eihoit","atp_osa","atp_maar","atp_vaik";
+CODES("Vuosi")="2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+CODES[sv]("År")="2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+CODES[en]("Year")="2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+VARIABLE-TYPE("Vuosi")="Time";
+VARIABLE-TYPE[sv]("År")="Time";
+VARIABLE-TYPE[en]("Year")="Time";
+LAST-UPDATED("Avoimet työpaikat")="20240220 08:00";
+LAST-UPDATED[sv]("Lediga arbetsplatser")="20240220 08:00";
+LAST-UPDATED[en]("Job vacancies")="20240220 08:00";
+LAST-UPDATED("Avoimet työpaikat, joilla ei ole hoitajaa")="20240220 08:00";
+LAST-UPDATED[sv]("Obesatta lediga arbetsplatser")="20240220 08:00";
+LAST-UPDATED[en]("Unoccupied job vacancies")="20240220 08:00";
+LAST-UPDATED("Osa-aikaiset avoimet työpaikat")="20240220 08:00";
+LAST-UPDATED[sv]("Lediga arbetsplatser på deltid")="20240220 08:00";
+LAST-UPDATED[en]("Part-time vacancies")="20240220 08:00";
+LAST-UPDATED("Määräaikaiset avoimet työpaikat")="20240220 08:00";
+LAST-UPDATED[sv]("Lediga arbetsplatser på viss tid")="20240220 08:00";
+LAST-UPDATED[en]("Fixed term vacancies")="20240220 08:00";
+LAST-UPDATED("Vaikeasti täytettävät avoimet työpaikat")="20240220 08:00";
+LAST-UPDATED[sv]("Svårbesatta lediga arbetsplatser")="20240220 08:00";
+LAST-UPDATED[en]("Hard-to-fill vacancies")="20240220 08:00";
+UNITS("Avoimet työpaikat")="Lukumäärä";
+UNITS[sv]("Lediga arbetsplatser")="Antal";
+UNITS[en]("Job vacancies")="Number";
+UNITS("Avoimet työpaikat, joilla ei ole hoitajaa")="Lukumäärä";
+UNITS[sv]("Obesatta lediga arbetsplatser")="Antal";
+UNITS[en]("Unoccupied job vacancies")="Number";
+UNITS("Osa-aikaiset avoimet työpaikat")="Lukumäärä";
+UNITS[sv]("Lediga arbetsplatser på deltid")="Antal";
+UNITS[en]("Part-time vacancies")="Number";
+UNITS("Määräaikaiset avoimet työpaikat")="Lukumäärä";
+UNITS[sv]("Lediga arbetsplatser på viss tid")="Antal";
+UNITS[en]("Fixed term vacancies")="Number";
+UNITS("Vaikeasti täytettävät avoimet työpaikat")="Lukumäärä";
+UNITS[sv]("Svårbesatta lediga arbetsplatser")="Antal";
+UNITS[en]("Hard-to-fill vacancies")="Number";
+CONTACT("Avoimet työpaikat")="<A HREF='https://stat.fi/tilasto/atp' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Lediga arbetsplatser")="<A HREF='https://stat.fi/sv/statistik/atp' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Job vacancies")="<A HREF='https://stat.fi/en/statistics/atp' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("Avoimet työpaikat, joilla ei ole hoitajaa")="<A HREF='https://stat.fi/tilasto/atp' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Obesatta lediga arbetsplatser")="<A HREF='https://stat.fi/sv/statistik/atp' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Unoccupied job vacancies")="<A HREF='https://stat.fi/en/statistics/atp' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("Osa-aikaiset avoimet työpaikat")="<A HREF='https://stat.fi/tilasto/atp' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Lediga arbetsplatser på deltid")="<A HREF='https://stat.fi/sv/statistik/atp' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Part-time vacancies")="<A HREF='https://stat.fi/en/statistics/atp' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("Määräaikaiset avoimet työpaikat")="<A HREF='https://stat.fi/tilasto/atp' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Lediga arbetsplatser på viss tid")="<A HREF='https://stat.fi/sv/statistik/atp' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Fixed term vacancies")="<A HREF='https://stat.fi/en/statistics/atp' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("Vaikeasti täytettävät avoimet työpaikat")="<A HREF='https://stat.fi/tilasto/atp' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Svårbesatta lediga arbetsplatser")="<A HREF='https://stat.fi/sv/statistik/atp' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Hard-to-fill vacancies")="<A HREF='https://stat.fi/en/statistics/atp' TARGET=_blank>Statistics' homepage</A>";
+SOURCE="Tilastokeskus, avoimet työpaikat";
+SOURCE[sv]="Statistikcentralen, undersökning om lediga arbetsplatser";
+SOURCE[en]="Statistics Finland, job vacancy survey";
+OFFICIAL-STATISTICS=YES;
+NOTE="<A HREF='https://stat.fi/tilasto/dokumentaatio/atp' TARGET=_blank>Tilaston dokumentaatio</A>";
+NOTE[sv]="<A HREF='https://stat.fi/sv/statistik/dokumentation/atp' TARGET=_blank>Dokumentation för statistiken</A>";
+NOTE[en]="<A HREF='https://stat.fi/en/statistics/documentation/atp' TARGET=_blank>Documentation of statistics</A>";
+MADE-WITH="PxPro";
+DATA=
+29500 28500 28900 33900 41600 49400 50000 43800 58000 68300 54500 
+13700 15400 14700 16300 20400 28100 28900 24000 33800 42100 32400 
+6900 6700 6400 7200 7700 9700 8300 8200 10600 11300 11900 
+12500 13300 12800 14600 16800 17600 18100 16500 20100 20900 19000 
+12200 9500 10700 13600 18600 26100 27900 21200 32800 41700 30300; 

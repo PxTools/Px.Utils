@@ -1,0 +1,191 @@
+CHARSET="ANSI";
+AXIS-VERSION="2013";
+CODEPAGE="iso-8859-15";
+LANGUAGE="fi";
+LANGUAGES="fi","sv","en";
+CREATION-DATE="20230609 09:00";
+NEXT-UPDATE="20241206 08:00";
+TABLEID="statfin_tvki_pxt_141p";
+DECIMALS=5;
+SHOWDECIMALS=1;
+MATRIX="001_141p_2023";
+SUBJECT-CODE="TVKI";
+SUBJECT-AREA="tvki";
+SUBJECT-AREA[sv]="tvki";
+SUBJECT-AREA[en]="tvki";
+COPYRIGHT=YES;
+DESCRIPTION="141p -- Tulospalkkioiden osuus palkkasummasta yksityisellä sektorilla toimialaryhmän (TOL 2008) mukaan - vuositiedot, 2007-2023";
+DESCRIPTION[sv]="141p -- Resultatpremiernas andel av lönesumman inom den privata sektorn efter näringsgren (TOL 2008) - årsuppgifter, 2007-2023";
+DESCRIPTION[en]="141p -- The share of performance-based bonuses of wages and salaries sum in the private sector by industry (TOL 2008) - annual data, 2007-2023";
+TITLE="Tulospalkkioiden osuus palkkasummasta yksityisellä sektorilla muuttujina Vuosi, Toimiala (TOL 2008) ja Tiedot";
+TITLE[sv]="Resultatpremiernas andel av lönesumman inom den privata sektorn efter År, Näringsgren (TOL 2008) och Uppgifter";
+TITLE[en]="The share of performance-based bonuses of wages and salaries sum in the private sector by Year, Industry (TOL 2008) and Information";
+CONTENTS="Tulospalkkioiden osuus palkkasummasta yksityisellä sektorilla";
+CONTENTS[sv]="Resultatpremiernas andel av lönesumman inom den privata sektorn";
+CONTENTS[en]="The share of performance-based bonuses of wages and salaries sum in the private sector";
+UNITS="";
+UNITS[sv]="";
+UNITS[en]="";
+STUB="Vuosi","Toimiala (TOL 2008)";
+STUB[sv]="År","Näringsgren (TOL 2008)";
+STUB[en]="Year","Industry (TOL 2008)";
+HEADING="Tiedot";
+HEADING[sv]="Uppgifter";
+HEADING[en]="Information";
+CONTVARIABLE="Tiedot";
+CONTVARIABLE[sv]="Uppgifter";
+CONTVARIABLE[en]="Information";
+VALUES("Vuosi")="2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018",
+"2019","2020","2021","2022","2023";
+VALUES[sv]("År")="2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
+"2018","2019","2020","2021","2022","2023";
+VALUES[en]("Year")="2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
+"2018","2019","2020","2021","2022","2023";
+VALUES("Toimiala (TOL 2008)")="Yhteensä","B-E Koko teollisuus","F Rakentaminen","G-N Palvelualat",
+"O-S Hyvinvointipalvelut";
+VALUES[sv]("Näringsgren (TOL 2008)")="Totalt","B-E Hela industrin","F Byggverksamhet",
+"G-N Servicenäringar","O-S Välfärdstjänster";
+VALUES[en]("Industry (TOL 2008)")="Total","B-E Total industry","F Construction",
+"G-N Service industries","O-S Welfare services";
+VALUES("Tiedot")=
+"Työvoimakustannusindeksi (2020=100) yksityisellä sektorilla, tulospalkkioiden osuus palkkasummasta, %";
+VALUES[sv]("Uppgifter")=
+"Arbetskraftskostnadsindex (2020=100) inom den privata sektorn, resultatpremiernas andel av lönesumman, %";
+VALUES[en]("Information")=
+"Labour cost index (2020=100) in the private sector, the share of perfomance-based bonuses of wages and salaries sum, %";
+TIMEVAL("Vuosi")=TLIST(A1),"2007","2008","2009","2010","2011","2012","2013","2014","2015","2016",
+"2017","2018","2019","2020","2021","2022","2023";
+TIMEVAL[sv]("År")=TLIST(A1),"2007","2008","2009","2010","2011","2012","2013","2014","2015","2016",
+"2017","2018","2019","2020","2021","2022","2023";
+TIMEVAL[en]("Year")=TLIST(A1),"2007","2008","2009","2010","2011","2012","2013","2014","2015","2016",
+"2017","2018","2019","2020","2021","2022","2023";
+CODES("Vuosi")="2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018",
+"2019","2020","2021","2022","2023";
+CODES[sv]("År")="2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018",
+"2019","2020","2021","2022","2023";
+CODES[en]("Year")="2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
+"2018","2019","2020","2021","2022","2023";
+CODES("Toimiala (TOL 2008)")="SSS","BTE","F","GTN","OTS";
+CODES[sv]("Näringsgren (TOL 2008)")="SSS","BTE","F","GTN","OTS";
+CODES[en]("Industry (TOL 2008)")="SSS","BTE","F","GTN","OTS";
+CODES("Tiedot")="tvkiy_tul_os_20";
+CODES[sv]("Uppgifter")="tvkiy_tul_os_20";
+CODES[en]("Information")="tvkiy_tul_os_20";
+VARIABLE-TYPE("Vuosi")="Time";
+VARIABLE-TYPE[sv]("År")="Time";
+VARIABLE-TYPE[en]("Year")="Time";
+VARIABLE-TYPE("Toimiala (TOL 2008)")="Classificatory";
+VARIABLE-TYPE[sv]("Näringsgren (TOL 2008)")="Classificatory";
+VARIABLE-TYPE[en]("Industry (TOL 2008)")="Classificatory";
+ELIMINATION("Toimiala (TOL 2008)")="Yhteensä";
+ELIMINATION[sv]("Näringsgren (TOL 2008)")="Totalt";
+ELIMINATION[en]("Industry (TOL 2008)")="Total";
+LAST-UPDATED("Työvoimakustannusindeksi (2020=100) yksityisellä sektorilla, tulospalkkioiden osuus palkkasummasta, %")="20240906 08:00";
+LAST-UPDATED[sv]("Arbetskraftskostnadsindex (2020=100) inom den privata sektorn, resultatpremiernas andel av lönesumman, %")="20240906 08:00";
+LAST-UPDATED[en]("Labour cost index (2020=100) in the private sector, the share of perfomance-based bonuses of wages and salaries sum, %")="20240906 08:00";
+UNITS("Työvoimakustannusindeksi (2020=100) yksityisellä sektorilla, tulospalkkioiden osuus palkkasummasta, %")="Prosentti";
+UNITS[sv]("Arbetskraftskostnadsindex (2020=100) inom den privata sektorn, resultatpremiernas andel av lönesumman, %")="Procent";
+UNITS[en]("Labour cost index (2020=100) in the private sector, the share of perfomance-based bonuses of wages and salaries sum, %")="Per cent";
+CONTACT("Työvoimakustannusindeksi (2020=100) yksityisellä sektorilla, tulospalkkioiden osuus palkkasummasta, %")="<A HREF='https://stat.fi/tilasto/tvki' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Arbetskraftskostnadsindex (2020=100) inom den privata sektorn, resultatpremiernas andel av lönesumman, %")="<A HREF='https://stat.fi/sv/statistik/tvki' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Labour cost index (2020=100) in the private sector, the share of perfomance-based bonuses of wages and salaries sum, %")="<A HREF='https://stat.fi/en/statistics/tvki' TARGET=_blank>Statistics' homepage</A>";
+SOURCE="Tilastokeskus, työvoimakustannusindeksi";
+SOURCE[sv]="Statistikcentralen, arbetskraftskostnadsindex";
+SOURCE[en]="Statistics Finland, labour cost index";
+META-ID("Vuosi")="SCALE-TYPE=None";
+META-ID[sv]("År")="SCALE-TYPE=None";
+META-ID[en]("Year")="SCALE-TYPE=None";
+META-ID("Toimiala (TOL 2008)")="SCALE-TYPE=nominal";
+META-ID[sv]("Näringsgren (TOL 2008)")="SCALE-TYPE=nominal";
+META-ID[en]("Industry (TOL 2008)")="SCALE-TYPE=nominal";
+OFFICIAL-STATISTICS=YES;
+NOTE="<A HREF='https://stat.fi/tilasto/dokumentaatio/tvki' TARGET=_blank>Tilaston dokumentaatio</A>";
+NOTE[sv]="<A HREF='https://stat.fi/sv/statistik/dokumentation/tvki' TARGET=_blank>Dokumentation för statistiken</A>";
+NOTE[en]="<A HREF='https://stat.fi/en/statistics/documentation/tvki' TARGET=_blank>Documentation of statistics</A>";
+MADE-WITH="PxPro";
+DATA=
+3.4576 
+4.38977 
+1.83422 
+3.41194 
+1.09052 
+3.27557 
+3.99551 
+1.82391 
+3.26182 
+1.27296 
+2.73297 
+3.4103 
+1.75874 
+2.68123 
+0.95436 
+2.93458 
+3.89094 
+1.90621 
+2.79265 
+0.9208 
+3.20146 
+4.4126 
+1.45955 
+3.10247 
+0.77687 
+2.72775 
+3.40472 
+1.41966 
+2.86957 
+0.74604 
+2.69037 
+3.73169 
+2.03169 
+2.53195 
+0.74613 
+2.73193 
+3.81147 
+2.1209 
+2.57275 
+0.88078 
+3.11953 
+4.33721 
+2.42373 
+2.99671 
+0.65573 
+3.14111 
+4.05499 
+2.41359 
+3.20119 
+0.80266 
+3.27338 
+4.15793 
+2.68535 
+3.40445 
+0.8936 
+3.19618 
+4.03944 
+2.63948 
+3.31538 
+0.9698 
+3.05969 
+3.74039 
+2.38655 
+3.3116 
+0.80761 
+3.0452 
+3.79836 
+2.31436 
+3.18278 
+1.26921 
+2.95514 
+3.99783 
+3.0039 
+2.86823 
+0.89609 
+3.39225 
+4.8028 
+2.9844 
+3.23127 
+1.21557 
+2.98862 
+4.36434 
+2.30697 
+2.87567 
+0.9005; 

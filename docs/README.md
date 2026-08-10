@@ -35,6 +35,20 @@ nuget install Px.Utils -Version 1.0.0
 
 ## Features
 
+## Integration test runner
+
+`Px.Utils.IntegrationTest` is a deterministic .NET 10 console runner for the checked-in PX database fixtures. It validates database feedback, fully reads every valid PX file, runs representative mapped reads, and compares sum, multiplication, division, and subtraction calculations with reviewed JSON expectations.
+
+Run it from the repository root after a build:
+
+```bash
+dotnet run --project Px.Utils.IntegrationTest/Px.Utils.IntegrationTest.csproj --no-build --configuration Debug
+```
+
+The runner prints scenario-level results and bounded, coordinate-aware differences. Its exit codes are `0` for success, `1` for comparison failures, and `2` for missing assets, malformed fixtures, or unexpected execution failures. It resolves copied `test-database` and `ExpectedResults` assets from the application base directory rather than the working directory.
+
+Expectation updates use a temporary, local-only fixture-generation tool to produce staged JSON from the checked-in valid PX files. Review the staged diff, promote approved fixtures into `Px.Utils.IntegrationTest/ExpectedResults`, then remove the generator project and its staging artifacts before committing. The generator must not be included in the solution, CI workflow, published packages, or the production integration-runner path.
+
 ### Reading the px files
 
 The read pipeline consists of the following components: Reading the metadata, building the metadata and reading the data.

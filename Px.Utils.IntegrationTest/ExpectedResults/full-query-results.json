@@ -1,0 +1,2687 @@
+{
+  "queries": [
+    {
+      "name": "statfin_akay_pxt_013.px",
+      "fileName": "statfin_akay_pxt_013.px",
+      "dimensions": [
+        {
+          "code": "V\u00E4est\u00F6ryhm\u00E4",
+          "valueCodes": [
+            "SSS",
+            "1",
+            "2",
+            "10-14",
+            "15-24",
+            "25-44",
+            "45-64",
+            "65-"
+          ]
+        },
+        {
+          "code": "Vuosi",
+          "valueCodes": [
+            "1991",
+            "1999",
+            "2009",
+            "2017"
+          ]
+        },
+        {
+          "code": "Tieto",
+          "valueCodes": [
+            "1",
+            "2",
+            "S",
+            "lkm"
+          ]
+        }
+      ],
+      "values": [
+        {
+          "type": "Exists",
+          "value": 29
+        },
+        {
+          "type": "Exists",
+          "value": 71
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 4378
+        },
+        {
+          "type": "Exists",
+          "value": 32
+        },
+        {
+          "type": "Exists",
+          "value": 68
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 5884
+        },
+        {
+          "type": "Exists",
+          "value": 34
+        },
+        {
+          "type": "Exists",
+          "value": 66
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 4645
+        },
+        {
+          "type": "Exists",
+          "value": 39
+        },
+        {
+          "type": "Exists",
+          "value": 61
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 7155
+        },
+        {
+          "type": "Exists",
+          "value": 26
+        },
+        {
+          "type": "Exists",
+          "value": 74
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 2108
+        },
+        {
+          "type": "Exists",
+          "value": 29
+        },
+        {
+          "type": "Exists",
+          "value": 71
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 2755
+        },
+        {
+          "type": "Exists",
+          "value": 31
+        },
+        {
+          "type": "Exists",
+          "value": 69
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 2179
+        },
+        {
+          "type": "Exists",
+          "value": 32
+        },
+        {
+          "type": "Exists",
+          "value": 68
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 3503
+        },
+        {
+          "type": "Exists",
+          "value": 33
+        },
+        {
+          "type": "Exists",
+          "value": 67
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 2270
+        },
+        {
+          "type": "Exists",
+          "value": 35
+        },
+        {
+          "type": "Exists",
+          "value": 65
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 3129
+        },
+        {
+          "type": "Exists",
+          "value": 37
+        },
+        {
+          "type": "Exists",
+          "value": 63
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 2466
+        },
+        {
+          "type": "Exists",
+          "value": 45
+        },
+        {
+          "type": "Exists",
+          "value": 55
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 3652
+        },
+        {
+          "type": "Exists",
+          "value": 68
+        },
+        {
+          "type": "Exists",
+          "value": 32
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 324
+        },
+        {
+          "type": "Exists",
+          "value": 71
+        },
+        {
+          "type": "Exists",
+          "value": 29
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 395
+        },
+        {
+          "type": "Exists",
+          "value": 75
+        },
+        {
+          "type": "Exists",
+          "value": 25
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 242
+        },
+        {
+          "type": "Exists",
+          "value": 66
+        },
+        {
+          "type": "Exists",
+          "value": 44
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 440
+        },
+        {
+          "type": "Exists",
+          "value": 47
+        },
+        {
+          "type": "Exists",
+          "value": 53
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 646
+        },
+        {
+          "type": "Exists",
+          "value": 51
+        },
+        {
+          "type": "Exists",
+          "value": 49
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 807
+        },
+        {
+          "type": "Exists",
+          "value": 50
+        },
+        {
+          "type": "Exists",
+          "value": 50
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 628
+        },
+        {
+          "type": "Exists",
+          "value": 43
+        },
+        {
+          "type": "Exists",
+          "value": 57
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 914
+        },
+        {
+          "type": "Exists",
+          "value": 26
+        },
+        {
+          "type": "Exists",
+          "value": 74
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 1603
+        },
+        {
+          "type": "Exists",
+          "value": 29
+        },
+        {
+          "type": "Exists",
+          "value": 71
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 1893
+        },
+        {
+          "type": "Exists",
+          "value": 35
+        },
+        {
+          "type": "Exists",
+          "value": 65
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 1303
+        },
+        {
+          "type": "Exists",
+          "value": 41
+        },
+        {
+          "type": "Exists",
+          "value": 59
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 2017
+        },
+        {
+          "type": "Exists",
+          "value": 21
+        },
+        {
+          "type": "Exists",
+          "value": 79
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 1144
+        },
+        {
+          "type": "Exists",
+          "value": 26
+        },
+        {
+          "type": "Exists",
+          "value": 74
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 1795
+        },
+        {
+          "type": "Exists",
+          "value": 26
+        },
+        {
+          "type": "Exists",
+          "value": 74
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 1589
+        },
+        {
+          "type": "Exists",
+          "value": 31
+        },
+        {
+          "type": "Exists",
+          "value": 69
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 2097
+        },
+        {
+          "type": "Exists",
+          "value": 15
+        },
+        {
+          "type": "Exists",
+          "value": 85
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 661
+        },
+        {
+          "type": "Exists",
+          "value": 18
+        },
+        {
+          "type": "Exists",
+          "value": 82
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 995
+        },
+        {
+          "type": "Exists",
+          "value": 24
+        },
+        {
+          "type": "Exists",
+          "value": 76
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 883
+        },
+        {
+          "type": "Exists",
+          "value": 35
+        },
+        {
+          "type": "Exists",
+          "value": 65
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 1686
+        }
+      ]
+    },
+    {
+      "name": "statfin_atp_pxt_11n3.px",
+      "fileName": "statfin_atp_pxt_11n3.px",
+      "dimensions": [
+        {
+          "code": "Tiedot",
+          "valueCodes": [
+            "atp_lkm",
+            "atp_eihoit",
+            "atp_osa",
+            "atp_maar",
+            "atp_vaik"
+          ]
+        },
+        {
+          "code": "Vuosi",
+          "valueCodes": [
+            "2013",
+            "2014",
+            "2015",
+            "2016",
+            "2017",
+            "2018",
+            "2019",
+            "2020",
+            "2021",
+            "2022",
+            "2023"
+          ]
+        }
+      ],
+      "values": [
+        {
+          "type": "Exists",
+          "value": 29500
+        },
+        {
+          "type": "Exists",
+          "value": 28500
+        },
+        {
+          "type": "Exists",
+          "value": 28900
+        },
+        {
+          "type": "Exists",
+          "value": 33900
+        },
+        {
+          "type": "Exists",
+          "value": 41600
+        },
+        {
+          "type": "Exists",
+          "value": 49400
+        },
+        {
+          "type": "Exists",
+          "value": 50000
+        },
+        {
+          "type": "Exists",
+          "value": 43800
+        },
+        {
+          "type": "Exists",
+          "value": 58000
+        },
+        {
+          "type": "Exists",
+          "value": 68300
+        },
+        {
+          "type": "Exists",
+          "value": 54500
+        },
+        {
+          "type": "Exists",
+          "value": 13700
+        },
+        {
+          "type": "Exists",
+          "value": 15400
+        },
+        {
+          "type": "Exists",
+          "value": 14700
+        },
+        {
+          "type": "Exists",
+          "value": 16300
+        },
+        {
+          "type": "Exists",
+          "value": 20400
+        },
+        {
+          "type": "Exists",
+          "value": 28100
+        },
+        {
+          "type": "Exists",
+          "value": 28900
+        },
+        {
+          "type": "Exists",
+          "value": 24000
+        },
+        {
+          "type": "Exists",
+          "value": 33800
+        },
+        {
+          "type": "Exists",
+          "value": 42100
+        },
+        {
+          "type": "Exists",
+          "value": 32400
+        },
+        {
+          "type": "Exists",
+          "value": 6900
+        },
+        {
+          "type": "Exists",
+          "value": 6700
+        },
+        {
+          "type": "Exists",
+          "value": 6400
+        },
+        {
+          "type": "Exists",
+          "value": 7200
+        },
+        {
+          "type": "Exists",
+          "value": 7700
+        },
+        {
+          "type": "Exists",
+          "value": 9700
+        },
+        {
+          "type": "Exists",
+          "value": 8300
+        },
+        {
+          "type": "Exists",
+          "value": 8200
+        },
+        {
+          "type": "Exists",
+          "value": 10600
+        },
+        {
+          "type": "Exists",
+          "value": 11300
+        },
+        {
+          "type": "Exists",
+          "value": 11900
+        },
+        {
+          "type": "Exists",
+          "value": 12500
+        },
+        {
+          "type": "Exists",
+          "value": 13300
+        },
+        {
+          "type": "Exists",
+          "value": 12800
+        },
+        {
+          "type": "Exists",
+          "value": 14600
+        },
+        {
+          "type": "Exists",
+          "value": 16800
+        },
+        {
+          "type": "Exists",
+          "value": 17600
+        },
+        {
+          "type": "Exists",
+          "value": 18100
+        },
+        {
+          "type": "Exists",
+          "value": 16500
+        },
+        {
+          "type": "Exists",
+          "value": 20100
+        },
+        {
+          "type": "Exists",
+          "value": 20900
+        },
+        {
+          "type": "Exists",
+          "value": 19000
+        },
+        {
+          "type": "Exists",
+          "value": 12200
+        },
+        {
+          "type": "Exists",
+          "value": 9500
+        },
+        {
+          "type": "Exists",
+          "value": 10700
+        },
+        {
+          "type": "Exists",
+          "value": 13600
+        },
+        {
+          "type": "Exists",
+          "value": 18600
+        },
+        {
+          "type": "Exists",
+          "value": 26100
+        },
+        {
+          "type": "Exists",
+          "value": 27900
+        },
+        {
+          "type": "Exists",
+          "value": 21200
+        },
+        {
+          "type": "Exists",
+          "value": 32800
+        },
+        {
+          "type": "Exists",
+          "value": 41700
+        },
+        {
+          "type": "Exists",
+          "value": 30300
+        }
+      ]
+    },
+    {
+      "name": "statfin_cvts_pxt_13vr.px",
+      "fileName": "statfin_cvts_pxt_13vr.px",
+      "dimensions": [
+        {
+          "code": "Vuosi",
+          "valueCodes": [
+            "2010",
+            "2015",
+            "2020"
+          ]
+        },
+        {
+          "code": "Koulutuksen esteet",
+          "valueCodes": [
+            "esta",
+            "estb",
+            "estc",
+            "estd",
+            "este",
+            "estf",
+            "estg",
+            "esth",
+            "esti"
+          ]
+        },
+        {
+          "code": "Tarkasteltavat yritykset",
+          "valueCodes": [
+            "SSS",
+            "1",
+            "2",
+            "3",
+            "4",
+            "6"
+          ]
+        },
+        {
+          "code": "Tiedot",
+          "valueCodes": [
+            "osuuse"
+          ]
+        }
+      ],
+      "values": [
+        {
+          "type": "Exists",
+          "value": 41.5
+        },
+        {
+          "type": "Exists",
+          "value": 32.6
+        },
+        {
+          "type": "Exists",
+          "value": 24.3
+        },
+        {
+          "type": "Exists",
+          "value": 31.8
+        },
+        {
+          "type": "Exists",
+          "value": 32.8
+        },
+        {
+          "type": "Exists",
+          "value": 72.1
+        },
+        {
+          "type": "Exists",
+          "value": 36.5
+        },
+        {
+          "type": "Exists",
+          "value": 31
+        },
+        {
+          "type": "Exists",
+          "value": 25.9
+        },
+        {
+          "type": "Exists",
+          "value": 30.9
+        },
+        {
+          "type": "Exists",
+          "value": 32.2
+        },
+        {
+          "type": "Exists",
+          "value": 54.4
+        },
+        {
+          "type": "Exists",
+          "value": 19
+        },
+        {
+          "type": "Exists",
+          "value": 20
+        },
+        {
+          "type": "Exists",
+          "value": 20.9
+        },
+        {
+          "type": "Exists",
+          "value": 20.1
+        },
+        {
+          "type": "Exists",
+          "value": 20.4
+        },
+        {
+          "type": "Exists",
+          "value": 15.8
+        },
+        {
+          "type": "Exists",
+          "value": 19.2
+        },
+        {
+          "type": "Exists",
+          "value": 19.1
+        },
+        {
+          "type": "Exists",
+          "value": 20.9
+        },
+        {
+          "type": "Exists",
+          "value": 19.1
+        },
+        {
+          "type": "Exists",
+          "value": 20.2
+        },
+        {
+          "type": "Exists",
+          "value": 18
+        },
+        {
+          "type": "Exists",
+          "value": 37.4
+        },
+        {
+          "type": "Exists",
+          "value": 38.6
+        },
+        {
+          "type": "Exists",
+          "value": 37.8
+        },
+        {
+          "type": "Exists",
+          "value": 38.5
+        },
+        {
+          "type": "Exists",
+          "value": 39.5
+        },
+        {
+          "type": "Exists",
+          "value": 31.6
+        },
+        {
+          "type": "Exists",
+          "value": 21.3
+        },
+        {
+          "type": "Exists",
+          "value": 18
+        },
+        {
+          "type": "Exists",
+          "value": 15.4
+        },
+        {
+          "type": "Exists",
+          "value": 17.6
+        },
+        {
+          "type": "Exists",
+          "value": 18.1
+        },
+        {
+          "type": "Exists",
+          "value": 33.8
+        },
+        {
+          "type": "Exists",
+          "value": 6.6
+        },
+        {
+          "type": "Exists",
+          "value": 6.8
+        },
+        {
+          "type": "Exists",
+          "value": 7.9
+        },
+        {
+          "type": "Exists",
+          "value": 6.8
+        },
+        {
+          "type": "Exists",
+          "value": 7.4
+        },
+        {
+          "type": "Exists",
+          "value": 5.9
+        },
+        {
+          "type": "Exists",
+          "value": 56
+        },
+        {
+          "type": "Exists",
+          "value": 58.6
+        },
+        {
+          "type": "Exists",
+          "value": 59.6
+        },
+        {
+          "type": "Exists",
+          "value": 58.9
+        },
+        {
+          "type": "Exists",
+          "value": 59.3
+        },
+        {
+          "type": "Exists",
+          "value": 42.3
+        },
+        {
+          "type": "Exists",
+          "value": 12.6
+        },
+        {
+          "type": "Exists",
+          "value": 13.4
+        },
+        {
+          "type": "Exists",
+          "value": 14
+        },
+        {
+          "type": "Exists",
+          "value": 13
+        },
+        {
+          "type": "Exists",
+          "value": 13.7
+        },
+        {
+          "type": "Exists",
+          "value": 9.2
+        },
+        {
+          "type": "Exists",
+          "value": 47
+        },
+        {
+          "type": "Exists",
+          "value": 40
+        },
+        {
+          "type": "Exists",
+          "value": 34.2
+        },
+        {
+          "type": "Exists",
+          "value": 39.8
+        },
+        {
+          "type": "Exists",
+          "value": 40.6
+        },
+        {
+          "type": "Exists",
+          "value": 81.9
+        },
+        {
+          "type": "Exists",
+          "value": 36.9
+        },
+        {
+          "type": "Exists",
+          "value": 32.9
+        },
+        {
+          "type": "Exists",
+          "value": 31.3
+        },
+        {
+          "type": "Exists",
+          "value": 32.6
+        },
+        {
+          "type": "Exists",
+          "value": 33.8
+        },
+        {
+          "type": "Exists",
+          "value": 52.8
+        },
+        {
+          "type": "Exists",
+          "value": 17.8
+        },
+        {
+          "type": "Exists",
+          "value": 18.4
+        },
+        {
+          "type": "Exists",
+          "value": 19.8
+        },
+        {
+          "type": "Exists",
+          "value": 18.2
+        },
+        {
+          "type": "Exists",
+          "value": 19.2
+        },
+        {
+          "type": "Exists",
+          "value": 15
+        },
+        {
+          "type": "Exists",
+          "value": 19
+        },
+        {
+          "type": "Exists",
+          "value": 18.8
+        },
+        {
+          "type": "Exists",
+          "value": 17.7
+        },
+        {
+          "type": "Exists",
+          "value": 18.4
+        },
+        {
+          "type": "Exists",
+          "value": 19.8
+        },
+        {
+          "type": "Exists",
+          "value": 18.7
+        },
+        {
+          "type": "Exists",
+          "value": 40.6
+        },
+        {
+          "type": "Exists",
+          "value": 40.6
+        },
+        {
+          "type": "Exists",
+          "value": 41.6
+        },
+        {
+          "type": "Exists",
+          "value": 40.7
+        },
+        {
+          "type": "Exists",
+          "value": 42.3
+        },
+        {
+          "type": "Exists",
+          "value": 39.9
+        },
+        {
+          "type": "Exists",
+          "value": 20.7
+        },
+        {
+          "type": "Exists",
+          "value": 17.8
+        },
+        {
+          "type": "Exists",
+          "value": 15.1
+        },
+        {
+          "type": "Exists",
+          "value": 18
+        },
+        {
+          "type": "Exists",
+          "value": 17.8
+        },
+        {
+          "type": "Exists",
+          "value": 34.2
+        },
+        {
+          "type": "Exists",
+          "value": 9.1
+        },
+        {
+          "type": "Exists",
+          "value": 9.4
+        },
+        {
+          "type": "Exists",
+          "value": 10
+        },
+        {
+          "type": "Exists",
+          "value": 9.3
+        },
+        {
+          "type": "Exists",
+          "value": 9.6
+        },
+        {
+          "type": "Exists",
+          "value": 6.7
+        },
+        {
+          "type": "Exists",
+          "value": 58.5
+        },
+        {
+          "type": "Exists",
+          "value": 60.4
+        },
+        {
+          "type": "Exists",
+          "value": 63.3
+        },
+        {
+          "type": "Exists",
+          "value": 60.3
+        },
+        {
+          "type": "Exists",
+          "value": 62
+        },
+        {
+          "type": "Exists",
+          "value": 48.2
+        },
+        {
+          "type": "Exists",
+          "value": 13.4
+        },
+        {
+          "type": "Exists",
+          "value": 12.8
+        },
+        {
+          "type": "Exists",
+          "value": 13.6
+        },
+        {
+          "type": "Exists",
+          "value": 12.8
+        },
+        {
+          "type": "Exists",
+          "value": 14.1
+        },
+        {
+          "type": "Exists",
+          "value": 15.5
+        },
+        {
+          "type": "Exists",
+          "value": 18.3
+        },
+        {
+          "type": "Exists",
+          "value": 8.7
+        },
+        {
+          "type": "Exists",
+          "value": 4.9
+        },
+        {
+          "type": "Exists",
+          "value": 8.5
+        },
+        {
+          "type": "Exists",
+          "value": 9.5
+        },
+        {
+          "type": "Exists",
+          "value": 38.9
+        },
+        {
+          "type": "Exists",
+          "value": 36.1
+        },
+        {
+          "type": "Exists",
+          "value": 28
+        },
+        {
+          "type": "Exists",
+          "value": 24.2
+        },
+        {
+          "type": "Exists",
+          "value": 28.3
+        },
+        {
+          "type": "Exists",
+          "value": 29.5
+        },
+        {
+          "type": "Exists",
+          "value": 51.2
+        },
+        {
+          "type": "Exists",
+          "value": 11
+        },
+        {
+          "type": "Exists",
+          "value": 10.6
+        },
+        {
+          "type": "Exists",
+          "value": 12
+        },
+        {
+          "type": "Exists",
+          "value": 9.9
+        },
+        {
+          "type": "Exists",
+          "value": 12.2
+        },
+        {
+          "type": "Exists",
+          "value": 9
+        },
+        {
+          "type": "Exists",
+          "value": 17.8
+        },
+        {
+          "type": "Exists",
+          "value": 16.8
+        },
+        {
+          "type": "Exists",
+          "value": 15.8
+        },
+        {
+          "type": "Exists",
+          "value": 16.1
+        },
+        {
+          "type": "Exists",
+          "value": 17.5
+        },
+        {
+          "type": "Exists",
+          "value": 19.9
+        },
+        {
+          "type": "Exists",
+          "value": 20
+        },
+        {
+          "type": "Exists",
+          "value": 18.9
+        },
+        {
+          "type": "Exists",
+          "value": 17.7
+        },
+        {
+          "type": "Exists",
+          "value": 18.9
+        },
+        {
+          "type": "Exists",
+          "value": 20.3
+        },
+        {
+          "type": "Exists",
+          "value": 19.4
+        },
+        {
+          "type": "Exists",
+          "value": 3.5
+        },
+        {
+          "type": "Exists",
+          "value": 2.4
+        },
+        {
+          "type": "Exists",
+          "value": 2.1
+        },
+        {
+          "type": "Exists",
+          "value": 2.4
+        },
+        {
+          "type": "Exists",
+          "value": 2.9
+        },
+        {
+          "type": "Exists",
+          "value": 5.3
+        },
+        {
+          "type": "Exists",
+          "value": 3.8
+        },
+        {
+          "type": "Exists",
+          "value": 2.6
+        },
+        {
+          "type": "Exists",
+          "value": 2.4
+        },
+        {
+          "type": "Exists",
+          "value": 2.8
+        },
+        {
+          "type": "Exists",
+          "value": 3
+        },
+        {
+          "type": "Exists",
+          "value": 6.5
+        },
+        {
+          "type": "Exists",
+          "value": 50.6
+        },
+        {
+          "type": "Exists",
+          "value": 53.9
+        },
+        {
+          "type": "Exists",
+          "value": 54
+        },
+        {
+          "type": "Exists",
+          "value": 54
+        },
+        {
+          "type": "Exists",
+          "value": 55.9
+        },
+        {
+          "type": "Exists",
+          "value": 40
+        },
+        {
+          "type": "Exists",
+          "value": 26.2
+        },
+        {
+          "type": "Exists",
+          "value": 30.6
+        },
+        {
+          "type": "Exists",
+          "value": 33.4
+        },
+        {
+          "type": "Exists",
+          "value": 29.7
+        },
+        {
+          "type": "Exists",
+          "value": 31.3
+        },
+        {
+          "type": "Exists",
+          "value": 16.2
+        }
+      ]
+    },
+    {
+      "name": "statfin_jate_pxt_jate001.px",
+      "fileName": "statfin_jate_pxt_jate001.px",
+      "dimensions": [
+        {
+          "code": "vuosi",
+          "valueCodes": [
+            "1997",
+            "1998",
+            "1999",
+            "2000",
+            "2001",
+            "2002",
+            "2003",
+            "2004",
+            "2005",
+            "2006",
+            "2007",
+            "2008",
+            "2009",
+            "2010",
+            "2011",
+            "2012",
+            "2013",
+            "2014",
+            "2015",
+            "2016",
+            "2017",
+            "2018"
+          ]
+        },
+        {
+          "code": "Tiedot",
+          "valueCodes": [
+            "TOT",
+            "AVS",
+            "ENE",
+            "M\u00C5T"
+          ]
+        }
+      ],
+      "values": [
+        {
+          "type": "Exists",
+          "value": 2200
+        },
+        {
+          "type": "Exists",
+          "value": 1450
+        },
+        {
+          "type": "Exists",
+          "value": 120
+        },
+        {
+          "type": "Exists",
+          "value": 630
+        },
+        {
+          "type": "Exists",
+          "value": 2300
+        },
+        {
+          "type": "Exists",
+          "value": 1510
+        },
+        {
+          "type": "Exists",
+          "value": 140
+        },
+        {
+          "type": "Exists",
+          "value": 650
+        },
+        {
+          "type": "Exists",
+          "value": 2400
+        },
+        {
+          "type": "Exists",
+          "value": 1480
+        },
+        {
+          "type": "Exists",
+          "value": 200
+        },
+        {
+          "type": "Exists",
+          "value": 720
+        },
+        {
+          "type": "Exists",
+          "value": 2600
+        },
+        {
+          "type": "Exists",
+          "value": 1580
+        },
+        {
+          "type": "Exists",
+          "value": 270
+        },
+        {
+          "type": "Exists",
+          "value": 750
+        },
+        {
+          "type": "Exists",
+          "value": 2402
+        },
+        {
+          "type": "Exists",
+          "value": 1468
+        },
+        {
+          "type": "Exists",
+          "value": 230
+        },
+        {
+          "type": "Exists",
+          "value": 704
+        },
+        {
+          "type": "Exists",
+          "value": 2384
+        },
+        {
+          "type": "Exists",
+          "value": 1485
+        },
+        {
+          "type": "Exists",
+          "value": 216
+        },
+        {
+          "type": "Exists",
+          "value": 684
+        },
+        {
+          "type": "Exists",
+          "value": 2428
+        },
+        {
+          "type": "Exists",
+          "value": 1445
+        },
+        {
+          "type": "Exists",
+          "value": 256
+        },
+        {
+          "type": "Exists",
+          "value": 727
+        },
+        {
+          "type": "Exists",
+          "value": 2453
+        },
+        {
+          "type": "Exists",
+          "value": 1423
+        },
+        {
+          "type": "Exists",
+          "value": 285
+        },
+        {
+          "type": "Exists",
+          "value": 746
+        },
+        {
+          "type": "Exists",
+          "value": 2506
+        },
+        {
+          "type": "Exists",
+          "value": 1478
+        },
+        {
+          "type": "Exists",
+          "value": 227
+        },
+        {
+          "type": "Exists",
+          "value": 801
+        },
+        {
+          "type": "Exists",
+          "value": 2600
+        },
+        {
+          "type": "Exists",
+          "value": 1504
+        },
+        {
+          "type": "Exists",
+          "value": 222
+        },
+        {
+          "type": "Exists",
+          "value": 874
+        },
+        {
+          "type": "Exists",
+          "value": 2675
+        },
+        {
+          "type": "Exists",
+          "value": 1411
+        },
+        {
+          "type": "Exists",
+          "value": 310
+        },
+        {
+          "type": "Exists",
+          "value": 953
+        },
+        {
+          "type": "Exists",
+          "value": 2768
+        },
+        {
+          "type": "Exists",
+          "value": 1406
+        },
+        {
+          "type": "Exists",
+          "value": 478
+        },
+        {
+          "type": "Exists",
+          "value": 884
+        },
+        {
+          "type": "Exists",
+          "value": 2562
+        },
+        {
+          "type": "Exists",
+          "value": 1180
+        },
+        {
+          "type": "Exists",
+          "value": 463
+        },
+        {
+          "type": "Exists",
+          "value": 920
+        },
+        {
+          "type": "Exists",
+          "value": 2520
+        },
+        {
+          "type": "Exists",
+          "value": 1141
+        },
+        {
+          "type": "Exists",
+          "value": 557
+        },
+        {
+          "type": "Exists",
+          "value": 822
+        },
+        {
+          "type": "Exists",
+          "value": 2718
+        },
+        {
+          "type": "Exists",
+          "value": 1093
+        },
+        {
+          "type": "Exists",
+          "value": 678
+        },
+        {
+          "type": "Exists",
+          "value": 947
+        },
+        {
+          "type": "Exists",
+          "value": 2738
+        },
+        {
+          "type": "Exists",
+          "value": 901
+        },
+        {
+          "type": "Exists",
+          "value": 925
+        },
+        {
+          "type": "Exists",
+          "value": 912
+        },
+        {
+          "type": "Exists",
+          "value": 2682
+        },
+        {
+          "type": "Exists",
+          "value": 672
+        },
+        {
+          "type": "Exists",
+          "value": 1137
+        },
+        {
+          "type": "Exists",
+          "value": 872
+        },
+        {
+          "type": "Exists",
+          "value": 2630
+        },
+        {
+          "type": "Exists",
+          "value": 458
+        },
+        {
+          "type": "Exists",
+          "value": 1316
+        },
+        {
+          "type": "Exists",
+          "value": 856
+        },
+        {
+          "type": "Exists",
+          "value": 2738
+        },
+        {
+          "type": "Exists",
+          "value": 315
+        },
+        {
+          "type": "Exists",
+          "value": 1312
+        },
+        {
+          "type": "Exists",
+          "value": 1111
+        },
+        {
+          "type": "Exists",
+          "value": 2768
+        },
+        {
+          "type": "Exists",
+          "value": 89
+        },
+        {
+          "type": "Exists",
+          "value": 1515
+        },
+        {
+          "type": "Exists",
+          "value": 1164
+        },
+        {
+          "type": "Exists",
+          "value": 2812
+        },
+        {
+          "type": "Exists",
+          "value": 26
+        },
+        {
+          "type": "Exists",
+          "value": 1646
+        },
+        {
+          "type": "Exists",
+          "value": 1140
+        },
+        {
+          "type": "Exists",
+          "value": 3041
+        },
+        {
+          "type": "Exists",
+          "value": 22
+        },
+        {
+          "type": "Exists",
+          "value": 1732
+        },
+        {
+          "type": "Exists",
+          "value": 1286
+        }
+      ]
+    },
+    {
+      "name": "statfin_khi_pxt_122q.px",
+      "fileName": "statfin_khi_pxt_122q.px",
+      "dimensions": [
+        {
+          "code": "Vuosi",
+          "valueCodes": [
+            "1980",
+            "1981",
+            "1982",
+            "1983",
+            "1984",
+            "1985",
+            "1986",
+            "1987",
+            "1988",
+            "1989",
+            "1990",
+            "1991",
+            "1992",
+            "1993",
+            "1994",
+            "1995",
+            "1996",
+            "1997",
+            "1998",
+            "1999",
+            "2000",
+            "2001",
+            "2002",
+            "2003",
+            "2004",
+            "2005",
+            "2006",
+            "2007",
+            "2008",
+            "2009",
+            "2010",
+            "2011",
+            "2012",
+            "2013",
+            "2014",
+            "2015",
+            "2016",
+            "2017",
+            "2018",
+            "2019",
+            "2020",
+            "2021",
+            "2022",
+            "2023"
+          ]
+        },
+        {
+          "code": "Tiedot",
+          "valueCodes": [
+            "Vuosimuutos"
+          ]
+        }
+      ],
+      "values": [
+        {
+          "type": "Exists",
+          "value": 11.6
+        },
+        {
+          "type": "Exists",
+          "value": 12
+        },
+        {
+          "type": "Exists",
+          "value": 9.3
+        },
+        {
+          "type": "Exists",
+          "value": 8.4
+        },
+        {
+          "type": "Exists",
+          "value": 7.1
+        },
+        {
+          "type": "Exists",
+          "value": 5.9
+        },
+        {
+          "type": "Exists",
+          "value": 3.6
+        },
+        {
+          "type": "Exists",
+          "value": 3.7
+        },
+        {
+          "type": "Exists",
+          "value": 5.1
+        },
+        {
+          "type": "Exists",
+          "value": 6.6
+        },
+        {
+          "type": "Exists",
+          "value": 6.1
+        },
+        {
+          "type": "Exists",
+          "value": 4.1
+        },
+        {
+          "type": "Exists",
+          "value": 2.6
+        },
+        {
+          "type": "Exists",
+          "value": 2.2
+        },
+        {
+          "type": "Exists",
+          "value": 1.1
+        },
+        {
+          "type": "Exists",
+          "value": 1
+        },
+        {
+          "type": "Exists",
+          "value": 0.6
+        },
+        {
+          "type": "Exists",
+          "value": 1.2
+        },
+        {
+          "type": "Exists",
+          "value": 1.4
+        },
+        {
+          "type": "Exists",
+          "value": 1.2
+        },
+        {
+          "type": "Exists",
+          "value": 3.4
+        },
+        {
+          "type": "Exists",
+          "value": 2.6
+        },
+        {
+          "type": "Exists",
+          "value": 1.6
+        },
+        {
+          "type": "Exists",
+          "value": 0.9
+        },
+        {
+          "type": "Exists",
+          "value": 0.2
+        },
+        {
+          "type": "Exists",
+          "value": 0.9
+        },
+        {
+          "type": "Exists",
+          "value": 1.6
+        },
+        {
+          "type": "Exists",
+          "value": 2.5
+        },
+        {
+          "type": "Exists",
+          "value": 4.1
+        },
+        {
+          "type": "Exists",
+          "value": 0
+        },
+        {
+          "type": "Exists",
+          "value": 1.2
+        },
+        {
+          "type": "Exists",
+          "value": 3.4
+        },
+        {
+          "type": "Exists",
+          "value": 2.8
+        },
+        {
+          "type": "Exists",
+          "value": 1.5
+        },
+        {
+          "type": "Exists",
+          "value": 1
+        },
+        {
+          "type": "Exists",
+          "value": -0.2
+        },
+        {
+          "type": "Exists",
+          "value": 0.4
+        },
+        {
+          "type": "Exists",
+          "value": 0.7
+        },
+        {
+          "type": "Exists",
+          "value": 1.1
+        },
+        {
+          "type": "Exists",
+          "value": 1
+        },
+        {
+          "type": "Exists",
+          "value": 0.3
+        },
+        {
+          "type": "Exists",
+          "value": 2.2
+        },
+        {
+          "type": "Exists",
+          "value": 7.1
+        },
+        {
+          "type": "Exists",
+          "value": 6.2
+        }
+      ]
+    },
+    {
+      "name": "statfin_kihi_pxt_141f.px",
+      "fileName": "statfin_kihi_pxt_141f.px",
+      "dimensions": [
+        {
+          "code": "Vuosi",
+          "valueCodes": [
+            "2009",
+            "2010",
+            "2011",
+            "2012",
+            "2013",
+            "2014",
+            "2015",
+            "2016",
+            "2017",
+            "2018",
+            "2019",
+            "2020",
+            "2021",
+            "2022",
+            "2023"
+          ]
+        },
+        {
+          "code": "Tiedot",
+          "valueCodes": [
+            "ketjutettu_lv",
+            "vmuut"
+          ]
+        }
+      ],
+      "values": [
+        {
+          "type": "Exists",
+          "value": 101.9
+        },
+        {
+          "type": "Missing",
+          "value": null
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": -1.8
+        },
+        {
+          "type": "Exists",
+          "value": 103.5
+        },
+        {
+          "type": "Exists",
+          "value": 3.5
+        },
+        {
+          "type": "Exists",
+          "value": 107.9
+        },
+        {
+          "type": "Exists",
+          "value": 4.3
+        },
+        {
+          "type": "Exists",
+          "value": 109.8
+        },
+        {
+          "type": "Exists",
+          "value": 1.7
+        },
+        {
+          "type": "Exists",
+          "value": 110.6
+        },
+        {
+          "type": "Exists",
+          "value": 0.8
+        },
+        {
+          "type": "Exists",
+          "value": 111.3
+        },
+        {
+          "type": "Exists",
+          "value": 0.6
+        },
+        {
+          "type": "Exists",
+          "value": 113
+        },
+        {
+          "type": "Exists",
+          "value": 1.5
+        },
+        {
+          "type": "Exists",
+          "value": 115
+        },
+        {
+          "type": "Exists",
+          "value": 1.8
+        },
+        {
+          "type": "Exists",
+          "value": 119.3
+        },
+        {
+          "type": "Exists",
+          "value": 3.8
+        },
+        {
+          "type": "Exists",
+          "value": 122.6
+        },
+        {
+          "type": "Exists",
+          "value": 2.8
+        },
+        {
+          "type": "Exists",
+          "value": 123.4
+        },
+        {
+          "type": "Exists",
+          "value": 0.6
+        },
+        {
+          "type": "Exists",
+          "value": 128.2
+        },
+        {
+          "type": "Exists",
+          "value": 3.9
+        },
+        {
+          "type": "Exists",
+          "value": 137.9
+        },
+        {
+          "type": "Exists",
+          "value": 7.6
+        },
+        {
+          "type": "Exists",
+          "value": 140.8
+        },
+        {
+          "type": "Exists",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "statfin_klts_pxt_11wv.px",
+      "fileName": "statfin_klts_pxt_11wv.px",
+      "dimensions": [
+        {
+          "code": "Tiedot",
+          "valueCodes": [
+            "klts010",
+            "klts020",
+            "klts030"
+          ]
+        },
+        {
+          "code": "Vuosi",
+          "valueCodes": [
+            "2008",
+            "2009",
+            "2010",
+            "2011",
+            "2012",
+            "2013",
+            "2014",
+            "2015",
+            "2016",
+            "2017",
+            "2018",
+            "2019",
+            "2020",
+            "2021",
+            "2022"
+          ]
+        }
+      ],
+      "values": [
+        {
+          "type": "Exists",
+          "value": 170940
+        },
+        {
+          "type": "Exists",
+          "value": 159066
+        },
+        {
+          "type": "Exists",
+          "value": 164663
+        },
+        {
+          "type": "Exists",
+          "value": 171583
+        },
+        {
+          "type": "Exists",
+          "value": 173661
+        },
+        {
+          "type": "Exists",
+          "value": 175985
+        },
+        {
+          "type": "Exists",
+          "value": 178410
+        },
+        {
+          "type": "Exists",
+          "value": 180818
+        },
+        {
+          "type": "Exists",
+          "value": 185988
+        },
+        {
+          "type": "Exists",
+          "value": 193268
+        },
+        {
+          "type": "Exists",
+          "value": 201308
+        },
+        {
+          "type": "Exists",
+          "value": 207291
+        },
+        {
+          "type": "Exists",
+          "value": 206158
+        },
+        {
+          "type": "Exists",
+          "value": 217207
+        },
+        {
+          "type": "Exists",
+          "value": 232691
+        },
+        {
+          "type": "Exists",
+          "value": 6085
+        },
+        {
+          "type": "Exists",
+          "value": 5786
+        },
+        {
+          "type": "Exists",
+          "value": 5428
+        },
+        {
+          "type": "Exists",
+          "value": 5526
+        },
+        {
+          "type": "Exists",
+          "value": 5668
+        },
+        {
+          "type": "Exists",
+          "value": 5575
+        },
+        {
+          "type": "Exists",
+          "value": 5829
+        },
+        {
+          "type": "Exists",
+          "value": 6314
+        },
+        {
+          "type": "Exists",
+          "value": 6665
+        },
+        {
+          "type": "Exists",
+          "value": 6592
+        },
+        {
+          "type": "Exists",
+          "value": 6554
+        },
+        {
+          "type": "Exists",
+          "value": 6475
+        },
+        {
+          "type": "Exists",
+          "value": 6034
+        },
+        {
+          "type": "Exists",
+          "value": 6787
+        },
+        {
+          "type": "Exists",
+          "value": 7112
+        },
+        {
+          "type": "Exists",
+          "value": 3.6
+        },
+        {
+          "type": "Exists",
+          "value": 3.6
+        },
+        {
+          "type": "Exists",
+          "value": 3.3
+        },
+        {
+          "type": "Exists",
+          "value": 3.2
+        },
+        {
+          "type": "Exists",
+          "value": 3.3
+        },
+        {
+          "type": "Exists",
+          "value": 3.2
+        },
+        {
+          "type": "Exists",
+          "value": 3.3
+        },
+        {
+          "type": "Exists",
+          "value": 3.5
+        },
+        {
+          "type": "Exists",
+          "value": 3.6
+        },
+        {
+          "type": "Exists",
+          "value": 3.4
+        },
+        {
+          "type": "Exists",
+          "value": 3.3
+        },
+        {
+          "type": "Exists",
+          "value": 3.1
+        },
+        {
+          "type": "Exists",
+          "value": 2.9
+        },
+        {
+          "type": "Exists",
+          "value": 3.1
+        },
+        {
+          "type": "Exists",
+          "value": 3.1
+        }
+      ]
+    },
+    {
+      "name": "statfin_ras_pxt_13m4.px",
+      "fileName": "statfin_ras_pxt_13m4.px",
+      "dimensions": [
+        {
+          "code": "Kuukausi",
+          "valueCodes": [
+            "2023M08",
+            "2023M09",
+            "2023M10",
+            "2023M11",
+            "2023M12",
+            "2024M01",
+            "2024M02",
+            "2024M03",
+            "2024M04",
+            "2024M05",
+            "2024M06",
+            "2024M07"
+          ]
+        },
+        {
+          "code": "Tiedot",
+          "valueCodes": [
+            "alk_muutos",
+            "alk_muutos_uusi",
+            "alk_muutos_revisio"
+          ]
+        }
+      ],
+      "values": [
+        {
+          "type": "Exists",
+          "value": -69.7
+        },
+        {
+          "type": "Exists",
+          "value": -65.1
+        },
+        {
+          "type": "Exists",
+          "value": 4.6
+        },
+        {
+          "type": "Exists",
+          "value": -0.7
+        },
+        {
+          "type": "Exists",
+          "value": 7.7
+        },
+        {
+          "type": "Exists",
+          "value": 8.4
+        },
+        {
+          "type": "Exists",
+          "value": -20.5
+        },
+        {
+          "type": "Exists",
+          "value": -13.7
+        },
+        {
+          "type": "Exists",
+          "value": 6.8
+        },
+        {
+          "type": "Exists",
+          "value": -30.9
+        },
+        {
+          "type": "Exists",
+          "value": -19.8
+        },
+        {
+          "type": "Exists",
+          "value": 11.1
+        },
+        {
+          "type": "Exists",
+          "value": -40.4
+        },
+        {
+          "type": "Exists",
+          "value": -33.8
+        },
+        {
+          "type": "Exists",
+          "value": 6.6
+        },
+        {
+          "type": "Exists",
+          "value": -54.8
+        },
+        {
+          "type": "Exists",
+          "value": -44.9
+        },
+        {
+          "type": "Exists",
+          "value": 9.9
+        },
+        {
+          "type": "Exists",
+          "value": 2.9
+        },
+        {
+          "type": "Exists",
+          "value": 7.5
+        },
+        {
+          "type": "Exists",
+          "value": 4.6
+        },
+        {
+          "type": "Exists",
+          "value": -13.1
+        },
+        {
+          "type": "Exists",
+          "value": -11.4
+        },
+        {
+          "type": "Exists",
+          "value": 1.7
+        },
+        {
+          "type": "Exists",
+          "value": -4.8
+        },
+        {
+          "type": "Exists",
+          "value": 24.3
+        },
+        {
+          "type": "Exists",
+          "value": 29.1
+        },
+        {
+          "type": "Exists",
+          "value": 13.8
+        },
+        {
+          "type": "Exists",
+          "value": 14.2
+        },
+        {
+          "type": "Exists",
+          "value": 0.4
+        },
+        {
+          "type": "Exists",
+          "value": -38.2
+        },
+        {
+          "type": "Exists",
+          "value": -30.4
+        },
+        {
+          "type": "Exists",
+          "value": 7.8
+        },
+        {
+          "type": "Exists",
+          "value": 8.3
+        },
+        {
+          "type": "Exists",
+          "value": 8.9
+        },
+        {
+          "type": "Exists",
+          "value": 0.6
+        }
+      ]
+    }
+  ]
+}

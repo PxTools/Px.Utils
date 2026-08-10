@@ -1,0 +1,92 @@
+CHARSET="ANSI";
+AXIS-VERSION="2013";
+CODEPAGE="windows-1252";
+LANGUAGE="fi";
+LANGUAGES="fi","en";
+CREATION-DATE="20190122 15:54";
+DECIMALS=0;
+SHOWDECIMALS=0;
+MATRIX="vpa_132_201700";
+SUBJECT-CODE="VPA";
+SUBJECT-AREA="Vapaa-ajan osallistuminen";
+SUBJECT-AREA[en]="Participation in leisure activities";
+COPYRIGHT=YES;
+DESCRIPTION="132 -- Harrastanut kilpapelaamista (eSports) , 15 vuotta täyttäneet (2017) %";
+DESCRIPTION[en]="132 -- Participated in competitive gaming (eSports) , those aged 15 or over (2017) %";
+TITLE="Harrastanut kilpapelaamista (eSports) , 15 vuotta täyttäneet (2017) % muuttujina Sukupuoli, Taustamuuttuja, Vuosi, Tiedot ja Vastaus";
+TITLE[en]="Participated in competitive gaming (eSports) , those aged 15 or over (2017) % by Sex, Background variable, Year, Data and Response";
+CONTENTS="Harrastanut kilpapelaamista (eSports) , 15 vuotta täyttäneet (2017) %";
+CONTENTS[en]="Participated in competitive gaming (eSports) , those aged 15 or over (2017) %";
+UNITS="lkm, %";
+UNITS[en]="number, %";
+STUB="Sukupuoli","Taustamuuttuja","Vuosi";
+STUB[en]="Sex","Background variable","Year";
+HEADING="Tiedot","Vastaus";
+HEADING[en]="Data","Response";
+VALUES("Sukupuoli")="Sukupuolet yhteensä","Miehet","Naiset";
+VALUES[en]("Sex")="Sex total","Men","Women";
+VALUES("Taustamuuttuja")="Sosioekonominen asema yhteensä","Yrittäjä (0-1)",
+"Ylempi toimihenkilö (2)","Alempi toimihenkilö (3)","Työntekijä (4-5)",
+"Eläkkeellä tai pitkäaikaissairas (6)","Työtön (7)","Opiskelija tai koululainen (8)",
+"Omaa kotitaloutta hoitava tai muu (9)";
+VALUES[en]("Background variable")="Socioeconomic status total","Employer (0-1)",
+"Upper-level  employee (2)","Lower-level employee (3)","Manual worker (4-5)",
+"Pensioner or long-term ill (6)","Unemployed (7)","Student or at school (8)",
+"Looks after own household or other (9)";
+VALUES("Vuosi")="2017";
+VALUES[en]("Year")="2017";
+VALUES("Tiedot")="%";
+VALUES[en]("Data")="%";
+VALUES("Vastaus")="Kyllä","Ei tai puuttuva tieto","Yhteensä","N(painot.)";
+VALUES[en]("Response")="Yes","No or missing","Total","N (weighted)";
+TIMEVAL("Vuosi")=TLIST(A1),"2017";
+TIMEVAL[en]("Year")=TLIST(A1),"2017";
+CODES("Sukupuoli")="0100","0101","0102";
+CODES[en]("Sex")="0100","0101","0102";
+CODES("Taustamuuttuja")="0500","0502","0503","0504","0505","0506","0507","0508","0509";
+CODES[en]("Background variable")="0500","0502","0503","0504","0505","0506","0507","0508","0509";
+CODES("Vuosi")="2017";
+CODES[en]("Year")="2017";
+CODES("Tiedot")="Pros";
+CODES[en]("Data")="Pros";
+CODES("Vastaus")="K58_0101","K58_0199","SSS","YYY";
+CODES[en]("Response")="K58_0101","K58_0199","SSS","YYY";
+LAST-UPDATED="20190131 09:00";
+CONTACT="Tilastokeskus#<A HREF=http://tilastokeskus.fi/til/vpa/index.html TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[en]="Statistics Finland#<A HREF=http://tilastokeskus.fi/til/vpa/index_en.html TARGET=_blank>Statistics homepage</A>";
+SOURCE="Tilastokeskus";
+SOURCE[en]="Statistics Finland";
+NOTE="<A HREF=http://tilastokeskus.fi/til/vpa/meta.html TARGET=_blank>Tilaston kuvaus</A>#<A HREF=http://tilastokeskus.fi/til/vpa/laa.html TARGET=_blank>Laatuseloste</A>#<A HREF=http://tilastokeskus.fi/til/vpa/kas.html TARGET=_blank>Käsitteet ja "
+"määritelmät</A>#<A HREF=http://tilastokeskus.fi/til/vpa/kat.html TARGET=_blank>Katsaus</A>##Merkintätapojen selitykset:#. tieto on epälooginen esitettäväksi#.. tietoa ei ole saatu, se on liian epävarma esitettäväksi tai se on salassapitosäännön alainen#- "
+"ei yhtään havaintoa";
+NOTE[en]="<A HREF=http://tilastokeskus.fi/til/vpa/meta_en.html TARGET=_blank>Description</A>#<A HREF=http://tilastokeskus.fi/til/vpa/laa_en.html TARGET=_blank>Quality descriptions</A>#<A HREF=http://tilastokeskus.fi/til/vpa/kas_en.html TARGET=_"
+"blank>Concepts and definitions</A>#<A HREF=http://tilastokeskus.fi/til/vpa/kat_en.html TARGET=_blank>Reviews</A>##Explanation of symbols:#. Category not applicable#.. Data not available or too uncertain for presentation, or subject to secrecy#- Magnitude "
+"nil";
+DATA=
+3 97 100 6715 
+1 99 100 325 
+2 98 100 844 
+2 98 100 1061 
+2 98 100 731 
+1 99 100 2122 
+5 95 100 393 
+7 93 100 863 
+4 96 100 210 
+4 96 100 3278 
+2 98 100 226 
+3 97 100 459 
+7 93 100 328 
+3 97 100 523 
+1 99 100 957 
+10 90 100 194 
+11 89 100 432 
+8 92 100 65 
+1 99 100 3436 
+"-" 100 100 99 
+1 99 100 385 
+0 100 100 733 
+1 99 100 208 
+0 100 100 1165 
+1 99 100 199 
+3 97 100 430 
+2 98 100 145; 
