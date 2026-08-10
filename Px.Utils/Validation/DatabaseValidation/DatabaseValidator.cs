@@ -5,6 +5,7 @@ using Px.Utils.Validation.SyntaxValidation;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Ude;
 
 namespace Px.Utils.Validation.DatabaseValidation
 {
@@ -68,8 +69,8 @@ namespace Px.Utils.Validation.DatabaseValidation
             {
                 fileTasks.Add(Task.Run(() =>
                 {
-                    DatabaseFileInfo file = ProcessAliasFile(fileName);
-                    aliasFiles.Add(file);
+                    DatabaseFileInfo? file = ProcessAliasFile(fileName);
+                    if (file is not null) aliasFiles.Add(file);
                 }));
             }
 
@@ -115,8 +116,8 @@ namespace Px.Utils.Validation.DatabaseValidation
             {
                 fileTasks.Add(Task.Run(async () =>
                 {
-                    DatabaseFileInfo file = await ProcessAliasFileAsync(fileName, cancellationToken);
-                    aliasFiles.Add(file);
+                    DatabaseFileInfo? file = await ProcessAliasFileAsync(fileName, cancellationToken);
+                    if (file is not null) aliasFiles.Add(file);
                 }, cancellationToken));
             }
             
@@ -141,7 +142,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             return (fileInfo, feedbacks);
         }
 
-        private DatabaseFileInfo ProcessAliasFile(string fileName)
+        private DatabaseFileInfo? ProcessAliasFile(string fileName)
         {
             using Stream stream = _fileSystem.GetFileStream(fileName);
             return GetAliasFileInfo(fileName, stream);
@@ -164,7 +165,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             return (fileInfo, feedbacks);
         }
 
-        private async Task<DatabaseFileInfo> ProcessAliasFileAsync(string fileName, CancellationToken cancellationToken)
+        private async Task<DatabaseFileInfo?> ProcessAliasFileAsync(string fileName, CancellationToken cancellationToken)
         {
             using Stream stream = _fileSystem.GetFileStream(fileName);
             cancellationToken.ThrowIfCancellationRequested();
@@ -260,7 +261,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             IEnumerable<string> allDirectories = _fileSystem.EnumerateDirectories(_directoryPath);
             foreach (string directory in allDirectories)
             {
-                string directoryName = new DirectoryInfo(directory).Name;
+                string directoryName = _fileSystem.GetFileName(directory);
                 if (directoryName == _conf.Tokens.Database.Index) continue;
 
                 foreach (IDatabaseValidator validator in directoryValidators)
@@ -400,7 +401,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
         }
 
-        private DatabaseFileInfo GetAliasFileInfo(string filename, Stream stream)
+        private DatabaseFileInfo? GetAliasFileInfo(string filename, Stream stream)
         {
             string name = _fileSystem.GetFileName(filename);
             string? path = _fileSystem.GetDirectoryName(filename);
@@ -409,12 +410,13 @@ namespace Px.Utils.Validation.DatabaseValidation
                 name.Split(_conf.Tokens.Database.LanguageSeparator)[1].Split('.')[0]
             ];
 
-            Encoding encoding = _fileSystem.GetEncoding(stream);
+            Encoding? encoding = DetectAliasEncoding(stream);
+            if (encoding is null) return null;
             DatabaseFileInfo fileInfo = new (name, location, languages, encoding);
             return fileInfo;
         }
 
-        private async Task<DatabaseFileInfo> GetAliasFileInfoAsync(string filename, Stream stream, CancellationToken cancellationToken)
+        private async Task<DatabaseFileInfo?> GetAliasFileInfoAsync(string filename, Stream stream, CancellationToken cancellationToken)
         {
             string name = _fileSystem.GetFileName(filename);
             string? path = _fileSystem.GetDirectoryName(filename);
@@ -423,9 +425,19 @@ namespace Px.Utils.Validation.DatabaseValidation
                 name.Split(_conf.Tokens.Database.LanguageSeparator)[1].Split('.')[0]
             ];
 
-            Encoding encoding = await _fileSystem.GetEncodingAsync(stream, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            Encoding? encoding = DetectAliasEncoding(stream);
+            if (encoding is null) return null;
             DatabaseFileInfo fileInfo = new (name, location, languages, encoding);
             return fileInfo;
+        }
+
+        private static Encoding? DetectAliasEncoding(Stream stream)
+        {
+            CharsetDetector detector = new();
+            detector.Feed(stream);
+            detector.DataEnd();
+            return detector.Charset is string charset ? Encoding.GetEncoding(charset) : null;
         }
     }
 

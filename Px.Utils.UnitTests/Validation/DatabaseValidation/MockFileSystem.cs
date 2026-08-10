@@ -1,4 +1,4 @@
-﻿using Px.Utils.Validation.DatabaseValidation;
+using Px.Utils.Validation.DatabaseValidation;
 using System.Text;
 
 namespace Px.Utils.UnitTests.Validation.DatabaseValidation
@@ -32,27 +32,27 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
                 "database/category/directory/Alias_sv.txt",
             ] },
             { "database_invalid", [
-                "database/Alias_fi.txt",
-                "database/Alias_en.txt",
-                "database/Alias_sv.txt",
-                "database/category/Alias_fi.txt",
-                "database/category/Alias_en.txt",
-                "database/category/Alias_sv.txt",
-                "database/category/directory/foo.px",
-                "database/category/directory/bar.px",
-                "database/category/directory/baz.px",
-                "database/category/directory/invalid.px",
-                "database/category/directory/Alias_fi.txt",
-                "database/category/directory/Alias_en.txt",
-                "database/category/directory/Alias_sv.txt",
+                "database_invalid/Alias_fi.txt",
+                "database_invalid/Alias_en.txt",
+                "database_invalid/Alias_sv.txt",
+                "database_invalid/category/Alias_fi.txt",
+                "database_invalid/category/Alias_en.txt",
+                "database_invalid/category/Alias_sv.txt",
+                "database_invalid/category/directory/foo.px",
+                "database_invalid/category/directory/bar.px",
+                "database_invalid/category/directory/baz.px",
+                "database_invalid/category/directory/invalid.px",
+                "database_invalid/category/directory/Alias_fi.txt",
+                "database_invalid/category/directory/Alias_en.txt",
+                "database_invalid/category/directory/Alias_sv.txt",
             ] },
             { "database_single_language", [
-                "database/Alias_en.txt",
-                "database/category/Alias_en.txt",
-                "database/category/directory/foo_sl.px",
-                "database/category/directory/bar_sl.px",
-                "database/category/directory/baz_sl.px",
-                "database/category/directory/Alias_en.txt",
+                "database_single_language/Alias_en.txt",
+                "database_single_language/category/Alias_en.txt",
+                "database_single_language/category/directory/foo_sl.px",
+                "database_single_language/category/directory/bar_sl.px",
+                "database_single_language/category/directory/baz_sl.px",
+                "database_single_language/category/directory/Alias_en.txt",
             ] }
         };
 
@@ -87,8 +87,17 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
         public Stream GetFileStream(string path)
         {
-            byte[] data = Encoding.UTF8.GetBytes(MockDatabaseFileStreams.FileStreams[path]);
+            byte[] data = path.EndsWith(".txt", StringComparison.OrdinalIgnoreCase)
+                ? Encoding.UTF8.GetBytes("Alias file content with special characters: ÅÄÖ")
+                : Encoding.UTF8.GetBytes(MockDatabaseFileStreams.FileStreams[GetFixturePath(path)]);
             return new MemoryStream(data);
+        }
+
+        private static string GetFixturePath(string path)
+        {
+            return path
+                .Replace("database_invalid", "database", StringComparison.Ordinal)
+                .Replace("database_single_language", "database", StringComparison.Ordinal);
         }
 
         public Encoding GetEncoding(Stream stream)
