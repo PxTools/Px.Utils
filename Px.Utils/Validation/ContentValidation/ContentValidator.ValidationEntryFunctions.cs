@@ -1,6 +1,5 @@
 using Px.Utils.Validation.SyntaxValidation;
 using Px.Utils.Models.Metadata.Enums;
-using System.Globalization;
 
 namespace Px.Utils.Validation.ContentValidation
 {
@@ -449,9 +448,9 @@ namespace Px.Utils.Validation.ContentValidation
                 return null;
             }
 
-            // Check if entry.value is in upper case
-            string valueUppercase = entry.Value.ToUpper(CultureInfo.InvariantCulture);
-            if (entry.Value != valueUppercase)
+            // CODEPAGE identifiers are ASCII; avoid runtime-dependent casing behavior for characters inside quoted values.
+            bool containsLowercaseAsciiLetter = entry.Value.Any(character => character is >= 'a' and <= 'z');
+            if (containsLowercaseAsciiLetter)
             {
                 KeyValuePair<int, int> feedbackIndexes = SyntaxValidationUtilityMethods.GetLineAndCharacterIndex(
                     entry.KeyStartLineIndex,
