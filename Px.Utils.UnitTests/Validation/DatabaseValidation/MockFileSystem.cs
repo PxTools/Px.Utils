@@ -12,7 +12,9 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
         {
             { "database", ["database/category", "database/category/directory", "database/_INDEX"] },
             { "database_invalid", ["database_invalid/category", "database_invalid/category/directory", "database_invalid/_INDEX"] },
-            { "database_single_language", ["database_single_language/category", "database_single_language/category/directory", "database_single_language/_INDEX"] }
+            { "database_single_language", ["database_single_language/category", "database_single_language/category/directory", "database_single_language/_INDEX"] },
+            { "database_empty", [] },
+            { "database_unreadable_alias", [] }
         };
 
         private readonly Dictionary<string, IEnumerable<string>> _files = new()
@@ -53,7 +55,9 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
                 "database_single_language/category/directory/bar_sl.px",
                 "database_single_language/category/directory/baz_sl.px",
                 "database_single_language/category/directory/Alias_en.txt",
-            ] }
+            ] },
+            { "database_empty", [] },
+            { "database_unreadable_alias", ["database_unreadable_alias/Alias_en.txt"] }
         };
 
         public IEnumerable<string> EnumerateDirectories(string path)
@@ -87,6 +91,11 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
 
         public Stream GetFileStream(string path)
         {
+            if (path.StartsWith("database_unreadable_alias", StringComparison.Ordinal))
+            {
+                return new MemoryStream();
+            }
+
             byte[] data = path.EndsWith(".txt", StringComparison.OrdinalIgnoreCase)
                 ? Encoding.UTF8.GetBytes("Alias file content with special characters: ÅÄÖ")
                 : Encoding.UTF8.GetBytes(MockDatabaseFileStreams.FileStreams[GetFixturePath(path)]);

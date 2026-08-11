@@ -22,6 +22,33 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
         }
 
         [TestMethod]
+        public void ValidateDatabaseWithNoFilesReturnsValidResult()
+        {
+            MockFileSystem fileSystem = new();
+            DatabaseValidator validator = new("database_empty", fileSystem: fileSystem);
+
+            ValidationResult result = validator.Validate();
+
+            Assert.IsNotNull(result, "Validation result should not be null");
+            Assert.HasCount(0, result.FeedbackItems);
+        }
+
+        [TestMethod]
+        public void ValidateDatabaseWithUnreadableAliasFileReturnsFeedback()
+        {
+            MockFileSystem fileSystem = new();
+            DatabaseValidator validator = new("database_unreadable_alias", fileSystem: fileSystem);
+            ValidationFeedbackKey unreadableAliasFileKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.UnreadableAliasFile);
+
+            ValidationResult result = validator.Validate();
+
+            Assert.IsNotNull(result, "Validation result should not be null");
+            Assert.HasCount(1, result.FeedbackItems);
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(unreadableAliasFileKey));
+            Assert.HasCount(1, result.FeedbackItems[unreadableAliasFileKey]);
+        }
+
+        [TestMethod]
         public async Task ValidateDatabaseAsyncWithValidDatabaseReturnsValidResult()
         {
             // Arrange
@@ -229,6 +256,33 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
             Assert.HasCount(0, result.FeedbackItems);
+        }
+
+        [TestMethod]
+        public async Task ValidateDatabaseAsyncWithNoFilesReturnsValidResult()
+        {
+            MockFileSystem fileSystem = new();
+            DatabaseValidator validator = new("database_empty", fileSystem: fileSystem);
+
+            ValidationResult result = await validator.ValidateAsync();
+
+            Assert.IsNotNull(result, "Validation result should not be null");
+            Assert.HasCount(0, result.FeedbackItems);
+        }
+
+        [TestMethod]
+        public async Task ValidateDatabaseAsyncWithUnreadableAliasFileReturnsFeedback()
+        {
+            MockFileSystem fileSystem = new();
+            DatabaseValidator validator = new("database_unreadable_alias", fileSystem: fileSystem);
+            ValidationFeedbackKey unreadableAliasFileKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.UnreadableAliasFile);
+
+            ValidationResult result = await validator.ValidateAsync();
+
+            Assert.IsNotNull(result, "Validation result should not be null");
+            Assert.HasCount(1, result.FeedbackItems);
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(unreadableAliasFileKey));
+            Assert.HasCount(1, result.FeedbackItems[unreadableAliasFileKey]);
         }
     }
 }

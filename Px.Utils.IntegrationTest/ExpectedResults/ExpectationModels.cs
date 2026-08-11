@@ -78,8 +78,6 @@ internal sealed class CalculationExpectation
 
     public required string FileName { get; init; }
 
-    public required List<DimensionExpectation> SourceMap { get; init; }
-
     public required List<DimensionExpectation> TargetMap { get; init; }
 
     public required string DimensionCode { get; init; }

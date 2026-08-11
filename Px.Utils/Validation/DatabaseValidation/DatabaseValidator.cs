@@ -201,11 +201,11 @@ namespace Px.Utils.Validation.DatabaseValidation
             ValidationFeedback feedbacks = [];
             IEnumerable<DatabaseFileInfo> allFiles = pxFiles.Concat(aliasFiles.Where(file => file.IsEncodingDetected));
             IEnumerable<string> databaseLanguages = pxFiles.SelectMany(file => file.Languages).Distinct();
-            Encoding mostCommonEncoding = allFiles.Select(file => file.Encoding)
+            Encoding? mostCommonEncoding = allFiles.Select(file => file.Encoding)
                 .GroupBy(enc => enc)
                 .OrderByDescending(group => group.Count())
-                .First()
-                .Key;
+                .FirstOrDefault()
+                ?.Key;
 
             feedbacks.AddRange(ValidatePxFiles(databaseLanguages, mostCommonEncoding, pxFiles));
             feedbacks.AddRange(ValidateAliasFiles(mostCommonEncoding, aliasFiles));
@@ -215,7 +215,7 @@ namespace Px.Utils.Validation.DatabaseValidation
 
         private ValidationFeedback ValidatePxFiles(
             IEnumerable<string> databaseLanguages, 
-            Encoding mostCommonEncoding, 
+            Encoding? mostCommonEncoding, 
             ConcurrentBag<DatabaseFileInfo> pxFiles)
         {
             ValidationFeedback feedbacks = [];
@@ -223,8 +223,11 @@ namespace Px.Utils.Validation.DatabaseValidation
             [
                 new DuplicatePxFileName([.. pxFiles]),
                 new MissingPxFileLanguages(databaseLanguages),
-                new MismatchingEncoding(mostCommonEncoding),
             ];
+            if (mostCommonEncoding is not null)
+            {
+                pxFileValidators = [.. pxFileValidators, new MismatchingEncoding(mostCommonEncoding)];
+            }
             if (_customPxFileValidators is not null)
             {
                 pxFileValidators = [.. pxFileValidators, .. _customPxFileValidators];
@@ -244,13 +247,14 @@ namespace Px.Utils.Validation.DatabaseValidation
             return feedbacks;
         }
 
-        private ValidationFeedback ValidateAliasFiles(Encoding mostCommonEncoding, ConcurrentBag<DatabaseFileInfo> aliasFiles)
+        private ValidationFeedback ValidateAliasFiles(Encoding? mostCommonEncoding, ConcurrentBag<DatabaseFileInfo> aliasFiles)
         {
             ValidationFeedback feedbacks = [];
-            IDatabaseValidator[] aliasFileValidators =
-            [
-                new MismatchingEncoding(mostCommonEncoding),
-            ];
+            IDatabaseValidator[] aliasFileValidators = [];
+            if (mostCommonEncoding is not null)
+            {
+                aliasFileValidators = [new MismatchingEncoding(mostCommonEncoding)];
+            }
             if (_customAliasFileValidators is not null)
             {
                 aliasFileValidators = [.. aliasFileValidators, .. _customAliasFileValidators];
