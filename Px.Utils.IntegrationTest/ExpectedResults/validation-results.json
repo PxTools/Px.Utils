@@ -1,476 +1,525 @@
 {
-    "files":  [
-                  {
-                      "fileName":  "valid-files/statfin_akay_pxt_013.px",
-                      "classification":  "valid-files",
-                      "warningCount":  24,
-                      "errorCount":  0,
-                      "entries":  [
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ExcessNewLinesInValue",
-                                          "count":  4
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "RecommendedKeyMissing",
-                                          "count":  19
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ValueIsNotInUpperCase",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  11,
-                                          "additionalInformation":  "CODEPAGE: \"iso-8859-15\""
-                                      }
-                                  ]
-                  },
-                  {
-                      "fileName":  "valid-files/statfin_atp_pxt_11n3.px",
-                      "classification":  "valid-files",
-                      "warningCount":  21,
-                      "errorCount":  0,
-                      "entries":  [
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ExcessNewLinesInValue",
-                                          "count":  1,
-                                          "row":  44,
-                                          "character":  92,
-                                          "additionalInformation":  "Not available"
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "RecommendedKeyMissing",
-                                          "count":  7
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "UnrecommendedLanguageDefinitionFound",
-                                          "count":  12
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ValueIsNotInUpperCase",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  11,
-                                          "additionalInformation":  "CODEPAGE: \"iso-8859-15\""
-                                      }
-                                  ]
-                  },
-                  {
-                      "fileName":  "valid-files/statfin_cvts_pxt_13vr.px",
-                      "classification":  "valid-files",
-                      "warningCount":  20,
-                      "errorCount":  0,
-                      "entries":  [
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "RecommendedKeyMissing",
-                                          "count":  15
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "UnrecommendedLanguageDefinitionFound",
-                                          "count":  4
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ValueIsNotInUpperCase",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  11,
-                                          "additionalInformation":  "CODEPAGE: \"iso-8859-15\""
-                                      }
-                                  ]
-                  },
-                  {
-                      "fileName":  "valid-files/statfin_jate_pxt_jate001.px",
-                      "classification":  "valid-files",
-                      "warningCount":  15,
-                      "errorCount":  0,
-                      "entries":  [
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ExcessNewLinesInValue",
-                                          "count":  2
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "RecommendedKeyMissing",
-                                          "count":  12
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ValueIsNotInUpperCase",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  11,
-                                          "additionalInformation":  "CODEPAGE: \"iso-8859-15\""
-                                      }
-                                  ]
-                  },
-                  {
-                      "fileName":  "valid-files/statfin_khi_pxt_122q.px",
-                      "classification":  "valid-files",
-                      "warningCount":  12,
-                      "errorCount":  0,
-                      "entries":  [
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "RecommendedKeyMissing",
-                                          "count":  7
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "UnrecommendedLanguageDefinitionFound",
-                                          "count":  4
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ValueIsNotInUpperCase",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  11,
-                                          "additionalInformation":  "CODEPAGE: \"iso-8859-15\""
-                                      }
-                                  ]
-                  },
-                  {
-                      "fileName":  "valid-files/statfin_kihi_pxt_141f.px",
-                      "classification":  "valid-files",
-                      "warningCount":  20,
-                      "errorCount":  0,
-                      "entries":  [
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ExcessNewLinesInValue",
-                                          "count":  6
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "RecommendedKeyMissing",
-                                          "count":  7
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "UnrecommendedLanguageDefinitionFound",
-                                          "count":  6
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ValueIsNotInUpperCase",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  11,
-                                          "additionalInformation":  "CODEPAGE: \"iso-8859-15\""
-                                      }
-                                  ]
-                  },
-                  {
-                      "fileName":  "valid-files/statfin_klts_pxt_11wv.px",
-                      "classification":  "valid-files",
-                      "warningCount":  26,
-                      "errorCount":  0,
-                      "entries":  [
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ExcessNewLinesInValue",
-                                          "count":  8
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "RecommendedKeyMissing",
-                                          "count":  7
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "UnrecommendedLanguageDefinitionFound",
-                                          "count":  10
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ValueIsNotInUpperCase",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  11,
-                                          "additionalInformation":  "CODEPAGE: \"iso-8859-15\""
-                                      }
-                                  ]
-                  },
-                  {
-                      "fileName":  "valid-files/statfin_ras_pxt_13m4.px",
-                      "classification":  "valid-files",
-                      "warningCount":  25,
-                      "errorCount":  0,
-                      "entries":  [
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ExcessNewLinesInValue",
-                                          "count":  9
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "RecommendedKeyMissing",
-                                          "count":  7
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "UnrecommendedLanguageDefinitionFound",
-                                          "count":  8
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ValueIsNotInUpperCase",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  11,
-                                          "additionalInformation":  "CODEPAGE: \"iso-8859-15\""
-                                      }
-                                  ]
-                  },
-                  {
-                      "fileName":  "invalid-files/statfin_kttav_pxt_11b6.px",
-                      "classification":  "invalid-files",
-                      "warningCount":  23,
-                      "errorCount":  1,
-                      "entries":  [
-                                      {
-                                          "level":  "Error",
-                                          "rule":  "DataValidationFeedbackInvalidRowCount",
-                                          "count":  1,
-                                          "row":  111,
-                                          "character":  2,
-                                          "additionalInformation":  " Expected 0 rows, got 1 rows."
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ExcessNewLinesInValue",
-                                          "count":  7
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "RecommendedKeyMissing",
-                                          "count":  7
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "UnrecommendedLanguageDefinitionFound",
-                                          "count":  8
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ValueIsNotInUpperCase",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  11,
-                                          "additionalInformation":  "CODEPAGE: \"iso-8859-15\""
-                                      }
-                                  ]
-                  },
-                  {
-                      "fileName":  "invalid-files/statfin_opiskt_pxt_13nm.px",
-                      "classification":  "invalid-files",
-                      "warningCount":  26,
-                      "errorCount":  9,
-                      "entries":  [
-                                      {
-                                          "level":  "Error",
-                                          "rule":  "IllegalCharactersInSpecifierPart",
-                                          "count":  9
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "RecommendedKeyMissing",
-                                          "count":  7
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "UnrecommendedLanguageDefinitionFound",
-                                          "count":  18
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ValueIsNotInUpperCase",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  11,
-                                          "additionalInformation":  "CODEPAGE: \"iso-8859-15\""
-                                      }
-                                  ]
-                  },
-                  {
-                      "fileName":  "invalid-files/statfin_tvki_pxt_141p.px",
-                      "classification":  "invalid-files",
-                      "warningCount":  26,
-                      "errorCount":  9,
-                      "entries":  [
-                                      {
-                                          "level":  "Error",
-                                          "rule":  "InvalidValueFormat",
-                                          "count":  3
-                                      },
-                                      {
-                                          "level":  "Error",
-                                          "rule":  "InvalidValueFound",
-                                          "count":  3
-                                      },
-                                      {
-                                          "level":  "Error",
-                                          "rule":  "UnmatchingValueType",
-                                          "count":  3
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ExcessNewLinesInValue",
-                                          "count":  9
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "RecommendedKeyMissing",
-                                          "count":  10
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "UnrecommendedLanguageDefinitionFound",
-                                          "count":  6
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ValueIsNotInUpperCase",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  11,
-                                          "additionalInformation":  "CODEPAGE: \"iso-8859-15\""
-                                      }
-                                  ]
-                  },
-                  {
-                      "fileName":  "invalid-files/statfin_tvki_pxt_141r.px",
-                      "classification":  "invalid-files",
-                      "warningCount":  18,
-                      "errorCount":  6,
-                      "entries":  [
-                                      {
-                                          "level":  "Error",
-                                          "rule":  "InvalidValueFormat",
-                                          "count":  3
-                                      },
-                                      {
-                                          "level":  "Error",
-                                          "rule":  "UnmatchingValueType",
-                                          "count":  3
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ExcessNewLinesInValue",
-                                          "count":  6
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "RecommendedKeyMissing",
-                                          "count":  7
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "UnrecommendedLanguageDefinitionFound",
-                                          "count":  4
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ValueIsNotInUpperCase",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  11,
-                                          "additionalInformation":  "CODEPAGE: \"iso-8859-15\""
-                                      }
-                                  ]
-                  },
-                  {
-                      "fileName":  "invalid-files/statfin_vpa_pxt_132.px",
-                      "classification":  "invalid-files",
-                      "warningCount":  21,
-                      "errorCount":  1,
-                      "entries":  [
-                                      {
-                                          "level":  "Error",
-                                          "rule":  "InvalidValueFound",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  10,
-                                          "additionalInformation":  "CODEPAGE: \"windows-1252\""
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "RecommendedKeyMissing",
-                                          "count":  18
-                                      },
-                                      {
-                                          "level":  "Warning",
-                                          "rule":  "ValueIsNotInUpperCase",
-                                          "count":  1,
-                                          "row":  3,
-                                          "character":  11,
-                                          "additionalInformation":  "CODEPAGE: \"windows-1252\""
-                                      }
-                                  ]
-                  }
-              ],
-    "databaseEntries":  [
-                            {
-                                "classification":  "database",
-                                "entries":  [
-                                                {
-                                                    "rule":  "FileEncodingDiffersFromDatabase",
-                                                    "level":  "Warning",
-                                                    "count":  3
-                                                }
-                                            ],
-                                "fileName":  "invalid-files/Alias_en.txt",
-                                "warningCount":  3,
-                                "errorCount":  0
-                            },
-                            {
-                                "classification":  "database",
-                                "entries":  [
-                                                {
-                                                    "rule":  "FileEncodingDiffersFromDatabase",
-                                                    "level":  "Warning",
-                                                    "count":  3
-                                                }
-                                            ],
-                                "fileName":  "invalid-files/Alias_fi.txt",
-                                "warningCount":  3,
-                                "errorCount":  0
-                            },
-                            {
-                                "classification":  "database",
-                                "entries":  [
-                                                {
-                                                    "rule":  "FileEncodingDiffersFromDatabase",
-                                                    "level":  "Warning",
-                                                    "count":  2
-                                                }
-                                            ],
-                                "fileName":  "valid-files/Alias_sv.txt",
-                                "warningCount":  2,
-                                "errorCount":  0
-                            },
-                            {
-                                "classification":  "database",
-                                "entries":  [
-                                                {
-                                                    "additionalInformation":  "Alias file for sv is missing",
-                                                    "rule":  "AliasFileMissing",
-                                                    "level":  "Warning",
-                                                    "count":  1
-                                                }
-                                            ],
-                                "fileName":  "invalid-files",
-                                "warningCount":  1,
-                                "errorCount":  0
-                            }
-                        ]
+  "files": [
+    {
+      "fileName": "valid-files/statfin_akay_pxt_013.px",
+      "classification": "valid-files",
+      "warningCount": 24,
+      "errorCount": 0,
+      "entries": [
+        {
+          "level": "Warning",
+          "rule": "ExcessNewLinesInValue",
+          "count": 4
+        },
+        {
+          "level": "Warning",
+          "rule": "RecommendedKeyMissing",
+          "count": 19
+        },
+        {
+          "level": "Warning",
+          "rule": "ValueIsNotInUpperCase",
+          "count": 1,
+          "row": 3,
+          "character": 11,
+          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+        }
+      ]
+    },
+    {
+      "fileName": "valid-files/statfin_atp_pxt_11n3.px",
+      "classification": "valid-files",
+      "warningCount": 21,
+      "errorCount": 0,
+      "entries": [
+        {
+          "level": "Warning",
+          "rule": "RecommendedKeyMissing",
+          "count": 7
+        },
+        {
+          "level": "Warning",
+          "rule": "UnrecommendedLanguageDefinitionFound",
+          "count": 12
+        },
+        {
+          "level": "Warning",
+          "rule": "ValueIsNotInUpperCase",
+          "count": 1,
+          "row": 3,
+          "character": 11,
+          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+        }
+      ]
+    },
+    {
+      "fileName": "valid-files/statfin_cvts_pxt_13vr.px",
+      "classification": "valid-files",
+      "warningCount": 20,
+      "errorCount": 0,
+      "entries": [
+        {
+          "level": "Warning",
+          "rule": "RecommendedKeyMissing",
+          "count": 15
+        },
+        {
+          "level": "Warning",
+          "rule": "UnrecommendedLanguageDefinitionFound",
+          "count": 4
+        },
+        {
+          "level": "Warning",
+          "rule": "ValueIsNotInUpperCase",
+          "count": 1,
+          "row": 3,
+          "character": 11,
+          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+        }
+      ]
+    },
+    {
+      "fileName": "valid-files/statfin_jate_pxt_jate001.px",
+      "classification": "valid-files",
+      "warningCount": 15,
+      "errorCount": 0,
+      "entries": [
+        {
+          "level": "Warning",
+          "rule": "ExcessNewLinesInValue",
+          "count": 2
+        },
+        {
+          "level": "Warning",
+          "rule": "RecommendedKeyMissing",
+          "count": 12
+        },
+        {
+          "level": "Warning",
+          "rule": "ValueIsNotInUpperCase",
+          "count": 1,
+          "row": 3,
+          "character": 11,
+          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+        }
+      ]
+    },
+    {
+      "fileName": "valid-files/statfin_khi_pxt_122q.px",
+      "classification": "valid-files",
+      "warningCount": 12,
+      "errorCount": 0,
+      "entries": [
+        {
+          "level": "Warning",
+          "rule": "RecommendedKeyMissing",
+          "count": 7
+        },
+        {
+          "level": "Warning",
+          "rule": "UnrecommendedLanguageDefinitionFound",
+          "count": 4
+        },
+        {
+          "level": "Warning",
+          "rule": "ValueIsNotInUpperCase",
+          "count": 1,
+          "row": 3,
+          "character": 11,
+          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+        }
+      ]
+    },
+    {
+      "fileName": "valid-files/statfin_kihi_pxt_141f.px",
+      "classification": "valid-files",
+      "warningCount": 20,
+      "errorCount": 0,
+      "entries": [
+        {
+          "level": "Warning",
+          "rule": "ExcessNewLinesInValue",
+          "count": 6
+        },
+        {
+          "level": "Warning",
+          "rule": "RecommendedKeyMissing",
+          "count": 7
+        },
+        {
+          "level": "Warning",
+          "rule": "UnrecommendedLanguageDefinitionFound",
+          "count": 6
+        },
+        {
+          "level": "Warning",
+          "rule": "ValueIsNotInUpperCase",
+          "count": 1,
+          "row": 3,
+          "character": 11,
+          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+        }
+      ]
+    },
+    {
+      "fileName": "valid-files/statfin_klts_pxt_11wv.px",
+      "classification": "valid-files",
+      "warningCount": 26,
+      "errorCount": 0,
+      "entries": [
+        {
+          "level": "Warning",
+          "rule": "ExcessNewLinesInValue",
+          "count": 8
+        },
+        {
+          "level": "Warning",
+          "rule": "RecommendedKeyMissing",
+          "count": 7
+        },
+        {
+          "level": "Warning",
+          "rule": "UnrecommendedLanguageDefinitionFound",
+          "count": 10
+        },
+        {
+          "level": "Warning",
+          "rule": "ValueIsNotInUpperCase",
+          "count": 1,
+          "row": 3,
+          "character": 11,
+          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+        }
+      ]
+    },
+    {
+      "fileName": "valid-files/statfin_ras_pxt_13m4.px",
+      "classification": "valid-files",
+      "warningCount": 25,
+      "errorCount": 0,
+      "entries": [
+        {
+          "level": "Warning",
+          "rule": "ExcessNewLinesInValue",
+          "count": 9
+        },
+        {
+          "level": "Warning",
+          "rule": "RecommendedKeyMissing",
+          "count": 7
+        },
+        {
+          "level": "Warning",
+          "rule": "UnrecommendedLanguageDefinitionFound",
+          "count": 8
+        },
+        {
+          "level": "Warning",
+          "rule": "ValueIsNotInUpperCase",
+          "count": 1,
+          "row": 3,
+          "character": 11,
+          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+        }
+      ]
+    },
+    {
+      "fileName": "valid-files/statfin_kttav_pxt_11b6.px",
+      "classification": "valid-files",
+      "warningCount": 23,
+      "errorCount": 0,
+      "entries": [
+        {
+          "level": "Warning",
+          "rule": "ExcessNewLinesInValue",
+          "count": 7
+        },
+        {
+          "level": "Warning",
+          "rule": "RecommendedKeyMissing",
+          "count": 7
+        },
+        {
+          "level": "Warning",
+          "rule": "UnrecommendedLanguageDefinitionFound",
+          "count": 8
+        },
+        {
+          "level": "Warning",
+          "rule": "ValueIsNotInUpperCase",
+          "count": 1,
+          "row": 3,
+          "character": 11,
+          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+        }
+      ]
+    },
+    {
+      "fileName": "invalid-files/statfin_opiskt_pxt_13nm.px",
+      "classification": "invalid-files",
+      "warningCount": 26,
+      "errorCount": 9,
+      "entries": [
+        {
+          "level": "Error",
+          "rule": "IllegalCharactersInSpecifierPart",
+          "count": 9
+        },
+        {
+          "level": "Warning",
+          "rule": "RecommendedKeyMissing",
+          "count": 7
+        },
+        {
+          "level": "Warning",
+          "rule": "UnrecommendedLanguageDefinitionFound",
+          "count": 18
+        },
+        {
+          "level": "Warning",
+          "rule": "ValueIsNotInUpperCase",
+          "count": 1,
+          "row": 3,
+          "character": 11,
+          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+        }
+      ]
+    },
+    {
+      "fileName": "invalid-files/statfin_tvki_pxt_141p.px",
+      "classification": "invalid-files",
+      "warningCount": 26,
+      "errorCount": 9,
+      "entries": [
+        {
+          "level": "Error",
+          "rule": "InvalidValueFormat",
+          "count": 3
+        },
+        {
+          "level": "Error",
+          "rule": "InvalidValueFound",
+          "count": 3
+        },
+        {
+          "level": "Error",
+          "rule": "UnmatchingValueType",
+          "count": 3
+        },
+        {
+          "level": "Warning",
+          "rule": "ExcessNewLinesInValue",
+          "count": 9
+        },
+        {
+          "level": "Warning",
+          "rule": "RecommendedKeyMissing",
+          "count": 10
+        },
+        {
+          "level": "Warning",
+          "rule": "UnrecommendedLanguageDefinitionFound",
+          "count": 6
+        },
+        {
+          "level": "Warning",
+          "rule": "ValueIsNotInUpperCase",
+          "count": 1,
+          "row": 3,
+          "character": 11,
+          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+        }
+      ]
+    },
+    {
+      "fileName": "invalid-files/statfin_tvki_pxt_141r.px",
+      "classification": "invalid-files",
+      "warningCount": 18,
+      "errorCount": 6,
+      "entries": [
+        {
+          "level": "Error",
+          "rule": "InvalidValueFormat",
+          "count": 3
+        },
+        {
+          "level": "Error",
+          "rule": "UnmatchingValueType",
+          "count": 3
+        },
+        {
+          "level": "Warning",
+          "rule": "ExcessNewLinesInValue",
+          "count": 6
+        },
+        {
+          "level": "Warning",
+          "rule": "RecommendedKeyMissing",
+          "count": 7
+        },
+        {
+          "level": "Warning",
+          "rule": "UnrecommendedLanguageDefinitionFound",
+          "count": 4
+        },
+        {
+          "level": "Warning",
+          "rule": "ValueIsNotInUpperCase",
+          "count": 1,
+          "row": 3,
+          "character": 11,
+          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+        }
+      ]
+    },
+    {
+      "fileName": "invalid-files/statfin_vpa_pxt_132.px",
+      "classification": "invalid-files",
+      "warningCount": 21,
+      "errorCount": 1,
+      "entries": [
+        {
+          "level": "Error",
+          "rule": "InvalidValueFound",
+          "count": 1,
+          "row": 3,
+          "character": 10,
+          "additionalInformation": "CODEPAGE: \"windows-1252\""
+        },
+        {
+          "level": "Warning",
+          "rule": "RecommendedKeyMissing",
+          "count": 18
+        },
+        {
+          "level": "Warning",
+          "rule": "ValueIsNotInUpperCase",
+          "count": 1,
+          "row": 3,
+          "character": 11,
+          "additionalInformation": "CODEPAGE: \"windows-1252\""
+        }
+      ]
+    }
+  ],
+  "databaseEntries": [
+    {
+      "classification": "database",
+      "entries": [
+        {
+          "rule": "FileEncodingDiffersFromDatabase",
+          "level": "Warning",
+          "count": 1
+        }
+      ],
+      "fileName": "invalid-files/Alias_en.txt",
+      "warningCount": 1,
+      "errorCount": 0
+    },
+    {
+      "classification": "database",
+      "entries": [
+        {
+          "rule": "FileEncodingDiffersFromDatabase",
+          "level": "Warning",
+          "count": 1
+        }
+      ],
+      "fileName": "invalid-files/Alias_fi.txt",
+      "warningCount": 1,
+      "errorCount": 0
+    },
+    {
+      "classification": "database",
+      "entries": [
+        {
+          "rule": "FileEncodingDiffersFromDatabase",
+          "level": "Warning",
+          "count": 1
+        }
+      ],
+      "fileName": "valid-files/Alias_sv.txt",
+      "warningCount": 1,
+      "errorCount": 0
+    },
+    {
+      "classification": "database",
+      "entries": [
+        {
+          "additionalInformation": "Alias file for sv is missing",
+          "rule": "AliasFileMissing",
+          "level": "Warning",
+          "count": 1
+        }
+      ],
+      "fileName": "invalid-files",
+      "warningCount": 1,
+      "errorCount": 0
+    },
+    {
+      "classification": "database",
+      "entries": [
+        {
+          "rule": "FileEncodingDiffersFromDatabase",
+          "level": "Warning",
+          "count": 1
+        }
+      ],
+      "fileName": "Alias_en.txt",
+      "warningCount": 1,
+      "errorCount": 0
+    },
+    {
+      "classification": "database",
+      "entries": [
+        {
+          "rule": "FileEncodingDiffersFromDatabase",
+          "level": "Warning",
+          "count": 1
+        }
+      ],
+      "fileName": "Alias_fi.txt",
+      "warningCount": 1,
+      "errorCount": 0
+    },
+    {
+      "classification": "database",
+      "entries": [
+        {
+          "rule": "FileEncodingDiffersFromDatabase",
+          "level": "Warning",
+          "count": 1
+        }
+      ],
+      "fileName": "Alias_sv.txt",
+      "warningCount": 1,
+      "errorCount": 0
+    },
+    {
+      "classification": "database",
+      "entries": [
+        {
+          "rule": "FileEncodingDiffersFromDatabase",
+          "level": "Warning",
+          "count": 1
+        }
+      ],
+      "fileName": "valid-files/Alias_en.txt",
+      "warningCount": 1,
+      "errorCount": 0
+    },
+    {
+      "classification": "database",
+      "entries": [
+        {
+          "rule": "FileEncodingDiffersFromDatabase",
+          "level": "Warning",
+          "count": 1
+        }
+      ],
+      "fileName": "valid-files/Alias_fi.txt",
+      "warningCount": 1,
+      "errorCount": 0
+    }
+  ]
 }
