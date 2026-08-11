@@ -48,6 +48,7 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// <returns>The database validation result with retained feedback.</returns>
         public ValidationResult Validate(ValidationOptions options)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             ValidationFeedbackSink sink = new(options);
             ConcurrentBag<DatabaseFileInfo> pxFiles = [];
             ConcurrentBag<DatabaseFileInfo> aliasFiles = [];
@@ -69,8 +70,9 @@ namespace Px.Utils.Validation.DatabaseValidation
             {
                 fileTasks.Add(Task.Run(() =>
                 {
-                    DatabaseFileInfo? file = ProcessAliasFile(fileName);
+                    (DatabaseFileInfo file, ValidationFeedback feedback) = ProcessAliasFile(fileName);
                     if (file is not null) aliasFiles.Add(file);
+                    feedbacks.AddRange(feedback);
                 }));
             }
 
@@ -95,6 +97,8 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// <returns>A task that produces the database validation result with retained feedback.</returns>
         public async Task<ValidationResult> ValidateAsync(ValidationOptions options, CancellationToken cancellationToken = default)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            ValidationFeedback feedbacks = [];
             ValidationFeedbackSink sink = new(options);
             ConcurrentBag<DatabaseFileInfo> pxFiles = [];
             ConcurrentBag<DatabaseFileInfo> aliasFiles = [];
@@ -116,8 +120,9 @@ namespace Px.Utils.Validation.DatabaseValidation
             {
                 fileTasks.Add(Task.Run(async () =>
                 {
-                    DatabaseFileInfo? file = await ProcessAliasFileAsync(fileName, cancellationToken);
+                    (DatabaseFileInfo file, ValidationFeedback feedback) = await ProcessAliasFileAsync(fileName, cancellationToken);
                     if (file is not null) aliasFiles.Add(file);
+                    feedbacks.AddRange(feedback);
                 }, cancellationToken));
             }
             
@@ -142,12 +147,22 @@ namespace Px.Utils.Validation.DatabaseValidation
             return (fileInfo, feedbacks);
         }
 
-        private DatabaseFileInfo? ProcessAliasFile(string fileName)
+        private (DatabaseFileInfo, ValidationFeedback) ProcessAliasFile(string fileName)
         {
+            ValidationFeedback feedbacks = [];
             using Stream stream = _fileSystem.GetFileStream(fileName);
-            return GetAliasFileInfo(fileName, stream);
+            DatabaseFileInfo file = GetAliasFileInfo(fileName, stream, out string? encodingError);
+            if (encodingError is not null)
+            {
+                feedbacks.Add(new(
+                    new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.UnreadableAliasFile),
+                    new(fileName, additionalInfo: encodingError)));
+            }
+
+            return (file, feedbacks);
         }
 
+        private async Task<(DatabaseFileInfo?, ValidationFeedback)> ProcessPxFileAsync(string fileName, CancellationToken cancellationToken)
         private async Task<(DatabaseFileInfo?, ValidationFeedback)> ProcessPxFileAsync(string fileName, ValidationFeedbackSink sink, CancellationToken cancellationToken)
         {
             ValidationFeedback feedbacks = [];
@@ -165,17 +180,26 @@ namespace Px.Utils.Validation.DatabaseValidation
             return (fileInfo, feedbacks);
         }
 
-        private async Task<DatabaseFileInfo?> ProcessAliasFileAsync(string fileName, CancellationToken cancellationToken)
+        private async Task<(DatabaseFileInfo, ValidationFeedback)> ProcessAliasFileAsync(string fileName, CancellationToken cancellationToken)
         {
+            ValidationFeedback feedbacks = [];
             using Stream stream = _fileSystem.GetFileStream(fileName);
             cancellationToken.ThrowIfCancellationRequested();
-            return await GetAliasFileInfoAsync(fileName, stream, cancellationToken);
+            (DatabaseFileInfo file, string? encodingError) = await GetAliasFileInfoAsync(fileName, stream, cancellationToken);
+            if (encodingError is not null)
+            {
+                feedbacks.Add(new(
+                    new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.UnreadableAliasFile),
+                    new(fileName, additionalInfo: encodingError)));
+            }
+
+            return (file, feedbacks);
         }
 
         private ValidationFeedback ValidateDatabaseContents(ConcurrentBag<DatabaseFileInfo> pxFiles, ConcurrentBag<DatabaseFileInfo> aliasFiles)
         {
             ValidationFeedback feedbacks = [];
-            IEnumerable<DatabaseFileInfo> allFiles = pxFiles.Concat(aliasFiles);
+            IEnumerable<DatabaseFileInfo> allFiles = pxFiles.Concat(aliasFiles.Where(file => file.IsEncodingDetected));
             IEnumerable<string> databaseLanguages = pxFiles.SelectMany(file => file.Languages).Distinct();
             Encoding mostCommonEncoding = allFiles.Select(file => file.Encoding)
                 .GroupBy(enc => enc)
@@ -236,6 +260,11 @@ namespace Px.Utils.Validation.DatabaseValidation
             {
                 foreach (IDatabaseValidator validator in aliasFileValidators)
                 {
+                    if (!fileInfo.IsEncodingDetected && validator is MismatchingEncoding)
+                    {
+                        continue;
+                    }
+
                     KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(fileInfo);
                     if (feedback is not null)
                     {
@@ -401,7 +430,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
         }
 
-        private DatabaseFileInfo? GetAliasFileInfo(string filename, Stream stream)
+        private DatabaseFileInfo GetAliasFileInfo(string filename, Stream stream, out string? encodingError)
         {
             string name = _fileSystem.GetFileName(filename);
             string? path = _fileSystem.GetDirectoryName(filename);
@@ -410,13 +439,11 @@ namespace Px.Utils.Validation.DatabaseValidation
                 name.Split(_conf.Tokens.Database.LanguageSeparator)[1].Split('.')[0]
             ];
 
-            Encoding? encoding = DetectAliasEncoding(stream);
-            if (encoding is null) return null;
-            DatabaseFileInfo fileInfo = new (name, location, languages, encoding);
-            return fileInfo;
+            Encoding? encoding = DetectAliasEncoding(stream, out encodingError);
+            return new(name, location, languages, encoding ?? Encoding.UTF8, encoding is not null);
         }
 
-        private async Task<DatabaseFileInfo?> GetAliasFileInfoAsync(string filename, Stream stream, CancellationToken cancellationToken)
+        private async Task<(DatabaseFileInfo File, string? EncodingError)> GetAliasFileInfoAsync(string filename, Stream stream, CancellationToken cancellationToken)
         {
             string name = _fileSystem.GetFileName(filename);
             string? path = _fileSystem.GetDirectoryName(filename);
@@ -426,21 +453,38 @@ namespace Px.Utils.Validation.DatabaseValidation
             ];
 
             cancellationToken.ThrowIfCancellationRequested();
-            Encoding? encoding = DetectAliasEncoding(stream);
-            if (encoding is null) return null;
-            DatabaseFileInfo fileInfo = new (name, location, languages, encoding);
-            return fileInfo;
+            Encoding? encoding = DetectAliasEncoding(stream, out string? encodingError);
+            return (new(name, location, languages, encoding ?? Encoding.UTF8, encoding is not null), encodingError);
         }
 
-        private static Encoding? DetectAliasEncoding(Stream stream)
+        private static Encoding? DetectAliasEncoding(Stream stream, out string? error)
         {
-            CharsetDetector detector = new();
-            detector.Feed(stream);
-            detector.DataEnd();
-            return detector.Charset is string charset ? Encoding.GetEncoding(charset) : null;
+            try
+            {
+                CharsetDetector detector = new();
+                detector.Feed(stream);
+                detector.DataEnd();
+                if (detector.Charset is not string charset)
+                {
+                    error = "The alias file encoding could not be detected.";
+                    return null;
+                }
+
+                error = null;
+                return Encoding.GetEncoding(charset);
+            }
+            catch (Exception exception) when (exception is ArgumentException or NotSupportedException)
+            {
+                error = $"The alias file encoding could not be read: {exception.Message}";
+                return null;
+            }
         }
     }
 
+    /// <summary>
+    /// Represents a file or directory within the database that is subject to validation.
+    /// </summary>
+    /// <param name="path">Path to the file or directory within the database.</param>
     /// <summary>
     /// Represents a database validation item.
     /// </summary>
@@ -448,11 +492,16 @@ namespace Px.Utils.Validation.DatabaseValidation
     public class DatabaseValidationItem(string path)
     {
         /// <summary>
+        /// Gets the path to the file or directory within the database.
+        /// </summary>
+        /// <summary>
         /// Gets the path of the file or directory.
         /// </summary>
         public string Path { get; } = path;
     }
 
+
+    public class DatabaseFileInfo(string name, string location, string[] languages, Encoding encoding, bool isEncodingDetected = true) : DatabaseValidationItem(System.IO.Path.Combine(location, name))
     /// <summary>
     /// Represents a px file or alias file within a px file database for validation purposes.
     /// </summary>
@@ -478,6 +527,7 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// Gets the encoding of the file.
         /// </summary>
         public Encoding Encoding { get; } = encoding;
+        public bool IsEncodingDetected { get; } = isEncodingDetected;
     }
 
     /// <summary>

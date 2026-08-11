@@ -21,13 +21,13 @@ internal sealed class DataScenarios(string databaseRoot, string expectationsRoot
         ValidationResult result = await validator.ValidateAsync();
         Dictionary<string, List<(ValidationFeedbackKey Key, ValidationFeedbackValue Value)>> actualByFile = result.FeedbackItems
             .SelectMany(pair => pair.Value.Select(value => (Pair: pair.Key, Value: value)))
-            .GroupBy(item => Path.GetFileName(item.Value.Filename))
+            .GroupBy(item => GetDatabaseRelativePath(item.Value.Filename))
             .ToDictionary(group => group.Key, group => group.Select(item => (item.Pair, item.Value)).ToList(), StringComparer.OrdinalIgnoreCase);
 
         foreach (ValidationExpectationFile file in expected.Files.Concat(expected.DatabaseEntries))
         {
-            string leafFileName = Path.GetFileName(file.FileName);
-            if (!actualByFile.Remove(leafFileName, out List<(ValidationFeedbackKey Key, ValidationFeedbackValue Value)>? values))
+            string expectedPath = NormalizePath(file.FileName);
+            if (!actualByFile.Remove(expectedPath, out List<(ValidationFeedbackKey Key, ValidationFeedbackValue Value)>? values))
             {
                 failures.Add($"Database validation / {file.FileName}: no feedback was produced.");
                 continue;
@@ -42,10 +42,17 @@ internal sealed class DataScenarios(string databaseRoot, string expectationsRoot
 
             foreach (ValidationExpectationEntry entry in file.Entries)
             {
-                int count = values.Count(item => item.Key.Level.ToString() == entry.Level && item.Key.Rule.ToString() == entry.Rule);
+                int count = values.Count(item =>
+                    item.Key.Level.ToString() == entry.Level &&
+                    item.Key.Rule.ToString() == entry.Rule &&
+                    (!entry.Row.HasValue || item.Value.Line == entry.Row) &&
+                    (!entry.Character.HasValue || item.Value.Character == entry.Character) &&
+                    (entry.AdditionalInformation is null || item.Value.AdditionalInfo == entry.AdditionalInformation));
                 if (count != entry.Count)
                 {
-                    failures.Add($"Database validation / {file.FileName}: {entry.Level} {entry.Rule}: expected {entry.Count}, actual {count}.");
+                    failures.Add($"Database validation / " +
+                        $"{file.FileName}: {entry.Level} {entry.Rule} ({entry.Row}, {entry.Character}, " +
+                        $"{entry.AdditionalInformation}): expected {entry.Count}, actual {count}.");
                 }
             }
         }
@@ -83,6 +90,18 @@ internal sealed class DataScenarios(string databaseRoot, string expectationsRoot
         string path = Path.Combine(expectationsRoot, fileName);
         string json = File.ReadAllText(path);
         return JsonSerializer.Deserialize<T>(json, JsonOptions) ?? throw new InvalidOperationException($"Could not read expectation fixture {fileName}.");
+    }
+
+    private string GetDatabaseRelativePath(string path)
+    {
+        string fullDatabasePath = Path.GetFullPath(databaseRoot);
+        string fullFeedbackPath = Path.GetFullPath(path);
+        return NormalizePath(Path.GetRelativePath(fullDatabasePath, fullFeedbackPath));
+    }
+
+    private static string NormalizePath(string path)
+    {
+        return path.Replace(Path.DirectorySeparatorChar, '/').Replace(Path.AltDirectorySeparatorChar, '/');
     }
 
 }

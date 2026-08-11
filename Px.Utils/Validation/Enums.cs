@@ -1,4 +1,4 @@
-﻿namespace Px.Utils.Validation
+namespace Px.Utils.Validation
 {
     /// <summary>
     /// Defines the levels of validation feedback. These levels can be used to categorize feedback items by severity.
@@ -85,6 +85,7 @@
         DuplicateFileNames = 55,
         StartOfDataSectionNotFound = 56,
         DuplicateEntry = 57,
-        DuplicateDimension = 58
+        DuplicateDimension = 58,
+        UnreadableAliasFile = 60
     }
 }

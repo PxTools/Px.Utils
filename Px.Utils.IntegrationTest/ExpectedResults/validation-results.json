@@ -428,7 +428,7 @@
                                                     "count":  3
                                                 }
                                             ],
-                                "fileName":  "Alias_en.txt",
+                                "fileName":  "invalid-files/Alias_en.txt",
                                 "warningCount":  3,
                                 "errorCount":  0
                             },
@@ -441,7 +441,7 @@
                                                     "count":  3
                                                 }
                                             ],
-                                "fileName":  "Alias_fi.txt",
+                                "fileName":  "invalid-files/Alias_fi.txt",
                                 "warningCount":  3,
                                 "errorCount":  0
                             },
@@ -454,7 +454,7 @@
                                                     "count":  2
                                                 }
                                             ],
-                                "fileName":  "Alias_sv.txt",
+                                "fileName":  "valid-files/Alias_sv.txt",
                                 "warningCount":  2,
                                 "errorCount":  0
                             },

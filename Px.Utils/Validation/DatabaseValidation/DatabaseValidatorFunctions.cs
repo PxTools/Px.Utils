@@ -24,7 +24,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 return new(
                     new(ValidationFeedbackLevel.Warning,
                         ValidationFeedbackRule.DuplicateFileNames),
-                    new(fileInfo.Name)
+                    new(fileInfo.Path)
                 );
             }
             else
@@ -55,7 +55,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 return new(
                     new(ValidationFeedbackLevel.Warning,
                     ValidationFeedbackRule.FileLanguageDiffersFromDatabase),
-                    new(fileInfo.Name, additionalInfo: $"Missing languages: {string.Join(", ", _allLanguages.Except(fileInfo.Languages))}")
+                    new(fileInfo.Path, additionalInfo: $"Missing languages: {string.Join(", ", _allLanguages.Except(fileInfo.Languages))}")
                 );
             }
             else
@@ -86,7 +86,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 return new (
                     new(ValidationFeedbackLevel.Warning,
                     ValidationFeedbackRule.FileEncodingDiffersFromDatabase),
-                    new(fileInfo.Name, additionalInfo: $"Inconsistent encoding: {fileInfo.Encoding.EncodingName}. " +
+                    new(fileInfo.Path, additionalInfo: $"Inconsistent encoding: {fileInfo.Encoding.EncodingName}. " +
                     $"Most commonly used encoding is {_mostCommonEncoding.EncodingName}"));
             }
             else
