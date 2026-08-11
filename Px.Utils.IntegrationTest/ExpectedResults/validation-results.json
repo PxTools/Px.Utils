@@ -21,7 +21,7 @@
           "rule": "ValueIsNotInUpperCase",
           "count": 1,
           "row": 3,
-          "character": 11,
+          "character": 10,
           "additionalInformation": "CODEPAGE: \"iso-8859-15\""
         }
       ]
@@ -47,7 +47,7 @@
           "rule": "ValueIsNotInUpperCase",
           "count": 1,
           "row": 3,
-          "character": 11,
+          "character": 10,
           "additionalInformation": "CODEPAGE: \"iso-8859-15\""
         }
       ]
@@ -73,7 +73,7 @@
           "rule": "ValueIsNotInUpperCase",
           "count": 1,
           "row": 3,
-          "character": 11,
+          "character": 10,
           "additionalInformation": "CODEPAGE: \"iso-8859-15\""
         }
       ]
@@ -99,7 +99,7 @@
           "rule": "ValueIsNotInUpperCase",
           "count": 1,
           "row": 3,
-          "character": 11,
+          "character": 10,
           "additionalInformation": "CODEPAGE: \"iso-8859-15\""
         }
       ]
@@ -125,7 +125,7 @@
           "rule": "ValueIsNotInUpperCase",
           "count": 1,
           "row": 3,
-          "character": 11,
+          "character": 10,
           "additionalInformation": "CODEPAGE: \"iso-8859-15\""
         }
       ]
@@ -156,7 +156,7 @@
           "rule": "ValueIsNotInUpperCase",
           "count": 1,
           "row": 3,
-          "character": 11,
+          "character": 10,
           "additionalInformation": "CODEPAGE: \"iso-8859-15\""
         }
       ]
@@ -187,7 +187,7 @@
           "rule": "ValueIsNotInUpperCase",
           "count": 1,
           "row": 3,
-          "character": 11,
+          "character": 10,
           "additionalInformation": "CODEPAGE: \"iso-8859-15\""
         }
       ]
@@ -218,7 +218,7 @@
           "rule": "ValueIsNotInUpperCase",
           "count": 1,
           "row": 3,
-          "character": 11,
+          "character": 10,
           "additionalInformation": "CODEPAGE: \"iso-8859-15\""
         }
       ]
@@ -249,7 +249,7 @@
           "rule": "ValueIsNotInUpperCase",
           "count": 1,
           "row": 3,
-          "character": 11,
+          "character": 10,
           "additionalInformation": "CODEPAGE: \"iso-8859-15\""
         }
       ]
@@ -280,7 +280,7 @@
           "rule": "ValueIsNotInUpperCase",
           "count": 1,
           "row": 3,
-          "character": 11,
+          "character": 10,
           "additionalInformation": "CODEPAGE: \"iso-8859-15\""
         }
       ]
@@ -326,7 +326,7 @@
           "rule": "ValueIsNotInUpperCase",
           "count": 1,
           "row": 3,
-          "character": 11,
+          "character": 10,
           "additionalInformation": "CODEPAGE: \"iso-8859-15\""
         }
       ]
@@ -367,7 +367,7 @@
           "rule": "ValueIsNotInUpperCase",
           "count": 1,
           "row": 3,
-          "character": 11,
+          "character": 10,
           "additionalInformation": "CODEPAGE: \"iso-8859-15\""
         }
       ]
@@ -396,7 +396,7 @@
           "rule": "ValueIsNotInUpperCase",
           "count": 1,
           "row": 3,
-          "character": 11,
+          "character": 10,
           "additionalInformation": "CODEPAGE: \"windows-1252\""
         }
       ]

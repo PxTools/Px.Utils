@@ -773,7 +773,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
         internal static ValidationStructuredEntry StructuredEntryWithLowerCaseValue =>
             new(filename,
             codepageEntry.Key,
-            "\"iso-8859-15\"",
+            "utf-8",
             codepageEntry.ValueStartIndex,
             codepageEntry.LineChangeIndexes,
             codepageEntry.ValueStartIndex,

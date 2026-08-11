@@ -695,6 +695,33 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
+        [DataRow(10)]
+        [DataRow(11, 1)]
+        public void ValidateValueUppercaseRecommendationsCalledWithDifferentLineEndingsReturnsLineRelativeCharacter(
+            int valueStartIndex,
+            int lineChangeIndex = -1)
+        {
+            // Arrange
+            int[] lineChangeIndexes = lineChangeIndex < 0 ? [] : [lineChangeIndex];
+            ValidationStructuredEntry entry = new(
+                filename,
+                new ValidationStructuredEntryKey("CODEPAGE"),
+                "\"iso-8859-15\"",
+                2,
+                lineChangeIndexes,
+                valueStartIndex,
+                global::Px.Utils.Validation.ValueType.StringValue);
+            ContentValidator validator = new(filename, encoding, [entry]);
+
+            // Act
+            ValidationFeedback? result = ContentValidator.ValidateValueUppercaseRecommendations(entry, validator);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(10, result.First().Value.Single().Character);
+        }
+
+        [TestMethod]
         public void ValidateContentWithCustomFunctionsReturnsValidResult()
         {
             // Arrange
