@@ -46,8 +46,9 @@ No DI container — all types instantiated directly via constructors. Configurat
 | Dependency | Purpose |
 |---|---|
 | `System.Text.Json` | JSON serialization of metadata models |
+| `Ude.NetStandard` | Character encoding detection for database alias files |
 
-No third-party NuGet dependencies in the main library.
+`Ude.NetStandard` is the only third-party NuGet dependency in the main library.
 
 ## File Map
 
@@ -69,3 +70,4 @@ Px.Utils/
 │   └── Metadata/                  -- IPxFileMetadataReader, PxFileMetadataReader
 ├── Serializers/Json/              -- JSON converters for models
 └── Validation/                    -- Validation pipeline (syntax → content → data → database)
+```

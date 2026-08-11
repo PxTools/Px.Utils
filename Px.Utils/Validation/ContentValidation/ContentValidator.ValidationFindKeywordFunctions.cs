@@ -243,26 +243,15 @@ namespace Px.Utils.Validation.ContentValidation
         }
 
         /// <summary>
-        /// Finds stub and heading dimensions in the Px file metadata and validates that they are defined for all available languages
+        /// Finds stub and heading dimensions in the Px file metadata and validates that both are defined for all available languages.
         /// </summary>
         /// <param name="entries">Px file metadata entries in an array of <see cref="ValidationStructuredEntry"/> objects</param>
         /// <param name="validator"><see cref="ContentValidator"/> object that stores information that is gathered during the validation process</param>
-        /// <returns>Key value pairs containing information about the rule violation are returned if stub and heading dimension entries are not found for any available language</returns>
+        /// <returns>Key value pairs containing information about the rule violation are returned if either dimension axis is not found for any available language.</returns>
         public static ValidationFeedback? ValidateFindStubAndHeading(ValidationStructuredEntry[] entries, ContentValidator validator)
         {
             ValidationStructuredEntry[] stubEntries = entries.Where(e => e.Key.Keyword.Equals(validator.Conf.Tokens.KeyWords.StubDimensions, StringComparison.Ordinal)).ToArray();
             ValidationStructuredEntry[] headingEntries = entries.Where(e => e.Key.Keyword.Equals(validator.Conf.Tokens.KeyWords.HeadingDimensions, StringComparison.Ordinal)).ToArray();
-
-            if (stubEntries.Length == 0 && headingEntries.Length == 0)
-            {
-                KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
-                    new(ValidationFeedbackLevel.Error,
-                        ValidationFeedbackRule.MissingStubAndHeading),
-                    new(validator._filename, 0, 0)
-                );
-
-                return new(feedback);
-            }
 
             string defaultLanguage = validator._defaultLanguage ?? string.Empty;
 
@@ -276,13 +265,24 @@ namespace Px.Utils.Validation.ContentValidation
 
             foreach (string language in languages)
             {
-                if ((validator._stubDimensionNames is null || !validator._stubDimensionNames.ContainsKey(language))
-                    &&
-                    (validator._headingDimensionNames is null || !validator._headingDimensionNames.ContainsKey(language)))
+                if (validator._stubDimensionNames is null || !validator._stubDimensionNames.ContainsKey(language))
                 {
                     KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
                         new(ValidationFeedbackLevel.Error,
-                                ValidationFeedbackRule.MissingStubAndHeading),
+                            ValidationFeedbackRule.MissingStubDimensions),
+                        new(validator._filename,
+                            0,
+                            0,
+                            $"{language}")
+                    );
+
+                    feedbackItems.Add(feedback);
+                }
+                if (validator._headingDimensionNames is null || !validator._headingDimensionNames.ContainsKey(language))
+                {
+                    KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
+                        new(ValidationFeedbackLevel.Error,
+                            ValidationFeedbackRule.MissingHeadingDimensions),
                         new(validator._filename,
                             0,
                             0,
@@ -292,13 +292,13 @@ namespace Px.Utils.Validation.ContentValidation
                     feedbackItems.Add(feedback);
                 }
                 // Check if any of the heading names are also in the stub names
-                else if (validator._stubDimensionNames is not null &&
+                if (validator._stubDimensionNames is not null &&
                     validator._headingDimensionNames is not null &&
                     validator._stubDimensionNames.TryGetValue(language, out string[]? stubValue) &&
                     validator._headingDimensionNames.TryGetValue(language, out string[]? headingValue) &&
                     stubValue.Intersect(headingValue).Any())
                 {
-                    string[] duplicates = stubValue.Intersect(headingValue).ToArray();
+                    string[] duplicates = [.. stubValue.Intersect(headingValue)];
                     KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> feedback = new(
                         new(ValidationFeedbackLevel.Warning,
                         ValidationFeedbackRule.DuplicateDimension),

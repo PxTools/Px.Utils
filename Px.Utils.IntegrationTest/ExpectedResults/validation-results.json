@@ -224,11 +224,16 @@
       ]
     },
     {
-      "fileName": "valid-files/statfin_kttav_pxt_11b6.px",
-      "classification": "valid-files",
+      "fileName": "invalid-files/statfin_kttav_pxt_11b6.px",
+      "classification": "invalid-files",
       "warningCount": 23,
-      "errorCount": 0,
+      "errorCount": 3,
       "entries": [
+        {
+          "level": "Error",
+          "rule": "MissingStubDimensions",
+          "count": 3
+        },
         {
           "level": "Warning",
           "rule": "ExcessNewLinesInValue",

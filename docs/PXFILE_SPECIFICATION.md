@@ -202,19 +202,19 @@ More spesific encoding information. The value must be a string that matches the 
 - Syntax -> Keys -> Language code rules and recommendations apply to each value.
 - This entry does not depend on any dimensions or dimension values.
 
-#### STUB*
-- Can be omitted if all the dimensions are defined in the HEADING.
+#### STUB
 - Defines the dimensions of the matrix which are placed on the rows.
 - The value must be a list of strings.
 - The values are the names of the dimensions.
 - Language dependant.
+- At least one dimension must be defined in STUB.
 
-#### HEADING*
-- Can be omitted if all the dimensions are defined in the STUB.
+#### HEADING
 - Defines the dimensions of the matrix which are placed on the columns.
 - The value must be a list of strings.
 - The values are the names of the dimensions.
 - Language dependant.
+- At least one dimension, not defined in STUB, must be defined in HEADING.
 
 #### VALUES
 - Defines the dimension values of one dimension per entry.

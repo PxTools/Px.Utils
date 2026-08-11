@@ -81,8 +81,8 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.HasCount(9, result.FeedbackItems); // Unique feedbacks
-            Assert.HasCount(11, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
+            Assert.HasCount(10, result.FeedbackItems); // Unique feedbacks
+            Assert.HasCount(12, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
         }
 
         [TestMethod]

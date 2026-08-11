@@ -86,6 +86,10 @@ namespace Px.Utils.Validation
         StartOfDataSectionNotFound = 56,
         DuplicateEntry = 57,
         DuplicateDimension = 58,
-        UnreadableAliasFile = 60
+        UnreadableAliasFile = 60,
+        NoAliasFilesFound = 61,
+        NoPxFilesFound = 62,
+        MissingStubDimensions = 64,
+        MissingHeadingDimensions = 65,
     }
 }

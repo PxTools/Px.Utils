@@ -116,14 +116,24 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
 
             IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "Alias_*.txt");
-            foreach (string fileName in aliasFilePaths)
+
+            if (!aliasFilePaths.Any())
             {
-                fileTasks.Add(Task.Run(async () =>
+                feedbacks.Add(new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.NoAliasFilesFound),
+                    new()));
+            }
+            else
+            {
+                foreach (string fileName in aliasFilePaths)
                 {
-                    (DatabaseFileInfo file, ValidationFeedback feedback) = await ProcessAliasFileAsync(fileName, cancellationToken);
-                    if (file is not null) aliasFiles.Add(file);
-                    feedbacks.AddRange(feedback);
-                }, cancellationToken));
+                    fileTasks.Add(Task.Run(async () =>
+                    {
+                        (DatabaseFileInfo file, ValidationFeedback feedback) = await ProcessAliasFileAsync(fileName, cancellationToken);
+                        if (file is not null) aliasFiles.Add(file);
+                        feedbacks.AddRange(feedback);
+                    }, cancellationToken));
+                }
             }
             
             await Task.WhenAll(fileTasks);
@@ -504,7 +514,14 @@ namespace Px.Utils.Validation.DatabaseValidation
         public string Path { get; } = path;
     }
 
-
+    /// <summary>
+    /// Represents a px or alias file within the database that is subject to validation.
+    /// </summary>
+    /// <param name="name">Name of the file.</param>
+    /// <param name="location">Path to the directory containing the file.</param>
+    /// <param name="languages">Languages present in the file.</param>
+    /// <param name="encoding">Encoding of the file.</param>
+    /// <param name="isEncodingDetected">Indicates whether the encoding was successfully detected.</param>
     public class DatabaseFileInfo(string name, string location, string[] languages, Encoding encoding, bool isEncodingDetected = true) : DatabaseValidationItem(System.IO.Path.Combine(location, name))
     /// <summary>
     /// Represents a px file or alias file within a px file database for validation purposes.
@@ -531,6 +548,9 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// Gets the encoding of the file.
         /// </summary>
         public Encoding Encoding { get; } = encoding;
+        /// <summary>
+        /// Gets a value indicating whether the encoding was successfully detected.
+        /// </summary>
         public bool IsEncodingDetected { get; } = isEncodingDetected;
     }
 

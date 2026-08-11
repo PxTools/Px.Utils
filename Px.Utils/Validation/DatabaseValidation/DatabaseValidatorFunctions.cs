@@ -117,7 +117,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             foreach (string language in _allLanguages)
             {
                 if (!_aliasFiles.Exists(file =>
-                    string.Equals(Path.GetFullPath(file.Location), directoryPath, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(Path.GetFullPath(file.Location), directoryPath, StringComparison.Ordinal) &&
                     file.Languages.Contains(language)))
                 {
                     return new(

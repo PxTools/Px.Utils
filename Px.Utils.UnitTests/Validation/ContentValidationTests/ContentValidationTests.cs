@@ -223,13 +223,13 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateFindStubOrHeadingCalledWithWithMissingHeadingReturnsWithError()
+        public void ValidateFindStubAndHeadingCalledWithMissingHeadingReturnsMissingHeadingError()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_STUB;
             ContentValidator validator = new(filename, encoding, entries);
             SetValidatorField(validator, "_defaultLanguage", defaultLanguage);
-            SetValidatorField(validator, "_availableLanguages", availableLanguages);
+            SetValidatorField(validator, "_availableLanguages", new string[] { defaultLanguage });
 
             // Act
             ValidationFeedback? result = ContentValidator.ValidateFindStubAndHeading(
@@ -240,7 +240,28 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             // Assert
             Assert.IsNotNull(result);
             Assert.HasCount(1, result);
-            Assert.AreEqual(ValidationFeedbackRule.MissingStubAndHeading, result.First().Key.Rule);
+            Assert.AreEqual(ValidationFeedbackRule.MissingHeadingDimensions, result.First().Key.Rule);
+        }
+
+        [TestMethod]
+        public void ValidateFindStubAndHeadingCalledWithMissingStubReturnsMissingStubError()
+        {
+            // Arrange
+            ValidationStructuredEntry[] entries = ContentValidationFixtures.STRUCTURED_ENTRY_ARRAY_WITH_HEADING;
+            ContentValidator validator = new(filename, encoding, entries);
+            SetValidatorField(validator, "_defaultLanguage", defaultLanguage);
+            SetValidatorField(validator, "_availableLanguages", new string[] { defaultLanguage });
+
+            // Act
+            ValidationFeedback? result = ContentValidator.ValidateFindStubAndHeading(
+                entries,
+                validator
+                );
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.HasCount(1, result);
+            Assert.AreEqual(ValidationFeedbackRule.MissingStubDimensions, result.First().Key.Rule);
         }
 
         [TestMethod]

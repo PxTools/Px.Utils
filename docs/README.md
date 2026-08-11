@@ -55,6 +55,8 @@ The read pipeline consists of the following components: Reading the metadata, bu
 Each of these components can be used separately and replaced with custom implementations.
 Especially if the contents of your px-files do not follow the standard px-file format, you might need to implement your own metadata builder.
 
+Px.Utils requires both `STUB` and `HEADING` metadata entries for every file language. Files missing either dimension axis are invalid and cannot be read by the built-in metadata builder or data reader.
+
 ### Supported text encodings
 
 Px.Utils supports ASCII-compatible single-byte encodings, including ANSI code pages specified through `CODEPAGE`, and UTF-8. UTF-8 files may be provided with or without a BOM. UTF-8 metadata may contain multibyte characters.

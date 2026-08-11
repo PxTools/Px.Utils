@@ -74,6 +74,11 @@ internal sealed class DataScenarios(string databaseRoot, string expectationsRoot
         Stopwatch stopwatch = Stopwatch.StartNew();
         List<string> failures = [];
         QueryExpectationDocument document = Load<QueryExpectationDocument>(fixtureName);
+        if (fixtureName.StartsWith("full", StringComparison.Ordinal))
+        {
+            AddFullQueryFixtureSetFailures(document, failures);
+        }
+
         foreach (QueryExpectation query in document.Queries)
         {
             MatrixMap map = PxLoader.CreateMap(query.Dimensions);
@@ -83,6 +88,29 @@ internal sealed class DataScenarios(string databaseRoot, string expectationsRoot
             failures.AddRange(IntegrationAssert.CompareMatrix($"{scenarioName} / {query.Name}", map, query.Values, loaded.Matrix.Data));
         }
         return new TestResult(scenarioName, failures.Count == 0, stopwatch.Elapsed, failures);
+    }
+
+    private void AddFullQueryFixtureSetFailures(QueryExpectationDocument document, List<string> failures)
+    {
+        string validFilesPath = Path.Combine(databaseRoot, "valid-files");
+        HashSet<string> fixtureFileNames = Directory
+            .EnumerateFiles(validFilesPath, "*.px", SearchOption.TopDirectoryOnly)
+            .Select(Path.GetFileName)
+            .OfType<string>()
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        HashSet<string> expectationFileNames = document.Queries
+            .Select(query => query.FileName)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        foreach (string missingFileName in fixtureFileNames.Except(expectationFileNames).OrderBy(value => value, StringComparer.Ordinal))
+        {
+            failures.Add($"Full query: fixture {missingFileName} has no expectation.");
+        }
+
+        foreach (string unexpectedFileName in expectationFileNames.Except(fixtureFileNames).OrderBy(value => value, StringComparer.Ordinal))
+        {
+            failures.Add($"Full query: expectation {unexpectedFileName} has no valid fixture.");
+        }
     }
 
     private T Load<T>(string fileName)
@@ -103,5 +131,4 @@ internal sealed class DataScenarios(string databaseRoot, string expectationsRoot
     {
         return path.Replace(Path.DirectorySeparatorChar, '/').Replace(Path.AltDirectorySeparatorChar, '/');
     }
-
 }
