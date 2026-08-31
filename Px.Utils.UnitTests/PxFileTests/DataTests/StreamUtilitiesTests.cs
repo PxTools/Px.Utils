@@ -205,6 +205,46 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
+        public void FindDataStartPositionWithMetadataKeywordReturnsFirstValueOffset()
+        {
+            // Arrange
+            string content = "TITLE=\"foo\";\nMETADATA=\"some-metadata\";\nVALUES=\"Ää\";\nDATA=1;";
+            byte[] data = Encoding.UTF8.GetBytes(content);
+            int dataValueIndex = content.LastIndexOf("DATA=", StringComparison.Ordinal) + "DATA=".Length;
+            int metadataValueIndex = content.IndexOf("METADATA=", StringComparison.Ordinal) + "METADATA=".Length;
+            long expectedPosition = Encoding.UTF8.GetByteCount(content[..dataValueIndex]);
+            long metadataValuePosition = Encoding.UTF8.GetByteCount(content[..metadataValueIndex]);
+            using Stream stream = new MemoryStream(data);
+
+            // Act
+            long position = StreamUtilities.FindDataStartPosition(stream, PxFileConfiguration.Default, 2);
+
+            // Assert
+            Assert.AreEqual(expectedPosition, position);
+            Assert.AreNotEqual(metadataValuePosition, position);
+        }
+
+        [TestMethod]
+        public async Task FindDataStartPositionWithMetadataKeywordAsyncReturnsFirstValueOffset()
+        {
+            // Arrange
+            string content = "TITLE=\"foo\";\nMETADATA=\"some-metadata\";\nVALUES=\"Ää\";\nDATA=1;";
+            byte[] data = Encoding.UTF8.GetBytes(content);
+            int dataValueIndex = content.LastIndexOf("DATA=", StringComparison.Ordinal) + "DATA=".Length;
+            int metadataValueIndex = content.IndexOf("METADATA=", StringComparison.Ordinal) + "METADATA=".Length;
+            long expectedPosition = Encoding.UTF8.GetByteCount(content[..dataValueIndex]);
+            long metadataValuePosition = Encoding.UTF8.GetByteCount(content[..metadataValueIndex]);
+            using Stream stream = new MemoryStream(data);
+
+            // Act
+            long position = await StreamUtilities.FindDataStartPositionAsync(stream, PxFileConfiguration.Default, 2, default);
+
+            // Assert
+            Assert.AreEqual(expectedPosition, position);
+            Assert.AreNotEqual(metadataValuePosition, position);
+        }
+
+        [TestMethod]
         [DataRow("DATA=;")]
         [DataRow("DATA= ;")]
         [DataRow("DATA=\r\n\t;")]
