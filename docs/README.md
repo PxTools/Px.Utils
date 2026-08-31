@@ -41,6 +41,12 @@ The read pipeline consists of the following components: Reading the metadata, bu
 Each of these components can be used separately and replaced with custom implementations.
 Especially if the contents of your px-files do not follow the standard px-file format, you might need to implement your own metadata builder.
 
+### Supported text encodings
+
+Px.Utils supports ASCII-compatible single-byte encodings, including ANSI code pages specified through `CODEPAGE`, and UTF-8. UTF-8 files may be provided with or without a BOM. UTF-8 metadata may contain multibyte characters.
+
+UTF-16 and UTF-32, in either byte order and with or without a BOM, are not supported for full PX file reading or validation.
+
 #### PxFileMetadataReader : IPxFileMetadataReader
 ```ReadMetadata(Stream stream, Encoding encoding)``` reads the metadata entries from the provided stream as a IEnumerable of ```KeyValuePair<string, string>``` representing the keys and values of the entries.
 **This method does not perform any validation on the metadata entries.**
@@ -56,6 +62,10 @@ The entries need to be in the same key-value format as the output of the ```PxFi
  The data will be written in to the buffer in order, starting form the offset.
 
 **IMPORTANT!** The target map must have the same order as the complete file map. This is for performance reasons, we do not want to move back and forth in the file or generate a second indexer for placing the data in the buffer.
+
+When the reader is created at stream position `0`, it finds the first non-whitespace data value after the top-level `DATA=` entry automatically. This also works with a UTF-8 BOM and multibyte metadata. The overload that accepts `dataStart` expects the absolute raw byte offset of that first value; use `StreamUtilities.FindDataStartPosition()` or `FindDataStartPositionAsync()` to obtain the offset from a seekable stream. Both helpers restore the original stream position and return `-1` when no data value is found, including an explicitly empty entry such as `DATA=;`.
+
+`StreamUtilities.FindKeywordPosition()` and `FindKeywordPositionAsync()` locate a specified keyword at the start of a top-level PX entry and return that keyword's raw byte offset. Use `FindDataStartPosition` or `FindDataStartPositionAsync` when locating the first data value after `DATA=`. Unlike the DATA-specific helpers, the generic keyword methods search from the stream's current position and leave it advanced after reading.
 
 ### Metadata example
 ```csharp
@@ -225,6 +235,14 @@ Validator classes implement either ```IPxFileStreamValidator``` or ```IPxFileStr
 - encoding (Encoding, optional): Encoding of the px file. Default is Encoding.Default
 - fileSystem (IFileSystem, optional): Object that defines the file system used for the validation process. Default file called LocalFileSystem system is used if none provided.
 
+#### Feedback retention
+All concrete validators provide overloads that accept a `ValidationOptions` instance. By default, validation retains at most 100 feedback items for each filename, feedback level, and rule combination. When a limit is reached, the final retained item is annotated to indicate that additional matching feedback was detected but not logged. Set `MaxFeedbackItemsPerSignature` to a positive number to choose a limit, or use `ValidationOptions.Unlimited` to retain every item.
+
+```csharp
+ValidationOptions options = new() { MaxFeedbackItemsPerSignature = 500 };
+ValidationResult result = validator.Validate(fileStream, "path/to/file.px", Encoding.UTF8, null, options);
+```
+
 #### PxFileValidator : IPxFileStreamValidator, IPxFileStreamValidatorAsync
 ```PxFileValidator``` is a class that validates the whole px file including its data, metadata syntax and metadata contents. The class can be instantiated with the following parameters:
 - conf (PxFileConfiguration, optional): Object that contains px file configuration.
@@ -236,6 +254,7 @@ Once the PxFileValidator object is instantiated, either the Validate or Validate
 	PxFileValidator validator = new PxFileValidator();
 	ValidationResult result = validator.Validate(fileStream, "path/to/file.px", Encoding.UTF8);
 	ValidationResult asyncResult = await validator.ValidateAsync(fileStream, "path/to/file.px", Encoding.UTF8, cancellationToken: cancellationToken);
+    ValidationResult limitedResult = validator.Validate(fileStream, "path/to/file.px", Encoding.UTF8, null, new ValidationOptions { MaxFeedbackItemsPerSignature = 500 });
 ```
 
 #### SyntaxValidator : IPxFileStreamValidator, IPxFileStreamValidatorAsync
@@ -249,6 +268,7 @@ The class can be instantiated with the following parameters:
 	SyntaxValidator validator = new SyntaxValidator();
 	SyntaxValidationResult result = validator.Validate(fileStream, "path/to/file.px", Encoding.UTF8);
 	SyntaxValidationResult asyncResult = await validator.ValidateAsync(fileStream, "path/to/file.px", Encoding.UTF8, cancellationToken: cancellationToken);
+    SyntaxValidationResult limitedResult = validator.Validate(fileStream, "path/to/file.px", Encoding.UTF8, null, ValidationOptions.Unlimited);
 ```
 
 #### ContentValidator : IValidator
@@ -267,6 +287,7 @@ The class can be instantiated with the following parameters:
 	SyntaxValidationResult syntaxResult = syntaxValidator.Validate(fileStream, "path/to/file.px", encoding);
 	ContentValidator validator = new ContentValidator("path/to/file.px", encoding, syntaxResult.Result);
 	ValidationResult result = validator.Validate();
+    ValidationResult limitedResult = validator.Validate(new ValidationOptions { MaxFeedbackItemsPerSignature = 500 });
 ```
 
 #### DataValidator : IPxFileStreamValidator, IPxFileStreamValidatorAsync
@@ -286,6 +307,7 @@ The class can be instantiated with the following parameters:
 	ValidationResult contentResult = contentValidator.Validate();
 	DataValidator validator = new DataValidator(contentResult.DataRowLength, contentResult.DataRowAmount, syntaxResult.DataStartRow);
 	ValidationResult result = validator.Validate(fileStream, "path/to/file.px", encoding);
+    ValidationResult limitedResult = validator.Validate(fileStream, "path/to/file.px", encoding, null, new ValidationOptions { MaxFeedbackItemsPerSignature = 500 });
 ```
 
 #### DatabaseValidator : IValidator, IValidatorAsync
@@ -305,6 +327,7 @@ The database needs to contain alias files for each language used in the database
 	DatabaseValidator validator = new DatabaseValidator("path/to/database");
 	ValidationResult result = validator.Validate();
 	ValidationResult asyncResult = await validator.ValidateAsync(cancellationToken);
+    ValidationResult limitedResult = validator.Validate(new ValidationOptions { MaxFeedbackItemsPerSignature = 500 });
 ```
 
 ### Computing

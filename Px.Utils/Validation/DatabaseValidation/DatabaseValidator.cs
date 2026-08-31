@@ -38,8 +38,16 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// </summary>
         /// <returns><see cref="ValidationResult"/> object that contains feedback gathered during the validation process.</returns>
         public ValidationResult Validate()
+            => Validate(new ValidationOptions());
+
+        /// <summary>
+        /// Runs database validation using the specified feedback retention options.
+        /// </summary>
+        /// <param name="options">Feedback retention options. A positive limit applies per filename, level, and rule; <see langword="null"/> limit retains all feedback.</param>
+        /// <returns>The database validation result with retained feedback.</returns>
+        public ValidationResult Validate(ValidationOptions options)
         {
-            ValidationFeedback feedbacks = [];
+            ValidationFeedbackSink sink = new(options);
             ConcurrentBag<DatabaseFileInfo> pxFiles = [];
             ConcurrentBag<DatabaseFileInfo> aliasFiles = [];
             List<Task> fileTasks = [];
@@ -49,9 +57,9 @@ namespace Px.Utils.Validation.DatabaseValidation
             {
                 fileTasks.Add(Task.Run(() =>
                 {
-                    (DatabaseFileInfo? file, ValidationFeedback feedback) = ProcessPxFile(fileName);
+                    (DatabaseFileInfo? file, ValidationFeedback feedback) = ProcessPxFile(fileName, sink);
                     if (file != null) pxFiles.Add(file);
-                    feedbacks.AddRange(feedback);
+                    sink.ReportRange(feedback);
                 }));
             }
             
@@ -66,8 +74,8 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
 
             Task.WaitAll([.. fileTasks]);
-            feedbacks.AddRange(ValidateDatabaseContents(pxFiles, aliasFiles));
-            return new (feedbacks);
+            sink.ReportRange(ValidateDatabaseContents(pxFiles, aliasFiles));
+            return new(sink.ToFeedback());
         }
 
         /// <summary>
@@ -76,8 +84,17 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// <param name="cancellationToken">Optional cancellation token</param>
         /// <returns><see cref="ValidationResult"/> object that contains feedback gathered during the validation process.</returns>
         public async Task<ValidationResult> ValidateAsync(CancellationToken cancellationToken = default)
+            => await ValidateAsync(new ValidationOptions(), cancellationToken);
+
+        /// <summary>
+        /// Runs database validation asynchronously using the specified feedback retention options.
+        /// </summary>
+        /// <param name="options">Feedback retention options. A positive limit applies per filename, level, and rule; <see langword="null"/> limit retains all feedback.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that produces the database validation result with retained feedback.</returns>
+        public async Task<ValidationResult> ValidateAsync(ValidationOptions options, CancellationToken cancellationToken = default)
         {
-            ValidationFeedback feedbacks = [];
+            ValidationFeedbackSink sink = new(options);
             ConcurrentBag<DatabaseFileInfo> pxFiles = [];
             ConcurrentBag<DatabaseFileInfo> aliasFiles = [];
             List<Task> fileTasks = [];
@@ -87,9 +104,9 @@ namespace Px.Utils.Validation.DatabaseValidation
             {
                 fileTasks.Add(Task.Run(async () =>
                 {
-                    (DatabaseFileInfo? file, ValidationFeedback feedback) = await ProcessPxFileAsync(fileName, cancellationToken);
+                    (DatabaseFileInfo? file, ValidationFeedback feedback) = await ProcessPxFileAsync(fileName, sink, cancellationToken);
                     if (file != null) pxFiles.Add(file);
-                    feedbacks.AddRange(feedback);
+                    sink.ReportRange(feedback);
                 }, cancellationToken));
             }
 
@@ -104,11 +121,11 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
             
             await Task.WhenAll(fileTasks);
-            feedbacks.AddRange(ValidateDatabaseContents(pxFiles, aliasFiles));
-            return new (feedbacks);
+            sink.ReportRange(ValidateDatabaseContents(pxFiles, aliasFiles));
+            return new(sink.ToFeedback());
         }
 
-        private (DatabaseFileInfo?, ValidationFeedback) ProcessPxFile(string fileName)
+        private (DatabaseFileInfo?, ValidationFeedback) ProcessPxFile(string fileName, ValidationFeedbackSink sink)
         {
             ValidationFeedback feedbacks = [];
             using Stream stream = _fileSystem.GetFileStream(fileName);
@@ -120,7 +137,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
             stream.Position = 0;
             PxFileValidator validator = new(_conf);
-            feedbacks.AddRange(validator.Validate(stream, fileName, fileInfo.Encoding).FeedbackItems);
+            validator.ValidateIntoSink(stream, fileName, fileInfo.Encoding, null, sink);
             return (fileInfo, feedbacks);
         }
 
@@ -130,7 +147,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             return GetAliasFileInfo(fileName, stream);
         }
 
-        private async Task<(DatabaseFileInfo?, ValidationFeedback)> ProcessPxFileAsync(string fileName, CancellationToken cancellationToken)
+        private async Task<(DatabaseFileInfo?, ValidationFeedback)> ProcessPxFileAsync(string fileName, ValidationFeedbackSink sink, CancellationToken cancellationToken)
         {
             ValidationFeedback feedbacks = [];
             using Stream stream = _fileSystem.GetFileStream(fileName);
@@ -142,8 +159,7 @@ namespace Px.Utils.Validation.DatabaseValidation
             }
             stream.Position = 0;
             PxFileValidator validator = new(_conf);
-            ValidationResult result = await validator.ValidateAsync(stream, fileName, fileInfo.Encoding, cancellationToken: cancellationToken);
-            feedbacks.AddRange(result.FeedbackItems);
+            await validator.ValidateIntoSinkAsync(stream, fileName, fileInfo.Encoding, null, sink, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             return (fileInfo, feedbacks);
         }
@@ -413,21 +429,55 @@ namespace Px.Utils.Validation.DatabaseValidation
         }
     }
 
+    /// <summary>
+    /// Represents a database validation item.
+    /// </summary>
+    /// <param name="path">The path of the database validation item.</param>
     public class DatabaseValidationItem(string path)
     {
+        /// <summary>
+        /// Gets the path of the file or directory.
+        /// </summary>
         public string Path { get; } = path;
     }
 
+    /// <summary>
+    /// Represents a px file or alias file within a px file database for validation purposes.
+    /// </summary>
+    /// <param name="name">Name of the file.</param>
+    /// <param name="location">Path of the file's directory.</param>
+    /// <param name="languages">Languages associated with the file.</param>
+    /// <param name="encoding">Encoding of the file.</param>
     public class DatabaseFileInfo(string name, string location, string[] languages, Encoding encoding) : DatabaseValidationItem(name)
     {
+        /// <summary>
+        /// Gets the name of the file.
+        /// </summary>
         public string Name { get; } = name;
+        /// <summary>
+        /// Gets the path of the file's directory.
+        /// </summary>
         public string Location { get; } = location;
+        /// <summary>
+        /// Gets the languages associated with the file.
+        /// </summary>
         public string[] Languages { get; } = languages;
+        /// <summary>
+        /// Gets the encoding of the file.
+        /// </summary>
         public Encoding Encoding { get; } = encoding;
     }
 
+    /// <summary>
+    /// Validator interface for validating a px file database including px files, alias files, and directory structures.
+    /// </summary>
     public interface IDatabaseValidator
     {
+        /// <summary>
+        /// Validates a given <see cref="DatabaseValidationItem"/> and returns a feedback entry if validation fails, or <see langword="null"/> if validation passes.
+        /// </summary>
+        /// <param name="item">The database validation item to validate.</param>
+        /// <returns>A key-value pair representing the validation feedback if validation fails, or <see langword="null"/> if validation passes.</returns>
         public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(DatabaseValidationItem item);
     }
 }

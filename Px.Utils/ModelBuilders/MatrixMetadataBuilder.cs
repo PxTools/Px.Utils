@@ -51,7 +51,7 @@ namespace Px.Utils.ModelBuilders
         /// <summary>
         /// Builds a <see cref="MatrixMetadata"/> object from a given set of metadata entries.
         /// </summary>
-        /// <param name="metadataInput">A <see cref="IReadOnlyDictionary{string, string}"/> of key-value pairs representing the metadata entries in the Px-File format.</param>
+        /// <param name="metadataInput">A <see cref="IReadOnlyDictionary{TKey, TValue}"/> of key-value pairs representing the metadata entries in the Px-File format.</param>
         /// <returns>A <see cref="MatrixMetadata"/> object constructed from the input metadata entries.</returns>
         public MatrixMetadata Build(IReadOnlyDictionary<string, string> metadataInput)
         {

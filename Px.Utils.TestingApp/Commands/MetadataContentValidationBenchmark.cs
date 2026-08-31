@@ -9,7 +9,8 @@ namespace Px.Utils.TestingApp.Commands
         internal override string Help =>
         "Validates the contents of the Px file metadata given amount of times." + Environment.NewLine +
         "\t-f, -file: The path to the px file to read." + Environment.NewLine +
-        "\t-i, -iter: The number of iterations to run.";
+        "\t-i, -iter: The number of iterations to run." + Environment.NewLine +
+        "\t-l, -limit: Feedback items retained per file, level, and rule; use a positive number. Defaults to 100.";
 
         internal override string Description => "Benchmarks the metadata content validation of Px.Utils/Validation/SyntaxValidator.";
 
@@ -34,7 +35,7 @@ namespace Px.Utils.TestingApp.Commands
         private void ValidateContentBenchmark()
         {
             ContentValidator validator = new(TestFilePath, Encoding.Default, [.. _entries]);
-            validator.Validate();
+            validator.Validate(ValidationOptions);
         }
     }
 }

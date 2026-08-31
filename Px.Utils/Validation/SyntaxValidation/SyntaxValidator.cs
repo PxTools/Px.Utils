@@ -1,4 +1,5 @@
-﻿using Px.Utils.PxFile;
+using Px.Utils.PxFile;
+using Px.Utils.PxFile.Data;
 using Px.Utils.Validation.DatabaseValidation;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -8,10 +9,9 @@ namespace Px.Utils.Validation.SyntaxValidation
     /// <summary>
     /// Provides methods for validating the syntax of a PX file. Validation can be done using both synchronous and asynchronous methods.
     /// Additionally custom validation functions can be provided to be used during validation.
+    /// </summary>
     /// <param name="conf">Object that stores syntax specific symbols and tokens for the PX file</param>
     /// <param name="customValidationFunctions">Object that contains any optional additional validation functions</param>
-    /// his is required if multiple validations are executed for the same stream.</param>
-    /// </summary>
     public class SyntaxValidator(
             PxFileConfiguration? conf = null,
             CustomSyntaxValidationFunctions? customValidationFunctions = null) 
@@ -19,7 +19,7 @@ namespace Px.Utils.Validation.SyntaxValidation
     {
         private const int _bufferSize = 4096;
         private int _dataSectionStartRow = -1;
-        private int _dataSectionStartStreamPosition = -1;
+        private long _dataSectionStartStreamPosition = -1;
 
         ///<summary>
         /// Validates the syntax of a PX file's metadata.
@@ -36,8 +36,46 @@ namespace Px.Utils.Validation.SyntaxValidation
             Encoding? encoding = null,
             IFileSystem? fileSystem = null)
         {
+            ValidationFeedbackSink sink = new();
+            SyntaxValidationOutput output = ValidateIntoSink(stream, filename, encoding, fileSystem, sink);
+            return new SyntaxValidationResult(sink.ToFeedback(), output.StructuredEntries, output.DataStartRow, output.DataStartStreamPosition);
+        }
+
+        /// <summary>
+        /// Validates the syntax of a PX file's metadata using the specified feedback retention options.
+        /// </summary>
+        /// <param name="stream">The PX file stream to validate.</param>
+        /// <param name="filename">The name used in reported feedback.</param>
+        /// <param name="encoding">The PX file encoding, or <see langword="null"/> to detect it.</param>
+        /// <param name="fileSystem">The file system used for encoding detection, or <see langword="null"/> for the default.</param>
+        /// <param name="options">Feedback retention options. A positive limit applies per filename, level, and rule; <see langword="null"/> limit retains all feedback.</param>
+        /// <returns>The syntax result with retained validation feedback and parsed metadata entries.</returns>
+        public SyntaxValidationResult Validate(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            ValidationOptions options)
+        {
+            ValidationFeedbackSink sink = new(options);
+            SyntaxValidationOutput output = ValidateIntoSink(stream, filename, encoding, fileSystem, sink);
+            return new SyntaxValidationResult(sink.ToFeedback(), output.StructuredEntries, output.DataStartRow, output.DataStartStreamPosition);
+        }
+
+        internal SyntaxValidationOutput ValidateIntoSink(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            ValidationFeedbackSink sink)
+        {
             fileSystem ??= new LocalFileSystem();
-            encoding ??= fileSystem.GetEncoding(stream);
+            if (encoding is null)
+            {
+                long originalPosition = stream.Position;
+                encoding = fileSystem.GetEncoding(stream);
+                stream.Position = originalPosition;
+            }
 
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
@@ -52,16 +90,17 @@ namespace Px.Utils.Validation.SyntaxValidation
             }
 
             conf ??= PxFileConfiguration.Default;
+            ResetDataSectionPosition();
+            _dataSectionStartStreamPosition = StreamUtilities.FindDataStartPosition(stream, conf, _bufferSize);
 
-            ValidationFeedback validationFeedbacks = [];
             List<ValidationEntry> stringEntries = BuildValidationEntries(stream, encoding, conf, filename, _bufferSize);
-            validationFeedbacks.AddRange(ValidateEntries(stringEntries, stringValidationFunctions, conf));
+            ReportEntryFeedback(stringEntries, stringValidationFunctions, conf, sink);
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(stringEntries, conf);
-            validationFeedbacks.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, conf));
+            ReportKeyValuePairFeedback(keyValuePairs, keyValueValidationFunctions, conf, sink);
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, conf);
-            validationFeedbacks.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, conf));
+            ReportStructuredFeedback(structuredEntries, structuredValidationFunctions, conf, sink);
 
-            return new SyntaxValidationResult(validationFeedbacks, structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
+            return new SyntaxValidationOutput(structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
         }
 
         /// <summary>
@@ -81,8 +120,49 @@ namespace Px.Utils.Validation.SyntaxValidation
             IFileSystem? fileSystem = null,
             CancellationToken cancellationToken = default)
         {
+            ValidationFeedbackSink sink = new();
+            SyntaxValidationOutput output = await ValidateIntoSinkAsync(stream, filename, encoding, fileSystem, sink, cancellationToken);
+            return new SyntaxValidationResult(sink.ToFeedback(), output.StructuredEntries, output.DataStartRow, output.DataStartStreamPosition);
+        }
+
+        /// <summary>
+        /// Asynchronously validates the syntax of a PX file's metadata using the specified feedback retention options.
+        /// </summary>
+        /// <param name="stream">The PX file stream to validate.</param>
+        /// <param name="filename">The name used in reported feedback.</param>
+        /// <param name="encoding">The PX file encoding, or <see langword="null"/> to detect it.</param>
+        /// <param name="fileSystem">The file system used for encoding detection, or <see langword="null"/> for the default.</param>
+        /// <param name="options">Feedback retention options. A positive limit applies per filename, level, and rule; <see langword="null"/> limit retains all feedback.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that produces the syntax result with retained validation feedback and parsed metadata entries.</returns>
+        public async Task<SyntaxValidationResult> ValidateAsync(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            ValidationOptions options,
+            CancellationToken cancellationToken = default)
+        {
+            ValidationFeedbackSink sink = new(options);
+            SyntaxValidationOutput output = await ValidateIntoSinkAsync(stream, filename, encoding, fileSystem, sink, cancellationToken);
+            return new SyntaxValidationResult(sink.ToFeedback(), output.StructuredEntries, output.DataStartRow, output.DataStartStreamPosition);
+        }
+
+        internal async Task<SyntaxValidationOutput> ValidateIntoSinkAsync(
+            Stream stream,
+            string filename,
+            Encoding? encoding,
+            IFileSystem? fileSystem,
+            ValidationFeedbackSink sink,
+            CancellationToken cancellationToken = default)
+        {
             fileSystem ??= new LocalFileSystem();
-            encoding ??= await fileSystem.GetEncodingAsync(stream, cancellationToken);
+            if (encoding is null)
+            {
+                long originalPosition = stream.Position;
+                encoding = await fileSystem.GetEncodingAsync(stream, cancellationToken);
+                stream.Position = originalPosition;
+            }
 
             SyntaxValidationFunctions validationFunctions = new();
             IEnumerable<EntryValidationFunction> stringValidationFunctions = validationFunctions.DefaultStringValidationFunctions;
@@ -97,15 +177,16 @@ namespace Px.Utils.Validation.SyntaxValidation
             }
 
             conf ??= PxFileConfiguration.Default;
-            ValidationFeedback validationFeedbacks = [];
+            ResetDataSectionPosition();
+            _dataSectionStartStreamPosition = await StreamUtilities.FindDataStartPositionAsync(stream, conf, _bufferSize, cancellationToken);
             List<ValidationEntry> entries = await BuildValidationEntriesAsync(stream, encoding, conf, filename, _bufferSize, cancellationToken);
-            validationFeedbacks.AddRange(ValidateEntries(entries, stringValidationFunctions, conf));
+            ReportEntryFeedback(entries, stringValidationFunctions, conf, sink);
             List<ValidationKeyValuePair> keyValuePairs = BuildKeyValuePairs(entries, conf);
-            validationFeedbacks.AddRange(ValidateKeyValuePairs(keyValuePairs, keyValueValidationFunctions, conf));
+            ReportKeyValuePairFeedback(keyValuePairs, keyValueValidationFunctions, conf, sink);
             List<ValidationStructuredEntry> structuredEntries = BuildValidationStructureEntries(keyValuePairs, conf);
-            validationFeedbacks.AddRange(ValidateStructs(structuredEntries, structuredValidationFunctions, conf));
+            ReportStructuredFeedback(structuredEntries, structuredValidationFunctions, conf, sink);
 
-            return new SyntaxValidationResult(validationFeedbacks, structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
+            return new SyntaxValidationOutput(structuredEntries, _dataSectionStartRow, _dataSectionStartStreamPosition);
         }
 
         #region Interface implementation
@@ -143,9 +224,12 @@ namespace Px.Utils.Validation.SyntaxValidation
             return false;
         }
 
-        private static ValidationFeedback ValidateEntries(IEnumerable<ValidationEntry> entries, IEnumerable<EntryValidationFunction> validationFunctions, PxFileConfiguration syntaxConf)
+        private static void ReportEntryFeedback(
+            IEnumerable<ValidationEntry> entries,
+            IEnumerable<EntryValidationFunction> validationFunctions,
+            PxFileConfiguration syntaxConf,
+            ValidationFeedbackSink sink)
         {
-            ValidationFeedback validationFeedback = [];
             foreach (ValidationEntry entry in entries)
             {
                 foreach (EntryValidationFunction function in validationFunctions)
@@ -153,19 +237,18 @@ namespace Px.Utils.Validation.SyntaxValidation
                     KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = function(entry, syntaxConf);
                     if (feedback is not null)
                     {
-                        validationFeedback.Add((KeyValuePair <ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
+                        sink.Report(feedback.Value);
                     }
                 }
             }
-            return validationFeedback;
         }
 
-        private static ValidationFeedback ValidateKeyValuePairs(
+        private static void ReportKeyValuePairFeedback(
             IEnumerable<ValidationKeyValuePair> kvpObjects,
             IEnumerable<KeyValuePairValidationFunction> validationFunctions,
-            PxFileConfiguration syntaxConf)
+            PxFileConfiguration syntaxConf,
+            ValidationFeedbackSink sink)
         {
-            ValidationFeedback validationFeedback = [];
             foreach (ValidationKeyValuePair kvpObject in kvpObjects)
             {
                 foreach (KeyValuePairValidationFunction function in validationFunctions)
@@ -173,19 +256,18 @@ namespace Px.Utils.Validation.SyntaxValidation
                     KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = function(kvpObject, syntaxConf);
                     if (feedback is not null)
                     {
-                        validationFeedback.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
+                        sink.Report(feedback.Value);
                     }
                 }
             }
-            return validationFeedback;
         }
 
-        private static ValidationFeedback ValidateStructs(
-            IEnumerable<ValidationStructuredEntry> structuredEntries, 
+        private static void ReportStructuredFeedback(
+            IEnumerable<ValidationStructuredEntry> structuredEntries,
             IEnumerable<StructuredValidationFunction> validationFunctions,
-            PxFileConfiguration syntaxConf)
+            PxFileConfiguration syntaxConf,
+            ValidationFeedbackSink sink)
         {
-            ValidationFeedback validationFeedback = [];
             foreach (ValidationStructuredEntry structuredEntry in structuredEntries)
             {
                 foreach (StructuredValidationFunction function in validationFunctions)
@@ -193,11 +275,10 @@ namespace Px.Utils.Validation.SyntaxValidation
                     KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = function(structuredEntry, syntaxConf);
                     if (feedback is not null)
                     {
-                        validationFeedback.Add((KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>)feedback);
+                        sink.Report(feedback.Value);
                     }
                 }
             }
-            return validationFeedback;
         }
 
         private static List<ValidationKeyValuePair> BuildKeyValuePairs(List<ValidationEntry> validationEntries, PxFileConfiguration syntaxConf)
@@ -251,8 +332,6 @@ namespace Px.Utils.Validation.SyntaxValidation
                     if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
                     {
                         _dataSectionStartRow = lineChangeIndexes.Count;
-                        // This here should find the actual start of the data section, after line changes, spaces and whatnot.
-                        _dataSectionStartStreamPosition = characterIndex + 1;
                         return entries;
                     }
                     UpdateLineAndCharacter(buffer[i], syntaxConf, ref characterIndex, ref lineChangeIndexes, ref isProcessingString);
@@ -311,7 +390,6 @@ namespace Px.Utils.Validation.SyntaxValidation
                     if (IsEndOfMetadataSection(buffer[i], syntaxConf, entryBuilder, isProcessingString))
                     {
                         _dataSectionStartRow = lineChangeIndexes.Count;
-                        _dataSectionStartStreamPosition = characterIndex + 1;
                         return entries;
                     }
                     UpdateLineAndCharacter(buffer[i], syntaxConf, ref characterIndex, ref lineChangeIndexes, ref isProcessingString);
@@ -333,6 +411,12 @@ namespace Px.Utils.Validation.SyntaxValidation
             while (read > 0);
 
             return entries;
+        }
+
+        private void ResetDataSectionPosition()
+        {
+            _dataSectionStartRow = -1;
+            _dataSectionStartStreamPosition = -1;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

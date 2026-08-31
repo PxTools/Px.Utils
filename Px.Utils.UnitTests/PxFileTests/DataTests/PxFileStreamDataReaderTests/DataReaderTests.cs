@@ -1,4 +1,5 @@
 using Px.Utils.Models.Metadata;
+using Px.Utils.PxFile;
 using Px.Utils.PxFile.Data;
 using PxFileTests.Fixtures;
 using Px.Utils.Models.Data;
@@ -11,6 +12,46 @@ namespace Px.Utils.UnitTests.PxFileTests.DataTests.PxFileStreamDataReaderTests
     public class DataReaderTests
     {
         private readonly double[] missingMarkers = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6];
+
+        [TestMethod]
+        public void ReadDoubleDataValuesQuotedDataKeywordAndWhitespaceWithSmallBufferReturnsCorrectValue()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes("TITLE=\"DATA=not-an-entry\";\nDATA=\r\n\t1;");
+            using Stream stream = new MemoryStream(data);
+            using PxFileStreamDataReader reader = new(stream, null, 2);
+            DoubleDataValue[] targetBuffer = new DoubleDataValue[1];
+            MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata([1]);
+
+            // Act
+            reader.ReadDoubleDataValues(targetBuffer, 0, metadata, metadata);
+
+            // Assert
+            Assert.AreEqual(1.0, targetBuffer[0].UnsafeValue);
+        }
+
+        [TestMethod]
+        public void ReadDoubleDataValuesExplicitDataStartMatchesAutomaticPositioning()
+        {
+            // Arrange
+            byte[] data = Encoding.UTF8.GetBytes("TITLE=\"DATA=not-an-entry\";\nDATA= 1;");
+            using Stream positionStream = new MemoryStream(data);
+            long dataStart = StreamUtilities.FindDataStartPosition(positionStream, PxFileConfiguration.Default);
+            using Stream automaticStream = new MemoryStream(data);
+            using Stream explicitPositionStream = new MemoryStream(data);
+            using PxFileStreamDataReader automaticReader = new(automaticStream, null, 2);
+            using PxFileStreamDataReader explicitPositionReader = new(explicitPositionStream, dataStart, null, 2);
+            DoubleDataValue[] automaticBuffer = new DoubleDataValue[1];
+            DoubleDataValue[] explicitPositionBuffer = new DoubleDataValue[1];
+            MatrixMetadata metadata = TestModelBuilder.BuildTestMetadata([1]);
+
+            // Act
+            automaticReader.ReadDoubleDataValues(automaticBuffer, 0, metadata, metadata);
+            explicitPositionReader.ReadDoubleDataValues(explicitPositionBuffer, 0, metadata, metadata);
+
+            // Assert
+            CollectionAssert.AreEqual(automaticBuffer, explicitPositionBuffer);
+        }
 
         [TestMethod]
         public void ReadDoubleDataValuesValidIntegersReturnsCorrectDoubleDataValues()

@@ -56,6 +56,25 @@ namespace Px.Utils.Validation.ContentValidation
         /// <returns><see cref="ContentValidationResult"/> object that contains the feedback gathered during the validation process.</returns>
         public ContentValidationResult Validate()
         {
+            ValidationFeedbackSink sink = new();
+            ContentValidationOutput output = ValidateIntoSink(sink);
+            return new ContentValidationResult(sink.ToFeedback(), output.DataRowLength, output.DataRowAmount);
+        }
+
+        /// <summary>
+        /// Validates contents of PX file metadata using the specified feedback retention options.
+        /// </summary>
+        /// <param name="options">Feedback retention options. A positive limit applies per filename, level, and rule; <see langword="null"/> limit retains all feedback.</param>
+        /// <returns>The content validation result with retained feedback and calculated data dimensions.</returns>
+        public ContentValidationResult Validate(ValidationOptions options)
+        {
+            ValidationFeedbackSink sink = new(options);
+            ContentValidationOutput output = ValidateIntoSink(sink);
+            return new ContentValidationResult(sink.ToFeedback(), output.DataRowLength, output.DataRowAmount);
+        }
+
+        internal ContentValidationOutput ValidateIntoSink(ValidationFeedbackSink sink)
+        {
             IEnumerable<ContentValidationEntryValidator> contentValidationEntryFunctions = DefaultContentValidationEntryFunctions;
             IEnumerable<ContentValidationFindKeywordValidator> contentValidationFindKeywordFunctions = DefaultContentValidationFindKeywordFunctions;
 
@@ -65,14 +84,12 @@ namespace Px.Utils.Validation.ContentValidation
                 contentValidationFindKeywordFunctions = contentValidationFindKeywordFunctions.Concat(customContentValidationFunctions.CustomContentValidationFindKeywordFunctions);
             }
 
-            ValidationFeedback feedbackItems = [];
-
             foreach (ContentValidationFindKeywordValidator findingFunction in contentValidationFindKeywordFunctions)
             {
                 ValidationFeedback? feedback = findingFunction(entries, this);
                 if (feedback is not null)
                 {
-                    feedbackItems.AddRange(feedback);
+                    sink.ReportRange(feedback);
                 }
             }
             foreach (ContentValidationEntryValidator entryFunction in contentValidationEntryFunctions)
@@ -82,7 +99,7 @@ namespace Px.Utils.Validation.ContentValidation
                     ValidationFeedback? feedback = entryFunction(entry, this);
                     if (feedback is not null)
                     {
-                        feedbackItems.AddRange(feedback);
+                        sink.ReportRange(feedback);
                     }
                 }
             }
@@ -90,7 +107,7 @@ namespace Px.Utils.Validation.ContentValidation
             int amountOfDataRows = _stubDimensionNames is not null ? GetProductOfDimensionValues(_stubDimensionNames) : 0;
             ResetFields();
 
-            return new ContentValidationResult(feedbackItems, lengthOfDataRows, amountOfDataRows);
+            return new ContentValidationOutput(lengthOfDataRows, amountOfDataRows);
         }
 
         #region Interface implementation

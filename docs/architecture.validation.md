@@ -22,11 +22,15 @@ Validate(stream, filename, encoding?, fileSystem?)
 ValidateAsync(stream, filename, encoding?, fileSystem?, cancellationToken)
 ```
 
+Concrete validators also expose `ValidationOptions` overloads. `ValidationOptions.MaxFeedbackItemsPerSignature` defaults to `100` and limits retained feedback by filename, level, and rule; set it to `null` through `ValidationOptions.Unlimited` to retain all feedback. Validators report each discovered finding directly to `ValidationFeedbackSink`, so configured limits bound retained feedback during syntax, content, and data scans instead of only truncating completed results. When a limit is exceeded, the last retained item is annotated with a truncation notice. `ValidationFeedbackSink` applies this policy safely while database validation processes files concurrently.
+
 ### SyntaxValidator
 
 Validates PX file metadata syntax (key-value structure, encoding, characters).  
 File: `Validation/SyntaxValidation/SyntaxValidator.cs`  
 Partial helpers: `SyntaxValidationFunctions.StringValidationFunctions.cs`, `KeyValueValidationFunctions.cs`, `StructuredValidationFunctions.cs`
+
+Before parsing metadata, it locates the first non-whitespace value after the top-level `DATA=` entry using `StreamUtilities`. `SyntaxValidationResult.DataStartStreamPosition` is the resulting absolute raw byte offset, suitable for direct assignment to `Stream.Position`, or `-1` if no data value is found. An empty entry such as `DATA=;` is treated as missing data and produces error-level `StartOfDataSectionNotFound` feedback in file and standalone data validation.
 
 ### ContentValidator
 
@@ -40,6 +44,8 @@ Dimension type validation uses `PxFileConfiguration.TokenDefinitions.VariableTyp
 
 Validates data section (row counts, row lengths, value types, separators).  
 File: `Validation/DataValidation/DataValidator.cs`
+
+When invoked at the start of a stream, it uses its supplied `PxFileConfiguration` to locate the configured DATA keyword and syntax separators.
 
 ### DatabaseValidator
 
@@ -93,6 +99,8 @@ Validation/
 ├── IPxFileStreamValidator.cs                -- IPxFileStreamValidator, IPxFileStreamValidatorAsync
 ├── IValidationResult.cs                     -- ValidationResult
 ├── ValidationFeedback.cs                    -- ValidationFeedbackKey, ValidationFeedbackValue, ValidationFeedback
+├── ValidationOptions.cs                     -- Feedback retention configuration
+├── ValidationFeedbackSink.cs                -- Concurrent feedback retention and truncation
 ├── ValidationObject.cs                      -- Validation context
 ├── Enums.cs                                 -- ValidationFeedbackLevel, ValidationFeedbackRule, ValueType
 ├── PxFileValidator.cs                       -- Orchestrator

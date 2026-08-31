@@ -18,6 +18,7 @@ Framework: MSTest + Moq. Naming: `MethodNameStateUnderTestExpectedBehavior`.
 | `DataStringValueValidatorTests` | `Validation/DataValidationTests/DataStringValueValidatorTests.cs` | String data validation |
 | `DataSeparatorValidatorTest` | `Validation/DataValidationTests/DataSeparatorValidatorTest.cs` | Separator validation |
 | `DataStructureValidationTests` | `Validation/DataValidationTests/DataStructureValidationTests.cs` | Data structure validation |
+| `ValidationFeedbackSinkTests` | `Validation/ValidationFeedbackSinkTests.cs` | Per-signature feedback limits, truncation annotations, unlimited retention, and invalid limits |
 | `DatabaseValidatorTests` | `Validation/DatabaseValidation/DatabaseValidatorTests.cs` | `DatabaseValidator` |
 | `DatabaseValidatorFunctionTests` | `Validation/DatabaseValidation/DatabaseValidatorFunctionTests.cs` | Database validator functions |
 | `PxFileValidationTests` | `Validation/PxFileValidationTests/PxFileValidationTests.cs` | `PxFileValidator` |
@@ -34,6 +35,7 @@ Framework: MSTest + Moq. Naming: `MethodNameStateUnderTestExpectedBehavior`.
 | `MultiPartReadingTests` | `PxFileTests/DataTests/PxFileStreamDataReaderTests/MultiPartReadingTests.cs` | Multi-part reads |
 | `DataIndexerTests` | `PxFileTests/DataTests/DataIndexerTests.cs` | `DataIndexer` |
 | `DataValueParserTests` | `PxFileTests/DataTests/DataValueParserTests.cs` | `DataValueParsers` |
+| `StreamUtilitiesTests` | `PxFileTests/DataTests/StreamUtilitiesTests.cs` | Byte-accurate `DATA=` start offsets with BOM, multibyte metadata, whitespace, buffer splits, and missing data |
 
 ### Model & Builder Tests
 
