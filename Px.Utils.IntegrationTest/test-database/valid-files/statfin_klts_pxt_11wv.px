@@ -1,6 +1,6 @@
-CHARSET="ANSI";
+CHARSET="Unicode";
 AXIS-VERSION="2013";
-CODEPAGE="iso-8859-15";
+CODEPAGE="UTF-8";
 LANGUAGE="fi";
 LANGUAGES="fi","sv","en";
 CREATION-DATE="20191004 08:00";
@@ -14,14 +14,14 @@ SUBJECT-AREA="klts";
 SUBJECT-AREA[sv]="klts";
 SUBJECT-AREA[en]="klts";
 COPYRIGHT=YES;
-DESCRIPTION="11wv -- Kulttuurin bruttoarvonlis‰ys, 2008-2022";
-DESCRIPTION[sv]="11wv -- Bruttofˆr‰dlingsv‰rde fˆr kultur, 2008-2022";
+DESCRIPTION="11wv -- Kulttuurin bruttoarvonlis√§ys, 2008-2022";
+DESCRIPTION[sv]="11wv -- Bruttof√∂r√§dlingsv√§rde f√∂r kultur, 2008-2022";
 DESCRIPTION[en]="11wv -- Gross value added in the field of culture, 2008-2022";
-TITLE="Kulttuurin bruttoarvonlis‰ys muuttujina Tiedot ja Vuosi";
-TITLE[sv]="Bruttofˆr‰dlingsv‰rde fˆr kultur efter Uppgifter och ≈r";
+TITLE="Kulttuurin bruttoarvonlis√§ys muuttujina Tiedot ja Vuosi";
+TITLE[sv]="Bruttof√∂r√§dlingsv√§rde f√∂r kultur efter Uppgifter och √Ör";
 TITLE[en]="Gross value added in the field of culture by Information and Year";
-CONTENTS="Kulttuurin bruttoarvonlis‰ys";
-CONTENTS[sv]="Bruttofˆr‰dlingsv‰rde fˆr kultur";
+CONTENTS="Kulttuurin bruttoarvonlis√§ys";
+CONTENTS[sv]="Bruttof√∂r√§dlingsv√§rde f√∂r kultur";
 CONTENTS[en]="Gross value added in the field of culture";
 UNITS="Miljoonaa euroa, %";
 UNITS[sv]="Miljoner euro, %";
@@ -30,27 +30,27 @@ STUB="Tiedot";
 STUB[sv]="Uppgifter";
 STUB[en]="Information";
 HEADING="Vuosi";
-HEADING[sv]="≈r";
+HEADING[sv]="√Ör";
 HEADING[en]="Year";
 CONTVARIABLE="Tiedot";
 CONTVARIABLE[sv]="Uppgifter";
 CONTVARIABLE[en]="Information";
-VALUES("Tiedot")="Bruttoarvonlis‰ys, miljoonaa euroa",
-"Kulttuurin bruttoarvonlis‰ys, miljoonaa euroa","Kulttuurin osuus bruttoarvonlis‰yksest‰, %";
-VALUES[sv]("Uppgifter")="Fˆr‰dlingsv‰rde, brutto, miljoner euro",
-"Fˆr‰dlingsv‰rde, brutto fˆr kultur, miljoner euro","Kulturens avdel av fˆr‰dlingsv‰rde, brutto, %";
+VALUES("Tiedot")="Bruttoarvonlis√§ys, miljoonaa euroa",
+"Kulttuurin bruttoarvonlis√§ys, miljoonaa euroa","Kulttuurin osuus bruttoarvonlis√§yksest√§, %";
+VALUES[sv]("Uppgifter")="F√∂r√§dlingsv√§rde, brutto, miljoner euro",
+"F√∂r√§dlingsv√§rde, brutto f√∂r kultur, miljoner euro","Kulturens avdel av f√∂r√§dlingsv√§rde, brutto, %";
 VALUES[en]("Information")="Gross value added, millions of euros",
 "Gross value added in the field of culture, million of euros",
 "Share of gross value added in the field of culture, %";
 VALUES("Vuosi")="2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
 "2020","2021","2022";
-VALUES[sv]("≈r")="2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018",
+VALUES[sv]("√Ör")="2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018",
 "2019","2020","2021","2022";
 VALUES[en]("Year")="2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018",
 "2019","2020","2021","2022";
 TIMEVAL("Vuosi")=TLIST(A1),"2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
 "2018","2019","2020","2021","2022";
-TIMEVAL[sv]("≈r")=TLIST(A1),"2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
+TIMEVAL[sv]("√Ör")=TLIST(A1),"2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
 "2018","2019","2020","2021","2022";
 TIMEVAL[en]("Year")=TLIST(A1),"2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
 "2018","2019","2020","2021","2022";
@@ -59,52 +59,52 @@ CODES[sv]("Uppgifter")="klts010","klts020","klts030";
 CODES[en]("Information")="klts010","klts020","klts030";
 CODES("Vuosi")="2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
 "2020","2021","2022";
-CODES[sv]("≈r")="2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
+CODES[sv]("√Ör")="2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
 "2020","2021","2022";
 CODES[en]("Year")="2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018",
 "2019","2020","2021","2022";
 VARIABLE-TYPE("Vuosi")="Time";
-VARIABLE-TYPE[sv]("≈r")="Time";
+VARIABLE-TYPE[sv]("√Ör")="Time";
 VARIABLE-TYPE[en]("Year")="Time";
-PRECISION("Tiedot","Kulttuurin osuus bruttoarvonlis‰yksest‰, %")=1;
-PRECISION[sv]("Uppgifter","Kulturens avdel av fˆr‰dlingsv‰rde, brutto, %")=1;
+PRECISION("Tiedot","Kulttuurin osuus bruttoarvonlis√§yksest√§, %")=1;
+PRECISION[sv]("Uppgifter","Kulturens avdel av f√∂r√§dlingsv√§rde, brutto, %")=1;
 PRECISION[en]("Information","Share of gross value added in the field of culture, %")=1;
-LAST-UPDATED("Bruttoarvonlis‰ys, miljoonaa euroa")="20240508 08:00";
-LAST-UPDATED[sv]("Fˆr‰dlingsv‰rde, brutto, miljoner euro")="20240508 08:00";
+LAST-UPDATED("Bruttoarvonlis√§ys, miljoonaa euroa")="20240508 08:00";
+LAST-UPDATED[sv]("F√∂r√§dlingsv√§rde, brutto, miljoner euro")="20240508 08:00";
 LAST-UPDATED[en]("Gross value added, millions of euros")="20240508 08:00";
-LAST-UPDATED("Kulttuurin bruttoarvonlis‰ys, miljoonaa euroa")="20240508 08:00";
-LAST-UPDATED[sv]("Fˆr‰dlingsv‰rde, brutto fˆr kultur, miljoner euro")="20240508 08:00";
+LAST-UPDATED("Kulttuurin bruttoarvonlis√§ys, miljoonaa euroa")="20240508 08:00";
+LAST-UPDATED[sv]("F√∂r√§dlingsv√§rde, brutto f√∂r kultur, miljoner euro")="20240508 08:00";
 LAST-UPDATED[en]("Gross value added in the field of culture, million of euros")="20240508 08:00";
-LAST-UPDATED("Kulttuurin osuus bruttoarvonlis‰yksest‰, %")="20240508 08:00";
-LAST-UPDATED[sv]("Kulturens avdel av fˆr‰dlingsv‰rde, brutto, %")="20240508 08:00";
+LAST-UPDATED("Kulttuurin osuus bruttoarvonlis√§yksest√§, %")="20240508 08:00";
+LAST-UPDATED[sv]("Kulturens avdel av f√∂r√§dlingsv√§rde, brutto, %")="20240508 08:00";
 LAST-UPDATED[en]("Share of gross value added in the field of culture, %")="20240508 08:00";
-UNITS("Bruttoarvonlis‰ys, miljoonaa euroa")="Miljoonaa euroa";
-UNITS[sv]("Fˆr‰dlingsv‰rde, brutto, miljoner euro")="Miljoner euro";
+UNITS("Bruttoarvonlis√§ys, miljoonaa euroa")="Miljoonaa euroa";
+UNITS[sv]("F√∂r√§dlingsv√§rde, brutto, miljoner euro")="Miljoner euro";
 UNITS[en]("Gross value added, millions of euros")="Million euros";
-UNITS("Kulttuurin bruttoarvonlis‰ys, miljoonaa euroa")="Miljoonaa euroa";
-UNITS[sv]("Fˆr‰dlingsv‰rde, brutto fˆr kultur, miljoner euro")="Miljoner euro";
+UNITS("Kulttuurin bruttoarvonlis√§ys, miljoonaa euroa")="Miljoonaa euroa";
+UNITS[sv]("F√∂r√§dlingsv√§rde, brutto f√∂r kultur, miljoner euro")="Miljoner euro";
 UNITS[en]("Gross value added in the field of culture, million of euros")="Million euros";
-UNITS("Kulttuurin osuus bruttoarvonlis‰yksest‰, %")="%";
-UNITS[sv]("Kulturens avdel av fˆr‰dlingsv‰rde, brutto, %")="%";
+UNITS("Kulttuurin osuus bruttoarvonlis√§yksest√§, %")="%";
+UNITS[sv]("Kulturens avdel av f√∂r√§dlingsv√§rde, brutto, %")="%";
 UNITS[en]("Share of gross value added in the field of culture, %")="%";
-CONTACT("Bruttoarvonlis‰ys, miljoonaa euroa")="<A HREF='https://stat.fi/tilasto/klts' TARGET=_blank>Tilaston kotisivu</A>";
-CONTACT[sv]("Fˆr‰dlingsv‰rde, brutto, miljoner euro")="<A HREF='https://stat.fi/sv/statistik/klts' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT("Bruttoarvonlis√§ys, miljoonaa euroa")="<A HREF='https://stat.fi/tilasto/klts' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("F√∂r√§dlingsv√§rde, brutto, miljoner euro")="<A HREF='https://stat.fi/sv/statistik/klts' TARGET=_blank>Statistikens webbsidor</A>";
 CONTACT[en]("Gross value added, millions of euros")="<A HREF='https://stat.fi/en/statistics/klts' TARGET=_blank>Statistics' homepage</A>";
-CONTACT("Kulttuurin bruttoarvonlis‰ys, miljoonaa euroa")="<A HREF='https://stat.fi/tilasto/klts' TARGET=_blank>Tilaston kotisivu</A>";
-CONTACT[sv]("Fˆr‰dlingsv‰rde, brutto fˆr kultur, miljoner euro")="<A HREF='https://stat.fi/sv/statistik/klts' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT("Kulttuurin bruttoarvonlis√§ys, miljoonaa euroa")="<A HREF='https://stat.fi/tilasto/klts' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("F√∂r√§dlingsv√§rde, brutto f√∂r kultur, miljoner euro")="<A HREF='https://stat.fi/sv/statistik/klts' TARGET=_blank>Statistikens webbsidor</A>";
 CONTACT[en]("Gross value added in the field of culture, million of euros")="<A HREF='https://stat.fi/en/statistics/klts' TARGET=_blank>Statistics' homepage</A>";
-CONTACT("Kulttuurin osuus bruttoarvonlis‰yksest‰, %")="<A HREF='https://stat.fi/tilasto/klts' TARGET=_blank>Tilaston kotisivu</A>";
-CONTACT[sv]("Kulturens avdel av fˆr‰dlingsv‰rde, brutto, %")="<A HREF='https://stat.fi/sv/statistik/klts' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT("Kulttuurin osuus bruttoarvonlis√§yksest√§, %")="<A HREF='https://stat.fi/tilasto/klts' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Kulturens avdel av f√∂r√§dlingsv√§rde, brutto, %")="<A HREF='https://stat.fi/sv/statistik/klts' TARGET=_blank>Statistikens webbsidor</A>";
 CONTACT[en]("Share of gross value added in the field of culture, %")="<A HREF='https://stat.fi/en/statistics/klts' TARGET=_blank>Statistics' homepage</A>";
 SOURCE="Tilastokeskus, kulttuurin satelliittitilinpito";
-SOURCE[sv]="Statistikcentralen, satellitr‰kenskaper fˆr kultur";
+SOURCE[sv]="Statistikcentralen, satellitr√§kenskaper f√∂r kultur";
 SOURCE[en]="Statistics Finland, culture satellite accounts";
 META-ID("Vuosi")="SCALE-TYPE=None";
-META-ID[sv]("≈r")="SCALE-TYPE=None";
+META-ID[sv]("√Ör")="SCALE-TYPE=None";
 META-ID[en]("Year")="SCALE-TYPE=None";
 OFFICIAL-STATISTICS=YES;
 NOTE="<A HREF='https://stat.fi/tilasto/dokumentaatio/klts' TARGET=_blank>Tilaston dokumentaatio</A>";
-NOTE[sv]="<A HREF='https://stat.fi/sv/statistik/dokumentation/klts' TARGET=_blank>Dokumentation fˆr statistiken</A>";
+NOTE[sv]="<A HREF='https://stat.fi/sv/statistik/dokumentation/klts' TARGET=_blank>Dokumentation f√∂r statistiken</A>";
 NOTE[en]="<A HREF='https://stat.fi/en/statistics/documentation/klts' TARGET=_blank>Documentation of statistics</A>";
 MADE-WITH="PxPro";
 DATA=

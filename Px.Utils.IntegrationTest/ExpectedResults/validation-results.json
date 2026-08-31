@@ -184,11 +184,9 @@
         },
         {
           "level": "Warning",
-          "rule": "ValueIsNotInUpperCase",
+          "rule": "FileEncodingDiffersFromDatabase",
           "count": 1,
-          "row": 3,
-          "character": 10,
-          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+          "additionalInformation": "Inconsistent encoding: Unicode (UTF-8). Most commonly used encoding is Latin 9 (ISO)"
         }
       ]
     },
@@ -215,11 +213,9 @@
         },
         {
           "level": "Warning",
-          "rule": "ValueIsNotInUpperCase",
+          "rule": "FileEncodingDiffersFromDatabase",
           "count": 1,
-          "row": 3,
-          "character": 10,
-          "additionalInformation": "CODEPAGE: \"iso-8859-15\""
+          "additionalInformation": "Inconsistent encoding: Unicode (UTF-8). Most commonly used encoding is Latin 9 (ISO)"
         }
       ]
     },
