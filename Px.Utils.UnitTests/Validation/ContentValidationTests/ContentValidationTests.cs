@@ -809,8 +809,9 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.HasCount(1, result);
-            Assert.AreEqual(ValidationFeedbackRule.MissingStubAndHeading, result.First().Key.Rule);
+            Assert.HasCount(2, result);
+            Assert.IsTrue(result.Any(feedback => feedback.Key.Rule == ValidationFeedbackRule.MissingStubDimensions));
+            Assert.IsTrue(result.Any(feedback => feedback.Key.Rule == ValidationFeedbackRule.MissingHeadingDimensions));
         }
 
         private static void SetValidatorField(ContentValidator validator, string fieldName, object value)

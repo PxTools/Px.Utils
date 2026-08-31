@@ -99,6 +99,6 @@ namespace Px.Utils.Validation
             => x.Level == y.Level && x.Rule == y.Rule && StringComparer.Ordinal.Equals(x.Filename, y.Filename);
 
         public int GetHashCode(ValidationFeedbackSignature obj)
-            => HashCode.Combine(StringComparer.Ordinal.GetHashCode(obj.Filename), obj.Level, obj.Rule);
+            => HashCode.Combine(StringComparer.Ordinal.GetHashCode(obj.Filename ?? string.Empty), obj.Level, obj.Rule);
     }
 }

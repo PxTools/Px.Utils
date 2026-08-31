@@ -72,7 +72,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 {
                     (DatabaseFileInfo file, ValidationFeedback feedback) = ProcessAliasFile(fileName);
                     if (file is not null) aliasFiles.Add(file);
-                    feedbacks.AddRange(feedback);
+                    sink.ReportRange(feedback);
                 }));
             }
 
@@ -98,13 +98,19 @@ namespace Px.Utils.Validation.DatabaseValidation
         public async Task<ValidationResult> ValidateAsync(ValidationOptions options, CancellationToken cancellationToken = default)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            ValidationFeedback feedbacks = [];
             ValidationFeedbackSink sink = new(options);
             ConcurrentBag<DatabaseFileInfo> pxFiles = [];
             ConcurrentBag<DatabaseFileInfo> aliasFiles = [];
             List<Task> fileTasks = [];
 
-            IEnumerable<string> pxFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "*.px");
+            string[] pxFilePaths = [.. _fileSystem.EnumerateFiles(_directoryPath, "*.px")];
+            if (pxFilePaths.Length == 0)
+            {
+                sink.Report(new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                    new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.NoPxFilesFound),
+                    new()));
+            }
+
             foreach (string fileName in pxFilePaths)
             {
                 fileTasks.Add(Task.Run(async () =>
@@ -115,11 +121,11 @@ namespace Px.Utils.Validation.DatabaseValidation
                 }, cancellationToken));
             }
 
-            IEnumerable<string> aliasFilePaths = _fileSystem.EnumerateFiles(_directoryPath, "Alias_*.txt");
+            string[] aliasFilePaths = [.. _fileSystem.EnumerateFiles(_directoryPath, "Alias_*.txt")];
 
-            if (!aliasFilePaths.Any())
+            if (aliasFilePaths.Length == 0)
             {
-                feedbacks.Add(new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
+                sink.Report(new KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>(
                     new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.NoAliasFilesFound),
                     new()));
             }
@@ -131,7 +137,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                     {
                         (DatabaseFileInfo file, ValidationFeedback feedback) = await ProcessAliasFileAsync(fileName, cancellationToken);
                         if (file is not null) aliasFiles.Add(file);
-                        feedbacks.AddRange(feedback);
+                        sink.ReportRange(feedback);
                     }, cancellationToken));
                 }
             }
@@ -172,7 +178,6 @@ namespace Px.Utils.Validation.DatabaseValidation
             return (file, feedbacks);
         }
 
-        private async Task<(DatabaseFileInfo?, ValidationFeedback)> ProcessPxFileAsync(string fileName, CancellationToken cancellationToken)
         private async Task<(DatabaseFileInfo?, ValidationFeedback)> ProcessPxFileAsync(string fileName, ValidationFeedbackSink sink, CancellationToken cancellationToken)
         {
             ValidationFeedback feedbacks = [];
@@ -523,14 +528,6 @@ namespace Px.Utils.Validation.DatabaseValidation
     /// <param name="encoding">Encoding of the file.</param>
     /// <param name="isEncodingDetected">Indicates whether the encoding was successfully detected.</param>
     public class DatabaseFileInfo(string name, string location, string[] languages, Encoding encoding, bool isEncodingDetected = true) : DatabaseValidationItem(System.IO.Path.Combine(location, name))
-    /// <summary>
-    /// Represents a px file or alias file within a px file database for validation purposes.
-    /// </summary>
-    /// <param name="name">Name of the file.</param>
-    /// <param name="location">Path of the file's directory.</param>
-    /// <param name="languages">Languages associated with the file.</param>
-    /// <param name="encoding">Encoding of the file.</param>
-    public class DatabaseFileInfo(string name, string location, string[] languages, Encoding encoding) : DatabaseValidationItem(name)
     {
         /// <summary>
         /// Gets the name of the file.
