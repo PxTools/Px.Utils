@@ -192,47 +192,6 @@ namespace PxFileTests.DataTests
         }
 
         [TestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public async Task FindDataStartPositionUncheckedQuotedKeywordAndWhitespaceReturnsOffsetAndAdvancesStream(bool includesUtf8Bom)
-        {
-            // Arrange
-            string content = "TITLE=\"DATA=not-an-entry\";\nVALUES=\"Ää\";\nDATA=\r\n\t1 2;";
-            byte[] bom = includesUtf8Bom ? Encoding.UTF8.GetPreamble() : [];
-            byte[] data = [.. bom, .. Encoding.UTF8.GetBytes(content)];
-            long expectedPosition = bom.Length + Encoding.UTF8.GetByteCount(content[..content.IndexOf('1')]);
-            using Stream synchronousStream = new MemoryStream(data);
-            using Stream asynchronousStream = new MemoryStream(data);
-
-            // Act
-            long synchronousPosition = StreamUtilities.FindDataStartPositionUnchecked(synchronousStream, PxFileConfiguration.Default, 2);
-            long asynchronousPosition = await StreamUtilities.FindDataStartPositionUncheckedAsync(asynchronousStream, PxFileConfiguration.Default, 2, TestContext.CancellationToken);
-
-            // Assert
-            Assert.AreEqual(expectedPosition, synchronousPosition);
-            Assert.AreEqual(synchronousPosition, asynchronousPosition);
-            Assert.IsGreaterThan(synchronousPosition, synchronousStream.Position);
-            Assert.IsGreaterThan(asynchronousPosition, asynchronousStream.Position);
-        }
-
-        [TestMethod]
-        public async Task FindDataStartPositionUncheckedMissingDataReturnsNegative1()
-        {
-            // Arrange
-            byte[] data = Encoding.UTF8.GetBytes("TITLE=\"value\";");
-            using Stream synchronousStream = new MemoryStream(data);
-            using Stream asynchronousStream = new MemoryStream(data);
-
-            // Act
-            long synchronousPosition = StreamUtilities.FindDataStartPositionUnchecked(synchronousStream, PxFileConfiguration.Default, 1);
-            long asynchronousPosition = await StreamUtilities.FindDataStartPositionUncheckedAsync(asynchronousStream, PxFileConfiguration.Default, 1, TestContext.CancellationToken);
-
-            // Assert
-            Assert.AreEqual(-1, synchronousPosition);
-            Assert.AreEqual(synchronousPosition, asynchronousPosition);
-        }
-
-        [TestMethod]
         public void FindDataStartPositionDataWithoutValueReturnsNegative1()
         {
             // Arrange

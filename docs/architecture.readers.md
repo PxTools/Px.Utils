@@ -40,7 +40,7 @@ When constructed at stream position `0`, `PxFileStreamDataReader` uses an intern
 |---|---|
 | `DataIndexer.cs` | Index mapping between source and target `IMatrixMap` |
 | `DataValueParsers.cs` | Parse raw data values from byte spans |
-| `StreamUtilities.cs` | Public `FindDataStartPosition` and async equivalent are validation-aware: they search from origin, return the first value after top-level `DATA=` as an absolute raw byte offset, and restore the original position of a seekable stream. Internal `FindDataStartPositionUnchecked` equivalents are for validated reader input, search from the current position, and leave the stream advanced. `FindKeywordPosition` and async equivalent locate quote-aware top-level entry keywords from the current position and leave the stream advanced. |
+| `StreamUtilities.cs` | Public `FindDataStartPosition` and async equivalent are validation-aware: they search from origin, return the first value after top-level `DATA=` as an absolute raw byte offset, and restore the original position of a seekable stream. `FindKeywordPosition` and async equivalent locate quote-aware top-level entry keywords from the current position and leave the stream advanced. |
 
 ## Binary Data
 

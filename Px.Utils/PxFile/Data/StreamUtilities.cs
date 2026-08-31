@@ -58,33 +58,6 @@ namespace Px.Utils.PxFile.Data
         }
 
         /// <summary>
-        /// Finds the first non-whitespace data value after a top-level DATA entry in already validated PX input.
-        /// The stream is read from its current position and remains advanced.
-        /// </summary>
-        /// <param name="stream">The PX file stream to search from its current position.</param>
-        /// <param name="conf">A configuration object that contains the DATA keyword and PX syntax symbols.</param>
-        /// <param name="bufferSize">The size of the buffer to use when reading from the stream. Defaults to 4096.</param>
-        /// <returns>The absolute raw byte offset of the first data value, or -1.</returns>
-        internal static long FindDataStartPositionUnchecked(Stream stream, PxFileConfiguration conf, int bufferSize = 4096)
-        {
-            return FindDataStartPositionUncheckedImpl(stream, conf, bufferSize);
-        }
-
-        /// <summary>
-        /// Asynchronously finds the first non-whitespace data value after a top-level DATA entry in already validated PX input.
-        /// The stream is read from its current position and remains advanced.
-        /// </summary>
-        /// <param name="stream">The PX file stream to search from its current position.</param>
-        /// <param name="conf">A configuration object that contains the DATA keyword and PX syntax symbols.</param>
-        /// <param name="bufferSize">The size of the buffer to use when reading from the stream. Defaults to 4096.</param>
-        /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-        /// <returns>The absolute raw byte offset of the first data value, or -1.</returns>
-        internal static Task<long> FindDataStartPositionUncheckedAsync(Stream stream, PxFileConfiguration conf, int bufferSize = 4096, CancellationToken cancellationToken = default)
-        {
-            return FindDataStartPositionUncheckedImplAsync(stream, conf, bufferSize, cancellationToken);
-        }
-
-        /// <summary>
         /// Asynchronously finds the absolute raw byte offset of the first non-whitespace data value after a top-level DATA entry.
         /// The stream position is restored before this method returns. Returns -1 when the DATA entry or its first value cannot be found.
         /// </summary>
@@ -130,45 +103,7 @@ namespace Px.Utils.PxFile.Data
 
             return -1;
         }
-
-        private static long FindDataStartPositionUncheckedImpl(Stream stream, PxFileConfiguration conf, int bufferSize)
-        {
-            byte[] dataKeywordBytes = Encoding.ASCII.GetBytes(conf.Tokens.KeyWords.Data + conf.Symbols.KeywordSeparator);
-            byte[] buffer = new byte[bufferSize];
-            UncheckedDataStartSearchState state = new(dataKeywordBytes, (byte)conf.Symbols.EntrySeparator, (byte)conf.Symbols.Key.StringDelimeter);
-
-            int bytesRead;
-            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                long bufferStart = stream.Position - bytesRead;
-                if (TryFindDataStartPositionUnchecked(buffer.AsSpan(0, bytesRead), bufferStart, ref state, out long dataStartPosition))
-                {
-                    return dataStartPosition;
-                }
-            }
-
-            return -1;
-        }
-
-        private static async Task<long> FindDataStartPositionUncheckedImplAsync(Stream stream, PxFileConfiguration conf, int bufferSize, CancellationToken cancellationToken)
-        {
-            byte[] dataKeywordBytes = Encoding.ASCII.GetBytes(conf.Tokens.KeyWords.Data + conf.Symbols.KeywordSeparator);
-            byte[] buffer = new byte[bufferSize];
-            UncheckedDataStartSearchState state = new(dataKeywordBytes, (byte)conf.Symbols.EntrySeparator, (byte)conf.Symbols.Key.StringDelimeter);
-
-            int bytesRead;
-            while ((bytesRead = await stream.ReadAsync(buffer.AsMemory(), cancellationToken)) > 0)
-            {
-                long bufferStart = stream.Position - bytesRead;
-                if (TryFindDataStartPositionUnchecked(buffer.AsSpan(0, bytesRead), bufferStart, ref state, out long dataStartPosition))
-                {
-                    return dataStartPosition;
-                }
-            }
-
-            return -1;
-        }
-
+        
         private static async Task<long> FindKeywordPositionImplAsync(Stream stream, string keyword, PxFileConfiguration conf, int bufferSize, CancellationToken cancellationToken)
         {
             await SkipUtf8BomAtStreamOriginAsync(stream, cancellationToken);
@@ -324,38 +259,6 @@ namespace Px.Utils.PxFile.Data
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool TryFindDataStartPositionUnchecked(ReadOnlySpan<byte> buffer, long bufferStart, ref UncheckedDataStartSearchState state, out long dataStartPosition)
-        {
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                byte currentByte = buffer[i];
-                if (state.IsAfterDataKeyword)
-                {
-                    if (currentByte == state.EntrySeparator)
-                    {
-                        dataStartPosition = -1;
-                        return true;
-                    }
-                    if (!IsWhitespace(currentByte))
-                    {
-                        dataStartPosition = bufferStart + i;
-                        return true;
-                    }
-
-                    continue;
-                }
-
-                if (TryProcessTopLevelKeywordByte(currentByte, ref state.KeywordSearchState))
-                {
-                    state.IsAfterDataKeyword = true;
-                }
-            }
-
-            dataStartPosition = -1;
-            return false;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool TryProcessEntryKeywordByte(byte currentByte, ref EntryKeywordSearchState state)
         {
             if (currentByte == state.EntrySeparator)
@@ -455,13 +358,6 @@ namespace Px.Utils.PxFile.Data
             public bool IsInString;
             public bool IsAfterDataKeyword;
             public bool IsDataEntryEmpty;
-        }
-
-        private struct UncheckedDataStartSearchState(byte[] dataKeywordBytes, byte entrySeparator, byte stringDelimiter)
-        {
-            public readonly byte EntrySeparator = entrySeparator;
-            public TopLevelKeywordSearchState KeywordSearchState = new(dataKeywordBytes, entrySeparator, stringDelimiter);
-            public bool IsAfterDataKeyword;
         }
 
         private struct EntryKeywordSearchState(byte[] keywordBytes, byte entrySeparator)
