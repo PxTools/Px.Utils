@@ -3,8 +3,7 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
     internal static class PxFileFixtures
     {
         internal static string MINIMAL_PX_FILE =
-            "CHARSET=\"ANSI\";" +
-            "\r\nAXIS-VERSION=\"2013\";" +
+            "AXIS-VERSION=\"2013\";" +
             "\r\nCODEPAGE=\"UTF-8\";" +
             "\r\nLANGUAGE=\"fi\";" +
             "\r\nLANGUAGES=\"fi\";" +

@@ -178,15 +178,15 @@ If the entry is related to the whole matrix, the spesifiers are not used. If the
 
 The keywords marked with an asterisk (*) are mandatory with conditions. The conditions are explained in the section of the keyword.
 
-#### CHARSET
-Value must be a string. Either ```ANSI``` or ```Unicode```. The value must also match the encoding of the file. If the file is not readable in the encoding specified, the file is not valid.
+#### CHARSET*
+Required **IF** the file is not in Unicode.Value must be a string. Either ```ANSI``` or ```Unicode```. The value must also match the encoding of the file. If the file is not readable in the encoding specified, the file is not valid.
 - This entry is language independent.
 - This entry does not depend on any dimensions or dimension values.
 
 #### CODEPAGE
 More spesific encoding information. The value must be a string that matches the encoding of the file. If the file is not readable in the encoding specified, the file is not valid.
 - If the CHARSET entry is ```ANSI```, the value must be the exact name of the encoding used. IE: ```ISO-8859-1```.
-- If the CHARSET entry is ```Unicode```, the value must be the exact name of the encoding used. IE: ```UTF-8```, ```UTF-16``` etc.
+- If the CHARSET entry is ```Unicode```, the value must be the exact name of the encoding used. IE: ```UTF-8``` etc.
 - Values are not case sensitive, but uppercase characters are **recommended**.
 - This entry is language independent.
 - This entry does not depend on any dimensions or dimension values.

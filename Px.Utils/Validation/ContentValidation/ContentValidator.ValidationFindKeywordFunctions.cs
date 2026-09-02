@@ -217,7 +217,6 @@ namespace Px.Utils.Validation.ContentValidation
             ValidationFeedback feedbackItems = [];
             string[] alwaysRequiredKeywords =
             [
-                validator.Conf.Tokens.KeyWords.Charset,
                 validator.Conf.Tokens.KeyWords.CodePage,
                 validator.Conf.Tokens.KeyWords.DefaultLanguage,
             ];

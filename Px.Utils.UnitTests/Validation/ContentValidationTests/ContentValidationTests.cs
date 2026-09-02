@@ -183,7 +183,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
         }
 
         [TestMethod]
-        public void ValidateFindRequiredCommonKeysCalledWithEmptyStructuredEntryArrayYReturnsWithError()
+        public void ValidateFindRequiredCommonKeysCalledWithEmptyStructuredEntryArrayReturnsWithError()
         {
             // Arrange
             ValidationStructuredEntry[] entries = ContentValidationFixtures.EMPTY_STRUCTURED_ENTRY_ARRAY;
@@ -198,7 +198,7 @@ namespace Px.Utils.UnitTests.Validation.ContentValidationTests
             // Assert
             Assert.IsNotNull(result);
             Assert.HasCount(1, result);
-            Assert.HasCount(3, result.First().Value);   
+            Assert.HasCount(2, result.First().Value);   
             Assert.AreEqual(ValidationFeedbackRule.RequiredKeyMissing, result.First().Key.Rule);
         }
 
