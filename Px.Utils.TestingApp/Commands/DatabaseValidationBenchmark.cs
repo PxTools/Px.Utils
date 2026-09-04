@@ -4,7 +4,9 @@ namespace Px.Utils.TestingApp.Commands
 {
     internal sealed class DatabaseValidationBenchmark : Benchmark
     {
-        internal override string Help => "Validates a px path database.";
+        internal override string Help =>
+            "Validates a px path database." + Environment.NewLine +
+            "\t-l, -limit: Feedback items retained per file, level, and rule; use a positive number. Defaults to 100.";
 
         internal override string Description => "Validates a px path database.";
         private static readonly string[] directoryFlags = ["-d", "-directory"];
@@ -59,13 +61,13 @@ namespace Px.Utils.TestingApp.Commands
         private void ValidationBenchmark()
         {
             if(validator is null) throw new InvalidOperationException("Validator not initialized.");
-            validator.Validate();
+            validator.Validate(ValidationOptions);
         }
 
         private async Task ValidationBenchmarkAsync()
         {
             if(validator is null) throw new InvalidOperationException("Validator not initialized.");
-            await validator.ValidateAsync();
+            await validator.ValidateAsync(ValidationOptions);
         }
     }
 }

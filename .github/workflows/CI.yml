@@ -35,3 +35,7 @@ jobs:
 
       - name: Build
         run: dotnet build --verbosity normal --no-restore --configuration ${{ matrix.configuration }}
+
+      - name: Run integration tests
+        if: matrix.dotnet-version == '10.x'
+        run: dotnet run --project Px.Utils.IntegrationTest/Px.Utils.IntegrationTest.csproj --no-build --configuration ${{ matrix.configuration }}

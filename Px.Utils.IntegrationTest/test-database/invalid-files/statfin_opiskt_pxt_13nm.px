@@ -1,0 +1,189 @@
+CHARSET="ANSI";
+AXIS-VERSION="2013";
+CODEPAGE="iso-8859-15";
+LANGUAGE="fi";
+LANGUAGES="fi","sv","en";
+CREATION-DATE="20220609 09:00";
+NEXT-UPDATE="20250528 08:00";
+TABLEID="statfin_opiskt_pxt_13nm";
+DECIMALS=0;
+SHOWDECIMALS=0;
+MATRIX="001_13nm_2023";
+SUBJECT-CODE="OPISKT";
+SUBJECT-AREA="opiskt";
+SUBJECT-AREA[sv]="opiskt";
+SUBJECT-AREA[en]="opiskt";
+COPYRIGHT=YES;
+DESCRIPTION="13nm -- Lukiokoulutuksen opiskelijat, ylioppilastutkinnot ja kansainväliset ylioppilastutkinnot, 2001-2023";
+DESCRIPTION[sv]="13nm -- Studerande inom gymnasieutbildning, studentexamina och internationella studentexamina, 2001-2023";
+DESCRIPTION[en]="13nm -- General upper secondary school students, matriculation examinations and international matriculation examinations, 2001-2023";
+TITLE="Lukiokoulutuksen opiskelijat, ylioppilastutkinnot ja kansainväliset ylioppilastutkinnot muuttujina Vuosi ja Tiedot";
+TITLE[sv]="Studerande inom gymnasieutbildning, studentexamina och internationella studentexamina efter År och Uppgifter";
+TITLE[en]="General upper secondary school students, matriculation examinations and international matriculation examinations by Year and Information";
+CONTENTS="Lukiokoulutuksen opiskelijat, ylioppilastutkinnot ja kansainväliset ylioppilastutkinnot";
+CONTENTS[sv]="Studerande inom gymnasieutbildning, studentexamina och internationella studentexamina";
+CONTENTS[en]="General upper secondary school students, matriculation examinations and international matriculation examinations";
+UNITS="";
+UNITS[sv]="";
+UNITS[en]="";
+STUB="Vuosi";
+STUB[sv]="År";
+STUB[en]="Year";
+HEADING="Tiedot";
+HEADING[sv]="Uppgifter";
+HEADING[en]="Information";
+CONTVARIABLE="Tiedot";
+CONTVARIABLE[sv]="Uppgifter";
+CONTVARIABLE[en]="Information";
+VALUES("Vuosi")="2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012",
+"2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+VALUES[sv]("År")="2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011",
+"2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+VALUES[en]("Year")="2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011",
+"2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+VALUES("Tiedot")="Lukiokoulutusta antavat oppilaitokset","Opiskelijat, yhteensä",
+"Opiskelijat, naiset","Yo-tutkinnot, yhteensä","Yo-tutkinnot, naiset",
+"European Baccalaureate-tutkinnot","Deutsche Internationale Abitur; Reifeprüfung",
+"International Baccalaureate-tutkinnot";
+VALUES[sv]("Uppgifter")="Läroanstalter som ger gymnasieutbildning","Studerande, totalt",
+"Studerande, kvinnor","Studentexamina, totalt","Studentexamina, kvinnor",
+"European Baccalaureate-examina","Deutsche Internationale Abitur; Reifeprüfung",
+"International Baccalaureate-examina";
+VALUES[en]("Information")="Educational institutions providing general upper secondary education",
+"Students, total","Students, females","Matriculation examinations, total",
+"Matriculation examinations, females","European Baccalaureate diplomas",
+"Deutsche Internationale Abitur; Reifeprüfung","International Baccalaureate diplomas";
+TIMEVAL("Vuosi")=TLIST(A1),"2001","2002","2003","2004","2005","2006","2007","2008","2009","2010",
+"2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+TIMEVAL[sv]("År")=TLIST(A1),"2001","2002","2003","2004","2005","2006","2007","2008","2009","2010",
+"2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+TIMEVAL[en]("Year")=TLIST(A1),"2001","2002","2003","2004","2005","2006","2007","2008","2009","2010",
+"2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+CODES("Vuosi")="2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012",
+"2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+CODES[sv]("År")="2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012",
+"2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+CODES[en]("Year")="2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011",
+"2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023";
+CODES("Tiedot")="lukiott_oppilaitokset","lukiott_opiskelijat_yhteensa","lukiott_opiskelijat_naiset",
+"lukiott_yotutkinnot_yhteensa","lukiott_yotutkinnot_naiset","lukiott_eb_tutkinnot",
+"lukiott_dia_tutkinnot","lukiot_ib_tutkinnot";
+CODES[sv]("Uppgifter")="lukiott_oppilaitokset","lukiott_opiskelijat_yhteensa",
+"lukiott_opiskelijat_naiset","lukiott_yotutkinnot_yhteensa","lukiott_yotutkinnot_naiset",
+"lukiott_eb_tutkinnot","lukiott_dia_tutkinnot","lukiot_ib_tutkinnot";
+CODES[en]("Information")="lukiott_oppilaitokset","lukiott_opiskelijat_yhteensa",
+"lukiott_opiskelijat_naiset","lukiott_yotutkinnot_yhteensa","lukiott_yotutkinnot_naiset",
+"lukiott_eb_tutkinnot","lukiott_dia_tutkinnot","lukiot_ib_tutkinnot";
+VARIABLE-TYPE("Vuosi")="Time";
+VARIABLE-TYPE[sv]("År")="Time";
+VARIABLE-TYPE[en]("Year")="Time";
+LAST-UPDATED("Lukiokoulutusta antavat oppilaitokset")="20240920 08:00";
+LAST-UPDATED[sv]("Läroanstalter som ger gymnasieutbildning")="20240920 08:00";
+LAST-UPDATED[en]("Educational institutions providing general upper secondary education")="20240920 08:00";
+LAST-UPDATED("Opiskelijat, yhteensä")="20240920 08:00";
+LAST-UPDATED[sv]("Studerande, totalt")="20240920 08:00";
+LAST-UPDATED[en]("Students, total")="20240920 08:00";
+LAST-UPDATED("Opiskelijat, naiset")="20240920 08:00";
+LAST-UPDATED[sv]("Studerande, kvinnor")="20240920 08:00";
+LAST-UPDATED[en]("Students, females")="20240920 08:00";
+LAST-UPDATED("Yo-tutkinnot, yhteensä")="20240920 08:00";
+LAST-UPDATED[sv]("Studentexamina, totalt")="20240920 08:00";
+LAST-UPDATED[en]("Matriculation examinations, total")="20240920 08:00";
+LAST-UPDATED("Yo-tutkinnot, naiset")="20240920 08:00";
+LAST-UPDATED[sv]("Studentexamina, kvinnor")="20240920 08:00";
+LAST-UPDATED[en]("Matriculation examinations, females")="20240920 08:00";
+LAST-UPDATED("European Baccalaureate-tutkinnot")="20240920 08:00";
+LAST-UPDATED[sv]("European Baccalaureate-examina")="20240920 08:00";
+LAST-UPDATED[en]("European Baccalaureate diplomas")="20240920 08:00";
+LAST-UPDATED("Deutsche Internationale Abitur; Reifeprüfung")="20240920 08:00";
+LAST-UPDATED[sv]("Deutsche Internationale Abitur; Reifeprüfung")="20240920 08:00";
+LAST-UPDATED[en]("Deutsche Internationale Abitur; Reifeprüfung")="20240920 08:00";
+LAST-UPDATED("International Baccalaureate-tutkinnot")="20240920 08:00";
+LAST-UPDATED[sv]("International Baccalaureate-examina")="20240920 08:00";
+LAST-UPDATED[en]("International Baccalaureate diplomas")="20240920 08:00";
+UNITS("Lukiokoulutusta antavat oppilaitokset")="Lukumäärä";
+UNITS[sv]("Läroanstalter som ger gymnasieutbildning")="Antal";
+UNITS[en]("Educational institutions providing general upper secondary education")="Number";
+UNITS("Opiskelijat, yhteensä")="Lukumäärä";
+UNITS[sv]("Studerande, totalt")="Antal";
+UNITS[en]("Students, total")="Number";
+UNITS("Opiskelijat, naiset")="Lukumäärä";
+UNITS[sv]("Studerande, kvinnor")="Antal";
+UNITS[en]("Students, females")="Number";
+UNITS("Yo-tutkinnot, yhteensä")="Lukumäärä";
+UNITS[sv]("Studentexamina, totalt")="Antal";
+UNITS[en]("Matriculation examinations, total")="Number";
+UNITS("Yo-tutkinnot, naiset")="Lukumäärä";
+UNITS[sv]("Studentexamina, kvinnor")="Antal";
+UNITS[en]("Matriculation examinations, females")="Number";
+UNITS("European Baccalaureate-tutkinnot")="Lukumäärä";
+UNITS[sv]("European Baccalaureate-examina")="Antal";
+UNITS[en]("European Baccalaureate diplomas")="Number";
+UNITS("Deutsche Internationale Abitur; Reifeprüfung")="Lukumäärä";
+UNITS[sv]("Deutsche Internationale Abitur; Reifeprüfung")="Antal";
+UNITS[en]("Deutsche Internationale Abitur; Reifeprüfung")="Number";
+UNITS("International Baccalaureate-tutkinnot")="Lukumäärä";
+UNITS[sv]("International Baccalaureate-examina")="Antal";
+UNITS[en]("International Baccalaureate diplomas")="Number";
+CONTACT("Lukiokoulutusta antavat oppilaitokset")="<A HREF='https://stat.fi/tilasto/opiskt' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Läroanstalter som ger gymnasieutbildning")="<A HREF='https://stat.fi/sv/statistik/opiskt' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Educational institutions providing general upper secondary education")="<A HREF='https://stat.fi/en/statistics/opiskt' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("Opiskelijat, yhteensä")="<A HREF='https://stat.fi/tilasto/opiskt' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Studerande, totalt")="<A HREF='https://stat.fi/sv/statistik/opiskt' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Students, total")="<A HREF='https://stat.fi/en/statistics/opiskt' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("Opiskelijat, naiset")="<A HREF='https://stat.fi/tilasto/opiskt' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Studerande, kvinnor")="<A HREF='https://stat.fi/sv/statistik/opiskt' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Students, females")="<A HREF='https://stat.fi/en/statistics/opiskt' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("Yo-tutkinnot, yhteensä")="<A HREF='https://stat.fi/tilasto/opiskt' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Studentexamina, totalt")="<A HREF='https://stat.fi/sv/statistik/opiskt' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Matriculation examinations, total")="<A HREF='https://stat.fi/en/statistics/opiskt' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("Yo-tutkinnot, naiset")="<A HREF='https://stat.fi/tilasto/opiskt' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Studentexamina, kvinnor")="<A HREF='https://stat.fi/sv/statistik/opiskt' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Matriculation examinations, females")="<A HREF='https://stat.fi/en/statistics/opiskt' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("European Baccalaureate-tutkinnot")="<A HREF='https://stat.fi/tilasto/opiskt' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("European Baccalaureate-examina")="<A HREF='https://stat.fi/sv/statistik/opiskt' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("European Baccalaureate diplomas")="<A HREF='https://stat.fi/en/statistics/opiskt' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("Deutsche Internationale Abitur; Reifeprüfung")="<A HREF='https://stat.fi/tilasto/opiskt' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Deutsche Internationale Abitur; Reifeprüfung")="<A HREF='https://stat.fi/sv/statistik/opiskt' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Deutsche Internationale Abitur; Reifeprüfung")="<A HREF='https://stat.fi/en/statistics/opiskt' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("International Baccalaureate-tutkinnot")="<A HREF='https://stat.fi/tilasto/opiskt' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("International Baccalaureate-examina")="<A HREF='https://stat.fi/sv/statistik/opiskt' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("International Baccalaureate diplomas")="<A HREF='https://stat.fi/en/statistics/opiskt' TARGET=_blank>Statistics' homepage</A>";
+SOURCE="Tilastokeskus, opiskelijat ja tutkinnot";
+SOURCE[sv]="Statistikcentralen, studerande och examina";
+SOURCE[en]="Statistics Finland, students and qualifications";
+OFFICIAL-STATISTICS=YES;
+NOTEX="Kansainvälisen ylioppilastutkinnon, Deutsche Internationale Abitur; Reifeprufung (Dia) suorittaneiden määriä on korjattu vuosien 2021 ja 2022 osalta. Virheelliset luvut olivat 57 tutkintoa (vuonna 2021) ja 58 tutkintoa (vuonna 2022). Oikeat luvut "
+"ovat 26 tutkintoa (vuonna 2021) ja 29 tutkintoa (vuonna 2022).";
+NOTEX[sv]="Antalet studenter som avlagt internationell studentexamen, Deutsche Internationale Abitur; Reifeprufung (DIA), har korrigerats för 2021 och 2022. De felaktiga siffrorna var 57 examina (år 2021) och 58 examina (år 2022). De rätta siffrorna är 26 "
+"examina (år 2021) och 29 examina (år 2022).";
+NOTEX[en]="The numbers of completers of the international matriculation examination, Deutsche Internationale Abitur; Reifeprufung (Dia) were corrected for the years 2021 and 2022. The erroneous figures were 57 qualifications (in 2021) and 58 "
+"qualifications (in 2022). The correct figures are 26 qualifications (in 2021) and 29 qualifications (in 2022).";
+NOTE="<A HREF='https://stat.fi/tilasto/dokumentaatio/opiskt' TARGET=_blank>Tilaston dokumentaatio</A>##. tieto on puuttuva";
+NOTE[sv]="<A HREF='https://stat.fi/sv/statistik/dokumentation/opiskt' TARGET=_blank>Dokumentation för statistiken</A>##. uppgift saknas";
+NOTE[en]="<A HREF='https://stat.fi/en/statistics/documentation/opiskt' TARGET=_blank>Documentation of statistics</A>##. missing";
+MADE-WITH="PxPro";
+DATA=
+483 128642 74309 35283 20538 "." 38 190 
+484 124644 71778 36224 21338 "." 48 174 
+483 121816 69742 35182 20642 "." 43 229 
+479 120531 68714 34652 20386 "." 44 267 
+471 118111 66921 34058 19624 "." 42 261 
+461 117260 66726 32786 18871 "." 39 286 
+449 115253 65806 33066 19186 "." 34 335 
+449 114240 65305 32592 18628 "." 35 321 
+441 112088 63939 32643 18835 "." 39 342 
+439 111778 63333 32324 18752 "." 41 328 
+433 109046 61701 32413 18571 "." 31 362 
+428 107412 60864 31595 18244 "." 29 378 
+421 105898 60008 31693 18181 8 31 393 
+414 103914 59201 31620 18074 13 29 402 
+397 104060 59561 30617 17589 19 45 400 
+389 103550 59170 30531 17834 8 24 423 
+388 103753 59672 30189 17518 22 30 400 
+384 103440 59820 30365 17754 9 29 470 
+383 105248 61227 29078 16848 19 39 469 
+382 106759 62203 29370 17181 12 35 488 
+378 109538 63999 29809 17449 26 26 560 
+379 109604 63828 30265 17810 15 29 566 
+378 110597 64365 30765 17865 16 39 543; 

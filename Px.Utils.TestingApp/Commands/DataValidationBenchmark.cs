@@ -17,16 +17,13 @@ namespace Px.Utils.TestingApp.Commands
         internal override string Help =>
         "Validates the px file data." + Environment.NewLine +
         "\t-r, -rows: How many data rows the validator should expect." + Environment.NewLine +
-        "\t-c, -cols: How many data colums the validator should expect.";
+        "\t-c, -cols: How many data colums the validator should expect." + Environment.NewLine +
+        "\t-l, -limit: Feedback items retained per file, level, and rule; use a positive number. Defaults to 100.";
 
         internal override string Description => "Benchmarks the data validation capabilities of the DataValidator.";
 
         private long start;
-        private const string dataKeyword = "DATA";
-
         private Encoding encoding;
-
-        private const int readStartOffset = 3;
 
         internal DataValidationBenchmark()
         {
@@ -44,28 +41,28 @@ namespace Px.Utils.TestingApp.Commands
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             PxFileMetadataReader reader = new();
             encoding = reader.GetEncoding(stream);
-            start = StreamUtilities.FindKeywordPosition(stream, dataKeyword, PxFileConfiguration.Default);
+            start = StreamUtilities.FindDataStartPosition(stream, PxFileConfiguration.Default);
             if (start == -1)
             {
-                throw new ArgumentException($"Could not find data keyword '{dataKeyword}'");
+                throw new ArgumentException("Could not find the first data value after 'DATA='");
             }
         }
 
         private void ValidateDataBenchmarks()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            stream.Position = start + dataKeyword.Length + readStartOffset; // skip the '=' and linechange
+            stream.Position = start;
             DataValidator validator = new(expectedCols, expectedRows, 0);
-            validator.Validate(stream, TestFilePath, encoding);
+            validator.Validate(stream, TestFilePath, encoding, null, ValidationOptions);
         }
 
         private async Task ValidateDataBenchmarksAsync()
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
-            stream.Position = start + dataKeyword.Length + readStartOffset; // skip the '=' and linechange
+            stream.Position = start;
             DataValidator validator = new(expectedCols, expectedRows, 0);
 
-            await validator.ValidateAsync(stream, TestFilePath, encoding);
+            await validator.ValidateAsync(stream, TestFilePath, encoding, null, ValidationOptions);
         }
 
         protected override void SetRunParameters()

@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Px.Utils.Validation.DatabaseValidation
@@ -24,7 +24,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 return new(
                     new(ValidationFeedbackLevel.Warning,
                         ValidationFeedbackRule.DuplicateFileNames),
-                    new(fileInfo.Name)
+                    new(fileInfo.Path)
                 );
             }
             else
@@ -55,7 +55,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 return new(
                     new(ValidationFeedbackLevel.Warning,
                     ValidationFeedbackRule.FileLanguageDiffersFromDatabase),
-                    new(fileInfo.Name, additionalInfo: $"Missing languages: {string.Join(", ", _allLanguages.Except(fileInfo.Languages))}")
+                    new(fileInfo.Path, additionalInfo: $"Missing languages: {string.Join(", ", _allLanguages.Except(fileInfo.Languages))}")
                 );
             }
             else
@@ -86,7 +86,7 @@ namespace Px.Utils.Validation.DatabaseValidation
                 return new (
                     new(ValidationFeedbackLevel.Warning,
                     ValidationFeedbackRule.FileEncodingDiffersFromDatabase),
-                    new(fileInfo.Name, additionalInfo: $"Inconsistent encoding: {fileInfo.Encoding.EncodingName}. " +
+                    new(fileInfo.Path, additionalInfo: $"Inconsistent encoding: {fileInfo.Encoding.EncodingName}. " +
                     $"Most commonly used encoding is {_mostCommonEncoding.EncodingName}"));
             }
             else
@@ -113,9 +113,12 @@ namespace Px.Utils.Validation.DatabaseValidation
         /// <returns>Null if no issues are found, a key value pair containing information about rule violation> in case some alias files are missing</returns>
         public KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? Validate(DatabaseValidationItem item)
         {
+            string directoryPath = Path.GetFullPath(item.Path);
             foreach (string language in _allLanguages)
             {
-                if (!_aliasFiles.Exists(file => file.Languages.Contains(language)))
+                if (!_aliasFiles.Exists(file =>
+                    string.Equals(Path.GetFullPath(file.Location), directoryPath, StringComparison.Ordinal) &&
+                    file.Languages.Contains(language)))
                 {
                     return new(
                         new(ValidationFeedbackLevel.Warning,

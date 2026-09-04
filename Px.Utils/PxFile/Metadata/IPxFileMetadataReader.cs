@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace Px.Utils.PxFile.Metadata
 {
@@ -13,11 +13,12 @@ namespace Px.Utils.PxFile.Metadata
         /// <param name="stream">The stream from which to determine the encoding.</param>
         /// <returns>The determined encoding of the stream.</returns>
         Encoding GetEncoding(Stream stream);
-       
+
         /// <summary>
         /// Asynchronously determines the encoding of the provided stream based on the Byte Order Mark (BOM) or the CODEPAGE keyword in the metadata.
         /// </summary>
         /// <param name="stream">The stream from which to determine the encoding.</param>
+        /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
         /// <returns>The determined encoding of the stream.</returns>
         Task<Encoding> GetEncodingAsync(Stream stream, CancellationToken cancellationToken = default);
 
@@ -38,6 +39,7 @@ namespace Px.Utils.PxFile.Metadata
         /// <param name="stream">The stream from which to read the metadata.</param>
         /// <param name="encoding">The encoding to use when reading the stream.</param>
         /// <param name="readBufferSize">The size of the buffer to use when reading the stream. If not specified, the default buffer size is used.</param>
+        /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> of key-value pairs representing the metadata entries in the file.</returns>
         IAsyncEnumerable<KeyValuePair<string, string>> ReadMetadataAsync(
             Stream stream,
@@ -63,6 +65,7 @@ namespace Px.Utils.PxFile.Metadata
         /// <param name="stream">The stream from which to read the metadata.</param>
         /// <param name="encoding">The encoding to use when reading the stream.</param>
         /// <param name="readBufferSize">The size of the buffer to use when reading the stream. If not specified, the default buffer size is used.</param>
+        /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
         /// <returns>A dictionary containing the metadata entries in the file.</returns>
         Task<Dictionary<string, string>> ReadMetadataToDictionaryAsync(
             Stream stream,

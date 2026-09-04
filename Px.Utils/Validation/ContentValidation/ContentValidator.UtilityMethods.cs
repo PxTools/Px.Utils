@@ -1,4 +1,4 @@
-﻿using Px.Utils.PxFile;
+using Px.Utils.PxFile;
 using Px.Utils.Validation.SyntaxValidation;
 
 namespace Px.Utils.Validation.ContentValidation
@@ -154,6 +154,7 @@ namespace Px.Utils.Validation.ContentValidation
         /// </summary>
         /// <param name="languageSpecificKeywords">Keywords to search for that are language specific</param>
         /// <param name="commonKeywords">Language agnostic keywords</param>
+        /// <param name="recommendedKeywords">Recommended keywords that should be present in the Px file</param>
         /// <param name="entries">Structured entries of Px file metadata to be searched from</param>
         /// <param name="validator">Object that provides information of the ongoing content validation process</param>
         /// <param name="languageAndDimensionPair">KeyValuePair that contains the processed language as key and the dimension name as value</param>

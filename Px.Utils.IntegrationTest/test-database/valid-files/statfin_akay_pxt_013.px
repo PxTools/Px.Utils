@@ -1,0 +1,107 @@
+CHARSET="ANSI";
+AXIS-VERSION="2006";
+CODEPAGE="iso-8859-15";
+LANGUAGE="fi";
+LANGUAGES="fi","sv","en";
+CREATION-DATE="20121024 09:00";
+DECIMALS=0;
+SHOWDECIMALS=0;
+MATRIX="akay_013_201700";
+SUBJECT-CODE="ELI";
+SUBJECT-AREA="Elinolot";
+SUBJECT-AREA[sv]="Levnadsförhållanden";
+SUBJECT-AREA[en]="Living Conditions";
+COPYRIGHT=YES;
+DESCRIPTION="013 -- Luovien taiteiden harrastaminen";
+DESCRIPTION[sv]="013 -- Konst som hobby";
+DESCRIPTION[en]="013 -- Creative art as a hobby";
+TITLE="013 -- Luovien taiteiden harrastaminen";
+TITLE[sv]="013 -- Konst som hobby";
+TITLE[en]="013 -- Creative art as a hobby";
+DESCRIPTIONDEFAULT=YES;
+CONTENTS="Luovien taiteiden harrastaminen";
+CONTENTS[sv]="Kunst som hobby";
+CONTENTS[en]="Creative art as a hobby";
+UNITS="%, lkm";
+UNITS[sv]="%, personer";
+UNITS[en]="%, persons";
+STUB="Väestöryhmä","Vuosi";
+STUB[sv]="Grupp","År";
+STUB[en]="Group","Year";
+HEADING="Tieto";
+HEADING[sv]="Information";
+HEADING[en]="Data";
+VALUES("Väestöryhmä")="10 vuotta täyttäneet yhteensä","Miehet","Naiset","10-14 vuotta",
+"15-24 vuotta","25-44 vuotta","45-64 vuotta","65- vuotta";
+VALUES[sv]("Grupp")="10 år eller äldre Alla totalt","Män","Kvinnor","10–14 år","15–24 år",
+"25–44 år","45–64 år","65– år";
+VALUES[en]("Group")="Those aged 10 or over  Total","Men","Women","Aged 10 to 14","Aged 15 to 24",
+"Aged 25 to 44","Aged 45 to 64","Aged 65 or over";
+VALUES("Vuosi")="1991","1999","2009","2017";
+VALUES[sv]("År")="1991","1999","2009","2017";
+VALUES[en]("Year")="1991","1999","2009","2017";
+VALUES("Tieto")=
+"Harrastaa nykyisin kirjoittamista, soittamista, laulamista, näyttelemistä tai kuvataiteita",
+"Ei harrasta nykyisin kirjoittamista, soittamista, laulamista, näyttelemistä tai kuvataiteita",
+"Yhteensä","N (painotettu)";
+VALUES[sv]("Information")=
+"Har skrivande, musik, sång, teater eller bildkonst som hobby nuförtiden",
+"Har inte skrivande, musik, sång, teater eller bildkonst som hobby nuförtiden","Totalt","N (viktat)";
+VALUES[en]("Data")="Has nowadays writing, playing, singing, acting or visual arts as a hobby",
+"Does not have any","Total","N (weighted)";
+CODES("Väestöryhmä")="SSS","1","2","10-14","15-24","25-44","45-64","65-";
+CODES[sv]("Grupp")="SSS","1","2","10-14","15-24","25-44","45-64","65-";
+CODES[en]("Group")="SSS","1","2","10-14","15-24","25-44","45-64","65-";
+CODES("Vuosi")="1991","1999","2009","2017";
+CODES[sv]("År")="1991","1999","2009","2017";
+CODES[en]("Year")="1991","1999","2009","2017";
+CODES("Tieto")="1","2","S","lkm";
+CODES[sv]("Information")="1","2","S","lkm";
+CODES[en]("Data")="1","2","S","lkm";
+LAST-UPDATED="20190912 08:00";
+CONTACT="Tilastokeskus#<A HREF=http://tilastokeskus.fi/til/akay/index.html TARGET=_blank>Tilaston kotisivu</A>#<A HREF=http://tilastokeskus.fi/til/akay/yht.html TARGET=_blank>Lisätietoja</A>";
+CONTACT[sv]="Statistikcentralen#<A HREF=http://tilastokeskus.fi/til/akay/index_sv.html TARGET=_blank>Statistikens hemsida</A>#<A HREF=http://tilastokeskus.fi/til/akay/yht_sv.html TARGET=_blank>Tilläggsupgifter</A>";
+CONTACT[en]="Statistics Finland#<A HREF=http://tilastokeskus.fi/til/akay/index_en.html TARGET=_blank>Statistics' home page</A>#<A HREF=http://tilastokeskus.fi/til/akay/yht_en.html TARGET=_blank>Further information</A>";
+DATABASE="StatFin";
+DATABASE[sv]="StatFin";
+DATABASE[en]="StatFin";
+SOURCE="Tilastokeskus#Ajankäyttötutkimus";
+SOURCE[sv]="Statistikcentralen#";
+SOURCE[en]="Statistics Finland";
+NOTE="<A HREF=http://www.tilastokeskus.fi/meta/til/akay.html TARGET=_blank>Tilaston kuvaus</A>#<A HREF=http://www.tilastokeskus.fi/til/akay/laa.html TARGET=_blank>Laatuselosteet</A>#<A HREF=http://www.tilastokeskus.fi/til/akay/kas.html TARGET=_"
+"blank>Käsitteet ja määritelmät</A>";
+NOTE[sv]="<A HREF=http://www.tilastokeskus.fi/meta/til/akay_sv.html TARGET=_blank>Statistikens beskrivning</A>#<A HREF=http://www.tilastokeskus.fi/til/akay/kas_sv.html TARGET=_blank>Begrepp och definitioner</A>";
+NOTE[en]="<A HREF=http://www.tilastokeskus.fi/meta/til/akay_en.html TARGET=_blank>Statistics' description</A>#<A HREF=http://www.tilastokeskus.fi/til/akay/kas_en.html TARGET=_blank>Concepts and definitions</A>";
+DATA=
+29 71 100 4378 
+32 68 100 5884 
+34 66 100 4645 
+39 61 100 7155 
+26 74 100 2108 
+29 71 100 2755 
+31 69 100 2179 
+32 68 100 3503 
+33 67 100 2270 
+35 65 100 3129 
+37 63 100 2466 
+45 55 100 3652 
+68 32 100 324 
+71 29 100 395 
+75 25 100 242 
+66 44 100 440 
+47 53 100 646 
+51 49 100 807 
+50 50 100 628 
+43 57 100 914 
+26 74 100 1603 
+29 71 100 1893 
+35 65 100 1303 
+41 59 100 2017 
+21 79 100 1144 
+26 74 100 1795 
+26 74 100 1589 
+31 69 100 2097 
+15 85 100 661 
+18 82 100 995 
+24 76 100 883 
+35 65 100 1686; 

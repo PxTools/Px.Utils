@@ -22,6 +22,33 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
         }
 
         [TestMethod]
+        public void ValidateDatabaseWithNoFilesReturnsValidResult()
+        {
+            MockFileSystem fileSystem = new();
+            DatabaseValidator validator = new("database_empty", fileSystem: fileSystem);
+
+            ValidationResult result = validator.Validate();
+
+            Assert.IsNotNull(result, "Validation result should not be null");
+            Assert.HasCount(0, result.FeedbackItems);
+        }
+
+        [TestMethod]
+        public void ValidateDatabaseWithUnreadableAliasFileReturnsFeedback()
+        {
+            MockFileSystem fileSystem = new();
+            DatabaseValidator validator = new("database_unreadable_alias", fileSystem: fileSystem);
+            ValidationFeedbackKey unreadableAliasFileKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.UnreadableAliasFile);
+
+            ValidationResult result = validator.Validate();
+
+            Assert.IsNotNull(result, "Validation result should not be null");
+            Assert.HasCount(1, result.FeedbackItems);
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(unreadableAliasFileKey));
+            Assert.HasCount(1, result.FeedbackItems[unreadableAliasFileKey]);
+        }
+
+        [TestMethod]
         public async Task ValidateDatabaseAsyncWithValidDatabaseReturnsValidResult()
         {
             // Arrange
@@ -50,15 +77,16 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             ValidationFeedbackKey dataValidationFeedbackInvalidRowLengthKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength);
             ValidationFeedbackKey unmatchingValueTypeKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.UnmatchingValueType);
             ValidationFeedbackKey excessNewLinesInValueKey = new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessNewLinesInValue);
-            ValidationFeedbackKey missingStubAndHeadingKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingStubAndHeading);
+            ValidationFeedbackKey missingStubKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingStubDimensions);
+            ValidationFeedbackKey missingHeadingKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingHeadingDimensions);
 
             // Act
             ValidationResult result = validator.Validate();
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.HasCount(9, result.FeedbackItems); // Unique feedbacks
-            Assert.HasCount(11, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
+            Assert.HasCount(10, result.FeedbackItems); // Unique feedbacks
+            Assert.HasCount(12, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
             Assert.IsTrue(result.FeedbackItems.ContainsKey(invalidValueFormatKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(recommendedKeyMissingKey));
             Assert.HasCount(3, result.FeedbackItems[recommendedKeyMissingKey]); // 3 warnings
@@ -68,7 +96,8 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             Assert.IsTrue(result.FeedbackItems.ContainsKey(dataValidationFeedbackInvalidRowLengthKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(unmatchingValueTypeKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(excessNewLinesInValueKey));
-            Assert.IsTrue(result.FeedbackItems.ContainsKey(missingStubAndHeadingKey));
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(missingStubKey));
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(missingHeadingKey));
         }
 
         [TestMethod]
@@ -85,15 +114,16 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             ValidationFeedbackKey dataValidationFeedbackInvalidRowLengthKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength);
             ValidationFeedbackKey unmatchingValueTypeKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.UnmatchingValueType);
             ValidationFeedbackKey excessNewLinesInValueKey = new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessNewLinesInValue);
-            ValidationFeedbackKey missingStubAndHeadingKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingStubAndHeading);
+            ValidationFeedbackKey missingStubKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingStubDimensions);
+            ValidationFeedbackKey missingHeadingKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingHeadingDimensions);
 
             // Act
             ValidationResult result = await validator.ValidateAsync();
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.HasCount(9, result.FeedbackItems); // Unique feedbacks
-            Assert.HasCount(11, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
+            Assert.HasCount(10, result.FeedbackItems); // Unique feedbacks
+            Assert.HasCount(12, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
             Assert.IsTrue(result.FeedbackItems.ContainsKey(invalidValueFormatKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(recommendedKeyMissingKey));
             Assert.HasCount(3, result.FeedbackItems[recommendedKeyMissingKey]); // 3 warnings
@@ -103,7 +133,8 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             Assert.IsTrue(result.FeedbackItems.ContainsKey(dataValidationFeedbackInvalidRowLengthKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(unmatchingValueTypeKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(excessNewLinesInValueKey));
-            Assert.IsTrue(result.FeedbackItems.ContainsKey(missingStubAndHeadingKey));
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(missingStubKey));
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(missingHeadingKey));
         }
 
         [TestMethod]
@@ -130,15 +161,16 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             ValidationFeedbackKey dataValidationFeedbackInvalidRowLengthKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength);
             ValidationFeedbackKey unmatchingValueTypeKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.UnmatchingValueType);
             ValidationFeedbackKey excessNewLinesInValueKey = new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessNewLinesInValue);
-            ValidationFeedbackKey missingStubAndHeadingKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingStubAndHeading);
+            ValidationFeedbackKey missingStubKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingStubDimensions);
+            ValidationFeedbackKey missingHeadingKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingHeadingDimensions);
 
             // Act
             ValidationResult result = validator.Validate();
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.HasCount(10, result.FeedbackItems); // Unique feedbacks
-            Assert.HasCount(26, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
+            Assert.HasCount(11, result.FeedbackItems); // Unique feedbacks
+            Assert.HasCount(27, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
             Assert.IsTrue(result.FeedbackItems.ContainsKey(invalidValueFormatKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(aliasFileMissingKey));
             Assert.HasCount(15, result.FeedbackItems[aliasFileMissingKey]); // 15 warnings
@@ -150,7 +182,8 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             Assert.IsTrue(result.FeedbackItems.ContainsKey(dataValidationFeedbackInvalidRowLengthKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(unmatchingValueTypeKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(excessNewLinesInValueKey));
-            Assert.IsTrue(result.FeedbackItems.ContainsKey(missingStubAndHeadingKey));
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(missingStubKey));
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(missingHeadingKey));
         }
 
         [TestMethod]
@@ -177,16 +210,16 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             ValidationFeedbackKey dataValidationFeedbackInvalidRowLengthKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.DataValidationFeedbackInvalidRowLength);
             ValidationFeedbackKey unmatchingValueTypeKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.UnmatchingValueType);
             ValidationFeedbackKey excessNewLinesInValueKey = new(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.ExcessNewLinesInValue);
-            ValidationFeedbackKey missingStubAndHeadingKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingStubAndHeading);
-
+            ValidationFeedbackKey missingStubKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingStubDimensions);
+            ValidationFeedbackKey missingHeadingKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.MissingHeadingDimensions);
 
             // Act
             ValidationResult result = await validator.ValidateAsync();
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.HasCount(10, result.FeedbackItems); // Unique feedbacks
-            Assert.HasCount(26, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
+            Assert.HasCount(11, result.FeedbackItems); // Unique feedbacks
+            Assert.HasCount(27, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
             Assert.IsTrue(result.FeedbackItems.ContainsKey(invalidValueFormatKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(aliasFileMissingKey));
             Assert.HasCount(15, result.FeedbackItems[aliasFileMissingKey]); // 15 warnings
@@ -198,7 +231,8 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             Assert.IsTrue(result.FeedbackItems.ContainsKey(dataValidationFeedbackInvalidRowLengthKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(unmatchingValueTypeKey));
             Assert.IsTrue(result.FeedbackItems.ContainsKey(excessNewLinesInValueKey));
-            Assert.IsTrue(result.FeedbackItems.ContainsKey(missingStubAndHeadingKey));
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(missingStubKey));
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(missingHeadingKey));
         }
 
         [TestMethod]
@@ -229,6 +263,34 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
             Assert.HasCount(0, result.FeedbackItems);
+        }
+
+        [TestMethod]
+        public async Task ValidateDatabaseAsyncWithNoFilesReturnsWarnings()
+        {
+            MockFileSystem fileSystem = new();
+            DatabaseValidator validator = new("database_empty", fileSystem: fileSystem);
+
+            ValidationResult result = await validator.ValidateAsync();
+
+            Assert.IsNotNull(result, "Validation result should not be null");
+            Assert.HasCount(2, result.FeedbackItems);
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(new ValidationFeedbackKey(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.NoPxFilesFound)));
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(new ValidationFeedbackKey(ValidationFeedbackLevel.Warning, ValidationFeedbackRule.NoAliasFilesFound)));
+        }
+
+        [TestMethod]
+        public async Task ValidateDatabaseAsyncWithUnreadableAliasFileReturnsFeedback()
+        {
+            MockFileSystem fileSystem = new();
+            DatabaseValidator validator = new("database_unreadable_alias", fileSystem: fileSystem);
+            ValidationFeedbackKey unreadableAliasFileKey = new(ValidationFeedbackLevel.Error, ValidationFeedbackRule.UnreadableAliasFile);
+
+            ValidationResult result = await validator.ValidateAsync();
+
+            Assert.IsNotNull(result, "Validation result should not be null");
+            Assert.IsTrue(result.FeedbackItems.ContainsKey(unreadableAliasFileKey));
+            Assert.HasCount(1, result.FeedbackItems[unreadableAliasFileKey]);
         }
     }
 }
