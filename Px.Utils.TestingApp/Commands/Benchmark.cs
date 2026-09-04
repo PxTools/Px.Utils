@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using Px.Utils.Validation;
 
 namespace Px.Utils.TestingApp.Commands
 {
@@ -77,12 +78,18 @@ namespace Px.Utils.TestingApp.Commands
         /// </summary>
         protected Func<Task>[] BenchmarkFunctionsAsync { get; set; } = [];
 
+        /// <summary>
+        /// Feedback retention options used by validation benchmark commands.
+        /// </summary>
+        protected ValidationOptions ValidationOptions { get; private set; } = new();
+
         private static readonly string[] iterFlags = ["-i", "-iter"];
+        private static readonly string[] feedbackLimitFlags = ["-l", "-limit"];
 
         /// <summary>
         /// List of flags that can be used to provide parameters to the benchmark command.
         /// </summary>
-        protected List<string[]> ParameterFlags { get; } = [iterFlags];
+        protected List<string[]> ParameterFlags { get; } = [iterFlags, feedbackLimitFlags];
 
         internal List<BenchmarkResult> Results { get; } = [];
         private int processesCompleted;
@@ -137,7 +144,8 @@ namespace Px.Utils.TestingApp.Commands
 
         protected virtual void SetRunParameters()
         {
-            if (Parameters.Keys.Count == ParameterFlags.Count)
+            ValidationOptions = new();
+            if (Parameters.Keys.All(key => Array.Exists(ParameterFlags.ToArray(), flag => flag.Contains(key))))
             {
                 foreach (string key in Parameters.Keys)
                 {
@@ -146,9 +154,9 @@ namespace Px.Utils.TestingApp.Commands
                     {
                         Iterations = iterations;
                     }
-                    else if(!Array.Exists(ParameterFlags.ToArray(), flag => flag.Contains(key)))
+                    else if (feedbackLimitFlags.Contains(key) && Parameters[key].Count == 1)
                     {
-                        throw new ArgumentException($"Invalid argument {key} {string.Join(' ', Parameters[key])}");
+                        ValidationOptions = ParseValidationOptions(Parameters[key][0]);
                     }
                 }
             }
@@ -174,6 +182,16 @@ namespace Px.Utils.TestingApp.Commands
             }
 
             Iterations = value;
+        }
+
+        private static ValidationOptions ParseValidationOptions(string value)
+        {
+            if (!int.TryParse(value, out int limit) || limit <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), "Feedback limit must be a positive integer.");
+            }
+
+            return new ValidationOptions { MaxFeedbackItemsPerSignature = limit };
         }
 
         /// <summary>

@@ -18,6 +18,7 @@ Framework: MSTest + Moq. Naming: `MethodNameStateUnderTestExpectedBehavior`.
 | `DataStringValueValidatorTests` | `Validation/DataValidationTests/DataStringValueValidatorTests.cs` | String data validation |
 | `DataSeparatorValidatorTest` | `Validation/DataValidationTests/DataSeparatorValidatorTest.cs` | Separator validation |
 | `DataStructureValidationTests` | `Validation/DataValidationTests/DataStructureValidationTests.cs` | Data structure validation |
+| `ValidationFeedbackSinkTests` | `Validation/ValidationFeedbackSinkTests.cs` | Per-signature feedback limits, truncation annotations, unlimited retention, and invalid limits |
 | `DatabaseValidatorTests` | `Validation/DatabaseValidation/DatabaseValidatorTests.cs` | `DatabaseValidator` |
 | `DatabaseValidatorFunctionTests` | `Validation/DatabaseValidation/DatabaseValidatorFunctionTests.cs` | Database validator functions |
 | `PxFileValidationTests` | `Validation/PxFileValidationTests/PxFileValidationTests.cs` | `PxFileValidator` |
@@ -34,6 +35,7 @@ Framework: MSTest + Moq. Naming: `MethodNameStateUnderTestExpectedBehavior`.
 | `MultiPartReadingTests` | `PxFileTests/DataTests/PxFileStreamDataReaderTests/MultiPartReadingTests.cs` | Multi-part reads |
 | `DataIndexerTests` | `PxFileTests/DataTests/DataIndexerTests.cs` | `DataIndexer` |
 | `DataValueParserTests` | `PxFileTests/DataTests/DataValueParserTests.cs` | `DataValueParsers` |
+| `StreamUtilitiesTests` | `PxFileTests/DataTests/StreamUtilitiesTests.cs` | Byte-accurate `DATA=` start offsets with BOM, multibyte metadata, whitespace, buffer splits, and missing data |
 
 ### Model & Builder Tests
 
@@ -102,3 +104,13 @@ All commands inherit `Command`. Benchmarks inherit `Benchmark`.
 | `BinaryWriteBenchmark` | Binary write |
 
 Supporting: `BenchmarkRunner.cs`, `TestAppConsole.cs`, `InteractiveFlow.cs`, `TestDataGenerator/`.
+
+---
+
+## Integration Runner (`Px.Utils.IntegrationTest`)
+
+The .NET 10 console runner validates checked-in database fixtures through the public `Px.Utils` APIs. It returns `0` when every scenario passes, `1` for expectation mismatches, and `2` when setup or execution fails.
+
+It compares structured validation feedback for all checked-in PX files, complete reads for every valid file, representative mapped reads, and public sum, multiplication, division, and relative-subtraction operations. Expected results are committed JSON fixtures under `Px.Utils.IntegrationTest/ExpectedResults`; comparisons require exact value types and use a documented tolerance only for division values.
+
+The runner locates copied `test-database` and expectation assets from `AppContext.BaseDirectory`, so it can run independently of the repository working directory. CI runs it after build only for the `10.x` SDK matrix entries on Windows and Linux.

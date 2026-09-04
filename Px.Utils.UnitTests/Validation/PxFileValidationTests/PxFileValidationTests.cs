@@ -40,6 +40,36 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
         }
 
         [TestMethod]
+        public void ValidatePxFileWithOnlyHeadingDimensionsReturnsValidResult()
+        {
+            // Arrange
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.HEADING_ONLY_PX_FILE));
+            PxFileValidator validator = new();
+
+            // Act
+            ValidationResult result = validator.Validate(stream, "foo", Encoding.UTF8);
+
+            // Assert
+            Assert.IsNotNull(result, "Validation result should not be null");
+            Assert.DoesNotContain(key => key.Rule == ValidationFeedbackRule.DataValidationFeedbackInvalidRowCount, result.FeedbackItems.Keys);
+        }
+
+        [TestMethod]
+        public void ValidatePxFileWithOnlyStubDimensionsReturnsValidResult()
+        {
+            // Arrange
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(PxFileFixtures.STUB_ONLY_PX_FILE));
+            PxFileValidator validator = new();
+
+            // Act
+            ValidationResult result = validator.Validate(stream, "foo", Encoding.UTF8);
+
+            // Assert
+            Assert.IsNotNull(result, "Validation result should not be null");
+            Assert.DoesNotContain(key => key.Rule == ValidationFeedbackRule.DataValidationFeedbackInvalidRowCount, result.FeedbackItems.Keys);
+        }
+
+        [TestMethod]
         public async Task ValidatePxFileWithInvalidPxFileReturnsFeedbacks()
         {
             // Arrange
@@ -51,8 +81,8 @@ namespace Px.Utils.UnitTests.Validation.PxFileValidationTests
 
             // Assert
             Assert.IsNotNull(result, "Validation result should not be null");
-            Assert.HasCount(9, result.FeedbackItems); // Unique feedbacks
-            Assert.HasCount(11, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
+            Assert.HasCount(10, result.FeedbackItems); // Unique feedbacks
+            Assert.HasCount(12, result.FeedbackItems.Values.SelectMany(f => f)); // Total feedbacks including duplicates
         }
 
         [TestMethod]

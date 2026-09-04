@@ -2,6 +2,12 @@
 
 Purpose of this document is to describe the syntax and content requirements for the pxfiles supported by this library. These requirements do not necessarily apply to other implementations of the pxfile format.
 
+## Supported text encodings
+
+Supported PX file encodings are ASCII-compatible single-byte encodings, including ANSI code pages declared through `CODEPAGE`, and UTF-8. UTF-8 files may include a BOM or omit it, and metadata strings may contain multibyte UTF-8 characters.
+
+UTF-16 and UTF-32 are not supported, regardless of byte order or BOM presence.
+
 ## Syntax
 
 ### Entries
@@ -172,15 +178,15 @@ If the entry is related to the whole matrix, the spesifiers are not used. If the
 
 The keywords marked with an asterisk (*) are mandatory with conditions. The conditions are explained in the section of the keyword.
 
-#### CHARSET
-Value must be a string. Either ```ANSI``` or ```Unicode```. The value must also match the encoding of the file. If the file is not readable in the encoding specified, the file is not valid.
+#### CHARSET*
+Required **IF** the file is not in Unicode.Value must be a string. Either ```ANSI``` or ```Unicode```. The value must also match the encoding of the file. If the file is not readable in the encoding specified, the file is not valid.
 - This entry is language independent.
 - This entry does not depend on any dimensions or dimension values.
 
 #### CODEPAGE
 More spesific encoding information. The value must be a string that matches the encoding of the file. If the file is not readable in the encoding specified, the file is not valid.
 - If the CHARSET entry is ```ANSI```, the value must be the exact name of the encoding used. IE: ```ISO-8859-1```.
-- If the CHARSET entry is ```Unicode```, the value must be the exact name of the encoding used. IE: ```UTF-8```, ```UTF-16``` etc.
+- If the CHARSET entry is ```Unicode```, the value must be the exact name of the encoding used. IE: ```UTF-8``` etc.
 - Values are not case sensitive, but uppercase characters are **recommended**.
 - This entry is language independent.
 - This entry does not depend on any dimensions or dimension values.
@@ -196,19 +202,19 @@ More spesific encoding information. The value must be a string that matches the 
 - Syntax -> Keys -> Language code rules and recommendations apply to each value.
 - This entry does not depend on any dimensions or dimension values.
 
-#### STUB*
-- Can be omitted if all the dimensions are defined in the HEADING.
+#### STUB
 - Defines the dimensions of the matrix which are placed on the rows.
 - The value must be a list of strings.
 - The values are the names of the dimensions.
 - Language dependant.
+- At least one dimension must be defined in STUB.
 
-#### HEADING*
-- Can be omitted if all the dimensions are defined in the STUB.
+#### HEADING
 - Defines the dimensions of the matrix which are placed on the columns.
 - The value must be a list of strings.
 - The values are the names of the dimensions.
 - Language dependant.
+- At least one dimension, not defined in STUB, must be defined in HEADING.
 
 #### VALUES
 - Defines the dimension values of one dimension per entry.
@@ -279,7 +285,7 @@ More spesific encoding information. The value must be a string that matches the 
 #### VARIABLE-TYPE
 - The value must be a string.
 - Recommended that the variable type is defined for each variable defined by the STUB or HEADING.
-- Has a set of allowed values: ```Content```, ```Time```, ```Geographical```, ```Ordinal```, ```Nominal```, ```Other```, ```Classificatory```., ```Unknown```.
+- Has a set of allowed values: ```Contents```, ```Time```, ```Geographical```, ```Ordinal```, ```Nominal```, ```Other```
 - Can be defined for each language, but this is not recommended.
 - Value is not case sensitive, but uppercase characters are recommended.
 

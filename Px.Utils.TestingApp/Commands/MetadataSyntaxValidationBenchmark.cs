@@ -9,7 +9,8 @@ namespace Px.Utils.TestingApp.Commands
         internal override string Help =>
         "Validates the syntax of the Px file metadata given amount of times." + Environment.NewLine +
         "\t-f, -file: The path to the px file to read." + Environment.NewLine +
-        "\t-i, -iter: The number of iterations to run.";
+        "\t-i, -iter: The number of iterations to run." + Environment.NewLine +
+        "\t-l, -limit: Feedback items retained per file, level, and rule; use a positive number. Defaults to 100.";
 
         internal override string Description => "Benchmarks the metadata syntax validation of Px.Utils/Validation/SyntaxValidator.";
 
@@ -34,7 +35,7 @@ namespace Px.Utils.TestingApp.Commands
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             SyntaxValidator validator = new();
-            validator.Validate(stream, TestFilePath, encoding);
+            validator.Validate(stream, TestFilePath, encoding, null, ValidationOptions);
             stream.Close();
         }
 
@@ -42,7 +43,7 @@ namespace Px.Utils.TestingApp.Commands
         {
             using Stream stream = new FileStream(TestFilePath, FileMode.Open, FileAccess.Read);
             SyntaxValidator validator = new();
-            await validator.ValidateAsync(stream, TestFilePath, encoding);
+            await validator.ValidateAsync(stream, TestFilePath, encoding, null, ValidationOptions);
             stream.Close();
         }
     }

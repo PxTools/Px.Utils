@@ -1,4 +1,4 @@
-# Architecture Reference — Px.Utils
+# Architecture Reference â€” Px.Utils
 
 > Machine-readable architecture index for AI coding agents. Read only the sub-file relevant to your task.
 

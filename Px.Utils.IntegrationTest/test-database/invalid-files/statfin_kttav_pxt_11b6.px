@@ -1,0 +1,111 @@
+CHARSET="ANSI";
+AXIS-VERSION="2013";
+CODEPAGE="iso-8859-15";
+LANGUAGE="fi";
+LANGUAGES="fi","sv","en";
+CREATION-DATE="20181005 09:00";
+NEXT-UPDATE="20250418 08:00";
+TABLEID="statfin_kttav_pxt_11b6";
+DECIMALS=0;
+SHOWDECIMALS=0;
+MATRIX="001_11b6_2023";
+SUBJECT-CODE="KTTAV";
+SUBJECT-AREA="kttav";
+SUBJECT-AREA[sv]="kttav";
+SUBJECT-AREA[en]="kttav";
+COPYRIGHT=YES;
+DESCRIPTION="11b6 -- Ulkomaan liikenteen suoritteet, 2011-2023";
+DESCRIPTION[sv]="11b6 -- Godsm‰ngd, trafikarbete och transportarbete inom utrikes v‰gtrafik, 2011-2023";
+DESCRIPTION[en]="11b6 -- Volume of goods, vehicle mileage and transport performance of international road transport, 2011-2023";
+TITLE="Ulkomaan liikenteen suoritteet muuttujina Vuosi ja Tiedot";
+TITLE[sv]="Godsm‰ngd, trafikarbete och transportarbete inom utrikes v‰gtrafik efter ≈r och Uppgifter";
+TITLE[en]="Volume of goods, vehicle mileage and transport performance of international road transport by Year and Information";
+CONTENTS="Ulkomaan liikenteen suoritteet";
+CONTENTS[sv]="Godsm‰ngd, trafikarbete och transportarbete inom utrikes v‰gtrafik";
+CONTENTS[en]="Volume of goods, vehicle mileage and transport performance of international road transport";
+UNITS="Tuhatta tonnia, Miljoonaa tonnikilometri‰, Miljoonaa kilometri‰";
+UNITS[sv]="Tusen ton, Miljoner tonkilometer, Miljoonaa kilometri‰";
+UNITS[en]="Thousand tonnes, Million tonne-kilometres, Miljoonaa kilometri‰";
+HEADING="Vuosi","Tiedot";
+HEADING[sv]="≈r","Uppgifter";
+HEADING[en]="Year","Information";
+CONTVARIABLE="Tiedot";
+CONTVARIABLE[sv]="Uppgifter";
+CONTVARIABLE[en]="Information";
+VALUES("Vuosi")="2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022",
+"2023";
+VALUES[sv]("≈r")="2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021",
+"2022","2023";
+VALUES[en]("Year")="2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021",
+"2022","2023";
+VALUES("Tiedot")="Tavaram‰‰r‰, 1000 t","Kuljetussuorite, milj. tkm","Liikennesuorite, milj. km";
+VALUES[sv]("Uppgifter")="Godsm‰ngd, 1 000 ton","Transportarbete, milj. tonkm","Trafikarbete, mn km";
+VALUES[en]("Information")="Volume of goods, 1,000 tonnes","Volume of transport, million tkms",
+"Vehicle mileage, mn km";
+TIMEVAL("Vuosi")=TLIST(A1),"2011","2012","2013","2014","2015","2016","2017","2018","2019","2020",
+"2021","2022","2023";
+TIMEVAL[sv]("≈r")=TLIST(A1),"2011","2012","2013","2014","2015","2016","2017","2018","2019","2020",
+"2021","2022","2023";
+TIMEVAL[en]("Year")=TLIST(A1),"2011","2012","2013","2014","2015","2016","2017","2018","2019","2020",
+"2021","2022","2023";
+CODES("Vuosi")="2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022",
+"2023";
+CODES[sv]("≈r")="2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022",
+"2023";
+CODES[en]("Year")="2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021",
+"2022","2023";
+CODES("Tiedot")="maara","kulj","liik";
+CODES[sv]("Uppgifter")="maara","kulj","liik";
+CODES[en]("Information")="maara","kulj","liik";
+VARIABLE-TYPE("Vuosi")="Time";
+VARIABLE-TYPE[sv]("≈r")="Time";
+VARIABLE-TYPE[en]("Year")="Time";
+LAST-UPDATED("Tavaram‰‰r‰, 1000 t")="20240419 08:00";
+LAST-UPDATED[sv]("Godsm‰ngd, 1 000 ton")="20240419 08:00";
+LAST-UPDATED[en]("Volume of goods, 1,000 tonnes")="20240419 08:00";
+LAST-UPDATED("Kuljetussuorite, milj. tkm")="20240419 08:00";
+LAST-UPDATED[sv]("Transportarbete, milj. tonkm")="20240419 08:00";
+LAST-UPDATED[en]("Volume of transport, million tkms")="20240419 08:00";
+LAST-UPDATED("Liikennesuorite, milj. km")="20240419 08:00";
+LAST-UPDATED[sv]("Trafikarbete, mn km")="20240419 08:00";
+LAST-UPDATED[en]("Vehicle mileage, mn km")="20240419 08:00";
+UNITS("Tavaram‰‰r‰, 1000 t")="Tuhatta tonnia";
+UNITS[sv]("Godsm‰ngd, 1 000 ton")="Tusen ton";
+UNITS[en]("Volume of goods, 1,000 tonnes")="Thousand tonnes";
+UNITS("Kuljetussuorite, milj. tkm")="Miljoonaa tonnikilometri‰";
+UNITS[sv]("Transportarbete, milj. tonkm")="Miljoner tonkilometer";
+UNITS[en]("Volume of transport, million tkms")="Million tonne-kilometres";
+UNITS("Liikennesuorite, milj. km")="Miljoonaa kilometri‰";
+UNITS[sv]("Trafikarbete, mn km")="Miljoonaa kilometri‰";
+UNITS[en]("Vehicle mileage, mn km")="Miljoonaa kilometri‰";
+CONTACT("Tavaram‰‰r‰, 1000 t")="liikenne.matkailu@stat.fi##<A HREF='https://stat.fi/tilasto/kttav' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Godsm‰ngd, 1 000 ton")="liikenne.matkailu@stat.fi##<A HREF='https://stat.fi/sv/statistik/kttav' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Volume of goods, 1,000 tonnes")="liikenne.matkailu@stat.fi##<A HREF='https://stat.fi/en/statistics/kttav' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("Kuljetussuorite, milj. tkm")="liikenne.matkailu@stat.fi##<A HREF='https://stat.fi/tilasto/kttav' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Transportarbete, milj. tonkm")="liikenne.matkailu@stat.fi##<A HREF='https://stat.fi/sv/statistik/kttav' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Volume of transport, million tkms")="liikenne.matkailu@stat.fi##<A HREF='https://stat.fi/en/statistics/kttav' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("Liikennesuorite, milj. km")="liikenne.matkailu@stat.fi##<A HREF='https://stat.fi/tilasto/kttav' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Trafikarbete, mn km")="liikenne.matkailu@stat.fi##<A HREF='https://stat.fi/sv/statistik/kttav' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Vehicle mileage, mn km")="liikenne.matkailu@stat.fi##<A HREF='https://stat.fi/en/statistics/kttav' TARGET=_blank>Statistics' homepage</A>";
+SOURCE="Tilastokeskus, tieliikenteen tavarankuljetukset";
+SOURCE[sv]="Statistikcentralen, varutransporter inom v‰gtrafiken";
+SOURCE[en]="Statistics Finland, goods transport by road";
+OFFICIAL-STATISTICS=YES;
+NOTE="<A HREF='https://stat.fi/tilasto/dokumentaatio/kttav' TARGET=_blank>Tilaston dokumentaatio</A>##Kotimaan tieliikenteen tavarankuljetustilasto kuvaa Suomessa sek‰ yksityiseen ett‰ luvanvaraiseen liikenteeseen rekisterˆityjen kuorma-autojen kotimaan "
+"kuljetustoimintaa";
+NOTE[sv]="<A HREF='https://stat.fi/sv/statistik/dokumentation/kttav' TARGET=_blank>Dokumentation fˆr statistiken</A>##Statistiken ˆver varutransporter inom inrikes v‰gtrafik beskriver inrikes varutransporten med lastbilar som registrerats fˆr privat eller "
+"tillstÂndspliktig trafik i Finland";
+NOTE[en]="<A HREF='https://stat.fi/en/statistics/documentation/kttav' TARGET=_blank>Documentation of statistics</A>##The statistics on domestic goods transport by road describe the domestic transport activity of lorries registered in Finland for both "
+"private and licensed transport";
+VALUENOTE("Tiedot","Tavaram‰‰r‰, 1000 t")="Tavaram‰‰r‰ kuvaa kuljetetun tavaran m‰‰r‰‰ kilogrammoina";
+VALUENOTE[sv]("Uppgifter","Godsm‰ngd, 1 000 ton")="Godsm‰ngd beskriver transporterad m‰ngd gods";
+VALUENOTE[en]("Information","Volume of goods, 1,000 tonnes")="Volume of goods describes the transported volume of goods";
+VALUENOTE("Tiedot","Kuljetussuorite, milj. tkm")="Kuljetussuorite (tonnikilometri) kuvaa kuljetustyˆn m‰‰r‰‰, joka saadaan kuljetetun tavaram‰‰r‰n (tonnia) ja kuljetusmatkan pituuden (kilometri‰) tulona.";
+VALUENOTE[sv]("Uppgifter","Transportarbete, milj. tonkm")="Transportarbetet (tonkilometer) beskriver transportarbetsvolymen, som erhÂlls genom att multiplicera transporterad m‰ngd gods (ton) med transportstr‰ckan(kilometer).";
+VALUENOTE[en]("Information","Volume of transport, million tkms")="Tonne-kilometre describes the volume of transport, and is obtained as a product of transported volume of goods (tonnes) and length of transport journey (kilometres).";
+VALUENOTE("Tiedot","Liikennesuorite, milj. km")="Liikennesuorite kuvaa tavarankuljetuksessa ajettujen kilometrien m‰‰r‰‰";
+VALUENOTE[sv]("Uppgifter","Trafikarbete, mn km")="Trafikarbete beskriver transportstr‰ckan";
+VALUENOTE[en]("Information","Vehicle mileage, mn km")="Vehicle mileage describes the length of the transport journey";
+MADE-WITH="PxPro";
+DATA=
+5232 3146 171 5760 3532 222 5164 3461 201 6219 3103 184 4416 3054 160 4400 2266 131 2845 1645 92 3613 2444 132 4495 2137 108 2897 1844 100 4338 1966 109 2455 1585 83 3138 1809 94; 

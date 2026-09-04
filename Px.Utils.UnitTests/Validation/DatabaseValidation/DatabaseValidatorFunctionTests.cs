@@ -1,4 +1,4 @@
-﻿using Px.Utils.Validation;
+using Px.Utils.Validation;
 using Px.Utils.Validation.DatabaseValidation;
 using System.Text;
 
@@ -139,6 +139,26 @@ namespace Px.Utils.UnitTests.Validation.DatabaseValidation
             IEnumerable<string> allLanguages = ["fi", "en", "sv"];
             MissingAliasFiles validator = new (aliasFiles, allLanguages);
             DatabaseValidationItem directoryInfo = new(path);
+
+            // Act
+            KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(directoryInfo);
+
+            // Assert
+            Assert.IsNotNull(feedback);
+            Assert.AreEqual(ValidationFeedbackRule.AliasFileMissing, feedback.Value.Key.Rule);
+        }
+
+        [TestMethod]
+        public void MissingAliasFilesWithCaseVariantDirectoryReturnsFeedback()
+        {
+            // Arrange
+            string directoryPath = "path/to/Category";
+            List<DatabaseFileInfo> aliasFiles = [
+                new("Alias_fi.txt", "path/to/category", ["fi"], Encoding.UTF8)
+            ];
+            IEnumerable<string> allLanguages = ["fi"];
+            MissingAliasFiles validator = new(aliasFiles, allLanguages);
+            DatabaseValidationItem directoryInfo = new(directoryPath);
 
             // Act
             KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue>? feedback = validator.Validate(directoryInfo);

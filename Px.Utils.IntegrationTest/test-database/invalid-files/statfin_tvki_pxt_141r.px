@@ -1,0 +1,102 @@
+CHARSET="ANSI";
+AXIS-VERSION="2013";
+CODEPAGE="iso-8859-15";
+LANGUAGE="fi";
+LANGUAGES="fi","sv","en";
+CREATION-DATE="20230609 09:00";
+NEXT-UPDATE="20241206 08:00";
+TABLEID="statfin_tvki_pxt_141r";
+DECIMALS=5;
+SHOWDECIMALS=1;
+MATRIX="001_141r_2023";
+SUBJECT-CODE="TVKI";
+SUBJECT-AREA="tvki";
+SUBJECT-AREA[sv]="tvki";
+SUBJECT-AREA[en]="tvki";
+COPYRIGHT=YES;
+DESCRIPTION="141r -- Muiden kertaluonteisten palkkaerien osuus palkkasummasta yksityisellä sektorilla - vuositiedot, 2007-2023";
+DESCRIPTION[sv]="141r -- Andra engångslöneposters andel av lönesumman inom den privata sektorn - årsuppgifter, 2007-2023";
+DESCRIPTION[en]="141r -- The share of other one-off pay components of wages and salaries sum in the private sector - annual data, 2007-2023";
+TITLE="Muiden kertaluonteisten palkkaerien osuus palkkasummasta yksityisellä sektorilla muuttujina Vuosi ja Tiedot";
+TITLE[sv]="Andra engångslöneposters andel av lönesumman inom den privata sektorn efter År och Uppgifter";
+TITLE[en]="The share of other one-off pay components of wages and salaries sum in the private sector by Year and Information";
+CONTENTS="Muiden kertaluonteisten palkkaerien osuus palkkasummasta yksityisellä sektorilla";
+CONTENTS[sv]="Andra engångslöneposters andel av lönesumman inom den privata sektorn";
+CONTENTS[en]="The share of other one-off pay components of wages and salaries sum in the private sector";
+UNITS="";
+UNITS[sv]="";
+UNITS[en]="";
+STUB="Vuosi";
+STUB[sv]="År";
+STUB[en]="Year";
+HEADING="Tiedot";
+HEADING[sv]="Uppgifter";
+HEADING[en]="Information";
+CONTVARIABLE="Tiedot";
+CONTVARIABLE[sv]="Uppgifter";
+CONTVARIABLE[en]="Information";
+VALUES("Vuosi")="2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018",
+"2019","2020","2021","2022","2023";
+VALUES[sv]("År")="2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
+"2018","2019","2020","2021","2022","2023";
+VALUES[en]("Year")="2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
+"2018","2019","2020","2021","2022","2023";
+VALUES("Tiedot")=
+"Työvoimakustannusindeksi (2020=100) yksityisellä sektorilla, muiden kertaluonteisten palkkaerien osuus palkkasummasta, %";
+VALUES[sv]("Uppgifter")=
+"Arbetskraftskostnadsindex (2020=100) inom den privata sektorn, andra engångslöneposters andel av lönesumman, %";
+VALUES[en]("Information")=
+"Labour cost index (2020=100) in the private sector, the share of other one-off pay components of wages and salaries sum, %";
+TIMEVAL("Vuosi")=TLIST(A1),"2007","2008","2009","2010","2011","2012","2013","2014","2015","2016",
+"2017","2018","2019","2020","2021","2022","2023";
+TIMEVAL[sv]("År")=TLIST(A1),"2007","2008","2009","2010","2011","2012","2013","2014","2015","2016",
+"2017","2018","2019","2020","2021","2022","2023";
+TIMEVAL[en]("Year")=TLIST(A1),"2007","2008","2009","2010","2011","2012","2013","2014","2015","2016",
+"2017","2018","2019","2020","2021","2022","2023";
+CODES("Vuosi")="2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018",
+"2019","2020","2021","2022","2023";
+CODES[sv]("År")="2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018",
+"2019","2020","2021","2022","2023";
+CODES[en]("Year")="2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
+"2018","2019","2020","2021","2022","2023";
+CODES("Tiedot")="tvkiy_muuke_20";
+CODES[sv]("Uppgifter")="tvkiy_muuke_20";
+CODES[en]("Information")="tvkiy_muuke_20";
+VARIABLE-TYPE("Vuosi")="Time";
+VARIABLE-TYPE[sv]("År")="Time";
+VARIABLE-TYPE[en]("Year")="Time";
+LAST-UPDATED("Työvoimakustannusindeksi (2020=100) yksityisellä sektorilla, muiden kertaluonteisten palkkaerien osuus palkkasummasta, %")="20240906 08:00";
+LAST-UPDATED[sv]("Arbetskraftskostnadsindex (2020=100) inom den privata sektorn, andra engångslöneposters andel av lönesumman, %")="20240906 08:00";
+LAST-UPDATED[en]("Labour cost index (2020=100) in the private sector, the share of other one-off pay components of wages and salaries sum, %")="20240906 08:00";
+UNITS("Työvoimakustannusindeksi (2020=100) yksityisellä sektorilla, muiden kertaluonteisten palkkaerien osuus palkkasummasta, %")="Prosentti";
+UNITS[sv]("Arbetskraftskostnadsindex (2020=100) inom den privata sektorn, andra engångslöneposters andel av lönesumman, %")="Procent";
+UNITS[en]("Labour cost index (2020=100) in the private sector, the share of other one-off pay components of wages and salaries sum, %")="Per cent";
+CONTACT("Työvoimakustannusindeksi (2020=100) yksityisellä sektorilla, muiden kertaluonteisten palkkaerien osuus palkkasummasta, %")="<A HREF='https://stat.fi/tilasto/tvki' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Arbetskraftskostnadsindex (2020=100) inom den privata sektorn, andra engångslöneposters andel av lönesumman, %")="<A HREF='https://stat.fi/sv/statistik/tvki' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Labour cost index (2020=100) in the private sector, the share of other one-off pay components of wages and salaries sum, %")="<A HREF='https://stat.fi/en/statistics/tvki' TARGET=_blank>Statistics' homepage</A>";
+SOURCE="Tilastokeskus, työvoimakustannusindeksi";
+SOURCE[sv]="Statistikcentralen, arbetskraftskostnadsindex";
+SOURCE[en]="Statistics Finland, labour cost index";
+OFFICIAL-STATISTICS=YES;
+NOTE="<A HREF='https://stat.fi/tilasto/dokumentaatio/tvki' TARGET=_blank>Tilaston dokumentaatio</A>";
+NOTE[sv]="<A HREF='https://stat.fi/sv/statistik/dokumentation/tvki' TARGET=_blank>Dokumentation för statistiken</A>";
+NOTE[en]="<A HREF='https://stat.fi/en/statistics/documentation/tvki' TARGET=_blank>Documentation of statistics</A>";
+MADE-WITH="PxPro";
+DATA=
+6.60399 
+6.35693 
+6.39582 
+6.1441 
+6.00283 
+6.33694 
+6.27298 
+6.23001 
+6.38883 
+6.57393 
+6.48228 
+6.2952 
+6.32157 
+6.50409 
+6.78394 
+6.63712 
+6.90747; 

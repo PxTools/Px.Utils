@@ -1,0 +1,113 @@
+﻿AXIS-VERSION="2013";
+CODEPAGE="UTF-8";
+LANGUAGE="fi";
+LANGUAGES="fi","sv","en";
+CREATION-DATE="20220419 09:00";
+TABLEID="statfin_ras_pxt_13m4";
+DECIMALS=1;
+SHOWDECIMALS=1;
+MATRIX="001_13m4_2024m07";
+SUBJECT-CODE="RAS";
+SUBJECT-AREA="ras";
+SUBJECT-AREA[sv]="ras";
+SUBJECT-AREA[en]="ras";
+COPYRIGHT=YES;
+DESCRIPTION="13m4 -- Myönnettyjen rakennuslupien vuosimuutosten tarkentuminen, 2023M08-2024M07";
+DESCRIPTION[sv]="13m4 -- Revidering av årsförändringar av beviljade bygglov, 2023M08-2024M07";
+DESCRIPTION[en]="13m4 -- Revision of annual changes in granted building permits, 2023M08-2024M07";
+TITLE="Myönnettyjen rakennuslupien vuosimuutosten tarkentuminen muuttujina Kuukausi ja Tiedot";
+TITLE[sv]="Revidering av årsförändringar av beviljade bygglov efter Månad och Uppgifter";
+TITLE[en]="Revision of annual changes in granted building permits by Month and Information";
+CONTENTS="Myönnettyjen rakennuslupien vuosimuutosten tarkentuminen";
+CONTENTS[sv]="Revidering av årsförändringar av beviljade bygglov";
+CONTENTS[en]="Revision of annual changes in granted building permits";
+UNITS="";
+UNITS[sv]="";
+UNITS[en]="";
+STUB="Kuukausi";
+STUB[sv]="Månad";
+STUB[en]="Month";
+HEADING="Tiedot";
+HEADING[sv]="Uppgifter";
+HEADING[en]="Information";
+CONTVARIABLE="Tiedot";
+CONTVARIABLE[sv]="Uppgifter";
+CONTVARIABLE[en]="Information";
+VALUES("Kuukausi")="2023M08","2023M09","2023M10","2023M11","2023M12","2024M01","2024M02","2024M03",
+"2024M04","2024M05","2024M06","2024M07";
+VALUES[sv]("Månad")="2023M08","2023M09","2023M10","2023M11","2023M12","2024M01","2024M02","2024M03",
+"2024M04","2024M05","2024M06","2024M07";
+VALUES[en]("Month")="2023M08","2023M09","2023M10","2023M11","2023M12","2024M01","2024M02","2024M03",
+"2024M04","2024M05","2024M06","2024M07";
+VALUES("Tiedot")="1. julkistus, vuosimuutos, %","Uusin julkistus, vuosimuutos, %",
+"Tarkentuminen, %-yksikköä";
+VALUES[sv]("Uppgifter")="1:a offentliggörandet, årsförändring, %",
+"Senaste offentliggörandet, årsförändring, %","Revidering, procentenhet";
+VALUES[en]("Information")="1st release, year-on-year change, %",
+"Latest release, year-on-year change, %","Revision, percentage points";
+TIMEVAL("Kuukausi")=TLIST(M1),"202308","202309","202310","202311","202312","202401","202402",
+"202403","202404","202405","202406","202407";
+TIMEVAL[sv]("Månad")=TLIST(M1),"202308","202309","202310","202311","202312","202401","202402",
+"202403","202404","202405","202406","202407";
+TIMEVAL[en]("Month")=TLIST(M1),"202308","202309","202310","202311","202312","202401","202402",
+"202403","202404","202405","202406","202407";
+CODES("Kuukausi")="2023M08","2023M09","2023M10","2023M11","2023M12","2024M01","2024M02","2024M03",
+"2024M04","2024M05","2024M06","2024M07";
+CODES[sv]("Månad")="2023M08","2023M09","2023M10","2023M11","2023M12","2024M01","2024M02","2024M03",
+"2024M04","2024M05","2024M06","2024M07";
+CODES[en]("Month")="2023M08","2023M09","2023M10","2023M11","2023M12","2024M01","2024M02","2024M03",
+"2024M04","2024M05","2024M06","2024M07";
+CODES("Tiedot")="alk_muutos","alk_muutos_uusi","alk_muutos_revisio";
+CODES[sv]("Uppgifter")="alk_muutos","alk_muutos_uusi","alk_muutos_revisio";
+CODES[en]("Information")="alk_muutos","alk_muutos_uusi","alk_muutos_revisio";
+VARIABLE-TYPE("Kuukausi")="Time";
+VARIABLE-TYPE[sv]("Månad")="Time";
+VARIABLE-TYPE[en]("Month")="Time";
+LAST-UPDATED("1. julkistus, vuosimuutos, %")="20241022 08:00";
+LAST-UPDATED[sv]("1:a offentliggörandet, årsförändring, %")="20241022 08:00";
+LAST-UPDATED[en]("1st release, year-on-year change, %")="20241022 08:00";
+LAST-UPDATED("Uusin julkistus, vuosimuutos, %")="20241022 08:00";
+LAST-UPDATED[sv]("Senaste offentliggörandet, årsförändring, %")="20241022 08:00";
+LAST-UPDATED[en]("Latest release, year-on-year change, %")="20241022 08:00";
+LAST-UPDATED("Tarkentuminen, %-yksikköä")="20241022 08:00";
+LAST-UPDATED[sv]("Revidering, procentenhet")="20241022 08:00";
+LAST-UPDATED[en]("Revision, percentage points")="20241022 08:00";
+UNITS("1. julkistus, vuosimuutos, %")="%";
+UNITS[sv]("1:a offentliggörandet, årsförändring, %")="%";
+UNITS[en]("1st release, year-on-year change, %")="%";
+UNITS("Uusin julkistus, vuosimuutos, %")="%";
+UNITS[sv]("Senaste offentliggörandet, årsförändring, %")="%";
+UNITS[en]("Latest release, year-on-year change, %")="%";
+UNITS("Tarkentuminen, %-yksikköä")="%";
+UNITS[sv]("Revidering, procentenhet")="%";
+UNITS[en]("Revision, percentage points")="%";
+CONTACT("1. julkistus, vuosimuutos, %")="<A HREF='https://stat.fi/tilasto/ras' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("1:a offentliggörandet, årsförändring, %")="<A HREF='https://stat.fi/sv/statistik/ras' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("1st release, year-on-year change, %")="<A HREF='https://stat.fi/en/statistics/ras' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("Uusin julkistus, vuosimuutos, %")="<A HREF='https://stat.fi/tilasto/ras' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Senaste offentliggörandet, årsförändring, %")="<A HREF='https://stat.fi/sv/statistik/ras' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Latest release, year-on-year change, %")="<A HREF='https://stat.fi/en/statistics/ras' TARGET=_blank>Statistics' homepage</A>";
+CONTACT("Tarkentuminen, %-yksikköä")="<A HREF='https://stat.fi/tilasto/ras' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Revidering, procentenhet")="<A HREF='https://stat.fi/sv/statistik/ras' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Revision, percentage points")="<A HREF='https://stat.fi/en/statistics/ras' TARGET=_blank>Statistics' homepage</A>";
+SOURCE="Tilastokeskus, rakennus- ja asuntotuotanto";
+SOURCE[sv]="Statistikcentralen, byggnads- och bostadsproduktion";
+SOURCE[en]="Statistics Finland, building and dwelling production";
+OFFICIAL-STATISTICS=YES;
+NOTE="<A HREF='https://stat.fi/tilasto/dokumentaatio/ras' TARGET=_blank>Tilaston dokumentaatio</A>";
+NOTE[sv]="<A HREF='https://stat.fi/sv/statistik/dokumentation/ras' TARGET=_blank>Dokumentation för statistiken</A>";
+NOTE[en]="<A HREF='https://stat.fi/en/statistics/documentation/ras' TARGET=_blank>Documentation of statistics</A>";
+MADE-WITH="PxPro";
+DATA=
+-69.7 -65.1 4.6 
+-0.7 7.7 8.4 
+-20.5 -13.7 6.8 
+-30.9 -19.8 11.1 
+-40.4 -33.8 6.6 
+-54.8 -44.9 9.9 
+2.9 7.5 4.6 
+-13.1 -11.4 1.7 
+-4.8 24.3 29.1 
+13.8 14.2 0.4 
+-38.2 -30.4 7.8 
+8.3 8.9 0.6; 
