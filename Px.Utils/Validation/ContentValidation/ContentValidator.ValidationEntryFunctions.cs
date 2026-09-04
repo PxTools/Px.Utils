@@ -449,7 +449,6 @@ namespace Px.Utils.Validation.ContentValidation
                 return null;
             }
 
-            // Check if entry.value is in upper case
             string valueUppercase = entry.Value.ToUpper(CultureInfo.InvariantCulture);
             if (entry.Value != valueUppercase)
             {
@@ -463,7 +462,7 @@ namespace Px.Utils.Validation.ContentValidation
                         ValidationFeedbackRule.ValueIsNotInUpperCase),
                     new(validator._filename,
                         feedbackIndexes.Key,
-                        entry.ValueStartIndex,
+                        feedbackIndexes.Value,
                         $"{entry.Key.Keyword}: {entry.Value}")
                 );
 

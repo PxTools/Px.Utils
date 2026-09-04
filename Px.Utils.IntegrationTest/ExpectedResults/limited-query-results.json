@@ -1,0 +1,181 @@
+{
+  "queries": [
+    {
+      "name": "statfin_akay_pxt_013-selected",
+      "fileName": "statfin_akay_pxt_013.px",
+      "dimensions": [
+        {
+          "code": "V\u00E4est\u00F6ryhm\u00E4",
+          "valueCodes": [
+            "SSS"
+          ]
+        },
+        {
+          "code": "Vuosi",
+          "valueCodes": [
+            "1991",
+            "2017"
+          ]
+        },
+        {
+          "code": "Tieto",
+          "valueCodes": [
+            "1",
+            "2",
+            "S",
+            "lkm"
+          ]
+        }
+      ],
+      "values": [
+        {
+          "type": "Exists",
+          "value": 29
+        },
+        {
+          "type": "Exists",
+          "value": 71
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 4378
+        },
+        {
+          "type": "Exists",
+          "value": 39
+        },
+        {
+          "type": "Exists",
+          "value": 61
+        },
+        {
+          "type": "Exists",
+          "value": 100
+        },
+        {
+          "type": "Exists",
+          "value": 7155
+        }
+      ]
+    },
+    {
+      "name": "statfin_atp_pxt_11n3-selected",
+      "fileName": "statfin_atp_pxt_11n3.px",
+      "dimensions": [
+        {
+          "code": "Tiedot",
+          "valueCodes": [
+            "atp_lkm"
+          ]
+        },
+        {
+          "code": "Vuosi",
+          "valueCodes": [
+            "2013",
+            "2023"
+          ]
+        }
+      ],
+      "values": [
+        {
+          "type": "Exists",
+          "value": 29500
+        },
+        {
+          "type": "Exists",
+          "value": 54500
+        }
+      ]
+    },
+    {
+      "name": "statfin_cvts_pxt_13vr-selected",
+      "fileName": "statfin_cvts_pxt_13vr.px",
+      "dimensions": [
+        {
+          "code": "Vuosi",
+          "valueCodes": [
+            "2010"
+          ]
+        },
+        {
+          "code": "Koulutuksen esteet",
+          "valueCodes": [
+            "esta",
+            "esti"
+          ]
+        },
+        {
+          "code": "Tarkasteltavat yritykset",
+          "valueCodes": [
+            "SSS",
+            "1",
+            "2",
+            "3",
+            "4",
+            "6"
+          ]
+        },
+        {
+          "code": "Tiedot",
+          "valueCodes": [
+            "osuuse"
+          ]
+        }
+      ],
+      "values": [
+        {
+          "type": "Exists",
+          "value": 41.5
+        },
+        {
+          "type": "Exists",
+          "value": 32.6
+        },
+        {
+          "type": "Exists",
+          "value": 24.3
+        },
+        {
+          "type": "Exists",
+          "value": 31.8
+        },
+        {
+          "type": "Exists",
+          "value": 32.8
+        },
+        {
+          "type": "Exists",
+          "value": 72.1
+        },
+        {
+          "type": "Exists",
+          "value": 12.6
+        },
+        {
+          "type": "Exists",
+          "value": 13.4
+        },
+        {
+          "type": "Exists",
+          "value": 14
+        },
+        {
+          "type": "Exists",
+          "value": 13
+        },
+        {
+          "type": "Exists",
+          "value": 13.7
+        },
+        {
+          "type": "Exists",
+          "value": 9.2
+        }
+      ]
+    }
+  ]
+}

@@ -120,14 +120,13 @@ namespace Px.Utils.Validation.ContentValidation
         private int GetProductOfDimensionValues(Dictionary<string, string[]> dimensions)
         {
             string? lang = _defaultLanguage ?? _availableLanguages?[0] ?? string.Empty;
-            if (lang is null || dimensions.Count == 0)
+            if (lang is null)
             {
                 return 0;
             }
-            string[] dimensionNames = dimensions[lang];
-            if (dimensionNames is null || dimensionNames.Length == 0 || _dimensionValueNames is null || _dimensionValueNames.Count == 0)
+            if (!dimensions.TryGetValue(lang, out string[]? dimensionNames) || dimensionNames.Length == 0 || _dimensionValueNames is null || _dimensionValueNames.Count == 0)
             {
-                return 0;
+                return 1;
             }
             return _dimensionValueNames
                 .Where(kvp => dimensionNames

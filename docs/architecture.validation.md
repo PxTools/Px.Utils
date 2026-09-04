@@ -38,6 +38,8 @@ Validates metadata content (required keys, language definitions, dimension consi
 File: `Validation/ContentValidation/ContentValidator.cs`  
 Partial files: `ValidationEntryFunctions.cs`, `ValidationFindKeywordFunctions.cs`, `UtilityMethods.cs`
 
+Both `STUB` and `HEADING` entries are required for every language. A missing dimension axis is reported as an error, and the file is invalid for the built-in metadata builder and data reader.
+
 Dimension type validation uses `PxFileConfiguration.TokenDefinitions.VariableTypeTokens`. The first configured token for each dimension type is treated as the recommended primary value, while additional configured tokens are accepted as aliases and reported as warnings.
 
 ### DataValidator

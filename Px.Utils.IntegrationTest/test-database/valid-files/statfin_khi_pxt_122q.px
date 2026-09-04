@@ -1,0 +1,147 @@
+CHARSET="ANSI";
+AXIS-VERSION="2013";
+CODEPAGE="iso-8859-15";
+LANGUAGE="fi";
+LANGUAGES="fi","sv","en";
+CREATION-DATE="20190514 09:00";
+NEXT-UPDATE="20250114 08:00";
+TABLEID="statfin_khi_pxt_122q";
+DECIMALS=1;
+SHOWDECIMALS=1;
+MATRIX="001_122q_2023";
+SUBJECT-CODE="KHI";
+SUBJECT-AREA="khi";
+SUBJECT-AREA[sv]="khi";
+SUBJECT-AREA[en]="khi";
+COPYRIGHT=YES;
+DESCRIPTION="122q -- Kuluttajahintaindeksin vuosimuutos, vuositiedot, 1980-2023";
+DESCRIPTION[sv]="122q -- Årsförändring av konsumentprisindexet, årsuppgifter, 1980-2023";
+DESCRIPTION[en]="122q -- Annual changes of Consumer Price Index, yearly data, 1980-2023";
+TITLE="Kuluttajahintaindeksin vuosimuutos muuttujina Vuosi ja Tiedot";
+TITLE[sv]="Årsförändring av konsumentprisindexet efter År och Uppgifter";
+TITLE[en]="Annual changes of Consumer Price Index by Year and Information";
+CONTENTS="Kuluttajahintaindeksin vuosimuutos";
+CONTENTS[sv]="Årsförändring av konsumentprisindexet";
+CONTENTS[en]="Annual changes of Consumer Price Index";
+UNITS="%";
+UNITS[sv]="%";
+UNITS[en]="%";
+STUB="Vuosi";
+STUB[sv]="År";
+STUB[en]="Year";
+HEADING="Tiedot";
+HEADING[sv]="Uppgifter";
+HEADING[en]="Information";
+CONTVARIABLE="Tiedot";
+CONTVARIABLE[sv]="Uppgifter";
+CONTVARIABLE[en]="Information";
+VALUES("Vuosi")="1980","1981","1982","1983","1984","1985","1986","1987","1988","1989","1990","1991",
+"1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003","2004","2005",
+"2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
+"2020","2021","2022","2023";
+VALUES[sv]("År")="1980","1981","1982","1983","1984","1985","1986","1987","1988","1989","1990",
+"1991","1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003","2004",
+"2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018",
+"2019","2020","2021","2022","2023";
+VALUES[en]("Year")="1980","1981","1982","1983","1984","1985","1986","1987","1988","1989","1990",
+"1991","1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003","2004",
+"2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018",
+"2019","2020","2021","2022","2023";
+VALUES("Tiedot")="Vuosimuutos (%)";
+VALUES[sv]("Uppgifter")="Årsförändring (%)";
+VALUES[en]("Information")="Annual change (%)";
+TIMEVAL("Vuosi")=TLIST(A1),"1980","1981","1982","1983","1984","1985","1986","1987","1988","1989",
+"1990","1991","1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003",
+"2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
+"2018","2019","2020","2021","2022","2023";
+TIMEVAL[sv]("År")=TLIST(A1),"1980","1981","1982","1983","1984","1985","1986","1987","1988","1989",
+"1990","1991","1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003",
+"2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
+"2018","2019","2020","2021","2022","2023";
+TIMEVAL[en]("Year")=TLIST(A1),"1980","1981","1982","1983","1984","1985","1986","1987","1988","1989",
+"1990","1991","1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003",
+"2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
+"2018","2019","2020","2021","2022","2023";
+CODES("Vuosi")="1980","1981","1982","1983","1984","1985","1986","1987","1988","1989","1990","1991",
+"1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003","2004","2005",
+"2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
+"2020","2021","2022","2023";
+CODES[sv]("År")="1980","1981","1982","1983","1984","1985","1986","1987","1988","1989","1990","1991",
+"1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003","2004","2005",
+"2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
+"2020","2021","2022","2023";
+CODES[en]("Year")="1980","1981","1982","1983","1984","1985","1986","1987","1988","1989","1990",
+"1991","1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003","2004",
+"2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018",
+"2019","2020","2021","2022","2023";
+CODES("Tiedot")="Vuosimuutos";
+CODES[sv]("Uppgifter")="Vuosimuutos";
+CODES[en]("Information")="Vuosimuutos";
+VARIABLE-TYPE("Vuosi")="Time";
+VARIABLE-TYPE[sv]("År")="Time";
+VARIABLE-TYPE[en]("Year")="Time";
+LAST-UPDATED("Vuosimuutos (%)")="20240115 08:00";
+LAST-UPDATED[sv]("Årsförändring (%)")="20240115 08:00";
+LAST-UPDATED[en]("Annual change (%)")="20240115 08:00";
+UNITS("Vuosimuutos (%)")="%";
+UNITS[sv]("Årsförändring (%)")="%";
+UNITS[en]("Annual change (%)")="%";
+CONTACT("Vuosimuutos (%)")="<A HREF='https://stat.fi/tilasto/khi' TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]("Årsförändring (%)")="<A HREF='https://stat.fi/sv/statistik/khi' TARGET=_blank>Statistikens webbsidor</A>";
+CONTACT[en]("Annual change (%)")="<A HREF='https://stat.fi/en/statistics/khi' TARGET=_blank>Statistics' homepage</A>";
+SOURCE="Tilastokeskus, kuluttajahintaindeksi";
+SOURCE[sv]="Statistikcentralen, konsumentprisindex";
+SOURCE[en]="Statistics Finland, consumer price index";
+OFFICIAL-STATISTICS=YES;
+NOTE="<A HREF='https://stat.fi/tilasto/dokumentaatio/khi' TARGET=_blank>Tilaston dokumentaatio</A>";
+NOTE[sv]="<A HREF='https://stat.fi/sv/statistik/dokumentation/khi' TARGET=_blank>Dokumentation för statistiken</A>";
+NOTE[en]="<A HREF='https://stat.fi/en/statistics/documentation/khi' TARGET=_blank>Documentation of statistics</A>";
+VALUENOTE("Tiedot","Vuosimuutos (%)")="Vuosimuutos on indeksin suhteellinen muutos vuotta aiempaan vastaavaan ajankohtaan verrattuna (esim. kuluttajahintojen kokonaisindeksin vuosimuutos eli inflaatio).";
+VALUENOTE[sv]("Uppgifter","Årsförändring (%)")="Årsförändring är indexets relativa förändring jämfört med motsvarande period året innan (t.ex. årsförändring av totalindexet för konsumentpriset, dvs. inflation).";
+VALUENOTE[en]("Information","Annual change (%)")="Annual change is the relative change of the index in comparison with the corresponding time period one year ago (e.g. annual change of total index of consumer prices, i.e. inflation).";
+MADE-WITH="PxPro";
+DATA=
+11.6 
+12 
+9.3 
+8.4 
+7.1 
+5.9 
+3.6 
+3.7 
+5.1 
+6.6 
+6.1 
+4.1 
+2.6 
+2.2 
+1.1 
+1 
+0.6 
+1.2 
+1.4 
+1.2 
+3.4 
+2.6 
+1.6 
+0.9 
+0.2 
+0.9 
+1.6 
+2.5 
+4.1 
+0 
+1.2 
+3.4 
+2.8 
+1.5 
+1 
+-0.2 
+0.4 
+0.7 
+1.1 
+1 
+0.3 
+2.2 
+7.1 
+6.2; 

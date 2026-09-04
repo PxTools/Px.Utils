@@ -48,6 +48,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture", "architectur
 		docs\architecture.validation.md = docs\architecture.validation.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Px.Utils.IntegrationTest", "Px.Utils.IntegrationTest\Px.Utils.IntegrationTest.csproj", "{4F5A811F-CF49-4267-8205-A5930F678211}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +68,10 @@ Global
 		{0C0227EC-68EE-425D-892B-F570EC18E792}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C0227EC-68EE-425D-892B-F570EC18E792}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C0227EC-68EE-425D-892B-F570EC18E792}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F5A811F-CF49-4267-8205-A5930F678211}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F5A811F-CF49-4267-8205-A5930F678211}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F5A811F-CF49-4267-8205-A5930F678211}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F5A811F-CF49-4267-8205-A5930F678211}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

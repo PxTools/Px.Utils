@@ -1,0 +1,98 @@
+CHARSET="ANSI";
+AXIS-VERSION="2006";
+CODEPAGE="iso-8859-15";
+LANGUAGE="fi";
+LANGUAGES="fi","sv","en";
+CREATION-DATE="20161220 09:00";
+NEXT-UPDATE="20200617 08:00";
+DECIMALS=0;
+SHOWDECIMALS=0;
+MATRIX="jate_001_2018";
+SUBJECT-CODE="YMP";
+SUBJECT-AREA="Ympäristö ja luonnonvarat";
+SUBJECT-AREA[sv]="Ympäristö ja luonnonvarat";
+SUBJECT-AREA[en]="Ympäristö ja luonnonvarat";
+COPYRIGHT=YES;
+DESCRIPTION="001 -- Yhdyskuntajätteet Suomessa käsittelytavoittain 1997-2018";
+DESCRIPTION[sv]="001 -- Kommunalt avfall i Finland, åren 1997–2017";
+DESCRIPTION[en]="001 -- Municipal waste by treatment method in 1997 to 2017";
+TITLE="Yhdyskuntajätteet Suomessa käsittelytavoittain, 1000 t muuttujina Vuosi ja Käsittely muuttujina vuosi ja Tiedot";
+TITLE[sv]="Kommunalt avfall i Finland enligt hantering, 1000 t efter År och Avfallshantering metod";
+TITLE[en]="Municipal waste by treatment method in 1997 to 2017, 1000 t by Year and Treatment";
+CONTENTS="Yhdyskuntajätteet Suomessa käsittelytavoittain, 1000 t muuttujina Vuosi ja Käsittely";
+CONTENTS[sv]="Kommunalt avfall i Finland enligt hantering, 1000 t";
+CONTENTS[en]="Municipal waste by treatment method in 1997 to 2017, 1000 t";
+UNITS="1000 t";
+UNITS[sv]="1000 t";
+UNITS[en]="1000 t";
+STUB="vuosi";
+STUB[sv]="År";
+STUB[en]="Year";
+HEADING="Tiedot";
+HEADING[sv]="Avfallshantering metod";
+HEADING[en]="Treatment";
+VALUES("vuosi")="1997","1998","1999","2000","2001","2002","2003","2004","2005","2006","2007",
+"2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018";
+VALUES[sv]("År")="1997","1998","1999","2000","2001","2002","2003","2004","2005","2006","2007",
+"2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018";
+VALUES[en]("Year")="1997","1998","1999","2000","2001","2002","2003","2004","2005","2006","2007",
+"2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018";
+VALUES("Tiedot")="Kokonaisjätemäärä","Kaatopaikkasijoitus","Hyödyntäminen energiana",
+"Hyödyntäminen materiana";
+VALUES[sv]("Avfallshantering metod")="Totalt","Avstjälpningsplats","Energiutvinning",
+"Materialåtervinning";
+VALUES[en]("Treatment")="Total","Landfilling","Energy recovery","Material recovery";
+TIMEVAL("vuosi")=TLIST(A1),"1997","1998","1999","2000","2001","2002","2003","2004","2005","2006",
+"2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018";
+TIMEVAL[sv]("År")=TLIST(A1),"1997","1998","1999","2000","2001","2002","2003","2004","2005","2006",
+"2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018";
+TIMEVAL[en]("Year")=TLIST(A1),"1997","1998","1999","2000","2001","2002","2003","2004","2005","2006",
+"2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018";
+CODES("vuosi")="1997","1998","1999","2000","2001","2002","2003","2004","2005","2006","2007","2008",
+"2009","2010","2011","2012","2013","2014","2015","2016","2017","2018";
+CODES[sv]("År")="1997","1998","1999","2000","2001","2002","2003","2004","2005","2006","2007",
+"2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018";
+CODES[en]("Year")="1997","1998","1999","2000","2001","2002","2003","2004","2005","2006","2007",
+"2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018";
+CODES("Tiedot")="TOT","AVS","ENE","MÅT";
+CODES[sv]("Avfallshantering metod")="TOT","AVS","ENE","MÅT";
+CODES[en]("Treatment")="TOT","AVS","ENE","MÅT";
+LAST-UPDATED="20200115 14:00";
+CONTACT="Tilastokeskus<A HREF=http://tilastokeskus.fi/til/jate/yht.html TARGET=_blank>Lisätietoja</A>#<A HREF=http://tilastokeskus.fi/til/jate/index.html TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[sv]="Tilastokeskus<A HREF=http://tilastokeskus.fi/til/jate/yht.html TARGET=_blank>Lisätietoja</A>#<A HREF=http://tilastokeskus.fi/til/jate/index.html TARGET=_blank>Tilaston kotisivu</A>";
+CONTACT[en]="Tilastokeskus<A HREF=http://tilastokeskus.fi/til/jate/yht.html TARGET=_blank>Lisätietoja</A>#<A HREF=http://tilastokeskus.fi/til/jate/index.html TARGET=_blank>Tilaston kotisivu</A>";
+DATABASE="StatFin";
+DATABASE[sv]="StatFin";
+DATABASE[en]="StatFin";
+SOURCE="Tilastokeskus, Suomen ympäristökeskus";
+SOURCE[sv]="Statistikcentralen och Finlands miljöcentral";
+SOURCE[en]="Statistics Finland, Finnish Environment Institute";
+NOTE="<A HREF=http://tilastokeskus.fi/meta/til/jate.html TARGET=_blank>Tilaston kuvaus</A>#<A HREF=http://tilastokeskus.fi/til/jate/laa.html TARGET=_blank>Laatuselosteet</A>#<A HREF=http://tilastokeskus.fi/til/jate/kas.html TARGET=_blank>Käsitteet ja "
+"määritelmät</A>#<A HREF=http://tilastokeskus.fi/til/jate/luo.html TARGET=_blank>Luokitukset</A>";
+NOTE[sv]="<A HREF=http://tilastokeskus.fi/meta/til/jate.html TARGET=_blank>Tilaston kuvaus</A>#<A HREF=http://tilastokeskus.fi/til/jate/laa.html TARGET=_blank>Laatuselosteet</A>#<A HREF=http://tilastokeskus.fi/til/jate/kas.html TARGET=_blank>Käsitteet ja "
+"määritelmät</A>#<A HREF=http://tilastokeskus.fi/til/jate/luo.html TARGET=_blank>Luokitukset</A>";
+NOTE[en]="<A HREF=http://tilastokeskus.fi/meta/til/jate.html TARGET=_blank>Tilaston kuvaus</A>#<A HREF=http://tilastokeskus.fi/til/jate/laa.html TARGET=_blank>Laatuselosteet</A>#<A HREF=http://tilastokeskus.fi/til/jate/kas.html TARGET=_blank>Käsitteet ja "
+"määritelmät</A>#<A HREF=http://tilastokeskus.fi/til/jate/luo.html TARGET=_blank>Luokitukset</A>";
+DATA=
+2200 1450 120 630 
+2300 1510 140 650 
+2400 1480 200 720 
+2600 1580 270 750 
+2402 1468 230 704 
+2384 1485 216 684 
+2428 1445 256 727 
+2453 1423 285 746 
+2506 1478 227 801 
+2600 1504 222 874 
+2675 1411 310 953 
+2768 1406 478 884 
+2562 1180 463 920 
+2520 1141 557 822 
+2718 1093 678 947 
+2738 901 925 912 
+2682 672 1137 872 
+2630 458 1316 856 
+2738 315 1312 1111 
+2768 89 1515 1164 
+2812 26 1646 1140 
+3041 22 1732 1286; 

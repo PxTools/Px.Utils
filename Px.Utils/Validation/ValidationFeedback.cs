@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 
 namespace Px.Utils.Validation
 {
@@ -12,11 +12,14 @@ namespace Px.Utils.Validation
         /// </summary>
         public void Add(KeyValuePair<ValidationFeedbackKey, ValidationFeedbackValue> item)
         {
-            if (!ContainsKey(item.Key))
+            lock (this)
             {
-                this[item.Key] = [];
+                if (!ContainsKey(item.Key))
+                {
+                    this[item.Key] = [];
+                }
+                this[item.Key].Add(item.Value);
             }
-            this[item.Key].Add(item.Value);
         }
 
         /// <summary>
@@ -25,13 +28,16 @@ namespace Px.Utils.Validation
         /// <param name="feedbacks">Feedback key value pairs to add</param>
         public void AddRange(ConcurrentDictionary<ValidationFeedbackKey, List<ValidationFeedbackValue>> feedbacks)
         {
-            foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> kvp in feedbacks)
+            lock (this)
             {
-                if (!ContainsKey(kvp.Key))
+                foreach (KeyValuePair<ValidationFeedbackKey, List<ValidationFeedbackValue>> kvp in feedbacks)
                 {
-                    this[kvp.Key] = [];
+                    if (!ContainsKey(kvp.Key))
+                    {
+                        this[kvp.Key] = [];
+                    }
+                    this[kvp.Key].AddRange(kvp.Value);
                 }
-                this[kvp.Key].AddRange(kvp.Value);
             }
         }
 

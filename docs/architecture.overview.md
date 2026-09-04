@@ -11,6 +11,7 @@ Library for reading, processing, and validating PX (PC-Axis) statistical file da
 | `Px.Utils` | Class library (NuGet) | `net10.0` | Core library — validation, models, readers, serializers, operations |
 | `Px.Utils.TestingApp` | Console app | `net10.0` | Benchmarking CLI for performance testing |
 | `Px.Utils.UnitTests` | Test project (MSTest) | `net10.0` | Unit tests for `Px.Utils` |
+| `Px.Utils.IntegrationTest` | Console app | `net10.0` | Deterministic PX database integration runner; CI consumes its process exit code |
 
 No DI container — all types instantiated directly via constructors. Configuration via `PxFileConfiguration`.
 
@@ -45,8 +46,9 @@ No DI container — all types instantiated directly via constructors. Configurat
 | Dependency | Purpose |
 |---|---|
 | `System.Text.Json` | JSON serialization of metadata models |
+| `Ude.NetStandard` | Character encoding detection for database alias files |
 
-No third-party NuGet dependencies in the main library.
+`Ude.NetStandard` is the only third-party NuGet dependency in the main library.
 
 ## File Map
 

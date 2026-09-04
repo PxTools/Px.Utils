@@ -494,6 +494,11 @@ namespace Px.Utils.UnitTests.Validation.Fixtures
                 stubEntry,
             ];
 
+        internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_HEADING =>
+            [
+                headingEntry,
+            ];
+
         internal static ValidationStructuredEntry[] STRUCTURED_ENTRY_ARRAY_WITH_DUPLICATE_DIMENSION =>
             [
                 stubEntry,
